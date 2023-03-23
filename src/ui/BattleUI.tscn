@@ -1,0 +1,108 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/ui/BattleUI.gd" type="Script" id=1]
+
+[node name="BattleUI" type="Control"]
+visible = false
+anchor_left = 0.02
+anchor_top = 0.02
+anchor_right = 0.98
+anchor_bottom = 0.98
+mouse_filter = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+options = NodePath("MarginContainer/ActionOptions")
+move_button = NodePath("MarginContainer/ActionOptions/MoveButton")
+attack_button = NodePath("MarginContainer/ActionOptions/AttackButton")
+wait_button = NodePath("MarginContainer/ActionOptions/WaitButton")
+undo_button = NodePath("MarginContainer/UndoButton")
+cancel_button = NodePath("MarginContainer/CancelButton")
+spacebar = NodePath("MarginContainer/Spacebar")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -351.8
+margin_right = -0.200073
+margin_bottom = 0.199951
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ActionOptions" type="VBoxContainer" parent="MarginContainer"]
+margin_right = 150.0
+margin_bottom = 351.0
+mouse_filter = 2
+size_flags_horizontal = 0
+custom_constants/separation = -50
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MoveButton" type="Button" parent="MarginContainer/ActionOptions"]
+margin_top = 75.0
+margin_right = 150.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 150, 75 )
+size_flags_horizontal = 0
+size_flags_vertical = 10
+text = "MOVE"
+
+[node name="AttackButton" type="Button" parent="MarginContainer/ActionOptions"]
+margin_top = 175.0
+margin_right = 150.0
+margin_bottom = 250.0
+rect_min_size = Vector2( 150, 75 )
+size_flags_horizontal = 0
+size_flags_vertical = 10
+text = "ATTACK"
+
+[node name="WaitButton" type="Button" parent="MarginContainer/ActionOptions"]
+margin_top = 276.0
+margin_right = 150.0
+margin_bottom = 351.0
+rect_min_size = Vector2( 150, 75 )
+size_flags_horizontal = 0
+size_flags_vertical = 10
+text = "WAIT"
+
+[node name="CancelButton" type="Button" parent="MarginContainer"]
+visible = false
+margin_top = 276.0
+margin_right = 150.0
+margin_bottom = 351.0
+rect_min_size = Vector2( 150, 75 )
+size_flags_horizontal = 0
+size_flags_vertical = 10
+text = "CANCEL"
+
+[node name="UndoButton" type="Button" parent="MarginContainer"]
+margin_left = 832.0
+margin_top = 276.0
+margin_right = 982.0
+margin_bottom = 351.0
+rect_min_size = Vector2( 150, 75 )
+size_flags_horizontal = 8
+size_flags_vertical = 12
+disabled = true
+text = "UNDO"
+
+[node name="Spacebar" type="PanelContainer" parent="MarginContainer"]
+margin_left = 477.0
+margin_top = 323.0
+margin_right = 505.0
+margin_bottom = 351.0
+size_flags_horizontal = 6
+size_flags_vertical = 8
+
+[node name="Label" type="Label" parent="MarginContainer/Spacebar"]
+margin_left = 14.0
+margin_top = 14.0
+margin_right = 262.0
+margin_bottom = 39.0
+text = "SPACEBAR - Next Actor"

@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/entities/Actor.tscn" type="PackedScene" id=1]
+
+[node name="Zahra" groups=[
+"enemy",
+] instance=ExtResource( 1 )]
+_mov = 2
+_hp = 4.0
+_rng = 1
+_dmg = 1.0
+start_position = Vector2( 2, 7 )
+ai_controlled = true
+
+[node name="Sprite" parent="." index="0"]
+self_modulate = Color( 0.443137, 1, 0, 1 )
+animation = "BackIdle"

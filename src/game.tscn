@@ -1,0 +1,133 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/services/StartupService.gd" type="Script" id=1]
+[ext_resource path="res://src/Game.gd" type="Script" id=2]
+
+[node name="Game" type="Node2D" groups=[
+"game",
+]]
+script = ExtResource( 2 )
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="UI" type="Control" parent="UILayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LeftWide" type="VBoxContainer" parent="UILayer/UI"]
+anchor_bottom = 1.0
+margin_right = 350.0
+rect_min_size = Vector2( 350, 0 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Free" type="Control" parent="UILayer/UI"]
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.95
+margin_top = -1.5874
+margin_bottom = -1.5874
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UILayer/UI/Free"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -168.0
+margin_bottom = 121.0
+grow_horizontal = 0
+mouse_filter = 2
+custom_constants/separation = 15
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="PanelContainer" parent="UILayer/UI/Free/VBoxContainer2"]
+self_modulate = Color( 0, 0.262745, 0.776471, 0.392157 )
+margin_right = 168.0
+margin_bottom = 53.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="UILayer/UI/Free/VBoxContainer2/Panel"]
+margin_left = 14.0
+margin_top = 14.0
+margin_right = 154.0
+margin_bottom = 39.0
+text = "F1 - Exit"
+align = 1
+valign = 1
+uppercase = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel2" type="PanelContainer" parent="UILayer/UI/Free/VBoxContainer2"]
+self_modulate = Color( 0, 0.262745, 0.776471, 0.392157 )
+margin_top = 68.0
+margin_right = 168.0
+margin_bottom = 121.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="UILayer/UI/Free/VBoxContainer2/Panel2"]
+margin_left = 14.0
+margin_top = 14.0
+margin_right = 154.0
+margin_bottom = 39.0
+text = "F2 - Restart"
+align = 1
+valign = 1
+uppercase = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Press_E" type="PanelContainer" parent="UILayer/UI/Free"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -156.0
+margin_top = -26.5
+margin_right = 156.0
+margin_bottom = 26.5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="UILayer/UI/Free/Press_E"]
+margin_left = 14.0
+margin_top = 14.0
+margin_right = 298.0
+margin_bottom = 39.0
+text = "Press E to start battle"
+align = 1
+valign = 1
+uppercase = true
+
+[node name="Services" type="Node" parent="."]
+__meta__ = {
+"_editor_description_": "Services are processes which are not accessed directly and are independent of the scene. They provide additional functionalities and data in the background."
+}
+
+[node name="StartupService" type="Node" parent="Services"]
+script = ExtResource( 1 )
+startup_scene = "res://src/Battle.tscn"
+
+[connection signal="game_restarted" from="Services/StartupService" to="." method="reload_game_scene"]
+[connection signal="game_started" from="Services/StartupService" to="." method="set_game_scene"]

@@ -1,0 +1,131 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Node2D",
+"class": "Actor",
+"language": "GDScript",
+"path": "res://src/entities/Actor.gd"
+}, {
+"base": "Control",
+"class": "BattleUI",
+"language": "GDScript",
+"path": "res://src/ui/BattleUI.gd"
+}, {
+"base": "Node",
+"class": "Dialogic",
+"language": "GDScript",
+"path": "res://addons/dialogic/Other/DialogicClass.gd"
+}, {
+"base": "Control",
+"class": "DialogicBackgroundMusic",
+"language": "GDScript",
+"path": "res://addons/dialogic/Nodes/BackgroundMusic.gd"
+}, {
+"base": "Node",
+"class": "DialogicDefinitionsUtil",
+"language": "GDScript",
+"path": "res://addons/dialogic/Other/DialogicDefinitionsUtil.gd"
+}, {
+"base": "Reference",
+"class": "DialogicResources",
+"language": "GDScript",
+"path": "res://addons/dialogic/Other/DialogicResources.gd"
+}, {
+"base": "Reference",
+"class": "DialogicUtil",
+"language": "GDScript",
+"path": "res://addons/dialogic/Other/DialogicUtil.gd"
+}, {
+"base": "Node2D",
+"class": "Grid",
+"language": "GDScript",
+"path": "res://src/entities/Grid.gd"
+}, {
+"base": "Node2D",
+"class": "Tile",
+"language": "GDScript",
+"path": "res://src/entities/Tile.gd"
+} ]
+_global_script_class_icons={
+"Actor": "",
+"BattleUI": "",
+"Dialogic": "",
+"DialogicBackgroundMusic": "",
+"DialogicDefinitionsUtil": "",
+"DialogicResources": "",
+"DialogicUtil": "",
+"Grid": "",
+"Tile": ""
+}
+
+[application]
+
+config/name="Egyptian Fantasy"
+run/main_scene="res://src/Game.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+WaitUtil="*res://src/singletons/WaitUtil.gd"
+Globals="*res://src/singletons/Globals.gd"
+DialogicSingleton="*res://addons/dialogic/Other/DialogicSingleton.gd"
+
+[debug]
+
+gdscript/warnings/unassigned_variable=false
+gdscript/warnings/unassigned_variable_op_assign=false
+gdscript/warnings/unused_variable=false
+gdscript/warnings/unused_argument=false
+gdscript/warnings/narrowing_conversion=false
+gdscript/warnings/unused_signal=false
+gdscript/warnings/return_value_discarded=false
+
+[display]
+
+window/size/width=1920
+window/size/height=1080
+window/size/resizable=false
+window/size/borderless=true
+window/dpi/allow_hidpi=true
+window/stretch/mode="2d"
+window/stretch/aspect="keep_width"
+
+[editor_plugins]
+
+enabled=PoolStringArray(  )
+
+[gui]
+
+theme/use_hidpi=true
+
+[layer_names]
+
+2d_physics/layer_1="actor"
+2d_physics/layer_2="tile"
+
+[physics]
+
+common/enable_pause_aware_picking=true
+2d/thread_model=2
+
+[rendering]
+
+quality/driver/fallback_to_gles2=true
+quality/intended_usage/framebuffer_allocation=0
+quality/intended_usage/framebuffer_allocation.mobile=1
+threads/thread_model=2
+quality/filters/anisotropic_filter_level=16
+batching/precision/uv_contract=true
+quality/subsurface_scattering/quality=2
+quality/subsurface_scattering/follow_surface=true
+quality/voxel_cone_tracing/high_quality=true
+quality/filters/msaa=3
+environment/default_environment="res://default_env.tres"
