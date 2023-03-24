@@ -3,9 +3,7 @@
 [ext_resource path="res://src/services/StartupService.gd" type="Script" id=1]
 [ext_resource path="res://src/Game.gd" type="Script" id=2]
 
-[node name="Game" type="Node2D" groups=[
-"game",
-]]
+[node name="Game" type="Node2D" groups=["game"]]
 script = ExtResource( 2 )
 
 [node name="UILayer" type="CanvasLayer" parent="."]

@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Node2D",
+"base": "Reference",
 "class": "Actor",
 "language": "GDScript",
 "path": "res://src/entities/Actor.gd"
@@ -49,7 +49,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/entities/Grid.gd"
 }, {
-"base": "Node2D",
+"base": "Reference",
 "class": "Tile",
 "language": "GDScript",
 "path": "res://src/entities/Tile.gd"
@@ -128,4 +128,4 @@ quality/subsurface_scattering/quality=2
 quality/subsurface_scattering/follow_surface=true
 quality/voxel_cone_tracing/high_quality=true
 quality/filters/msaa=3
-environment/default_environment="res://default_env.tres"
+environment/default_environment="res://Default_env.tres"
