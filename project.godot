@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Reference",
+"base": "Node2D",
 "class": "Actor",
 "language": "GDScript",
 "path": "res://src/entities/Actor.gd"
@@ -44,12 +44,22 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/dialogic/Other/DialogicUtil.gd"
 }, {
+"base": "Node",
+"class": "Empire",
+"language": "GDScript",
+"path": "res://Empire2.gd"
+}, {
 "base": "Node2D",
 "class": "Grid",
 "language": "GDScript",
 "path": "res://src/entities/Grid.gd"
 }, {
-"base": "Reference",
+"base": "TextureButton",
+"class": "Territory",
+"language": "GDScript",
+"path": "res://Scenes/OverWorld Scenes/Territory.gd"
+}, {
+"base": "Node2D",
 "class": "Tile",
 "language": "GDScript",
 "path": "res://src/entities/Tile.gd"
@@ -62,7 +72,9 @@ _global_script_class_icons={
 "DialogicDefinitionsUtil": "",
 "DialogicResources": "",
 "DialogicUtil": "",
+"Empire": "",
 "Grid": "",
+"Territory": "",
 "Tile": ""
 }
 
@@ -93,7 +105,6 @@ gdscript/warnings/return_value_discarded=false
 window/size/width=1920
 window/size/height=1080
 window/size/resizable=false
-window/size/borderless=true
 window/dpi/allow_hidpi=true
 window/stretch/mode="2d"
 window/stretch/aspect="keep_width"
@@ -105,6 +116,19 @@ enabled=PoolStringArray(  )
 [gui]
 
 theme/use_hidpi=true
+
+[input]
+
+left_klick={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+right_klick={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":2,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
 
 [layer_names]
 
