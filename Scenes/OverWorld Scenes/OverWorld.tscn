@@ -1,11 +1,14 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://assets/Map_wo_Separators_Color_Filters_Blank.png" type="Texture" id=1]
+[ext_resource path="res://Scenes/OverWorld Scenes/Territory.tscn" type="PackedScene" id=2]
+[ext_resource path="res://OverworldGameManager.gd" type="Script" id=3]
 
 [node name="OverWorld" type="Node2D"]
+script = ExtResource( 3 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = -100
+layer = -1
 
 [node name="WorldMapBG" type="TextureRect" parent="CanvasLayer"]
 margin_left = -36.0
@@ -14,3 +17,73 @@ margin_right = 1964.0
 margin_bottom = 1127.0
 texture = ExtResource( 1 )
 expand = true
+
+[node name="Territory1" parent="." instance=ExtResource( 2 )]
+margin_left = 1422.0
+margin_top = 722.0
+margin_right = 5736.0
+margin_bottom = 3214.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory2" parent="." instance=ExtResource( 2 )]
+margin_left = 1432.0
+margin_top = 494.0
+margin_right = 5746.0
+margin_bottom = 2986.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory3" parent="." instance=ExtResource( 2 )]
+margin_left = 1517.0
+margin_top = 182.0
+margin_right = 5831.0
+margin_bottom = 2674.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory4" parent="." instance=ExtResource( 2 )]
+margin_left = 1159.0
+margin_top = 166.0
+margin_right = 5473.0
+margin_bottom = 2658.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory5" parent="." instance=ExtResource( 2 )]
+margin_left = 1023.0
+margin_top = 455.0
+margin_right = 5337.0
+margin_bottom = 2947.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory6" parent="." instance=ExtResource( 2 )]
+margin_left = 890.0
+margin_top = 668.0
+margin_right = 5204.0
+margin_bottom = 3160.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory7" parent="." instance=ExtResource( 2 )]
+margin_left = 764.0
+margin_top = 170.0
+margin_right = 5078.0
+margin_bottom = 2662.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory8" parent="." instance=ExtResource( 2 )]
+margin_left = 515.0
+margin_top = 412.0
+margin_right = 4829.0
+margin_bottom = 2904.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory9" parent="." instance=ExtResource( 2 )]
+margin_left = 276.0
+margin_top = 646.0
+margin_right = 4590.0
+margin_bottom = 3138.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )
+
+[node name="Territory10" parent="." instance=ExtResource( 2 )]
+margin_left = 236.0
+margin_top = 182.0
+margin_right = 4550.0
+margin_bottom = 2674.0
+rect_scale = Vector2( 0.0627217, 0.0627217 )

@@ -1,25 +1,44 @@
-class_name Territory extends TextureButton
-tool
-#class Territory
+extends TextureButton
 
+class_name Territory
 
-export var TerritoryName : String
+# Exposed properties
+export var territory_name: String = ""
+export var adjacient_territories: Array = []
+export var units: Array = []
+export var training_battle_scenes: Array = []
+export var invasion_scene: PackedScene
 
-var Units : Array 
-var AdjacientTerritories : Array 
-var InvasionBattleground : Node 
-var TrainingBattegrounds : Array
-var Owner : Node 
+# Internal properties
+var owner_name_label: Label
 
+# Change owner function
+# Change owner function
+func change_owner(new_owner: String) -> void:
+	# Change owner name label
+	owner_name_label.text = new_owner
+	
+	# Change texture for all button states
+	var texture_path = "res://assets/CharacterPotraits2/" + new_owner + ".png"
+	var texture = load(texture_path)
+	set_button_texture(texture)
 
-func update_text() -> void:
-	pass
+	# Generate click mask from the image
+	var click_mask = ImageTexture.new()
+	click_mask.create_from_image_alpha(texture.get_data())
+	set_click_mask(click_mask)
 
-# Called when the node enters the scene tree for the first time.
+# Set button texture for all states
+func set_button_texture(texture: Texture) -> void:
+	texture_normal = texture
+	texture_hover = texture
+	texture_pressed = texture
+	texture_disabled = texture
+
+# Initialization
 func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-#	pass
+	# Find owner name label by name
+	owner_name_label = $OwnerName
+	
+	# Connect the button's pressed signal to handle invasion
+	#connect("pressed", self, "_on_territory_pressed")
