@@ -47,7 +47,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "Empire",
 "language": "GDScript",
-"path": "res://Empire2.gd"
+"path": "res://Empire.gd"
 }, {
 "base": "Node2D",
 "class": "Grid",

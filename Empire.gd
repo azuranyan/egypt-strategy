@@ -1,55 +1,70 @@
 extends Node
 
-export(float, 0, 1) var aggression_rating = 0.0
-var territories = []
-var units = []
-var leader = 5
-export var is_AI_controlled = true
-export var use_mock_str_rateing = true
-export(float, 0, 1) var mock_strength_rating: float = 0.5
-var strength_rating = 0.5
-var hp_multiplier: float = 1.0
+class_name Empire
 
+# Exposed properties
+export var leader: String = ""
+export var leader_unit: NodePath
+export var territories: Array = []
+export var adjacent_territories: Array = []
+var Units : Array = []
+
+
+# Internal properties
 var home_territory
 
-func _ready():
-	pass
-
-func calculate_strength_rating():
-	if use_mock_str_rateing == false:
-		var random_factor = randf() * 0.2
-		strength_rating = territories.size() * leader.power * random_factor
-	else:
-		strength_rating = randf() * 0.2 + mock_strength_rating
-
-func win_territory(territory):
-	for each_unit in territory.home_turf_units:
-		units.append(each_unit)
-	territories.append(territory)
-	territory.set_owner(leader)
-	territory.owner_empire = self
+# Update adjacent territories when gaining a territory
+func update_adjacent_territories() -> void:
+	adjacent_territories.clear()
 	
-func lose_territory(territory):
-	for each_unit in territory.home_turf_units:
-		units.remove(each_unit)
-	territories.remove(territory)
+	for territory_path in territories:
+		var territory = get_node(territory_path)
+		if territory != null and territory is Territory:
+			for adjacent_territory in territory.adjacent_territories:
+				if adjacent_territory.empire_owner != self and !adjacent_territories.find(adjacent_territory) == -1:
+					adjacent_territories.append(adjacent_territory)
+	
+	# Remove duplicate entries
+	adjacent_territories = remove_duplicates(adjacent_territories)
+	
+# Remove duplicates from an array
+func remove_duplicates(array: Array) -> Array:
+	var unique_array = []
+	
+	for item in array:
+		if !unique_array.includes(item):
+			unique_array.append(item)
+	
+	return unique_array
 
-func get_adjacent_territories():
-	var adjacent_territories = []
-	for territory in territories:
-		for adjacent in territory.adjacent_territories:
-			if not adjacent in territories and not adjacent in adjacent_territories:
-				adjacent_territories.append(adjacent)
-	return adjacent_territories
+# Check if a territory is adjacent to the empire
+func is_territory_adjacent(territory: Territory) -> bool:
+	return true if adjacent_territories.find(territory) != -1 else false
 
-func set_hp_multiplier(value: float):
-	hp_multiplier = value
-
-func reset_hp_multiplier():
-	hp_multiplier = 1.0
-
-func rest_action():
-	reset_hp_multiplier()
+# Get units of all controlled territories
+func get_controlled_units() -> Array:
+	var controlled_units = []
+	
+	for territory_path in territories:
+		var territory = get_node(territory_path)
+		if territory != null and territory is Territory:
+			controlled_units += territory.units
+	
+	return controlled_units
 
 func has_been_beaten() -> bool:
 	return territories.empty()
+	
+func win_territory(territory):
+	territories.append(territory)
+	territory.change_owner(leader)
+	territory.owner_empire = self
+	
+func lose_territory(territory):
+	territories.remove(territory)
+
+# Initialization
+func _ready() -> void:
+	
+	# Update adjacent territories on startup
+	update_adjacent_territories()

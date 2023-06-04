@@ -1,17 +1,123 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://assets/CharacterPotraits2/Alara.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/OverWorld Scenes/Territory.gd" type="Script" id=2]
+[ext_resource path="res://assets/ButtonImages/BGColor.png" type="Texture" id=4]
+[ext_resource path="res://assets/ButtonImages/AttackButton.png" type="Texture" id=5]
+[ext_resource path="res://assets/Themes/MenuTheme.tres" type="Theme" id=6]
+
+[sub_resource type="Animation" id=1]
+resource_name = "Appear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("../CanvasLayer/ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../CanvasLayer/ColorRect/TextureButton:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../CanvasLayer/ColorRect/OwnerAndStrengthLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("../CanvasLayer/ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../CanvasLayer/ColorRect/TextureButton:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../CanvasLayer/ColorRect/OwnerAndStrengthLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "StartAnimation"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("../CanvasLayer/ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../CanvasLayer/ColorRect/TextureButton:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, true ]
+}
 
 [node name="Territory" type="TextureButton"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -1120.0
-margin_top = -621.0
-margin_right = -796.0
-margin_bottom = -439.0
+margin_left = -160.0
+margin_top = -81.0
+margin_right = 164.0
+margin_bottom = 101.0
 texture_normal = ExtResource( 1 )
 texture_pressed = ExtResource( 1 )
 texture_hover = ExtResource( 1 )
@@ -19,7 +125,82 @@ texture_disabled = ExtResource( 1 )
 texture_focused = ExtResource( 1 )
 expand = true
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../Label")
+autoplay = "StartAnimation"
+anims/Appear = SubResource( 1 )
+anims/RESET = SubResource( 2 )
+anims/StartAnimation = SubResource( 3 )
 
 [node name="Label" type="Label" parent="."]
-margin_right = 40.0
-margin_bottom = 25.0
+anchor_left = 0.494
+anchor_top = 0.445
+anchor_right = 0.494
+anchor_bottom = 0.445
+margin_left = -152.056
+margin_top = 59.01
+margin_right = 157.944
+margin_bottom = 102.01
+theme = ExtResource( 6 )
+text = "Default Name"
+align = 1
+valign = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+modulate = Color( 1, 1, 1, 0 )
+margin_left = -239.0
+margin_top = 80.0
+margin_right = 279.0
+margin_bottom = 254.0
+rect_scale = Vector2( 0.924943, 0.740841 )
+color = Color( 0, 0, 0, 1 )
+
+[node name="BgColor" type="TextureRect" parent="CanvasLayer/ColorRect"]
+anchor_left = 0.499
+anchor_top = -0.621
+anchor_right = 0.499
+anchor_bottom = -0.621
+margin_left = -253.482
+margin_top = 113.054
+margin_right = 506.518
+margin_bottom = 361.054
+rect_scale = Vector2( 0.66745, 0.666113 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="TextureButton" type="TextureButton" parent="CanvasLayer/ColorRect"]
+margin_left = 126.494
+margin_top = 130.932
+margin_right = 462.494
+margin_bottom = 200.932
+rect_scale = Vector2( 0.779385, 0.963181 )
+disabled = true
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_disabled = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+
+[node name="OwnerAndStrengthLabel" type="Label" parent="CanvasLayer/ColorRect"]
+margin_left = 6.48689
+margin_top = 28.3462
+margin_right = 433.487
+margin_bottom = 96.3462
+rect_scale = Vector2( 1.18122, 1.37579 )
+theme = ExtResource( 6 )
+text = "Enemy Leaders: %s
+Force Strength: %s"
+align = 1
+valign = 1
+
+[connection signal="focus_entered" from="." to="." method="_on_Territory_focus_entered"]
+[connection signal="mouse_entered" from="." to="." method="_on_Territory_mouse_entered"]

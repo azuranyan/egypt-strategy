@@ -10,13 +10,21 @@ export var training_battle_scenes: Array = []
 export var invasion_scene: PackedScene
 
 # Internal properties
-var owner_name_label: Label
+onready var owner_name_label: Label = get_node("CanvasLayer/ColorRect/OwnerAndStrengthLabel")
+var strength = "Full"
+var owner_name = ""
+
+func update_display_strength(new_strength):
+	strength = new_strength
+	owner_name_label.text = owner_name_label.text % [owner_name,strength]
+	
+func update_owner(new_owner):
+	owner_name = new_owner
+	owner_name_label.text = owner_name_label.text % [owner_name,strength]
 
 # Change owner function
-# Change owner function
 func change_owner(new_owner: String) -> void:
-	# Change owner name label
-	owner_name_label.text = new_owner
+	update_owner(new_owner)
 	
 	# Change texture for all button states
 	var texture_path = "res://assets/CharacterPotraits2/" + new_owner + ".png"
@@ -37,8 +45,16 @@ func set_button_texture(texture: Texture) -> void:
 
 # Initialization
 func _ready() -> void:
+	pass
 	# Find owner name label by name
-	owner_name_label = $OwnerName
-	
 	# Connect the button's pressed signal to handle invasion
 	#connect("pressed", self, "_on_territory_pressed")
+
+
+func _on_Territory_mouse_entered() -> void:
+	_on_Territory_focus_entered()
+	
+
+func _on_Territory_focus_entered() -> void:
+	$AnimationPlayer.play("Appear")
+

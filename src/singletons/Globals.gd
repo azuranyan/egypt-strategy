@@ -1,18 +1,30 @@
 extends Node
 #var MENU_COLOR_BEIGE = Color(239/255,230/255,221/255,1.0)
 var MENU_COLOR_BEIGE = Color(0.937, 0.902, 0.867)
-
-enum Gods {Player,Sutekh,NykaraM,Maia,IshtarM,Eirene,Alara}
-const Gods_Array = ["Player","Sutekh","NykaraM","Maia","IshtarM","Eirene","Alara"]
-
-var Empire_Idle_Chance ={ # This is the chance that CPUs will Idle their turn.
-	1:0.1, # Idle chance of the God inhabiting Neru-Khisi
-	2:0.2,# Idle chance of Satayi starter God
-	3:0.2,# Khel-Et & Forsaken Temple
-	4:0.5,# Medjed'sBeacon and Fort Zaka 
-	5:0.5,#  RuinsOfAtesh and Nekhet's Rest
-	6:0.5 # 1.0 is always 0.0 is never
-}
+var FINAL_BOSS_GOD = Gods.Sitri
+enum Gods {
+	Player,
+	Maia_and_Menna,
+	Zahra,
+	Ishtar,
+	Alara,
+	Sutekh,
+	Eirene,
+	Nykara,
+	Tali,
+	Sitri
+	}
+const Gods_Array = [
+"Player",
+"Maia and Menna",
+"Zahra",
+"Ishtar",
+"Alara",
+"Sutekh",
+"Eirene",
+"Nykara",
+"Tali",
+"Sitri"]
 
 const GRID_DIM := 8
 const TILE_W := 311.0
