@@ -1,0 +1,101 @@
+[gd_scene load_steps=4 format=3 uid="uid://c11gexecl1hvb"]
+
+[ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
+[ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
+[ext_resource type="PackedScene" uid="uid://bgqlbxk6ulnwb" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
+
+[node name="Overworld" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mrexs")
+
+[node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
+position = Vector2(-36, -21)
+texture = ExtResource("2_gnts6")
+centered = false
+
+[node name="Territory1" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 1422.0
+offset_top = 722.0
+offset_right = 5736.0
+offset_bottom = 3214.0
+scale = Vector2(0.063, 0.063)
+territory_name = "Zetennu"
+
+[node name="Territory2" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 1444.0
+offset_top = 477.0
+offset_right = 5758.0
+offset_bottom = 2969.0
+scale = Vector2(0.063, 0.063)
+territory_name = "Neru-Khisi"
+
+[node name="Territory3" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 1501.0
+offset_top = 186.0
+offset_right = 5815.0
+offset_bottom = 2678.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory4" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 1165.0
+offset_top = 171.0
+offset_right = 5479.0
+offset_bottom = 2663.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory5" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 1009.0
+offset_top = 451.0
+offset_right = 5323.0
+offset_bottom = 2943.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory6" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 923.0
+offset_top = 711.0
+offset_right = 5237.0
+offset_bottom = 3203.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory7" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 739.0
+offset_top = 181.0
+offset_right = 5053.0
+offset_bottom = 2673.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory8" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 529.0
+offset_top = 419.0
+offset_right = 4843.0
+offset_bottom = 2911.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory9" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 268.0
+offset_top = 676.0
+offset_right = 4582.0
+offset_bottom = 3168.0
+scale = Vector2(0.063, 0.063)
+
+[node name="Territory10" parent="." instance=ExtResource("3_aby1e")]
+layout_mode = 0
+offset_left = 230.0
+offset_top = 168.0
+offset_right = 4544.0
+offset_bottom = 2660.0
+scale = Vector2(0.063, 0.063)

@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bgqlbxk6ulnwb"]
+
+[ext_resource type="Texture2D" uid="uid://k77qjplmssw2" path="res://Screens/Alara.png" id="1_p0g38"]
+[ext_resource type="Script" path="res://Screens/Overworld/TerritoryButton.gd" id="1_vyiyw"]
+
+[node name="TerritoryButton" type="TextureButton"]
+texture_normal = ExtResource("1_p0g38")
+script = ExtResource("1_vyiyw")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 1925.0
+offset_right = 4276.0
+offset_bottom = 2447.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 380
+text = "Yabadabadoo"
+horizontal_alignment = 1
