@@ -1,5 +1,5 @@
 @tool
-extends Node
+extends Button 
 
 # Editable from the interface are:
 # 	territory name
