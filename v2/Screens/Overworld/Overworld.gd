@@ -15,8 +15,14 @@ const all_territories_taken := 'overworld.all_territories_taken'
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("ready: overworld")
-
-
+	
+	var test := Empire.new()
+	test.leader = Territory.Unused.name
+	test.territories = [Territory.all[1], Territory.all[3], Territory.all[5]]
+	var v = test.get_adjacent()
+	for e in v:
+		print(e.name)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass

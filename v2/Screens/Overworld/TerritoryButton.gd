@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 # Editable from the interface are:
@@ -13,19 +14,33 @@ extends Node
 # 	pos
 #	portrait
 
+# TODO global space where all predefined data are accessible
+@export_enum(
+		"Zetennu",
+		"Neru-Khisi",
+		"Satayi",
+		"Khel-Et",
+		"Medjed's Beacon",
+		"Fort Zaka",
+		"Forsaken Temple",
+		"Ruins of Atesh",
+		"Nekhet's Rest",
+		"Cursed Stronghold"
+	) var territory: String:
+		get:
+			return territory
+		set(value):
+			territory = value
+			$Label.text = value
 
-@export var territory_name: String:
-	get:
-		return territory_name
-	set(value):
-		_territory = Territory.new(value, "")
-		territory_name = _territory.name
-		$Label.text = territory_name
-		
-@export var territory_mapscene: String
-		
+@export var mapscene: String
 
 var _territory: Territory = null
 
 func _ready():
-	print("ready: territorybutton " + territory_name)
+	print("ready: territory button")
+	if Engine.is_editor_hint():
+		pass
+	else:
+		_territory = Territory.get_territory(territory)
+		$Label.text = territory
