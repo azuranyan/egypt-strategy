@@ -12,17 +12,88 @@ const turn_end := 'overworld.turn_end'
 const win_territory := 'overworld.win_territory'
 const all_territories_taken := 'overworld.all_territories_taken'
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("ready: overworld")
+		
+	assign_empires_to_territory()
+	for e in Territory.all:
+		var territory: String = e.name
+		var leader: String = e.owner.leader.name
+		var player_controlled: bool = e.owner.leader == God.Player
+		print("Territory: <%s>; Leader: <%s>; PlayerControlled: <%s>" %
+			[territory, leader, player_controlled])
 	
-	var test := Empire.new()
-	test.leader = Territory.Unused.name
-	test.territories = [Territory.all[1], Territory.all[3], Territory.all[5]]
-	var v = test.get_adjacent()
-	for e in v:
-		print(e.name)
+	# TODO if on game phase xxx, show but by default it should be hidden
+	# $Territory10.show()
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+
+# Player is fixed, Sitri is last boss, Hesra and Nebet are special side charas
+#static var territory_selection: Array[God] = [Maia, Zahra, Ishtar, Alara, Sutekh, Eirene, Nyaraka, Tali]
+
+func assign_empires_to_territory():
+	# for now the empires are created here, later when we have
+	# level and unit definitions they will have their own place
+	
+	# special territories
+	# [0] = unused/hesra, [1] = player, [-1] = final boss
+	var dummy_empire = Empire.new()
+	dummy_empire.leader = God.Hesra
+	empire_give_territory(null, dummy_empire, Territory.all[0])
+	Globals.empires.push_back(dummy_empire)
+	
+	var player_empire = Empire.new()
+	player_empire.leader = God.Player
+	empire_give_territory(null, player_empire, Territory.all[1])
+	Globals.empires.push_back(player_empire)
+	
+	var boss_empire = Empire.new()
+	boss_empire.leader = God.Sitri
+	empire_give_territory(null, boss_empire, Territory.all[-1])
+	Globals.empires.push_back(player_empire)
+	
+	# randomized selection
+	var selection := God.territory_selection.duplicate()
+	selection.shuffle()
+	
+	# we're assigning random gods starting from [2] up to [9]
+	# there's an unenforced coupling in the number of gods and territories
+	# (at least gods >= territory) so this should work fine
+	var i = 2
+	while !selection.is_empty():
+		var god: God = selection.pop_back()
+		
+		var random_empire = Empire.new()
+		random_empire.leader = god
+		empire_give_territory(null, random_empire, Territory.all[i])
+		Globals.empires.push_back(player_empire)
+		i += 1
+		
+	
+
+#func _process(delta):
+#	pass
+	
+
+# api functions?
+func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Territory):
+	# take
+	if from_empire != null:
+		from_empire.territories.erase(territory)
+		
+	# give
+	to_empire.territories.append(territory)
+	
+	# change owner
+	territory.owner = to_empire
+	
+	# broadcast
+	MessageBus.territory_owner_changed.emit(from_empire, to_empire, territory)
+	
+func territory_set_owner(territory: Territory, new_empire: Empire):
+	var old_empire: Empire = territory.owner
+	empire_give_territory(old_empire, new_empire, territory)
+	
+

@@ -1,0 +1,61 @@
+[gd_scene load_steps=6 format=3 uid="uid://bgqlbxk6ulnwb"]
+
+[ext_resource type="Texture2D" uid="uid://k77qjplmssw2" path="res://Screens/Alara.png" id="1_p0g38"]
+[ext_resource type="Script" path="res://Screens/Overworld/TerritoryButton.gd" id="1_vyiyw"]
+[ext_resource type="Texture2D" uid="uid://c1tjvvva43kas" path="res://Screens/Overworld/ExpandedButton/BGColor - Outline.png" id="3_24emm"]
+[ext_resource type="Texture2D" uid="uid://b75cl1cl5ds5e" path="res://Screens/Overworld/ExpandedButton/BGColor.png" id="4_b4fx5"]
+[ext_resource type="Texture2D" uid="uid://k1lgvb5f4f0l" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="5_ij8ad"]
+
+[node name="TerritoryButton" type="TextureButton"]
+texture_normal = ExtResource("1_p0g38")
+script = ExtResource("1_vyiyw")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 1925.0
+offset_right = 4276.0
+offset_bottom = 2447.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 380
+text = "Yabadabadoo"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 34.0
+offset_top = 1911.0
+offset_right = 4280.0
+offset_bottom = 2458.0
+
+[node name="ExtendedA" type="CanvasLayer" parent="."]
+layer = -1
+visible = false
+
+[node name="BgColor-Outline" type="Sprite2D" parent="ExtendedA"]
+position = Vector2(2167, 3476)
+scale = Vector2(7.23403, 9.24522)
+texture = ExtResource("3_24emm")
+
+[node name="BgColor" type="Sprite2D" parent="ExtendedA"]
+position = Vector2(2167, 3476)
+scale = Vector2(7.09474, 8.90121)
+texture = ExtResource("4_b4fx5")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ExtendedA/BgColor"]
+offset_left = -336.0
+offset_top = -78.0
+offset_right = 333.0
+offset_bottom = 41.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 40
+text = "Enemy Leader(s): %s
+Force Strength: %s"
+
+[node name="AttackButton" type="Sprite2D" parent="ExtendedA"]
+position = Vector2(2273, 4554)
+scale = Vector2(8.09822, 9.73571)
+texture = ExtResource("5_ij8ad")
+
+[connection signal="toggled" from="." to="." method="_on_toggled"]

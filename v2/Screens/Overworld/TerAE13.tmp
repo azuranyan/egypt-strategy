@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bgqlbxk6ulnwb"]
+[gd_scene load_steps=7 format=3 uid="uid://bgqlbxk6ulnwb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/TerritoryButton.gd" id="1_vyiyw"]
 [ext_resource type="Texture2D" uid="uid://c1tjvvva43kas" path="res://Screens/Overworld/ExpandedButton/BGColor - Outline.png" id="3_24emm"]
@@ -6,7 +6,6 @@
 [ext_resource type="ButtonGroup" uid="uid://de7k1tuawexim" path="res://Screens/Overworld/TerritoryButtonGroup.tres" id="5_6xcty"]
 [ext_resource type="Texture2D" uid="uid://k1lgvb5f4f0l" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="5_ij8ad"]
 [ext_resource type="Texture2D" uid="uid://wgrleifymsqc" path="res://Screens/Overworld/ButtonImage/Alara.png" id="6_2p5nu"]
-[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="7_y88vb"]
 
 [node name="TerritoryButton" type="Control"]
 layout_mode = 3
@@ -15,43 +14,33 @@ script = ExtResource("1_vyiyw")
 territory = "Zetennu"
 
 [node name="ExtendedEnemyPanel" type="Control" parent="."]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 
 [node name="BgColor-Outline" type="Sprite2D" parent="ExtendedEnemyPanel"]
-position = Vector2(2167, 2990.5)
-scale = Vector2(7.53947, 6.46371)
+position = Vector2(2167, 3476)
+scale = Vector2(7.23403, 9.24522)
 texture = ExtResource("3_24emm")
 
 [node name="BgColor" type="Sprite2D" parent="ExtendedEnemyPanel"]
-position = Vector2(2167, 2990.63)
-scale = Vector2(7.45, 6.18246)
+position = Vector2(2167, 3476)
+scale = Vector2(7.09474, 8.90121)
 texture = ExtResource("4_b4fx5")
 
-[node name="LeaderLabel" type="Label" parent="ExtendedEnemyPanel"]
-offset_left = 39.0
-offset_top = 3027.0
-offset_right = 4276.0
-offset_bottom = 3549.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 380
-text = "Force Strength: %s"
-horizontal_alignment = 1
-
-[node name="ForceLabel" type="Label" parent="ExtendedEnemyPanel"]
-offset_left = 39.0
-offset_top = 2588.0
-offset_right = 4276.0
-offset_bottom = 3110.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 380
-text = "Enemy Leader: %s"
-horizontal_alignment = 1
+[node name="RichTextLabel" type="RichTextLabel" parent="ExtendedEnemyPanel/BgColor"]
+offset_left = -336.0
+offset_top = -78.0
+offset_right = 333.0
+offset_bottom = 41.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 40
+text = "Enemy Leader(s): %s
+Force Strength: %s"
+metadata/_edit_use_anchors_ = true
 
 [node name="AttackButton" type="Sprite2D" parent="ExtendedEnemyPanel"]
-position = Vector2(2166, 3838)
+position = Vector2(2273, 4554)
 scale = Vector2(8.09822, 9.73571)
 texture = ExtResource("5_ij8ad")
 
@@ -104,19 +93,23 @@ toggle_mode = true
 button_group = ExtResource("5_6xcty")
 texture_normal = ExtResource("6_2p5nu")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 34.0
+offset_top = 1911.0
+offset_right = 4280.0
+offset_bottom = 2458.0
+
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
 offset_left = 39.0
-offset_top = 1966.0
+offset_top = 1925.0
 offset_right = 4276.0
-offset_bottom = 2500.0
-theme_override_colors/font_color = Color(0.290196, 0.180392, 0.105882, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 13
-theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 500
+offset_bottom = 2447.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 380
 text = "Zetennu"
 horizontal_alignment = 1
-vertical_alignment = 1
 
 [connection signal="toggled" from="TextureButton" to="." method="_on_texture_button_toggled"]

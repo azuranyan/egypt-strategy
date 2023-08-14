@@ -1,62 +1,65 @@
 class_name Territory
 
 var name: String
-var mapscene: String
+var battlemap_id: String # id of the battle scene loaded by battle manager
 var adjacent: Array[int]
-var units: Array[String]
-var owner: String
+var units: Array[Unit] # territory owns this
+var owner: Empire
 
 func _init(name: String):
 	self.name = name
-	self.owner = ""
+	self.owner = null
+	# if adjusted, adjust everything with territory_names
+	# grep territory_names
 	match name:
 		"Unused":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = []
 			self.units = []
 		"Zetennu":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [2]
 			self.units = []
 		"Neru-Khisi":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [1, 3, 7]
 			self.units = []
 		"Satayi":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [2, 4]
 			self.units = []
 		"Khel-Et":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [3, 5]
 			self.units = []
 		"Forsaken Temple":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [4, 6]
 			self.units = []
 		"Medjed's Beacon":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [5, 7, 9]
 			self.units = []
 		"Fort Zaka":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [2, 6, 8]
 			self.units = []
 		"Nekhet's Rest":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [7]
 			self.units = []
 		"Ruins of Atesh":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = [6]
 			self.units = []
 		"Cursed Stronghold":
-			self.mapscene = ""
+			self.battlemap_id = ""
 			self.adjacent = []
 			self.units = []
 		_:
 			assert(false, "Invalid territory name '" + name + "'")
 
+# Returns a new(!!) list of adjacent territories
 func get_adjacent() -> Array[Territory]:
 	# this needs indirection because we cannot directly
 	# reference territory nodes during initialization
@@ -66,6 +69,22 @@ func get_adjacent() -> Array[Territory]:
 	for i in range(adjacent.size()):
 		re[i] = all[adjacent[i]]
 	return re
+
+# Returns a new(!!) list of leader units
+func get_leaders() -> Array[Unit]:
+	var re: Array[Unit] = []
+	for e in units:
+		if e.is_leader():
+			re.append(e)
+	return re
+	
+func get_force_strength() -> String:
+	# TODO add ratings later
+	return "Full"
+
+################################################################################
+## Territory definition
+################################################################################
 
 static var Unused := Territory.new("Unused")
 static var Zetennu := Territory.new("Zetennu")
@@ -80,7 +99,7 @@ static var Ruins_of_Atesh := Territory.new("Ruins of Atesh")
 static var Cursed_Stronghold := Territory.new("Cursed Stronghold")
 
 static var all: Array[Territory] = [
-	Unused,
+	Unused, # 0
 	Zetennu,
 	Neru_Khisi,
 	Satayi,
@@ -90,11 +109,11 @@ static var all: Array[Territory] = [
 	Fort_Zaka,
 	Nekhets_Rest,
 	Ruins_of_Atesh,
-	Cursed_Stronghold,
+	Cursed_Stronghold, # 10
 ]
 
 static func get_territory(name: String) -> Territory:
 	for e in all:
 		if e.name == name: return e
-	assert(false, "get_territory null")
+	assert(false, "get_territory <%s> null" % name)
 	return null

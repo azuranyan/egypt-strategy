@@ -1,5 +1,5 @@
 @tool
-extends Button 
+extends Node 
 
 # Editable from the interface are:
 # 	territory name
@@ -16,6 +16,8 @@ extends Button
 
 # TODO global space where all predefined data are accessible
 @export_enum(
+	# if adjusted, adjust everything with territory_names
+	# grep territory_names
 		"Zetennu",
 		"Neru-Khisi",
 		"Satayi",
@@ -31,16 +33,42 @@ extends Button
 			return territory
 		set(value):
 			territory = value
-			$Label.text = value
-
+			if Engine.is_editor_hint():
+				$Label.text = value
+	
 @export var mapscene: String
 
 var _territory: Territory = null
 
 func _ready():
-	print("ready: territory button")
 	if Engine.is_editor_hint():
-		pass
+		print("[editor] ready: territory <%s> button" % territory)
 	else:
+		print("ready: territory <%s> button" % territory)
 		_territory = Territory.get_territory(territory)
 		$Label.text = territory
+	
+	# you can't do this here because we're initialized first before overworld
+	# there should be a messagebus object or node that gets initialized before
+	# everything else that gets loaded first
+	# $Overworld.connect()
+
+func _on_texture_button_toggled(button_pressed):
+	var player_owned := _territory.owner.leader == God.Player
+	if button_pressed:
+		print("territory %s pressed" % territory)
+		if player_owned:
+			$ExtendedPlayerPanel.show()
+		else:
+			$ExtendedEnemyPanel.show()
+			var adjacent: bool = Globals.empires[1].is_territory_adjacent(_territory)
+			if adjacent:
+				$ExtendedEnemyPanel/AttackButton.show()
+			else:
+				$ExtendedEnemyPanel/AttackButton.hide()
+	else:
+		print("territory %s released" % territory)
+		$ExtendedPlayerPanel.hide()
+		$ExtendedEnemyPanel.hide()
+		
+		

@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://c11gexecl1hvb"]
+[gd_scene load_steps=5 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
-[ext_resource type="Texture2D" uid="uid://d3yatin1vvip3" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
+[ext_resource type="Script" path="res://Screens/Overworld/MessageBus.gd" id="2_6x23h"]
+[ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://bgqlbxk6ulnwb" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
 
 [node name="Overworld" type="Control"]
@@ -12,6 +13,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mrexs")
+
+[node name="MessageBus" type="Node" parent="."]
+script = ExtResource("2_6x23h")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
 position = Vector2(-36, -21)
@@ -25,7 +29,6 @@ offset_top = 722.0
 offset_right = 5736.0
 offset_bottom = 3214.0
 scale = Vector2(0.063, 0.063)
-territory = "Zetennu"
 
 [node name="Territory2" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
