@@ -6,6 +6,7 @@ var adjacent: Array[int]
 var units: Array[Unit] # territory owns this
 var owner: Empire
 
+
 func _init(name: String):
 	self.name = name
 	self.owner = null
@@ -59,7 +60,13 @@ func _init(name: String):
 		_:
 			assert(false, "Invalid territory name '" + name + "'")
 
-# Returns a new(!!) list of adjacent territories
+
+## Returns true if territory is player owned.
+func is_player_owned() -> bool:
+	return owner.is_player_owned()
+	
+	
+## Returns a new(!!) list of adjacent territories.
 func get_adjacent() -> Array[Territory]:
 	# this needs indirection because we cannot directly
 	# reference territory nodes during initialization
@@ -70,7 +77,8 @@ func get_adjacent() -> Array[Territory]:
 		re[i] = all[adjacent[i]]
 	return re
 
-# Returns a new(!!) list of leader units
+
+## Returns a new(!!) list of leader units.
 func get_leaders() -> Array[Unit]:
 	var re: Array[Unit] = []
 	for e in units:
@@ -78,10 +86,33 @@ func get_leaders() -> Array[Unit]:
 			re.append(e)
 	return re
 	
+
+## Returns the force strength string.
 func get_force_strength() -> String:
 	# TODO add ratings later
 	return "Full"
 
+
+## Returns the index of the territory.
+func get_index() -> int:
+	for i in range(Territory.all.size()):
+		if Territory.all[i] == self:
+			return i
+		
+	assert(false, "trying to get territory index of an unrecognized territory")
+	return 0
+	
+	
+## Connects the territory to another.
+func connect_adjacent(other: Territory):
+	_connect_adjacent(other)
+	other._connect_adjacent(self)
+
+func _connect_adjacent(other: Territory):
+	var i := get_index()
+	if i not in other.adjacent:
+		other.adjacent.append(i)
+		
 ################################################################################
 ## Territory definition
 ################################################################################

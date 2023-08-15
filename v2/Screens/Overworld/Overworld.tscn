@@ -32,9 +32,9 @@ scale = Vector2(0.063, 0.063)
 
 [node name="Territory2" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
-offset_left = 1444.0
+offset_left = 1445.0
 offset_top = 477.0
-offset_right = 5758.0
+offset_right = 5759.0
 offset_bottom = 2969.0
 scale = Vector2(0.063, 0.063)
 territory = "Neru-Khisi"

@@ -15,7 +15,10 @@ const all_territories_taken := 'overworld.all_territories_taken'
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("ready: overworld")
+	if Engine.is_editor_hint():
+		print("[editor] ready: overworld")
+	else:
+		print("ready: overworld")
 		
 	assign_empires_to_territory()
 	for e in Territory.all:
@@ -24,15 +27,46 @@ func _ready():
 		var player_controlled: bool = e.owner.leader == God.Player
 		print("Territory: <%s>; Leader: <%s>; PlayerControlled: <%s>" %
 			[territory, leader, player_controlled])
-	
-	# TODO if on game phase xxx, show but by default it should be hidden
-	# $Territory10.show()
-	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+			
+	$MessageBus.connect("empire_attack", _empire_attack)
+	$MessageBus.connect("all_territories_taken", _boss_spawn)
 
-# Player is fixed, Sitri is last boss, Hesra and Nebet are special side charas
-#static var territory_selection: Array[God] = [Maia, Zahra, Ishtar, Alara, Sutekh, Eirene, Nyaraka, Tali]
 
+# TODO put into battle manager or something
+func _empire_attack(empire: Empire, territory: Territory):
+	print("%s attacks %s!" % [empire.leader.name, territory.name])
+	var win_chance := 0.75 if empire.is_player_owned() else 0.50
+	if randf() < win_chance:
+		print("territory taken!")
+		# emits territory_owner_changed
+		territory_set_owner(territory, empire)
+		
+		if empire.is_player_owned():
+			# emits all_territories_taken
+			update_boss_spawn_condition()
+		elif territory == Territory.all[-1]:
+			$MessageBus.emit_signal("boss_defeated")
+		
+	else:
+		print("battle lost!")
+
+
+func update_boss_spawn_condition():
+	for i in range(2, 10):
+		if !Territory.all[i].is_player_owned():
+			return
+	
+	$MessageBus.emit_signal("all_territories_taken")
+		
+
+func _boss_spawn():
+	# do some animation maybe
+	# insert animation here yadayada
+	
+	# put cursed stronghold adjacent to relevant territories
+	Territory.all[-1].connect_adjacent(Territory.all[8])
+		
+	
 func assign_empires_to_territory():
 	# for now the empires are created here, later when we have
 	# level and unit definitions they will have their own place
@@ -71,12 +105,11 @@ func assign_empires_to_territory():
 		Globals.empires.push_back(player_empire)
 		i += 1
 		
-	
-
+		
 #func _process(delta):
 #	pass
 	
-
+	
 # api functions?
 func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Territory):
 	# take
@@ -90,7 +123,8 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 	territory.owner = to_empire
 	
 	# broadcast
-	MessageBus.territory_owner_changed.emit(from_empire, to_empire, territory)
+	$MessageBus.territory_owner_changed.emit(from_empire, to_empire, territory)
+	
 	
 func territory_set_owner(territory: Territory, new_empire: Empire):
 	var old_empire: Empire = territory.owner

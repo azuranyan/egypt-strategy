@@ -14,6 +14,9 @@ func get_adjacent() -> Array[Territory]:
 		if Territory.all[i] not in re:
 			re.append(Territory.all[i])
 	return re
+
+func is_player_owned() -> bool:
+	return leader == God.Player
 	
 func is_territory_adjacent(territory: Territory) -> bool:
 	# terrible efficiency lol

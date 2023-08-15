@@ -15,6 +15,7 @@ script = ExtResource("1_vyiyw")
 territory = "Zetennu"
 
 [node name="ExtendedEnemyPanel" type="Control" parent="."]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 
@@ -29,31 +30,38 @@ scale = Vector2(7.45, 6.18246)
 texture = ExtResource("4_b4fx5")
 
 [node name="LeaderLabel" type="Label" parent="ExtendedEnemyPanel"]
+layout_mode = 0
 offset_left = 39.0
 offset_top = 3027.0
 offset_right = 4276.0
 offset_bottom = 3549.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 380
+theme_override_font_sizes/font_size = 350
 text = "Force Strength: %s"
 horizontal_alignment = 1
 
 [node name="ForceLabel" type="Label" parent="ExtendedEnemyPanel"]
+layout_mode = 0
 offset_left = 39.0
 offset_top = 2588.0
 offset_right = 4276.0
 offset_bottom = 3110.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 380
+theme_override_font_sizes/font_size = 350
 text = "Enemy Leader: %s"
 horizontal_alignment = 1
 
-[node name="AttackButton" type="Sprite2D" parent="ExtendedEnemyPanel"]
-position = Vector2(2166, 3838)
-scale = Vector2(8.09822, 9.73571)
-texture = ExtResource("5_ij8ad")
+[node name="AttackButton" type="TextureButton" parent="ExtendedEnemyPanel"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 806.0
+offset_top = 3497.0
+offset_right = 3526.0
+offset_bottom = 4064.0
+texture_normal = ExtResource("5_ij8ad")
+stretch_mode = 4
 
 [node name="ExtendedPlayerPanel" type="Control" parent="."]
 visible = false
@@ -107,16 +115,17 @@ texture_normal = ExtResource("6_2p5nu")
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
 offset_left = 39.0
-offset_top = 1966.0
+offset_top = 1945.0
 offset_right = 4276.0
-offset_bottom = 2500.0
+offset_bottom = 2479.0
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.105882, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 13
 theme_override_fonts/font = ExtResource("7_y88vb")
-theme_override_font_sizes/font_size = 500
+theme_override_font_sizes/font_size = 400
 text = "Zetennu"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[connection signal="pressed" from="ExtendedEnemyPanel/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="toggled" from="TextureButton" to="." method="_on_texture_button_toggled"]
