@@ -12,4 +12,5 @@ func _process(delta):
 
 
 func _on_new_game_pressed():
-	messagebus.emit_event("new_game")
+	#messagebus.emit_event("new_game")
+	pass

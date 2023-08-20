@@ -1,18 +1,7 @@
 @tool
 extends Node 
 
-# Editable from the interface are:
-# 	territory name
-# 	territory map
-# 
-# Fixed properties are
-# 	territory names
-# 	adjacency graph
-#
-# Per instance are
-# 	owner
-# 	pos
-#	portrait
+# TODO add icon if home territory
 
 # TODO global space where all predefined data are accessible
 @export_enum(
@@ -47,6 +36,7 @@ func _ready():
 	else:
 		print("ready: %s <%s> button" % [self, territory])
 		_territory = Territory.get_territory(territory)
+		
 	$Label.text = territory
 	
 	# you can't do this here because we're initialized first before overworld
@@ -54,13 +44,19 @@ func _ready():
 	# everything else that gets loaded first
 	# TODO we really shouldn't be messing with sibling nodes like this, so
 	# maybe we can put the messagebus somewhere else
-	$"../MessageBus".connect("territory_owner_changed", _on_owner_change)
+	OverworldEvents.connect("territory_owner_changed", _on_owner_change)
+	
+	OverworldEvents.connect("cycle_turn_start", _on_cycle_turn_start)
+	
+	OverworldEvents.connect("cycle_turn_end", _on_cycle_turn_end)
 
 
 func _on_owner_change(old_owner: Empire, new_owner: Empire, territory: Territory):
+	# everyone is subscribed to the event so we only proceed
+	# if this event is actually about our territory
 	if territory != _territory:
 		return
-		
+	
 	var image := Image.new()
 	image.load(new_owner.leader.button_image)
 	#image.generate_mipmaps()
@@ -70,34 +66,85 @@ func _on_owner_change(old_owner: Empire, new_owner: Empire, territory: Territory
 	mask.create_from_image_alpha(image)
 	$TextureButton.texture_click_mask = mask
 	
+	if territory.is_player_owned():
+		pass
+	else:
+		$ExtendedEnemyPanel/LeaderLabel.text = "Enemy Leader: %s" % new_owner.leader.name
+		$ExtendedEnemyPanel/ForceLabel.text = "Force Strength: %s" % territory.get_force_strength()
+
+
+func show_extended_enemy_panel(show_attack: bool):
+	# no need to do hide the other panel, it's only there for formality
+	$ExtendedEnemyPanel.show()
+	$ExtendedPlayerPanel.hide() 
+	if show_attack:
+		$ExtendedEnemyPanel/Background1.hide()
+		$ExtendedEnemyPanel/Background2.show()
+		$ExtendedEnemyPanel/AttackButton.show()
+	else:
+		$ExtendedEnemyPanel/Background1.show()
+		$ExtendedEnemyPanel/Background2.hide()
+		$ExtendedEnemyPanel/AttackButton.hide()
+		
+	if _territory.owner.home_territory == _territory:
+		$ExtendedEnemyPanel/Home.show()
+	else:
+		$ExtendedEnemyPanel/Home.hide()
+
+
+func show_extended_player_panel():
+	# no need to do hide the other panel, it's only there for formality
+	$ExtendedEnemyPanel.hide()
+	$ExtendedPlayerPanel.show()
 	
+	
+func hide_extended_panel():
+	$ExtendedPlayerPanel.hide()
+	$ExtendedEnemyPanel.hide()
+
+
 func _on_texture_button_toggled(button_pressed):
 	var player_owned := self._territory.owner.leader == God.Player
 	if button_pressed:
-		print("territory %s pressed" % self.territory)
-		# relative z ordering doesn't work when toggle is triggered via code trick
-		# to hide the button again, try to fix later
-		#self.z_index += 1
+		# raise z so it is over all other buttons
+		self.z_index += 1
 		if player_owned:
-			$ExtendedPlayerPanel.show()
+			show_extended_player_panel()
 		else:
-			$ExtendedEnemyPanel.show()
 			var adjacent: bool = Globals.empires[1].is_territory_adjacent(self._territory)
-			if adjacent:
-				$ExtendedEnemyPanel/AttackButton.show()
-			else:
-				$ExtendedEnemyPanel/AttackButton.hide()
+			show_extended_enemy_panel(adjacent)
 	else:
-		print("territory %s released" % self.territory)
-		#self.z_index -= 1
-		$ExtendedPlayerPanel.hide()
-		$ExtendedEnemyPanel.hide()
+		self.z_index -= 1
+		hide_extended_panel()
 		
 		
 func _on_attack_button_pressed():
-	# trick: toggle this button again to unpress, since we're in a buttongroup
-	$TextureButton.emit_signal("toggled", false)
+	$TextureButton.button_pressed = false
 	
 	# this button should appear only for player and therefore is
 	# always the player empire triggering this
-	$"../MessageBus".emit_signal("empire_attack", Globals.empires[1], _territory)
+	OverworldEvents.emit_signal("empire_attack", Globals.empires[1], _territory)
+	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires[1])
+
+
+func _on_inspect_button_pressed():
+	OverworldEvents.emit_signal("inspect")
+
+
+func _on_rest_button_pressed():
+	OverworldEvents.emit_signal("rest")
+
+
+func _on_train_button_pressed():
+	OverworldEvents.emit_signal("train")
+	
+	
+func _on_cycle_turn_start(empire: Empire):
+	if empire == _territory.owner:
+		$ColorRect.show()
+	else:
+		$ColorRect.hide()
+	
+func _on_cycle_turn_end(empire: Empire):
+	# hides all panels
+	hide_extended_panel()

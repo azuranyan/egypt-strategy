@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://deoum6p0ur60e"]
+
+[ext_resource type="Script" path="res://Screens/Overworld/CombinedPlayerMenu.gd" id="1_h566u"]
+
+[node name="CombinedPlayerMenu" type="Node2D"]
+script = ExtResource("1_h566u")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 0.439216)
+
+[node name="Esc" type="Button" parent="."]
+visible = false
+offset_right = 1920.0
+offset_bottom = 1080.0
+flat = true
+
+[node name="Inspect" type="Label" parent="."]
+visible = false
+offset_left = 19.0
+offset_right = 537.0
+offset_bottom = 86.0
+theme_override_font_sizes/font_size = 60
+text = "Currently: Inspect"
+
+[node name="Rest" type="Label" parent="."]
+visible = false
+offset_left = 19.0
+offset_right = 426.0
+offset_bottom = 86.0
+theme_override_font_sizes/font_size = 60
+text = "Currently: Rest
+"
+
+[node name="Train" type="Label" parent="."]
+visible = false
+offset_left = 19.0
+offset_right = 476.0
+offset_bottom = 86.0
+theme_override_font_sizes/font_size = 60
+text = "Currently: Train
+"
+
+[connection signal="pressed" from="Esc" to="." method="_on_esc_pressed"]

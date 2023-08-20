@@ -40,7 +40,7 @@ class StatusEffect:
 	
 	
 var unit_type: UnitType
-var leader # can either be null for default or bool override
+#var leader # can either be null for default or bool override
 var behavior: Behavior
 var bond: int
 var stats: BattleStats
@@ -54,14 +54,15 @@ func is_god() -> bool:
 			return true
 	return false
 
+# TODO no longer used
 # This is used for determining leader units.
 # Each territory is owned by an empire, and every empire has a leader god.
 # All gods have unit representations.
-func is_leader() -> bool:
-	if leader == null:
-		return is_god()
-	else:
-		return leader == true
+#func is_leader() -> bool:
+#	if leader == null:
+#		return is_god()
+#	else:
+#		return leader == true
 	
 func is_player_controlled() -> bool:
 	return behavior == Behavior.PlayerControlled

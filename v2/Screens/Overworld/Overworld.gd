@@ -12,6 +12,8 @@ const turn_end := 'overworld.turn_end'
 const win_territory := 'overworld.win_territory'
 const all_territories_taken := 'overworld.all_territories_taken'
 
+var manager: Manager
+var battle_manager: BattleManager
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -27,28 +29,133 @@ func _ready():
 		var player_controlled: bool = e.owner.leader == God.Player
 		print("Territory: <%s>; Leader: <%s>; PlayerControlled: <%s>" %
 			[territory, leader, player_controlled])
+	
+	# create turn cycle main loop
+	manager = Manager.new()
+	call_deferred("_start_overworld_cycle")
+	
+	# create battle manager
+	battle_manager = MockBattleManager.new()
+	
+	# connect overworld events
+	OverworldEvents.connect("empire_attack", _empire_attack)
+	#OverworldEvents.connect("empire_attack", battle_manager.initiate_attack)
+	OverworldEvents.connect("all_territories_taken", _boss_spawn)
+	OverworldEvents.connect("battle_result", _battle_result)
+	
+	# connect cycle events
+	OverworldEvents.connect("cycle_turn_start", _turn_start)
+
+func _start_overworld_cycle():
+	manager.do_cycle()
+
+	
+func _turn_start(empire: Empire):
+	if empire.is_player_owned():
+		# no need to do anything, just wait for cycle_turn_end from the ui
+		pass
+	else:
+		$MouseEventBlocker.show()
+		await get_tree().create_timer(1.0).timeout
+		_do_ai_turn(empire)
+		$MouseEventBlocker.hide()
+		_end_turn()
+		
+		# this has to be deferred if we're calling in the same frame otherwise
+		# we'd be firing the signal at the same time as the main loop is
+		# awaiting and it wouldn't work
+		# call_deferred("_end_turn")
+		
+
+func _end_turn():
+	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires[manager.current_turn])
+
+	
+func _do_ai_turn(empire: Empire):
+	if empire.hp_multiplier < 0.8:
+		empire_rest(empire)
+	else:
+		empire.aggression += randf()
+		
+		if empire.aggression < 1.0:
+			empire.aggression += 0.05
+			empire_rest(empire)
+		else:
+			var adjacent: Array[Territory] = empire.get_adjacent()
+			print("[%s] %s (%s); %s" % [manager.current_turn, empire.leader.name, manager.get_empire_turn_order(empire), adjacent])
 			
-	$MessageBus.connect("empire_attack", _empire_attack)
-	$MessageBus.connect("all_territories_taken", _boss_spawn)
+			if adjacent.size() > 0:
+				var target_territory: Territory = adjacent[randi() % adjacent.size()]
+				
+				_empire_attack(empire, target_territory)
+				empire.aggression = empire.base_aggression
+			else:
+				# degenerate case of not having neighbors
+				print("warning: possible logic error: %s has no neighbors" % empire.leader.name)
+			
 
-
+func empire_rest(empire: Empire):
+	if empire.is_player_owned():
+		print("%s rests. HP recovered." % empire.leader.name)
+	else:
+		print("%s rests. HP recovered (aggression: %s)" % [empire.leader.name, empire.aggression])
+		
+	empire.hp_multiplier = 1.0
+	
+	
 # TODO put into battle manager or something
 func _empire_attack(empire: Empire, territory: Territory):
-	print("%s attacks %s!" % [empire.leader.name, territory.name])
-	var win_chance := 0.75 if empire.is_player_owned() else 0.50
-	if randf() < win_chance:
-		print("territory taken!")
-		# emits territory_owner_changed
-		territory_set_owner(territory, empire)
+	print("%s attacks %s (%s)!" % [empire.leader.name, territory.name, territory.owner.leader.name])
+	battle_manager.initiate_attack(empire, territory)
+
+
+func _attacker_victory(empire: Empire, territory: Territory):
+	print("territory taken!")
+	var old_owner := territory.owner
+	
+	# change owners
+	territory_set_owner(territory, empire)
+	
+	# if home_territory, give the rest to the winning empire
+	if Globals.prefs['defeat_if_home_territory_captured'] and territory == old_owner.home_territory:
+		print("    home territory is captured!")
+		while !old_owner.territories.is_empty():
+			var t: Territory = old_owner.territories.pop_back()
+			print("        surrendering %s" % t.name)
+			territory_set_owner(t, empire)
+			
+	# remove from the pool if needed
+	if old_owner.is_beaten():
+		print("%s is defeated!" % old_owner.leader.name)
 		
-		if empire.is_player_owned():
-			# emits all_territories_taken
-			update_boss_spawn_condition()
-		elif territory == Territory.all[-1]:
-			$MessageBus.emit_signal("boss_defeated")
-		
-	else:
-		print("battle lost!")
+		if old_owner.is_player_owned():
+			print("player defeated, game uber")
+		else:
+			if old_owner.leader == God.Sitri:
+				# boss
+				print("boss defeated, congerets")
+				OverworldEvents.emit_signal("boss_defeated")
+			else:
+				# normal enemy
+				update_boss_spawn_condition()
+			manager.remove_from_turn_order(old_owner)
+			
+			
+func _battle_result(empire: Empire, territory: Territory, result: BattleManager.Result):
+	var attacker := empire
+	var defender := territory.owner
+	print("YE? AM STUPID THIS WOT I GOT ", result)
+	match result:
+		BattleManager.Result.AttackerVictory:
+			_attacker_victory(empire, territory)
+			defender.hp_multiplier = 0.1
+		BattleManager.Result.DefenderWithdraw:
+			_attacker_victory(empire, territory)
+		BattleManager.Result.AttackerWithdraw:
+			print("withdraw! battle lost!")
+		BattleManager.Result.DefenderVictory:
+			print("battle lost!")
+			attacker.hp_multiplier = 0.1
 
 
 func update_boss_spawn_condition():
@@ -56,37 +163,49 @@ func update_boss_spawn_condition():
 		if !Territory.all[i].is_player_owned():
 			return
 	
-	$MessageBus.emit_signal("all_territories_taken")
+	OverworldEvents.emit_signal("all_territories_taken")
+	
 		
-
 func _boss_spawn():
 	# do some animation maybe
 	# insert animation here yadayada
 	
 	# put cursed stronghold adjacent to relevant territories
 	Territory.all[-1].connect_adjacent(Territory.all[8])
-		
+	#Territory.all[-1].connect_adjacent(Territory.all[5])
+	#Territory.all[-1].connect_adjacent(Territory.all[9])
 	
-func assign_empires_to_territory():
-	# for now the empires are created here, later when we have
+	# add to turn order
+	
+	# empires[0] = unused, [1] = player, [2] = boss
+	# this ordering is confusing because territory[0] and territory[1]
+	# both correspond to empires [0] and [1] respectively, but territory[-1]
+	# corresponds to empire[2]
+	
+	# manager.turn_order.append(Globals.empires[2])
+	manager.turn_order.append(Territory.all[-1].owner)
+	
+
+
+func assign_empires_to_territory():	# for now the empires are created here, later when we have
 	# level and unit definitions they will have their own place
 	
 	# special territories
 	# [0] = unused/hesra, [1] = player, [-1] = final boss
 	var dummy_empire = Empire.new()
 	dummy_empire.leader = God.Hesra
-	empire_give_territory(null, dummy_empire, Territory.all[0])
+	empire_give_territory(null, dummy_empire, Territory.all[0], true)
 	Globals.empires.push_back(dummy_empire)
 	
 	var player_empire = Empire.new()
 	player_empire.leader = God.Player
-	empire_give_territory(null, player_empire, Territory.all[1])
+	empire_give_territory(null, player_empire, Territory.all[1], true)
 	Globals.empires.push_back(player_empire)
 	
 	var boss_empire = Empire.new()
 	boss_empire.leader = God.Sitri
-	empire_give_territory(null, boss_empire, Territory.all[-1])
-	Globals.empires.push_back(player_empire)
+	empire_give_territory(null, boss_empire, Territory.all[-1], true)
+	Globals.empires.push_back(boss_empire)
 	
 	# randomized selection
 	var selection := God.territory_selection.duplicate()
@@ -101,29 +220,35 @@ func assign_empires_to_territory():
 		
 		var random_empire = Empire.new()
 		random_empire.leader = god
-		empire_give_territory(null, random_empire, Territory.all[i])
-		Globals.empires.push_back(player_empire)
+		empire_give_territory(null, random_empire, Territory.all[i], true)
+		Globals.empires.push_back(random_empire)
 		i += 1
-		
-		
+
+
 #func _process(delta):
 #	pass
 	
 	
 # api functions?
-func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Territory):
+func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Territory, home_territory: bool=false):
 	# take
 	if from_empire != null:
 		from_empire.territories.erase(territory)
-		
+	
+	assert(to_empire != null, "to_empire is null")
+	
 	# give
 	to_empire.territories.append(territory)
 	
+	# assign home if needed
+	if home_territory:
+		to_empire.home_territory = territory
+		
 	# change owner
 	territory.owner = to_empire
 	
 	# broadcast
-	$MessageBus.territory_owner_changed.emit(from_empire, to_empire, territory)
+	OverworldEvents.territory_owner_changed.emit(from_empire, to_empire, territory)
 	
 	
 func territory_set_owner(territory: Territory, new_empire: Empire):

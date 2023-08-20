@@ -159,7 +159,7 @@ static var Tali := register_god("Tali", "F", "Avatar of Bastet",
 	"Feisty Feline Goddess",
 	"White",
 	"res://Screens/Overworld/Portraits/Alara.png", # TODO
-	"res://Screens/Overworld/ButtonImage/Alara.png",
+	"res://Screens/Overworld/ButtonImage/Tali.png",
 	"res://Screens/Overworld/ButtonImage/Alara.bmp")
 	
 ### Sitri
@@ -167,7 +167,7 @@ static var Sitri := register_god("Sitri", "F", "Dark Serpent",
 	"Vainglorious Viper Goddess",
 	"Royal Purple",
 	"res://Screens/Overworld/Portraits/Alara.png", # TODO
-	"res://Screens/Overworld/ButtonImage/Alara.png",
+	"res://Screens/Overworld/ButtonImage/Sitri.png",
 	"res://Screens/Overworld/ButtonImage/Alara.bmp")
 	
 ### Hesra

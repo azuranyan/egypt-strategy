@@ -23,7 +23,7 @@ func _init(name: String):
 			self.units = []
 		"Neru-Khisi":
 			self.battlemap_id = ""
-			self.adjacent = [1, 3, 7]
+			self.adjacent = [1, 3, 6]
 			self.units = []
 		"Satayi":
 			self.battlemap_id = ""
@@ -39,11 +39,11 @@ func _init(name: String):
 			self.units = []
 		"Medjed's Beacon":
 			self.battlemap_id = ""
-			self.adjacent = [5, 7, 9]
+			self.adjacent = [2, 5, 7, 9]
 			self.units = []
 		"Fort Zaka":
 			self.battlemap_id = ""
-			self.adjacent = [2, 6, 8]
+			self.adjacent = [6, 8]
 			self.units = []
 		"Nekhet's Rest":
 			self.battlemap_id = ""
@@ -79,18 +79,27 @@ func get_adjacent() -> Array[Territory]:
 
 
 ## Returns a new(!!) list of leader units.
-func get_leaders() -> Array[Unit]:
-	var re: Array[Unit] = []
-	for e in units:
-		if e.is_leader():
-			re.append(e)
-	return re
+#func get_leaders() -> Array[Unit]:
+#	var re: Array[Unit] = []
+#	for e in units:
+#		if e.is_leader():
+#			re.append(e)
+#	return re
 	
 
 ## Returns the force strength string.
 func get_force_strength() -> String:
-	# TODO add ratings later
-	return "Full"
+	# TODO put in empire
+	if owner.hp_multiplier <= 0.1:
+		return "Critical"
+	elif owner.hp_multiplier <= 0.3:
+		return "Low"
+	elif owner.hp_multiplier <= 0.7:
+		return "Hurt"
+	elif owner.hp_multiplier == 1.0:
+		return "Full"
+	else:
+		return "Good"
 
 
 ## Returns the index of the territory.
@@ -130,17 +139,17 @@ static var Ruins_of_Atesh := Territory.new("Ruins of Atesh")
 static var Cursed_Stronghold := Territory.new("Cursed Stronghold")
 
 static var all: Array[Territory] = [
-	Unused, # 0
-	Zetennu,
-	Neru_Khisi,
-	Satayi,
-	Khel_Et,
-	Forsaken_Temple,
-	Medjeds_Beacon,
-	Fort_Zaka,
-	Nekhets_Rest,
-	Ruins_of_Atesh,
-	Cursed_Stronghold, # 10
+	Unused, 			# 0
+	Zetennu,			# 1
+	Neru_Khisi,			# 2
+	Satayi,				# 3
+	Khel_Et,			# 4
+	Forsaken_Temple,	# 5
+	Medjeds_Beacon,		# 6
+	Fort_Zaka,			# 7
+	Nekhets_Rest,		# 8
+	Ruins_of_Atesh,		# 9
+	Cursed_Stronghold,	# 10
 ]
 
 static func get_territory(name: String) -> Territory:
