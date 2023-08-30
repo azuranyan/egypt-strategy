@@ -36,9 +36,6 @@ anchor_bottom = 0.95
 margin_top = -1.5874
 margin_bottom = -1.5874
 mouse_filter = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="UILayer/UI/Free"]
 anchor_left = 1.0

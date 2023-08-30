@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcd0kq31m2hxk"]
+
+[ext_resource type="Script" path="res://Screens/Battle/Entrypoint.gd" id="1_5clfs"]
+[ext_resource type="PackedScene" uid="uid://cf36ibjmq5ufb" path="res://Screens/Battle/maps/StartingZone.tscn" id="2_dcep5"]
+
+[node name="Entrypoint" type="Node2D"]
+script = ExtResource("1_5clfs")
+map_scene = ExtResource("2_dcep5")

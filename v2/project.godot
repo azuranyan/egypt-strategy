@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Globals="*res://globals.gd"
 OverworldEvents="*res://OverworldEvents.gd"
+Battle="*res://Screens/Battle/Battle.gd"
 
 [display]
 
@@ -27,3 +28,8 @@ window/size/viewport_height=1080
 window/size/mode=2
 window/size/initial_position_type=2
 window/stretch/mode="canvas_items"
+
+[rendering]
+
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
+mesh_lod/directional_shadow/size=8192

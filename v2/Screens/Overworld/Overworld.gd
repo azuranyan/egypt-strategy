@@ -144,7 +144,7 @@ func _attacker_victory(empire: Empire, territory: Territory):
 func _battle_result(empire: Empire, territory: Territory, result: BattleManager.Result):
 	var attacker := empire
 	var defender := territory.owner
-	print("YE? AM STUPID THIS WOT I GOT ", result)
+	#print("YE? AM STUPID THIS WOT I GOT ", result)
 	match result:
 		BattleManager.Result.AttackerVictory:
 			_attacker_victory(empire, territory)

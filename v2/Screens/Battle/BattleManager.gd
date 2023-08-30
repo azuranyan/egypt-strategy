@@ -14,5 +14,7 @@ enum Result {
 	DefenderWithdraw,
 }
 
+#var _context: BattleContext = null
+
 func initiate_attack(empire: Empire, territory: Territory):
 	OverworldEvents.emit_signal("battle_result", empire, territory, Result.AttackerVictory)
