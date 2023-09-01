@@ -1,6 +1,14 @@
 @tool
 extends Node2D
+
+## Class depicting a world.
 class_name World
+
+
+signal texture_changed(texture: Texture2D)
+
+signal transform_changed(map_size: Vector2i, offset: Vector2, tile_size: int, y_ratio: float)
+
 
 @export_category("World")
 
@@ -10,7 +18,13 @@ class_name World
 @export var texture: Texture2D:
 	set(value):
 		texture = value
-		update_texture()
+		
+		if texture != null:
+			internal_size = texture.get_size()
+		else:
+			internal_size = Vector2i.ZERO
+		
+		texture_changed.emit(texture)
 	get:
 		return texture
 
@@ -18,8 +32,7 @@ class_name World
 @export var map_size: Vector2i:
 	set(value):
 		map_size = value
-		grid.size = value
-		grid.queue_redraw()
+		transform_changed.emit(map_size, offset, tile_size, y_ratio)
 		recalculate_uniform_world_transform()
 	get:
 		return map_size
@@ -28,7 +41,7 @@ class_name World
 @export var offset: Vector2:
 	set(value):
 		offset = value
-		grid.queue_redraw()
+		transform_changed.emit(map_size, offset, tile_size, y_ratio)
 		recalculate_world_transform()
 	get:
 		return offset
@@ -37,7 +50,7 @@ class_name World
 @export var tile_size: int:
 	set(value):
 		tile_size = value
-		grid.queue_redraw()
+		transform_changed.emit(map_size, offset, tile_size, y_ratio)
 		recalculate_uniform_world_transform()
 	get:
 		return tile_size
@@ -46,7 +59,7 @@ class_name World
 @export var y_ratio: float:
 	set(value):
 		y_ratio = value
-		grid.queue_redraw()
+		transform_changed.emit(map_size, offset, tile_size, y_ratio)
 		recalculate_world_transform()
 	get:
 		return y_ratio
@@ -63,63 +76,70 @@ var uniform_world_transform: Transform2D
 ## Inverse of uniform world space transform matrix.
 var uniform_world_transform_inverse: Transform2D
 
-## The internal sprite.
-var sprite: Sprite2D = Sprite2D.new()
-
-## The procedural grid.
-var grid: Grid = Grid.new(self)
-
 ## The size of the image source.
 var internal_size: Vector2i:
 	set(value):
 		internal_size = value
-		grid.queue_redraw()
 		recalculate_world_transform()
 	get:
 		return internal_size
 
-class Grid extends Node2D:
-	var world: World
-	
-	var size: Vector2i:
-		set(value):
-			size = value
-			queue_redraw()
-		get:
-			return size
-	
-	func _init(world: World):
-		self.world = world
-	
-	func _draw():
-		var half := Vector2(0.5, 0.5)
-		
-		for i in size.x + 1:
-			var p1 := world.uniform_to_screen(Vector2(i, 0) - half)
-			var p2 := world.uniform_to_screen(Vector2(i, size.y)- half)
-			draw_line(p1, p2, Color(Color.BLACK, 0.3), 1, true)
-			
-		for i in size.y + 1:
-			var p1 := world.uniform_to_screen(Vector2(0, i) - half)
-			var p2 := world.uniform_to_screen(Vector2(size.x, i) - half)
-			draw_line(p1, p2, Color(Color.BLACK, 0.3), 1, true)
 
+func _ready():
+	# re-emit them to notify the changes
+	texture_changed.emit(texture)
+	transform_changed.emit(map_size, offset, tile_size, y_ratio)
+	
+#func _ready():
+#	var no_texture_grid := true
+#
+#	# for the very first instance of this object, the children will be saved
+#	# together with the instance. however when it's instanced from file these
+#	# objects are already in the scene, so this will throw an error because
+#	# it's gonna try to create and add the same objects again.
+#
+#	# we also cannot have this on _init because at _init phase, these children
+#	# already exist but haven't been added yet (get_child_count will be 0).
+#	# this is why we do it on _ready. HAAAAAAAAAAAAH
+#	for i in get_child_count():
+#		var child := get_child(i)
+#		# we just assume that these objects are created and deleted together
+#		if child.name == 'BaseSprite' or child.name == 'Grid':
+#			no_texture_grid = false 
+#			break
+#
+#	if no_texture_grid:
+#		sprite = Sprite2D.new()
+#		sprite.set_name("BaseSprite")
+#		add_child(sprite)
+#		sprite.set_owner(self)
+#
+#		grid = Grid.new(self)
+#		grid.set_name("Grid")
+#		add_child(grid)
+#		grid.set_owner(self)
 
 func _enter_tree():
-	sprite.texture = texture
-	
-	add_child(sprite)
-	add_child(grid)
+	var map := get_map()
+	print("map, @world: ", map)
+	if map != null:
+		map.world = self
 
 
-## Updates the texture and world parameters.
-func update_texture():
-	sprite.texture = texture
-		
-	internal_size = texture.get_size()
+func _exit_tree():
+	var map := get_map()
+	if map != null:
+		map.world = null
 	
-	sprite.scale = Vector2(Battle.get_viewport_size())/Vector2(internal_size)
-	sprite.position = Battle.get_viewport_size()/2
+	
+func get_map() -> Map:
+	var node = get_parent()
+	while node != null:
+		if node is Map:
+			break
+		else:
+			node = node.get_parent()
+	return node
 	
 
 ## Recalculates the world transform
@@ -199,4 +219,12 @@ func screen_to_uniform(pos: Vector2, snap: bool=false) -> Vector2:
 		re.x = roundf(re.x)
 		re.y = roundf(re.y)
 	return re
+	
+	
+func get_viewport_scale() -> Vector2:
+	return Vector2(Battle.get_viewport_size())/Vector2(internal_size)
+	
+
+func get_viewport_offset() -> Vector2:
+	return Battle.get_viewport_size()/2
 

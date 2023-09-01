@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="GameGame"
+config/name="Egyptian Fantasy"
 run/main_scene="res://Screens/Overworld/Overworld.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"

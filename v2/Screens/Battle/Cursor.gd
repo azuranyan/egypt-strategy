@@ -42,9 +42,18 @@ func _unhandled_input(event):
 	if event is InputEventMouse:
 		#self.transform = $"..".world_to_screen_transform
 		position = event.position
-		var uniform: Vector2 = $"..".screen_to_uniform(position, true)
-		$Label.text = "screen: %s\nworld: %s\nuniform: %s" % [position, $"..".screen_to_world(position), uniform]
-		
+		var uniform: Vector2 = $"..".world.screen_to_uniform(position, true)
+		$Label.text = "screen: %s\nworld: %s\nuniform: %s" % [position, $"..".world.screen_to_world(position), uniform]
+
+
+class MapNode:
+	var world: World = null
+	
+	func set_map(map: Map):
+		if map != null:
+			self.world = map.world
+		else:
+			self.world = null
 		
 	
 	

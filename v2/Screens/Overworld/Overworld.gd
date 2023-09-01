@@ -46,6 +46,7 @@ func _ready():
 	# connect cycle events
 	OverworldEvents.connect("cycle_turn_start", _turn_start)
 
+
 func _start_overworld_cycle():
 	manager.do_cycle()
 

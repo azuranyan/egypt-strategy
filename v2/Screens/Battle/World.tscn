@@ -1,0 +1,69 @@
+[gd_scene load_steps=5 format=3 uid="uid://bvn5edllk4u7g"]
+
+[ext_resource type="Script" path="res://Screens/Battle/World.gd" id="1_qtti8"]
+[ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_l0t5p"]
+
+[sub_resource type="GDScript" id="GDScript_fchj6"]
+resource_name = "BaseSprite"
+script/source = "@tool
+extends Sprite2D
+
+
+func _on_world_texture_changed(texture):
+	self.texture = texture
+	scale = $\"..\".get_viewport_scale()
+	position = $\"..\".get_viewport_offset()
+
+"
+
+[sub_resource type="GDScript" id="GDScript_vgj77"]
+resource_name = "Grid"
+script/source = "@tool
+extends Node2D
+
+var size: Vector2i:
+	set(value):
+		size = value
+		queue_redraw()
+	get:
+		return size
+		
+
+func _draw():
+	var half := Vector2(0.5, 0.5)
+	
+	for i in size.x + 1:
+		var p1: Vector2 = $\"..\".uniform_to_screen(Vector2(i, 0) - half)
+		var p2: Vector2 = $\"..\".uniform_to_screen(Vector2(i, size.y)- half)
+		draw_line(p1, p2, Color(Color.BLACK, 0.3), 1, true)
+		
+	for i in size.y + 1:
+		var p1: Vector2 = $\"..\".uniform_to_screen(Vector2(0, i) - half)
+		var p2: Vector2 = $\"..\".uniform_to_screen(Vector2(size.x, i) - half)
+		draw_line(p1, p2, Color(Color.BLACK, 0.3), 1, true)
+
+
+func _on_world_transform_changed(map_size, offset, tile_size, y_ratio):
+	size = map_size
+	
+"
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_qtti8")
+texture = ExtResource("2_l0t5p")
+map_size = Vector2i(8, 8)
+offset = Vector2(110.198, 9.641)
+tile_size = 218
+y_ratio = 0.576
+
+[node name="BaseSprite" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+scale = Vector2(0.46875, 0.46875)
+texture = ExtResource("2_l0t5p")
+script = SubResource("GDScript_fchj6")
+
+[node name="Grid" type="Node2D" parent="."]
+script = SubResource("GDScript_vgj77")
+
+[connection signal="texture_changed" from="." to="BaseSprite" method="_on_world_texture_changed"]
+[connection signal="transform_changed" from="." to="Grid" method="_on_world_transform_changed"]
