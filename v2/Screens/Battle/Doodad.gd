@@ -20,19 +20,19 @@ class_name Doodad
 	get:
 		return world
 	
-## The position of this object in the world space.
-@export var map_pos: Vector2:
+## The position of this object uniform world space.
+@export var source_pos: Vector2:
 	set(value):
-		map_pos = value
+		source_pos = value
 		_update_tile()
 	get:
-		return map_pos
+		return source_pos
 
 func _update_tile():
 	if !is_inside_tree() or world == null: return
 	
 	# position ourselves here
-	position = world.uniform_to_screen(map_pos)
+	position = world.uniform_to_screen(source_pos)
 	_update_sprite()
 	
 	var p := [
@@ -46,11 +46,11 @@ func _update_tile():
 	for i in range(4):
 		p[i] *= world.tile_size
 		
-	var pos = world.uniform_world_transform * map_pos
+	var pos = world.uniform_world_transform * source_pos
 	
 	# translate the tile to where it should be
 	for i in range(4):
-		p[i] += world.uniform_world_transform * map_pos
+		p[i] += world.uniform_world_transform * source_pos
 	
 	# put the tile in world space to screen space
 	for i in range(4):
@@ -86,7 +86,6 @@ func get_map() -> Map:
 func _notification(what):
 	if what == NOTIFICATION_PARENTED:
 		var map := get_map()
-		print("map, @doodad: ", map)
 		if map != null:
 			world = map.world
 	

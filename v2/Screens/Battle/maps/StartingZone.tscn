@@ -27,7 +27,10 @@ script = ExtResource("1_p1bo2")
 [node name="World" parent="." instance=ExtResource("2_oubso")]
 
 [node name="Cursor" type="Sprite2D" parent="."]
-position = Vector2(794.253, 375.313)
+position = Vector2(1011.66, 542.603)
+rotation = 0.522585
+scale = Vector2(0.651461, 0.651461)
+skew = 0.525625
 texture = ExtResource("17_vw8y8")
 script = ExtResource("20_p6uwl")
 pos_x = 4
@@ -51,75 +54,76 @@ texture = ExtResource("21_5tb70")
 position = Vector2(1517.46, 542.603)
 texture = ExtResource("15_yb0x7")
 world = NodePath("../World")
-map_pos = Vector2(7, 7)
+source_pos = Vector2(7, 7)
 
 [node name="Cactus1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1011.66, 833.945)
 texture = ExtResource("7_vxnex")
 world = NodePath("../World")
-map_pos = Vector2(0, 7)
+source_pos = Vector2(0, 7)
 
 [node name="Rock1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(939.398, 792.325)
 texture = ExtResource("8_ytl8v")
 world = NodePath("../World")
-map_pos = Vector2(0, 6)
+source_pos = Vector2(0, 6)
 
 [node name="Tree2" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1445.2, 500.983)
 texture = ExtResource("9_tnqb5")
 world = NodePath("../World")
-map_pos = Vector2(7, 6)
+source_pos = Vector2(7, 6)
 
 [node name="Tree3" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1083.91, 625.844)
 texture = ExtResource("10_8c462")
 world = NodePath("../World")
-map_pos = Vector2(3, 5)
+source_pos = Vector2(3, 5)
 
 [node name="Shrub1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1228.43, 459.362)
 texture = ExtResource("11_18pi1")
 world = NodePath("../World")
-map_pos = Vector2(6, 4)
+source_pos = Vector2(6, 4)
 
 [node name="Barrel1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(939.398, 459.362)
 texture = ExtResource("12_f1ess")
 world = NodePath("../World")
-map_pos = Vector2(4, 2)
+source_pos = Vector2(4, 2)
 
 [node name="Barrel2" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1011.66, 417.742)
 texture = ExtResource("13_grv5o")
 world = NodePath("../World")
-map_pos = Vector2(5, 2)
+source_pos = Vector2(5, 2)
 
 [node name="Shrub2" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(867.14, 417.742)
 texture = ExtResource("14_u13b4")
 world = NodePath("../World")
-map_pos = Vector2(4, 1)
+source_pos = Vector2(4, 1)
 
 [node name="Post1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(794.883, 459.362)
 texture = ExtResource("15_uoaf0")
 world = NodePath("../World")
-map_pos = Vector2(3, 1)
+source_pos = Vector2(3, 1)
 
 [node name="Tree4" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(578.11, 584.223)
 texture = ExtResource("16_enh5f")
 world = NodePath("../World")
-map_pos = Vector2(0, 1)
+source_pos = Vector2(0, 1)
 
 [node name="Building1" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(1011.66, 251.261)
 texture = ExtResource("17_rknwg")
 world = NodePath("../World")
-map_pos = Vector2(7, 0)
+source_pos = Vector2(7, 0)
 
 [node name="Tree5" parent="." node_paths=PackedStringArray("world") instance=ExtResource("22_ucvn6")]
 position = Vector2(505.853, 542.603)
 texture = ExtResource("18_5ae6j")
 world = NodePath("../World")
+source_pos = Vector2(0, 0)

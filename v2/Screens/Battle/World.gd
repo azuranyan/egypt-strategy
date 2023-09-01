@@ -121,7 +121,6 @@ func _ready():
 
 func _enter_tree():
 	var map := get_map()
-	print("map, @world: ", map)
 	if map != null:
 		map.world = self
 

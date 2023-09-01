@@ -21,11 +21,20 @@ func _enter_tree():
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	var m = Transform2D()
+	
+	# scale to downsize to unit vector
+	m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
+	
+	# scale to tile size
+	m = m.scaled(Vector2($"..".world.tile_size, $"..".world.tile_size))
+	
+	transform = $"..".world.world_to_screen_transform * m
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	
 	# set the transform to get to the same space
 	#self.transform = $"..".world_to_screen_transform
 	
@@ -40,11 +49,13 @@ func _process(delta):
 	
 func _unhandled_input(event):
 	if event is InputEventMouse:
-		#self.transform = $"..".world_to_screen_transform
-		position = event.position
-		var uniform: Vector2 = $"..".world.screen_to_uniform(position, true)
+		var uniform: Vector2 = $"..".world.screen_to_uniform(event.position, true)
+		
 		$Label.text = "screen: %s\nworld: %s\nuniform: %s" % [position, $"..".world.screen_to_world(position), uniform]
 
+		position = $"..".world.uniform_to_screen(uniform)
+		#$"../Tree1".position = position
+		
 
 class MapNode:
 	var world: World = null

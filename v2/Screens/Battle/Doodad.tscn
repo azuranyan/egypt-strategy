@@ -3,10 +3,13 @@
 [ext_resource type="Script" path="res://Screens/Battle/Doodad.gd" id="1_833pm"]
 
 [node name="Doodad" type="Node2D"]
+z_index = 1
+z_as_relative = false
 script = ExtResource("1_833pm")
+source_pos = null
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
-visible = false
+z_as_relative = false
 color = Color(0.47451, 0.780392, 0.486275, 0.592157)
 polygon = PackedVector2Array(-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5)
 
