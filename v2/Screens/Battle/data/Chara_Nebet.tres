@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://4gcrtjo26pyc"]
+
+[ext_resource type="Texture2D" uid="uid://dbmh6m16yd65m" path="res://Screens/Overworld/Portraits/placeholder.webp" id="1_x3g1c"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_fttcf"]
+
+[resource]
+script = ExtResource("2_fttcf")
+name = "Nebet"
+gender = "F"
+avatar = "Avatar of Sia"
+title = ""
+map_color = Color(0.376471, 0.721569, 0.815686, 1)
+portrait = ExtResource("1_x3g1c")
+metadata/territory_selection = false
+metadata/god = true

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://bkdmg4n5eme2g"]
+
+[ext_resource type="Texture2D" uid="uid://d3xbbyt40j0qu" path="res://Screens/Overworld/Portraits/NykaraF.png" id="1_7f08h"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_isxnp"]
+
+[resource]
+script = ExtResource("2_isxnp")
+name = "Nyaraka"
+gender = "F"
+avatar = "Avatar of Anubis"
+title = "Judicious Jackal God"
+map_color = Color(0.352941, 0.352941, 0.352941, 1)
+portrait = ExtResource("1_7f08h")
+metadata/territory_selection = true
+metadata/god = true

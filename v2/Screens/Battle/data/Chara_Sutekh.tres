@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://cau3yor7msqp6"]
+
+[ext_resource type="Texture2D" uid="uid://du24rj6kyyr7v" path="res://Screens/Overworld/Portraits/Sutekh.png" id="1_ytwlc"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_kh5v6"]
+
+[resource]
+script = ExtResource("2_kh5v6")
+name = "Sutekh"
+gender = "F"
+avatar = "Avatar of Seth"
+title = "Ferocious Fox God"
+map_color = Color(0.545098, 0, 0, 1)
+portrait = ExtResource("1_ytwlc")
+metadata/territory_selection = true
+metadata/god = true

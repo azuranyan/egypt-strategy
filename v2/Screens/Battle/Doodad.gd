@@ -1,92 +1,34 @@
 @tool
-extends Node2D
+extends MapObject
+
+## A MapObject for objects exported together with the world image asset.
 class_name Doodad
 
-@export_category("Doodad")
 
-## The image texture to use.
-@export var texture: Texture2D:
-	set(value):
-		texture = value
-		$Sprite2D.texture = value
-	get:
-		return texture
-
-## The world space to reference.
-@export var world: World:
-	set(value):
-		world = value
-		_update_tile()
-	get:
-		return world
-	
-## The position of this object uniform world space.
-@export var source_pos: Vector2:
-	set(value):
-		source_pos = value
-		_update_tile()
-	get:
-		return source_pos
-
-func _update_tile():
-	if !is_inside_tree() or world == null: return
-	
-	# position ourselves here
-	position = world.uniform_to_screen(source_pos)
-	_update_sprite()
-	
-	var p := [
-		Vector2(-0.5, -0.5),
-		Vector2(+0.5, -0.5),
-		Vector2(+0.5, +0.5),
-		Vector2(-0.5, +0.5),
-	]
-	
-	# scale the tile to world size
-	for i in range(4):
-		p[i] *= world.tile_size
+## The type of doodad to use.
+@export var doodad_type: DoodadType
 		
-	var pos = world.uniform_world_transform * source_pos
-	
-	# translate the tile to where it should be
-	for i in range(4):
-		p[i] += world.uniform_world_transform * source_pos
-	
-	# put the tile in world space to screen space
-	for i in range(4):
-		$Polygon2D.polygon[i] = world.world_to_screen_transform * p[i] - position
-		
-		
+## Uses source_pos as map_pos on ready.
+@export var use_source_pos := true
 
-func _update_sprite():
-	if !is_inside_tree() or world == null: return
-	
-	$Sprite2D.scale = world.get_viewport_scale()
-	$Sprite2D.position = world.get_viewport_offset() - position
-	
-	
+
+var sprite: Sprite2D
+
+
 func _ready():
-	var map = get_map()
-	if map != null:
-		world = map.world
-	_update_sprite()
-	_update_tile()
-
-
-func get_map() -> Map:
-	var node = get_parent()
-	while node != null:
-		if node is Map:
-			break
-		else:
-			node = node.get_parent()
-	return node
-
-
-func _notification(what):
-	if what == NOTIFICATION_PARENTED:
-		var map := get_map()
-		if map != null:
-			world = map.world
+	sprite = Sprite2D.new()
+	#sprite.z_index = 1
+	add_child(sprite)
 	
-		
+	
+func map_init():
+	sprite.texture = doodad_type.texture
+	sprite.scale = world.get_viewport_scale()
+	sprite.position = world.get_viewport_offset() - world.uniform_to_screen(doodad_type.source_pos)
+	
+	if use_source_pos:
+		map_pos = doodad_type.source_pos
+
+	# connect properties
+	
+	# refresh properties

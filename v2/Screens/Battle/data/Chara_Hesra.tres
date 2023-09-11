@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://dw0ii0h0jo7eg"]
+
+[ext_resource type="Texture2D" uid="uid://dbmh6m16yd65m" path="res://Screens/Overworld/Portraits/placeholder.webp" id="1_y047q"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_weo8t"]
+
+[resource]
+script = ExtResource("2_weo8t")
+name = "Hesra"
+gender = "F"
+avatar = "Priestess of Ra"
+title = ""
+map_color = Color(0.376471, 0.721569, 0.815686, 1)
+portrait = ExtResource("1_y047q")
+metadata/territory_selection = false
+metadata/god = false

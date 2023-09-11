@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://dm37wpgx22flt"]
+
+[ext_resource type="Texture2D" uid="uid://ciqcmot0a1p08" path="res://Screens/Overworld/Portraits/Player.png" id="1_83k4p"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_vo47a"]
+
+[resource]
+script = ExtResource("2_vo47a")
+name = "Lysandra"
+gender = "F"
+avatar = "Priestess of Ra"
+title = "Supreme Sun God"
+map_color = Color(0.666667, 0.352941, 0.2, 1)
+portrait = ExtResource("1_83k4p")
+metadata/territory_selection = false
+metadata/god = true
+metadata/player = true

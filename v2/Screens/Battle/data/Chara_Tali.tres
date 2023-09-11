@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://t3800uynfq65"]
+
+[ext_resource type="Texture2D" uid="uid://dbmh6m16yd65m" path="res://Screens/Overworld/Portraits/placeholder.webp" id="1_phv6x"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_darn7"]
+
+[resource]
+script = ExtResource("2_darn7")
+name = "Alara"
+gender = "F"
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+portrait = ExtResource("1_phv6x")
+metadata/territory_selection = true
+metadata/god = true

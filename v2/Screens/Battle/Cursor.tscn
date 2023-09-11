@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://dp800jdwxg243"]
+
+[ext_resource type="Script" path="res://Screens/Battle/Cursor.gd" id="2_r1hcp"]
+
+[node name="Cursor" type="Node2D"]
+z_index = 1
+z_as_relative = false
+position = Vector2(505.554, 543.329)
+script = ExtResource("2_r1hcp")
+
+[node name="Node2D" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+
+[node name="Label" type="Label" parent="Node2D"]
+offset_left = -33.2531
+offset_top = 72.687
+offset_right = 59.7469
+offset_bottom = 150.687
+text = "screen: %s
+world: %s
+uniform: %s"
+metadata/_edit_use_anchors_ = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true

@@ -1,70 +1,79 @@
 @tool
-extends Sprite2D
+extends MapObject
 
-@export var pos_x: int:
-	set(value):
-		pos_x = value
-		#self.position = $"..".uniform_to_screen(Vector2(pos_x, pos_y))
-	get:
-		return pos_x
-		
-@export var pos_y: int:
-	set(value):
-		pos_y = value
-		#self.position = $"..".uniform_to_screen(Vector2(pos_x, pos_y))
-	get:
-		return pos_y
+## A MapObject cursor.
+class_name Cursor
 
-func _enter_tree():
-	set_process_input(true)
+
+var texture := preload("res://Screens/Battle/cursor.png") as Texture2D
 	
+var sprite: Sprite2D
+
+func map_init():
+	sprite = Sprite2D.new()
+	sprite.texture = texture
 	
-# Called when the node enters the scene tree for the first time.
-func _ready():
+	sprite.z_index = -1 # so it always draws under objects
+	
+	add_child(sprite)
+	
 	var m = Transform2D()
 	
 	# scale to downsize to unit vector
 	m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
-	
+
 	# scale to tile size
-	m = m.scaled(Vector2($"..".world.tile_size, $"..".world.tile_size))
-	
-	transform = $"..".world.world_to_screen_transform * m
+	m = m.scaled(Vector2(world.tile_size, world.tile_size))
 
+	sprite.transform = world._world_to_screen_transform * m
+	sprite.position = Vector2.ZERO
+	
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	
-	# set the transform to get to the same space
-	#self.transform = $"..".world_to_screen_transform
-	
-	#self.transform = Transform2D()
-	#var offset := Vector2()#($"..".tile_size/8, $"..".tile_size/8)
-	#offset.x = $"..".tile_size/2# * $"..".y_ratio / 2
-	#offset.y = $"..".tile_size/2
-	#self.position = $"..".world_to_screen_transform*offset
-	#self.transform = $"..".world_to_screen_transform.translated(offset)
-	pass
-
-	
-func _unhandled_input(event):
-	if event is InputEventMouse:
-		var uniform: Vector2 = $"..".world.screen_to_uniform(event.position, true)
-		
-		$Label.text = "screen: %s\nworld: %s\nuniform: %s" % [position, $"..".world.screen_to_world(position), uniform]
-
-		position = $"..".world.uniform_to_screen(uniform)
-		#$"../Tree1".position = position
-		
-
-class MapNode:
-	var world: World = null
-	
-	func set_map(map: Map):
-		if map != null:
-			self.world = map.world
-		else:
-			self.world = null
-		
-	
-	
+#extends Sprite2D
+#class_name Cursor
+#
+#signal position_changed(pos)
+#
+#var _last_position: Vector2
+#
+#var enable_mouse_control := false
+#
+#var map: Map
+#
+#func _enter_tree():
+#	set_process_input(true)
+#
+## Called when the node enters the scene tree for the first time.
+#func _ready():
+#	await find_parent("Battle").map_loaded
+#	map = find_parent("Battle").map
+#
+#	var m = Transform2D()
+#
+#	# scale to downsize to unit vector
+#	m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
+#
+#	# scale to tile size
+#	m = m.scaled(Vector2(map.world.tile_size, map.world.tile_size))
+#
+#	transform = map.world.world_to_screen_transform * m
+#
+#	$Node2D.global_rotation = 0
+#	$Node2D.global_scale = Vector2(1, 1)
+#
+#
+#
+##func get_map() -> Map:
+##	var node = get_parent()
+##	while node != null:
+##		if node is Battle:
+##			node = node.map
+##			break
+##		else:
+##			node = node.get_parent()
+##	return node
+#
+#
+#
+#
+#

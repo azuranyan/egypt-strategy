@@ -1,8 +1,82 @@
-[gd_scene load_steps=3 format=3 uid="uid://dcd0kq31m2hxk"]
+[gd_scene load_steps=4 format=3 uid="uid://dcd0kq31m2hxk"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Entrypoint.gd" id="1_5clfs"]
 [ext_resource type="PackedScene" uid="uid://cf36ibjmq5ufb" path="res://Screens/Battle/maps/StartingZone.tscn" id="2_dcep5"]
+[ext_resource type="PackedScene" uid="uid://c11gexecl1hvb" path="res://Screens/Overworld/Overworld.tscn" id="3_xo6ed"]
 
-[node name="Entrypoint" type="Node2D"]
+[node name="Entrypoint" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_5clfs")
 map_scene = ExtResource("2_dcep5")
+
+[node name="Overworld" parent="." instance=ExtResource("3_xo6ed")]
+visible = false
+layout_mode = 1
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.5
+offset_top = -15.5
+offset_right = 52.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Start Battle!!"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = 41.0
+offset_bottom = 107.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "Lysandra"
+popup/item_0/id = 0
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "vs"
+
+[node name="OptionButton2" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "Lysandra"
+popup/item_0/id = 0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="OptionButton3" type="OptionButton" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "Starting Zone"
+popup/item_0/id = 0
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

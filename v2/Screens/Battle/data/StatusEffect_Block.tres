@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusEffect" load_steps=3 format=3 uid="uid://pgcn74qbd1cu"]
+
+[ext_resource type="Texture2D" uid="uid://uq1xmyrwxpxo" path="res://Screens/Battle/data/status_effect_block.png" id="1_es22s"]
+[ext_resource type="Script" path="res://Screens/Battle/types/StatusEffect.gd" id="2_a2o7n"]
+
+[resource]
+script = ExtResource("2_a2o7n")
+name = "Block"
+description = "Blocks an instance of damage."
+short_name = "BLK"
+short_description = "Blocking"
+icon = ExtResource("1_es22s")

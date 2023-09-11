@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://dny2mp22w4kt6"]
+
+[ext_resource type="Texture2D" uid="uid://cd4ikrtdbdp67" path="res://Screens/Overworld/Portraits/Eirene.png" id="1_ugnnn"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_mue4o"]
+
+[resource]
+script = ExtResource("2_mue4o")
+name = "Eirene"
+gender = "F"
+avatar = "Avatar of Hathor"
+title = "Caring Cow Goddess"
+map_color = Color(0.886275, 0.313726, 0.596078, 1)
+portrait = ExtResource("1_ugnnn")
+metadata/territory_selection = true
+metadata/god = true

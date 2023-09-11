@@ -26,7 +26,7 @@ func _ready():
 	for e in Territory.all:
 		var territory: String = e.name
 		var leader: String = e.owner.leader.name
-		var player_controlled: bool = e.owner.leader == God.Player
+		var player_controlled: bool = e.owner.leader.get_meta("player", false)
 		print("Territory: <%s>; Leader: <%s>; PlayerControlled: <%s>" %
 			[territory, leader, player_controlled])
 	
@@ -132,7 +132,7 @@ func _attacker_victory(empire: Empire, territory: Territory):
 		if old_owner.is_player_owned():
 			print("player defeated, game uber")
 		else:
-			if old_owner.leader == God.Sitri:
+			if old_owner.leader.get_meta("final_boss", false):
 				# boss
 				print("boss defeated, congerets")
 				OverworldEvents.emit_signal("boss_defeated")
@@ -194,22 +194,26 @@ func assign_empires_to_territory():	# for now the empires are created here, late
 	# special territories
 	# [0] = unused/hesra, [1] = player, [-1] = final boss
 	var dummy_empire = Empire.new()
-	dummy_empire.leader = God.Hesra
+	dummy_empire.leader = Globals.charas.Hesra
 	empire_give_territory(null, dummy_empire, Territory.all[0], true)
 	Globals.empires.push_back(dummy_empire)
 	
 	var player_empire = Empire.new()
-	player_empire.leader = God.Player
+	player_empire.leader = Globals.charas.Player
 	empire_give_territory(null, player_empire, Territory.all[1], true)
 	Globals.empires.push_back(player_empire)
 	
 	var boss_empire = Empire.new()
-	boss_empire.leader = God.Sitri
+	boss_empire.leader = Globals.charas.Sitri
 	empire_give_territory(null, boss_empire, Territory.all[-1], true)
 	Globals.empires.push_back(boss_empire)
 	
 	# randomized selection
-	var selection := God.territory_selection.duplicate()
+	var selection: Array[Chara] = []
+	for c in Globals.charas.values():
+		if c.get_meta("territory_selection", false):
+			selection.append(c)
+	
 	selection.shuffle()
 	
 	# we're assigning random gods starting from [2] up to [9]
@@ -217,10 +221,10 @@ func assign_empires_to_territory():	# for now the empires are created here, late
 	# (at least gods >= territory) so this should work fine
 	var i = 2
 	while !selection.is_empty():
-		var god: God = selection.pop_back()
+		var chara: Chara = selection.pop_back()
 		
 		var random_empire = Empire.new()
-		random_empire.leader = god
+		random_empire.leader = chara
 		empire_give_territory(null, random_empire, Territory.all[i], true)
 		Globals.empires.push_back(random_empire)
 		i += 1

@@ -1,0 +1,279 @@
+[gd_scene load_steps=12 format=3 uid="uid://dy2jg0e1iws2m"]
+
+[ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
+[ext_resource type="Script" path="res://StateMachine.gd" id="2_ox1f2"]
+
+[sub_resource type="GDScript" id="GDScript_wxbqf"]
+script/source = "extends State
+
+# Idle state
+
+# we're just waiting for the load_map signal
+func enter(kwargs:={}):
+	print(\"enter idle\")
+
+func exit():
+	state_machine.grab_focus()
+"
+
+[sub_resource type="GDScript" id="GDScript_52mns"]
+script/source = "extends State
+
+# Init state
+
+var battle: Battle
+
+
+func enter(kwargs := {}) -> void:
+	print(\"enter init\")
+	battle = kwargs.battle
+	
+	# initialize context
+	var context = Battle.Context.new()
+	context.attacker = kwargs.attacker
+	context.defender = kwargs.defender
+	context.territory = kwargs.territory
+	context.result = Battle.Result.Cancelled
+	context.turns = 0
+	context.current_turn = context.attacker
+	
+	battle.context = context
+	
+	# load territory map
+	battle.load_map(\"res://Screens/Battle/maps/StartingZone.tscn\")
+	
+	# emit signal
+	battle.battle_started.emit(context.attacker, context.defender, context.territory)
+	
+	# if defender is ai, allow them to set first
+	var prep_queue := []
+	if !context.defender.is_player_owned() and context.attacker.is_player_owned():
+		prep_queue.append(context.defender)
+		prep_queue.append(context.attacker)
+	else:
+		prep_queue.append(context.attacker)
+		prep_queue.append(context.defender)
+	
+	#$Node2D.visible = true
+	$Node2D/Label.text = \"%s vs %s\" % [context.attacker.leader.name, context.defender.leader.name]
+	
+	# start prep phase
+	state_machine.transition_to(\"Prep\", {battle=battle, prep_queue=prep_queue})
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_c22gi"]
+font_size = 30
+
+[sub_resource type="GDScript" id="GDScript_jipoe"]
+script/source = "extends State
+
+# Prep state
+
+var battle: Battle
+
+var prep_queue: Array = []
+var prep: Empire
+
+
+func handle_gui_input(event: InputEvent) -> void:
+	# consume event
+	#print(\"accept gui \", event) # this one? yes it gets called for mouse inputs
+	if not event is InputEventMouseMotion:
+		pass
+		
+	#state_machine.accept_event()
+		
+func handle_input(event: InputEvent) -> void:
+	#if event is InputEventKey:
+		#print(\"accept INPUT? \", event)
+		#get_tree().root.set_input_as_handled()
+	pass
+	
+func update(delta: float) -> void:
+	pass
+	
+func physics_update(delta: float) -> void:
+	pass
+	
+func enter(kwargs := {}) -> void:
+	print(\"enter prep\")
+	battle = kwargs.battle
+	prep_queue.append_array(kwargs.prep_queue)
+	
+	prep = prep_queue.pop_front()
+	
+	$UI/Prep.text = \"Prep: %s\" % prep.leader.name
+	
+	if !prep.is_player_owned():
+		auto_fill_slots()
+		done()
+	else:
+		$UI.visible = true
+		
+func auto_fill_slots() -> void:
+	# units = all_qualified_units_in_empire
+	# fill_required_slots(units)
+	# fill_slots(units)
+	pass
+
+func done() -> void:
+	if prep_queue.is_empty():
+		state_machine.transition_to(\"TurnEval\", {battle=battle})
+	else:
+		state_machine.transition_to(\"Prep\", {battle=battle, prep_queue=prep_queue})
+
+func exit() -> void:
+	$UI.visible = false
+	prep = null
+	# we can't reset queue on exit because we're using it on done
+	# doing so will pass an empty array on next prep call
+	#prep_queue.clear()
+	
+"
+
+[sub_resource type="GDScript" id="GDScript_18fha"]
+script/source = "extends State
+
+# TurnEval state
+
+func enter(kwargs:={}):
+	print(\"enter turn eval\")
+"
+
+[sub_resource type="GDScript" id="GDScript_t4niq"]
+script/source = "extends State
+
+# PlayerAction state
+
+func enter(kwargs:={}):
+	print(\"enter player action\")
+"
+
+[sub_resource type="GDScript" id="GDScript_nu43r"]
+script/source = "extends State
+
+# AIAction state
+
+func enter(kwargs:={}):
+	print(\"enter ai action\")
+"
+
+[sub_resource type="GDScript" id="GDScript_gihxl"]
+script/source = "extends State
+
+# End state
+
+func enter(kwargs:={}):
+	print(\"enter end\")
+
+func exit():
+	state_machine.release_focus()
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
+font_size = 30
+
+[node name="Battle" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 1
+script = ExtResource("1_nfufl")
+
+[node name="States" type="Control" parent="."]
+process_priority = -1
+visible = false
+z_index = 1
+layout_mode = 3
+anchors_preset = 0
+focus_mode = 2
+mouse_filter = 1
+script = ExtResource("2_ox1f2")
+initial_state = NodePath("Idle")
+metadata/_edit_group_ = true
+
+[node name="Idle" type="Node2D" parent="States"]
+script = SubResource("GDScript_wxbqf")
+
+[node name="Init" type="Node2D" parent="States"]
+script = SubResource("GDScript_52mns")
+
+[node name="Node2D" type="Node2D" parent="States/Init"]
+
+[node name="Label" type="Label" parent="States/Init/Node2D"]
+offset_left = 58.0
+offset_top = 34.0
+offset_right = 187.0
+offset_bottom = 79.0
+size_flags_horizontal = 4
+text = "%s vs %s"
+label_settings = SubResource("LabelSettings_c22gi")
+
+[node name="Prep" type="Node2D" parent="States"]
+script = SubResource("GDScript_jipoe")
+
+[node name="UI" type="Node2D" parent="States/Prep"]
+
+[node name="Prep" type="Label" parent="States/Prep/UI"]
+offset_left = 58.0
+offset_top = 79.0
+offset_right = 158.0
+offset_bottom = 105.0
+text = "Prep: %s"
+
+[node name="TurnEval" type="Node2D" parent="States"]
+script = SubResource("GDScript_18fha")
+
+[node name="PlayerAction" type="Node2D" parent="States"]
+script = SubResource("GDScript_t4niq")
+
+[node name="AIAction" type="Node2D" parent="States"]
+script = SubResource("GDScript_nu43r")
+
+[node name="End" type="Node2D" parent="States"]
+script = SubResource("GDScript_gihxl")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="Viewport" type="SubViewport" parent="SubViewportContainer"]
+disable_3d = true
+handle_input_locally = false
+canvas_cull_mask = 4294966783
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="UI" type="Control" parent="."]
+anchors_preset = 0
+mouse_filter = 1
+
+[node name="Label" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 146.0
+offset_top = 738.0
+offset_right = 186.0
+offset_bottom = 761.0
+text = "Tile: Tree1
+x = %s
+y = %s"
+metadata/_edit_use_anchors_ = true
+
+[node name="OnTurn" type="Label" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = 58.0
+offset_top = 79.0
+offset_right = 152.0
+offset_bottom = 105.0
+text = "on_turn: %s"
+
+[node name="TurnNumber" type="Label" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = 37.0
+offset_top = 34.0
+offset_right = 77.0
+offset_bottom = 57.0
+text = "Turn %s"
+label_settings = SubResource("LabelSettings_6nd0a")

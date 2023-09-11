@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://b75cl1cl5ds5e" path="res://Screens/Overworld/ExpandedButton/BGColor.png" id="4_b4fx5"]
 [ext_resource type="ButtonGroup" uid="uid://de7k1tuawexim" path="res://Screens/Overworld/TerritoryButtonGroup.tres" id="5_6xcty"]
 [ext_resource type="Texture2D" uid="uid://k1lgvb5f4f0l" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="5_ij8ad"]
-[ext_resource type="Texture2D" uid="uid://wgrleifymsqc" path="res://Screens/Overworld/ButtonImage/Alara.png" id="6_2p5nu"]
+[ext_resource type="Texture2D" uid="uid://ck3oa8ftfyfga" path="res://Screens/Overworld/ButtonImage/Alara.png" id="6_2p5nu"]
 [ext_resource type="Texture2D" uid="uid://bnk231ahs1kmg" path="res://Screens/Overworld/ExpandedButton/spacing.png" id="6_q4oxn"]
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="7_y88vb"]
 [ext_resource type="Texture2D" uid="uid://en77gxcfd3r0" path="res://Screens/Overworld/ExpandedButton/home.png" id="9_f1dxg"]

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DoodadType" load_steps=4 format=3 uid="uid://bafwh6ta733hr"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_v0ek6"]
+[ext_resource type="Texture2D" uid="uid://csc47u6o4u3x8" path="res://Screens/Battle/maps/StartingZoneObj10.png" id="2_xirha"]
+[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_h1bye"]
+
+[resource]
+script = ExtResource("1_v0ek6")
+texture = ExtResource("2_xirha")
+world = ExtResource("3_h1bye")
+source_pos = Vector2(1, 3)

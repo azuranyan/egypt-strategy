@@ -51,15 +51,19 @@ func _ready():
 	OverworldEvents.connect("cycle_turn_end", _on_cycle_turn_end)
 
 
+func _get_button_image(chara: Chara) -> Image:
+	var image := Image.new()
+	image.load("res://Screens/Overworld/ButtonImage/%s.png" % chara.name)
+	#image.generate_mipmaps()
+	return image
+	
 func _on_owner_change(old_owner: Empire, new_owner: Empire, territory: Territory):
 	# everyone is subscribed to the event so we only proceed
 	# if this event is actually about our territory
 	if territory != _territory:
 		return
 	
-	var image := Image.new()
-	image.load(new_owner.leader.button_image)
-	#image.generate_mipmaps()
+	var image := _get_button_image(new_owner.leader)
 	$TextureButton.texture_normal = ImageTexture.create_from_image(image)
 	
 	var mask := BitMap.new()
@@ -104,7 +108,7 @@ func hide_extended_panel():
 
 
 func _on_texture_button_toggled(button_pressed):
-	var player_owned := self._territory.owner.leader == God.Player
+	var player_owned := self._territory.owner.is_player_owned()
 	if button_pressed:
 		# raise z so it is over all other buttons
 		self.z_index += 1

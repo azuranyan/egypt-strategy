@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://c77i5p06r7021"]
+
+[ext_resource type="Texture2D" uid="uid://2ayfybrmfgnx" path="res://Screens/Overworld/Portraits/ZahraF.png" id="1_o2j46"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_lkw52"]
+
+[resource]
+script = ExtResource("2_lkw52")
+name = "Zahra"
+gender = "F"
+avatar = "Avatar of Sobek"
+title = "Cruel Crocodile God"
+map_color = Color(0, 0.501961, 0.501961, 1)
+portrait = ExtResource("1_o2j46")
+metadata/territory_selection = true
+metadata/god = true

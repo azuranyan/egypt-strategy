@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://rs1wuvpv4ems"]
+
+[ext_resource type="Script" path="res://tools/MapCreator.gd" id="1_6h2g8"]
+
+[node name="MapCreator" type="Node2D"]
+script = ExtResource("1_6h2g8")
+map_size = null
+tile_size = null
+offset = null
+y_ratio = null

@@ -1,0 +1,16 @@
+- Resources have to be @tool if used in tool scripts otherwise its methods won't be found. it works in-game though.
+- resources don't save their variables if not @export-ed or get_property_list(?)
+	- exporting automatically lists the property in property list
+	- this is useful for stateful and runtime things but have to be kept in mind
+- tool scripts fail silently and abandons current function and continues if encountering an error
+- tool doesn't call init on (pre)loaded resources on reload scene (only once, from reload project)
+	- works as intended, but should be wary of when testing
+- another init: nodes can have children but they are inaccessible from init.
+- call down, signal up or sibling
+	- don't access tree in setters, use signals. signal down if necessaryinit and there's no way to find out if you have child or not from there.
+- setting owner allows a node to be saved along with its owner. do not set for transient object
+- export_subgroup and export_category with same name as a class may break the class
+- positive rotation is fucking clockwise
+	- https://docs.godotengine.org/en/stable/tutorials/math/matrices_and_transforms.html
+	- y is down, as usual
+- use your_referece_space.make_input_local(event) for viewports translated by camera

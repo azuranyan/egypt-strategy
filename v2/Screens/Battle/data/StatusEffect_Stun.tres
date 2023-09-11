@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusEffect" load_steps=3 format=3 uid="uid://cbawos6kw82ri"]
+
+[ext_resource type="Texture2D" uid="uid://qcs7vxjkvmhh" path="res://Screens/Battle/data/status_effect_stun.png" id="1_6qti0"]
+[ext_resource type="Script" path="res://Screens/Battle/types/StatusEffect.gd" id="2_kg4ye"]
+
+[resource]
+script = ExtResource("2_kg4ye")
+name = "Stun"
+description = "Cannot move for 1 turn."
+short_name = "STN"
+short_description = "Stunned"
+icon = ExtResource("1_6qti0")
