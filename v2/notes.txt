@@ -2,6 +2,7 @@
 - resources don't save their variables if not @export-ed or get_property_list(?)
 	- exporting automatically lists the property in property list
 	- this is useful for stateful and runtime things but have to be kept in mind
+	- functions are not found/included in property list when not tool
 - tool scripts fail silently and abandons current function and continues if encountering an error
 - tool doesn't call init on (pre)loaded resources on reload scene (only once, from reload project)
 	- works as intended, but should be wary of when testing

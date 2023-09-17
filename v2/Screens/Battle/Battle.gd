@@ -62,7 +62,10 @@ func _unhandled_input(event: InputEvent):
 				uniform.x += 1
 				
 		cursor.position = map.world.uniform_to_screen(uniform)
-		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(uniform).get_name(), uniform.x, uniform.y]
+		var tile_name = "None"
+		if map.get_object_at(uniform):
+			tile_name = map.get_object_at(uniform).name
+		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [tile_name, uniform.x, uniform.y]
 			
 	#if cursor.position != cursor._last_position:
 	#	cursor.position_changed.emit(uniform)
@@ -108,7 +111,7 @@ func load_map_scene(scene: PackedScene):
 	#cursor.position_changed.connect(_on_cursor_position_changed)
 	cursor.name = "Cursor"
 	#viewport.add_child(cursor)
-	add_map_object(cursor)
+	map.place_object(cursor, Vector2.ZERO)
 	
 	map_loaded.emit(map)
 	
@@ -144,29 +147,31 @@ class Context:
 	
 	var turns: int
 	var current_turn: Empire
+
+	var spawned_units: Array[Unit] = []
+
 	
 var context: Context
 
 @onready var state_machine: StateMachine = $States
 
-	
-	
-	
+
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick:=true):
 	if !_fulfills_battle_requirements(attacker, territory):
 		battle_ended.emit(Result.AttackerRequirementsError)
 		return
-	
+
+
 	if do_quick and !(attacker.is_player_owned() or defender.is_player_owned()):
 		_start_quick_battle(attacker, defender, territory)
 	else:
 		_start_real_battle.call_deferred(attacker, defender, territory)
-		
+
 
 func _fulfills_battle_requirements(empire: Empire, territory: Territory) -> bool:
 	return true
-	
-	
+
+
 func _start_quick_battle(attacker: Empire, defender: Empire, territory: Territory):
 	battle_started.emit(attacker, defender, territory)
 		
@@ -176,29 +181,68 @@ func _start_quick_battle(attacker: Empire, defender: Empire, territory: Territor
 		battle_ended.emit(Result.AttackerVictory)
 		
 	continuation.call_deferred()
-	
-	
+
+
 func _start_real_battle(attacker: Empire, defender: Empire, territory: Territory):
 	get_tree().current_scene = self
 	
 	state_machine.transition_to("Init", {battle=self, attacker=attacker, defender=defender, territory=territory})
 
-	
+
 func get_viewport_size() -> Vector2i:
 	return viewport.size
-	
-	
+
+
 func set_debug_tile_visible(debug_tile_visible: bool):
 	# inspector starts with 1 but this is 0-based
 	viewport.set_canvas_cull_mask_bit(9, debug_tile_visible)
 
 
-func add_map_object(object: MapObject):
-	map.add_child(object)
-	object._map_enter(map)
+
+## Spawns a unit of type tag with name at pos, facing x.
+func spawn_unit(tag: String, owner: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
+	assert(owner == context.attacker or owner == context.defender, "owner is neither empire!")	
+	
+	var unit := load("res://Screens/Battle/Unit.tscn").instantiate() as Unit
+	unit.unit_type = Globals.unit_type[tag]
+	unit.unit_name = name if name != "" else tag
+	unit.unit_owner = owner
+	unit.heading = heading
+	
+	context.spawned_units.append(unit)
+	map.place_object(unit, pos)
+	
+	return unit
+	
+	
+## Removes a unit from the map.
+func remove_unit(unit: Unit):
+	map.remove_object(unit)
+	context.spawned_units.erase(unit)
+	
+
+## Returns an array of units at pos.
+func get_units_at(pos: Vector2) -> Array[Unit]:
+	var x := roundi(pos.x)
+	var y := roundi(pos.y)
+	var re: Array[Unit] = []
+	
+	for u in context.spawned_units:
+		if roundi(u.map_pos.x) == x and roundi(u.map_pos.y) == y:
+			re.append(u)
+	return re
+
+
+## Returns the first unit at pos.
+func get_unit_at(pos: Vector2) -> Unit:
+	var x := roundi(pos.x)
+	var y := roundi(pos.y)
+	
+	for u in context.spawned_units:
+		if roundi(u.map_pos.x) == x and roundi(u.map_pos.y) == y:
+			return u
+	return null
 	
 
 func _on_cursor_position_changed(pos: Vector2):
 	$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(pos).get_name(), pos.x, pos.y]
-	
-	

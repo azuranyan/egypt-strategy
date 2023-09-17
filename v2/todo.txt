@@ -1,0 +1,10 @@
+make a couple of units
+instance them in the map through ai placement
+instance them in the map through manual placement
+finish prep phase
+
+finish turn phase
+
+finish battle sequence
+
+back to main world, connect

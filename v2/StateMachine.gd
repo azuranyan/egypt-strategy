@@ -11,7 +11,8 @@ func _ready():
 	await get_parent().ready
 	
 	for child in get_children():
-		child.state_machine = self
+		if child is State:
+			child.state_machine = self
 	
 	assert(state != null, "did you forget to set initial_state?")
 	state.enter()

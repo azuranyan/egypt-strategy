@@ -5,6 +5,7 @@
 [ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_sxwef"]
 
 [resource]
+resource_name = "Rock_01"
 script = ExtResource("1_q77gy")
 texture = ExtResource("2_77jmm")
 world = ExtResource("3_sxwef")

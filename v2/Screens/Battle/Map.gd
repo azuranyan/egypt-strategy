@@ -2,67 +2,76 @@
 extends Node2D
 class_name Map
 
+
 ## The world. Populated when world enters the scene tree.
 @export var world: World
 
-var tiles: Array[Tile] = []
 
+var dynamic_objects: Array[MapObject] = []
 
-class Tile:
-	var object
-	var x: int
-	var y: int
-	
-	func get_name() -> String:
-		if object == null:
-			return "None"
-		elif object is Node:
-			return object.name
-		else:
-			return object
-			
-	func is_passable() -> bool:
-		if object is Doodad:
-			return object.passable
-		return true
+var static_objects: Array[MapObject] = []
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_tile_doodads()
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-
-
-func _tile_doodads():
-	tiles.resize(world.map_size.x * world.map_size.y)
-	for y in world.map_size.y:
-		for x in world.map_size.x:
-			var tile := Tile.new()
-			tile.object = null
-			tile.x = x
-			tile.y = y
-			tiles[y*world.map_size.x + x] = tile
+	static_objects.resize(world.map_size.x * world.map_size.y)
+	var ss := get_objects(true)
+	for c in ss:
+		c._map_enter(self)
+		static_objects[c.map_pos.y*world.map_size.x + c.map_pos.x] = c
 		
+	var dd := get_objects(false)
+	for c in dd:
+		c._map_enter(self)
+		dynamic_objects.append(c)
+		
+	
+
+
+## Returns a list of objects in the map.
+func get_objects(is_static := true) -> Array[MapObject]:
+	var v: Array[MapObject] = []
 	for c in get_children():
-		if c is MapObject:
-			c._map_enter(self)
-			get_tile(c.map_pos).object = c
-
-
-func get_tile(pos: Vector2) -> Tile:
+		if c is MapObject and c.is_static() == is_static:
+			v.append(c)
+	return v
+	
+	
+## Returns the object at a given position
+func get_object_at(pos := Vector2.ZERO, is_static := true) -> MapObject:
 	var x := roundi(pos.x)
 	var y := roundi(pos.y)
 	
-	if x < 0 or y < 0 or x >= world.map_size.x or y >= world.map_size.y:
-		var t := Tile.new()
-		t.object = "Out of bounds"
-		t.x = x
-		t.y = y
-		return t
+	if is_static:
+		return static_objects[y*world.map_size.x + x]
 	else:
-		return tiles[y*world.map_size.x + x]
+		for c in dynamic_objects:
+			if roundi(c.map_pos.x) == x and roundi(c.map_pos.y) == y:
+				return c
+		return null
+
+
+## Places the object in the map.
+func place_object(object: MapObject, pos := Vector2.ZERO):
+	add_child(object)
+	object._map_enter(self)
+	
+	if object.is_static():
+		var x := roundi(pos.x)
+		var y := roundi(pos.y)
+		object.map_pos = Vector2(x, y)
+		static_objects[y*world.map_size.x + x] = object
+	else:
+		object.map_pos = pos
+		dynamic_objects.append(object)
+		
+	
+## Removes the object from the map.
+func remove_object(object: MapObject):
+	if object:
+		remove_child(object)
+		if object.is_static():
+			static_objects.erase(object)
+		else:
+			dynamic_objects.erase(object)
 	

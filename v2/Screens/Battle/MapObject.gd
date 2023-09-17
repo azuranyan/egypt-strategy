@@ -123,3 +123,8 @@ func _update_visibility():
 func map_init() -> void:
 	pass
 	
+
+## Virtual function for determining static objects.
+func is_static() -> bool:
+	return true
+	

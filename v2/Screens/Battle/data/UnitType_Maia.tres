@@ -10,7 +10,7 @@ name = "Dual Attack"
 description = "Maia's basic attack."
 range = 1
 status_effect = "None"
-target_fixed = false
+target_melee = false
 target_unit = 2
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
@@ -20,7 +20,7 @@ name = "Poison Attack"
 description = "Maia's poison attack."
 range = 1
 status_effect = "PSN"
-target_fixed = false
+target_melee = false
 target_unit = 2
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 

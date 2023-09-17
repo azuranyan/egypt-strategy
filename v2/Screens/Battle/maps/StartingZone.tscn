@@ -140,6 +140,7 @@ script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("17_6esm7")
 
 [node name="Impassable" type="Node2D" parent="."]
+visibility_layer = 512
 z_index = 1
 z_as_relative = false
 position = Vector2(722.326, 418.468)
@@ -147,8 +148,10 @@ script = ExtResource("19_5ojx1")
 texture = ExtResource("17_mky4j")
 fit_to_grid = true
 map_pos = Vector2(0, 3)
+no_show = true
 
 [node name="Impassable2" type="Node2D" parent="."]
+visibility_layer = 512
 z_index = 1
 z_as_relative = false
 position = Vector2(1228.13, 376.848)
@@ -156,12 +159,15 @@ script = ExtResource("19_5ojx1")
 texture = ExtResource("17_mky4j")
 fit_to_grid = true
 map_pos = Vector2(3, 7)
+no_show = true
 
 [node name="TileObject" type="Node2D" parent="."]
+visibility_layer = 512
 z_index = 1
 z_as_relative = false
 position = Vector2(1155.87, 668.19)
 script = ExtResource("21_21af1")
-color = Color(0.4, 0.466667, 0.831373, 0.490196)
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
 map_pos = Vector2(6, 3)
 impassable = false
+no_show = true

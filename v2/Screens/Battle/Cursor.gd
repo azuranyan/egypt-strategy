@@ -72,8 +72,6 @@ func map_init():
 ##		else:
 ##			node = node.get_parent()
 ##	return node
-#
-#
-#
-#
-#
+
+func is_static() -> bool:
+	return false

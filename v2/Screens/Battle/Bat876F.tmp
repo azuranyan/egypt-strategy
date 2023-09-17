@@ -91,16 +91,7 @@ func handle_gui_input(event: InputEvent) -> void:
 	#state_machine.accept_event()
 		
 func handle_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == 1:
-			print(\"spawning\")
-			battle.spawn_unit(\"Maia\", battle.context.attacker, \"Player Maia\", Vector2(1, 1))
-		
-		if event.button_index == 2:
-			print(\"removing\")
-			var u := battle.get_unit_at(Vector2(1, 1))
-			battle.remove_unit(u)
-
+	#if event is InputEventKey:
 		#print(\"accept INPUT? \", event)
 		#get_tree().root.set_input_as_handled()
 	pass
@@ -134,6 +125,9 @@ func auto_fill_slots() -> void:
 	pass
 	
 func player_fill_slots():
+	print(\"spawning unit\")
+	battle.spawn_unit(\"Maia\", battle.context.attacker, \"\", Vector2(1, 1))
+	print(\"spawned unit\")
 	pass
 
 func done() -> void:

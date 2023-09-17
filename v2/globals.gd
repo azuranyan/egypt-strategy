@@ -29,6 +29,12 @@ var prefs := {
 	'defeat_if_home_territory_captured': true,
 }
 
+var chara := {}
+var doodad_type := {}
+var status_effect := {}
+var unit_type := {}
+var world := {}
+
 var scene_queue: Array[String] = []
 
 func _ready():
