@@ -34,6 +34,9 @@ func _ready():
 	Globals.battle = self
 
 func _unhandled_input(event: InputEvent):
+	if map == null:
+		return # can be triggered before map is loaded
+	
 	# because we're using a camera that transforms the viewport
 	# we need to make this event local to the map input!!!
 	event = map.make_input_local(event)
@@ -154,6 +157,7 @@ class Context:
 var context: Context
 
 @onready var state_machine: StateMachine = $States
+@onready var character_list: CharacterList = $UI/CharacterList
 
 
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick:=true):
@@ -209,10 +213,17 @@ func spawn_unit(tag: String, owner: Empire, name := "", pos := Vector2.ZERO, hea
 	unit.unit_owner = owner
 	unit.heading = heading
 	
-	context.spawned_units.append(unit)
-	map.place_object(unit, pos)
+	add_unit(unit, pos)
 	
 	return unit
+	
+
+## Adds an already created unit to the map.
+func add_unit(unit: Unit, pos := Vector2.ZERO):
+	# TODO spawned_units is a misnomer and should be changed later
+	# what policy do we even use for spawned and added units?
+	context.spawned_units.append(unit)
+	map.place_object(unit, pos)
 	
 	
 ## Removes a unit from the map.

@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=13 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
+[ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
 
 [sub_resource type="GDScript" id="GDScript_nspcd"]
 script/source = "extends StateMachine
@@ -91,18 +92,18 @@ func handle_gui_input(event: InputEvent) -> void:
 	#state_machine.accept_event()
 		
 func handle_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == 1:
-			print(\"spawning\")
-			battle.spawn_unit(\"Maia\", battle.context.attacker, \"Player Maia\", Vector2(1, 1))
-		
-		if event.button_index == 2:
-			print(\"removing\")
-			var u := battle.get_unit_at(Vector2(1, 1))
-			battle.remove_unit(u)
-
-		#print(\"accept INPUT? \", event)
-		#get_tree().root.set_input_as_handled()
+#	if event is InputEventMouseButton and event.pressed:
+#		if event.button_index == 1:
+#			print(\"spawning\")
+#			battle.spawn_unit(\"Maia\", battle.context.attacker, \"Player Maia\", Vector2(1, 1))
+#
+#		if event.button_index == 2:
+#			print(\"removing\")
+#			var u := battle.get_unit_at(Vector2(1, 1))
+#			battle.remove_unit(u)
+#
+#		#print(\"accept INPUT? \", event)
+#		#get_tree().root.set_input_as_handled()
 	pass
 	
 func update(delta: float) -> void:
@@ -111,6 +112,8 @@ func update(delta: float) -> void:
 func physics_update(delta: float) -> void:
 	pass
 	
+	
+var test_units
 func enter(kwargs := {}) -> void:
 	print(\"enter prep\")
 	battle = kwargs.battle
@@ -125,7 +128,18 @@ func enter(kwargs := {}) -> void:
 		done()
 	else:
 		$UI.visible = true
+		
+		test_units = [
+			battle.spawn_unit(\"Lysandra\", battle.context.attacker, \"\", Vector2(0, 1)),
+			battle.spawn_unit(\"Maia\", battle.context.attacker, \"\", Vector2(0, 2)),
+			battle.spawn_unit(\"Zahra\", battle.context.attacker, \"\", Vector2(0, 3)),
+		]
+		for u in test_units:
+			battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
+			battle.character_list.add_unit(u)
 		player_fill_slots()
+		
+	battle.character_list.visible = true
 		
 func auto_fill_slots() -> void:
 	# units = all_qualified_units_in_empire
@@ -145,10 +159,28 @@ func done() -> void:
 func exit() -> void:
 	$UI.visible = false
 	prep = null
+	
+	battle.character_list.visible = false
 	# we can't reset queue on exit because we're using it on done
 	# doing so will pass an empty array on next prep call
 	#prep_queue.clear()
 	
+
+
+func _on_character_list_unit_selected(unit):
+	pass # Replace with function body.
+
+
+func _on_character_list_unit_released(unit):
+	pass # Replace with function body.
+
+
+func _on_character_list_unit_dragged(unit, pos):
+	unit.map_pos = battle.map.world.screen_to_uniform(pos)
+
+
+func _on_character_list_unit_drag_started(unit, pos):
+	battle.add_unit(unit, battle.map.world.screen_to_uniform(pos))
 "
 
 [sub_resource type="GDScript" id="GDScript_18fha"]
@@ -223,6 +255,7 @@ script = SubResource("GDScript_wxbqf")
 script = SubResource("GDScript_52mns")
 
 [node name="Node2D" type="Node2D" parent="States/Init"]
+visible = false
 
 [node name="Label" type="Label" parent="States/Init/Node2D"]
 offset_left = 58.0
@@ -273,6 +306,13 @@ render_target_update_mode = 4
 anchors_preset = 0
 mouse_filter = 1
 
+[node name="CharacterList" parent="UI" instance=ExtResource("2_6wey6")]
+visible = false
+offset_left = 1427.0
+offset_top = 112.0
+offset_right = 1877.0
+offset_bottom = 687.0
+
 [node name="Label" type="Label" parent="UI"]
 layout_mode = 0
 offset_left = 146.0
@@ -302,3 +342,8 @@ offset_right = 77.0
 offset_bottom = 57.0
 text = "Turn %s"
 label_settings = SubResource("LabelSettings_6nd0a")
+
+[connection signal="unit_drag_started" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_drag_started"]
+[connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]
+[connection signal="unit_released" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_released"]
+[connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]

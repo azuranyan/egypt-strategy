@@ -53,7 +53,11 @@ func get_object_at(pos := Vector2.ZERO, is_static := true) -> MapObject:
 
 ## Places the object in the map.
 func place_object(object: MapObject, pos := Vector2.ZERO):
+	if object in get_children():
+		return # silence the annoying already in map error
+		
 	add_child(object)
+	# TODO what to do with reentry?
 	object._map_enter(self)
 	
 	if object.is_static():

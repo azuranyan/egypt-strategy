@@ -53,6 +53,7 @@ var status_effects: Array[AppliedStatusEffect] = []
 
 var unit_owner: Empire
 
+
 @onready var hud_hp_bar = $HUD/HP
 @onready var hud_hp_label = $HUD/Label
 @onready var hud_name = $HUD/Label3
