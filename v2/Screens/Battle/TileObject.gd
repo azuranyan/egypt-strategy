@@ -20,6 +20,8 @@ var rect: Polygon2D
 
 func _ready():
 	rect = Polygon2D.new()
+	rect.z_index = -1 # set z as -1 so it draws under default z index objects
+	
 	add_child(rect)
 	
 

@@ -162,7 +162,6 @@ map_pos = Vector2(3, 7)
 no_show = true
 
 [node name="TileObject" type="Node2D" parent="."]
-visibility_layer = 512
 z_index = 1
 z_as_relative = false
 position = Vector2(1155.87, 668.19)
@@ -170,4 +169,14 @@ script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
 map_pos = Vector2(6, 3)
 impassable = false
-no_show = true
+metadata/spawn_point = "player"
+
+[node name="TileObject2" type="Node2D" parent="."]
+z_index = 1
+z_as_relative = false
+position = Vector2(866.841, 584.949)
+script = ExtResource("21_21af1")
+color = Color(0.929412, 0, 0.192157, 0.490196)
+map_pos = Vector2(3, 2)
+impassable = false
+metadata/spawn_point = "ai"

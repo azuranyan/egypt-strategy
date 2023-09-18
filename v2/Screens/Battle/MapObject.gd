@@ -128,3 +128,7 @@ func map_init() -> void:
 func is_static() -> bool:
 	return true
 	
+
+## Snaps self to grid.
+func snap():
+	map_pos = Vector2(roundi(map_pos.x), roundi(map_pos.y))

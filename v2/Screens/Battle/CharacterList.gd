@@ -1,46 +1,64 @@
 extends Control
+
+## Interactive character (Unit) list.
 class_name CharacterList
 
-## Emitted when selected unit drag is initiated.
-signal unit_drag_started(unit, pos)
+## Emitted when a unit is selected.
+signal unit_selected(unit, pos)
+
+## Emitted when selected unit is released.
+signal unit_released(unit, pos)
 
 ## Emitted when selected unit is dragged outside of the frame.
 signal unit_dragged(unit, pos)
 
-## Emitted when a unit is selected.
-signal unit_selected(unit)
-
-## Emitted when selected unit is released.
-signal unit_released(unit)
+## Emitted when interaction is cancelled.
+signal unit_cancelled(unit)
 
 
 var units: Array[Unit] = []
+#var selected: Unit
 
 
 @onready var container = $ScrollContainer/VBoxContainer
 	
 
+## Set the list of the units.
+func set_units(arr: Array[Unit]):
+	clear_units()
+	for a in arr:
+		add_unit(a)
+	
+	
+## Adds a unit to the character list.
 func add_unit(unit: Unit):
+	if has_unit(unit):
+		return
+		
 	var cb := load("res://Screens/Battle/CharacterButton.tscn").instantiate() as CharacterButton
 	cb.portrait = unit.unit_type.chara.portrait
 	cb.display_name = unit.unit_name
 	cb.set_meta("unit", unit)
-	cb.selected.connect(func(): _on_selected(cb))
-	cb.released.connect(func(): _on_released(cb))
+	
+	cb.selected.connect(func(pos: Vector2): _on_selected(cb, pos))
+	cb.released.connect(func(pos: Vector2): _on_released(cb, pos))
 	cb.dragged.connect(func(pos: Vector2): _on_dragged(cb, pos))
-	cb.drag_started.connect(func(pos: Vector2): _on_drag_started(cb, pos))
+	cb.cancelled.connect(func(): _on_cancelled(cb))
+	
 	container.add_child(cb)
 	units.append(unit)
 	
 
+## Removes a unit from the character list.
 func remove_unit(unit: Unit):
-	for cb in container.get_children():
-		if cb.get_meta("unit") == unit:
-			remove_child(cb)
-			cb.queue_free()
-	units.erase(unit)
+	var cb = get_button(unit)
+	if cb != null:
+		remove_child(cb)
+		cb.queue_free()
+		units.erase(unit)
 
 
+## Removes all the units in the character list.
 func clear_units():
 	for cb in container.get_children():
 		remove_child(cb)
@@ -48,33 +66,59 @@ func clear_units():
 	units.clear()
 	
 
-func set_selected(unit):
-	pass
-	
+## Returns true if the unit is in the list.
+func has_unit(unit: Unit) -> bool:
+	return get_button(unit) != null
 
-func get_selected():
-	pass
-	
 
-func _on_selected(which: CharacterButton):
+## Returns the button associated with the unit.
+func get_button(unit: Unit) -> CharacterButton:
+	for cb in container.get_children():
+		if cb.get_meta("unit") == unit:
+			return cb
+	return null
+
+#
+### Sets the unit as the selected item.
+#func select_unit(unit: Unit):
+#	var button := get_button(unit)
+#	if button:
+#		_unselect_others(button)
+#		selected = unit
+#		unit_selected.emit(unit)
+#
+#
+### Returns the selected unit.
+#func get_selected() -> Unit:
+#	return selected
+#
+#
+### Unselects currently selected.
+#func release_selected():
+#	_unselect_others(null)
+#
+
+## Helper function to unselect everything that isn't the button.
+func _unselect_others(which: CharacterButton):
 	for cb in container.get_children():
 		if cb.state != CharacterButton.State.IDLE and which != cb:
-			cb.set_selected(false, true)
-	print(which.display_name, " selected")
-	unit_selected.emit(which.get_meta("unit"))
+			cb.release()
+
+
+func _on_selected(which: CharacterButton, pos: Vector2):
+	_unselect_others(which)
+#	selected = which.get_meta("unit")
+#	unit_selected.emit(selected, pos)
+	unit_selected.emit(which.get_meta("unit"), pos)
 	
 	
-func _on_released(which: CharacterButton):
-	print(which.display_name, " released")
-	unit_released.emit(which.get_meta("unit"))
+func _on_released(which: CharacterButton, pos: Vector2):
+	unit_released.emit(which.get_meta("unit"), pos)
+	
 	
 func _on_dragged(which: CharacterButton, pos: Vector2):
-	print(which.display_name, " dragged ", pos)
 	unit_dragged.emit(which.get_meta("unit"), pos)
 
-func _on_drag_started(which: CharacterButton, pos: Vector2):
-	for cb in container.get_children():
-		if cb.state != CharacterButton.State.IDLE and which != cb:
-			cb.set_selected(false, true)
-	print(which.display_name, " drag started ", pos)
-	unit_drag_started.emit(which.get_meta("unit"), pos)
+
+func _on_cancelled(which: CharacterButton):
+	unit_cancelled.emit(which.get_meta("unit"))

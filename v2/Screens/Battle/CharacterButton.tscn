@@ -27,7 +27,6 @@ portrait = ExtResource("3_22ggk")
 display_name = "Alara"
 
 [node name="Control" type="Control" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,7 +51,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="ColorRect"]
-position = Vector2(10, -55)
+position = Vector2(-10, -55)
 scale = Vector2(0.0970588, 0.0970588)
 texture = ExtResource("3_22ggk")
 centered = false

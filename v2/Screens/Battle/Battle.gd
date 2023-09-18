@@ -66,7 +66,7 @@ func _unhandled_input(event: InputEvent):
 				
 		cursor.position = map.world.uniform_to_screen(uniform)
 		var tile_name = "None"
-		if map.get_object_at(uniform):
+		if map.is_inside_bounds(uniform) and map.get_object_at(uniform):
 			tile_name = map.get_object_at(uniform).name
 		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [tile_name, uniform.x, uniform.y]
 			

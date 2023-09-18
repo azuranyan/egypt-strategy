@@ -21,6 +21,3 @@ text = "screen: %s
 world: %s
 uniform: %s"
 metadata/_edit_use_anchors_ = true
-
-[node name="Camera2D" type="Camera2D" parent="."]
-position_smoothing_enabled = true

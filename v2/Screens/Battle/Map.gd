@@ -24,8 +24,6 @@ func _ready():
 	for c in dd:
 		c._map_enter(self)
 		dynamic_objects.append(c)
-		
-	
 
 
 ## Returns a list of objects in the map.
@@ -43,12 +41,13 @@ func get_object_at(pos := Vector2.ZERO, is_static := true) -> MapObject:
 	var y := roundi(pos.y)
 	
 	if is_static:
-		return static_objects[y*world.map_size.x + x]
+		if is_inside_bounds(Vector2(x, y)):
+			return static_objects[y*world.map_size.x + x]
 	else:
 		for c in dynamic_objects:
 			if roundi(c.map_pos.x) == x and roundi(c.map_pos.y) == y:
 				return c
-		return null
+	return null
 
 
 ## Places the object in the map.
@@ -61,10 +60,11 @@ func place_object(object: MapObject, pos := Vector2.ZERO):
 	object._map_enter(self)
 	
 	if object.is_static():
-		var x := roundi(pos.x)
-		var y := roundi(pos.y)
-		object.map_pos = Vector2(x, y)
-		static_objects[y*world.map_size.x + x] = object
+		object.snap()
+		if is_inside_bounds(object.map_pos):
+			static_objects[object.map_pos.y*world.map_size.x + object.map_pos.x] = object
+		else:
+			push_error("static object out of bounds: ", object)
 	else:
 		object.map_pos = pos
 		dynamic_objects.append(object)
@@ -72,10 +72,14 @@ func place_object(object: MapObject, pos := Vector2.ZERO):
 	
 ## Removes the object from the map.
 func remove_object(object: MapObject):
-	if object:
+	if object and object in get_children():
 		remove_child(object)
 		if object.is_static():
 			static_objects.erase(object)
 		else:
 			dynamic_objects.erase(object)
 	
+
+## Returns true if uniform pos is inside bounds.
+func is_inside_bounds(pos: Vector2) -> bool:
+	return pos.x >= 0 and pos.y >= 0 and pos.x <= world.map_size.x-1 and pos.y <= world.map_size.y-1

@@ -59,6 +59,7 @@ var unit_owner: Empire
 @onready var hud_name = $HUD/Label3
 @onready var sprite = $Sprite
 @onready var color_rect = $HUD/ColorRect
+@onready var animation := $AnimationPlayer as AnimationPlayer
 
 enum Heading { North, East, West, South }
 

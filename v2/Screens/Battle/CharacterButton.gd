@@ -1,16 +1,18 @@
 @tool
 extends ColorRect
 
+## Interactive button for character list.
 class_name CharacterButton
+
 
 signal portrait_changed
 signal display_name_changed
 signal highlight_changed
 
-signal selected
-signal released
-signal drag_started(pos: Vector2)
+signal selected(pos: Vector2)
+signal released(pos: Vector2)
 signal dragged(pos: Vector2)
+signal cancelled
 
 @export var portrait: Texture2D:
 	set(value):
@@ -97,60 +99,62 @@ func _gui_input(event):
 				# releasing lmb turns it to selected
 				if !event.is_pressed():
 					state = State.SELECTED
-					selected.emit()
+					selected.emit(pos)
 			
 			elif event is InputEventMouseMotion and !get_global_rect().has_point(pos):
 				state = State.DRAGGED
-				drag_started.emit(pos)
+				selected.emit(pos)
 				
 				
 		State.DRAGGED:
 			if event is InputEventMouseMotion:
 				dragged.emit(pos)
 			
-			# releasing or pressing any button cancels the interaction and only
-			# LMB will emit the proper signal
+			# release lmb to properly release
 			elif event is InputEventMouseButton:
-				scale = Vector2(1, 1)
-				highlight = false
-				state = State.IDLE
 				if event.button_index == 1 and !event.pressed:
-					released.emit()
+					release()
+				else:
+					cancel()
 
 						
 		State.SELECTED:
 			if event is InputEventMouseButton and event.button_index == 1:
 				if !event.is_pressed() and get_global_rect().has_point(pos):
-					selected.emit()
+					selected.emit(pos)
 					
-			elif event is InputEventMouseMotion and !get_global_rect().has_point(pos):
-				state = State.DRAGGED
-				drag_started.emit(pos)
+			#elif event is InputEventMouseMotion and !get_global_rect().has_point(pos):
+			#	state = State.DRAGGED
+			#	drag_started.emit(pos)
 					
 	accept_event()
 				
 				
 func _input(event: InputEvent):
-	if event is InputEventMouseButton and event.is_pressed() and event.button_index == 2:
-		scale = Vector2(1, 1)
-		highlight = false
-		state = State.IDLE
+	if state != State.IDLE and event is InputEventMouseButton and event.is_pressed() and event.button_index == 2:
+		cancel()
 
 
-func set_selected(_selected: bool, emit := true):
-	if _selected:
-		scale = Vector2(1.05, 1.05)
-		highlight = true
-		state = State.SELECTED
-		if emit:
-			selected.emit()
-	else:
-		scale = Vector2(1, 1)
-		highlight = false
-		state = State.IDLE
-		if emit:
-			released.emit()
-		
+func select():
+	scale = Vector2(1.05, 1.05)
+	highlight = true
+	state = State.SELECTED
+	selected.emit(get_global_mouse_position())
+	
+	
+func release():
+	scale = Vector2(1, 1)
+	highlight = false
+	state = State.IDLE
+	released.emit(get_global_mouse_position())
+
+
+func cancel():
+	scale = Vector2(1, 1)
+	highlight = false
+	state = State.IDLE
+	cancelled.emit()
+
 
 func _on_mouse_entered():
 	highlight = true
