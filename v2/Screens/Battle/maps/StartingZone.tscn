@@ -161,17 +161,56 @@ fit_to_grid = true
 map_pos = Vector2(3, 7)
 no_show = true
 
-[node name="TileObject" type="Node2D" parent="."]
+[node name="PlayerSpawn" type="Node2D" parent="."]
+visibility_layer = 512
 z_index = 1
 z_as_relative = false
-position = Vector2(1155.87, 668.19)
+position = Vector2(1011.36, 668.19)
 script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
-map_pos = Vector2(6, 3)
+map_pos = Vector2(5, 2)
 impassable = false
+no_show = true
 metadata/spawn_point = "player"
 
-[node name="TileObject2" type="Node2D" parent="."]
+[node name="PlayerSpawn2" type="Node2D" parent="."]
+visibility_layer = 512
+z_index = 1
+z_as_relative = false
+position = Vector2(1155.87, 584.949)
+script = ExtResource("21_21af1")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(5, 4)
+impassable = false
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="PlayerSpawn3" type="Node2D" parent="."]
+visibility_layer = 512
+z_index = 1
+z_as_relative = false
+position = Vector2(1083.61, 709.81)
+script = ExtResource("21_21af1")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(6, 2)
+impassable = false
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="PlayerSpawn4" type="Node2D" parent="."]
+visibility_layer = 512
+z_index = 1
+z_as_relative = false
+position = Vector2(1228.13, 626.57)
+script = ExtResource("21_21af1")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(6, 4)
+impassable = false
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="AISpawn" type="Node2D" parent="."]
+visibility_layer = 512
 z_index = 1
 z_as_relative = false
 position = Vector2(866.841, 584.949)
@@ -179,4 +218,17 @@ script = ExtResource("21_21af1")
 color = Color(0.929412, 0, 0.192157, 0.490196)
 map_pos = Vector2(3, 2)
 impassable = false
+no_show = true
+metadata/spawn_point = "ai"
+
+[node name="AISpawn2" type="Node2D" parent="."]
+visibility_layer = 512
+z_index = 1
+z_as_relative = false
+position = Vector2(939.099, 543.329)
+script = ExtResource("21_21af1")
+color = Color(0.929412, 0, 0.192157, 0.490196)
+map_pos = Vector2(3, 3)
+impassable = false
+no_show = true
 metadata/spawn_point = "ai"

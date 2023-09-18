@@ -113,7 +113,6 @@ z_index = 1
 z_as_relative = false
 position = Vector2(887, 522)
 script = ExtResource("1_bbiad")
-metadata/_edit_group_ = true
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jjgb4")
@@ -183,3 +182,20 @@ text = "Name"
 libraries = {
 "": SubResource("AnimationLibrary_xege1")
 }
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -33.0
+offset_top = -136.0
+offset_right = 33.0
+offset_bottom = 14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+
+[connection signal="gui_input" from="Control" to="." method="_on_control_gui_input"]

@@ -1,5 +1,5 @@
 @tool
-extends ColorRect
+extends Control
 
 ## Interactive button for character list.
 class_name CharacterButton
@@ -13,6 +13,7 @@ signal selected(pos: Vector2)
 signal released(pos: Vector2)
 signal dragged(pos: Vector2)
 signal cancelled
+
 
 @export var portrait: Texture2D:
 	set(value):
@@ -30,9 +31,10 @@ signal cancelled
 		highlight_changed.emit()
 		
 		
-		
+
+@onready var bg := $BG as Control
 @onready var sprite := $ColorRect/Sprite2D as Sprite2D
-@onready var control := $Control as Control
+@onready var control := $ColorRect/Control as Control
 @onready var label := $Label as Label
 		
 		
@@ -89,8 +91,9 @@ func _gui_input(event):
 	match state:
 		State.IDLE:
 			if event is InputEventMouseButton and event.button_index == 1 and event.is_pressed():
-				scale = Vector2(1.05, 1.05)
+				#scale = Vector2(1.05, 1.05)
 				highlight = true
+				bg.visible = true
 				state = State.PRESSED
 				
 				
@@ -121,6 +124,7 @@ func _gui_input(event):
 		State.SELECTED:
 			if event is InputEventMouseButton and event.button_index == 1:
 				if !event.is_pressed() and get_global_rect().has_point(pos):
+					bg.visible = true
 					selected.emit(pos)
 					
 			#elif event is InputEventMouseMotion and !get_global_rect().has_point(pos):
@@ -136,21 +140,24 @@ func _input(event: InputEvent):
 
 
 func select():
-	scale = Vector2(1.05, 1.05)
+	#scale = Vector2(1.05, 1.05)
+	bg.visible = true
 	highlight = true
 	state = State.SELECTED
 	selected.emit(get_global_mouse_position())
 	
 	
 func release():
-	scale = Vector2(1, 1)
+	#scale = Vector2(1, 1)
+	bg.visible = false
 	highlight = false
 	state = State.IDLE
 	released.emit(get_global_mouse_position())
 
 
 func cancel():
-	scale = Vector2(1, 1)
+	#scale = Vector2(1, 1)
+	bg.visible = false
 	highlight = false
 	state = State.IDLE
 	cancelled.emit()

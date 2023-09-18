@@ -4,6 +4,10 @@ extends MapObject
 class_name Unit
 
 
+signal button_pressed(button: int)
+signal button_released(button: int)
+
+
 enum {
 	RESET_HP = 1 << 0,
 	RESET_STATS = 1 << 1,
@@ -145,3 +149,11 @@ func is_static() -> bool:
 #	target.y = 1080 - target.y
 #	$HUD/Label2.text = "pos = %s\nheading = %s\nx = %s\ny = %s" % [position, Heading.keys()[heading], target.x, target.y]
 #	face_towards(target)
+
+
+func _on_control_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			button_pressed.emit(event.button_index)
+		else:
+			button_released.emit(event.button_index)

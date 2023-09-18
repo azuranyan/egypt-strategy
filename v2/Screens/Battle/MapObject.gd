@@ -37,17 +37,27 @@ var world: World
 ## The debug tile.
 var tile: Polygon2D
 	
+	
+var _setup_done := false
+
 
 ## Called by map when adding to this node.
 func _map_enter(_map: Map):
 	map = _map
 	world = _map.world
 	
-	_setup()
+	if !_setup_done:
+		# had to do it this way because we're getting weird null error if
+		# it's in ready even after making sure super._ready() is called
+		_setup()
+	
+	map_init()
 
 
 # Base ready. Loads a default world when initialized outside of map.
 func _ready():
+	_setup_done = false
+	
 	# load a default world if running headless
 	if map == null:
 		world = preload("res://Screens/Battle/data/World_StartingZone.tres") as World
@@ -71,7 +81,7 @@ func _setup():
 	z_as_relative = false
 	#z_index = 1
 	
-	map_init()
+	_setup_done = true
 	
 	
 ## Creates the debug tile under the object.

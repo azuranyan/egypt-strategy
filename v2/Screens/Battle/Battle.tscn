@@ -77,8 +77,6 @@ script/source = "extends State
 
 # Prep state
 
-@export var strict_spawning := false
-
 var battle: Battle
 
 var prep_queue: Array = []
@@ -90,14 +88,38 @@ func handle_gui_input(event: InputEvent) -> void:
 	pass
 		
 func handle_input(event: InputEvent) -> void:
+	if heading_adjusted:
+		if event is InputEventMouseMotion:
+			# TODO!!!! get_global_mouse_position must be transformed like
+			# below to return the correct transformations
+			#var pos = battle.viewport.canvas_transform.affine_inverse() * get_global_mouse_position()
+			#pos.y = 1080 - pos.y
+			
+			var target = battle.map.world.screen_to_uniform(get_global_mouse_position(), true)
+			
+			#if heading_adjusted.map_pos.distance_squared_to(target) > 1:
+			if heading_adjusted.map_pos != target:
+				heading_adjusted.face_towards(target)
+			
+		if event is InputEventMouseButton:
+			if event.button_index == 2:
+				heading_adjusted.heading = Unit.Heading.West
+				#_remove_unit(heading_adjusted)
+			if event.button_index == 3 and !event.pressed:
+				heading_adjusted = null
+			
 	if selected:
 		if event is InputEventMouseMotion:
-			#battle.cursor.map_pos = battle.map.world.screen_to_uniform(event.position, true)
-			selected.map_pos = battle.map.world.screen_to_uniform(event.position, true)
-			
+			selected.map_pos = battle.map.world.screen_to_uniform(event.position) + selected_offset
+			#selected.snap()
+#
 			if can_spawn(selected, selected.map_pos):
+#			else:
+			#if can_spawn(selected, battle.map.world.screen_to_uniform(event.position, true)):
+				#selected.visible = true
 				selected.animation.stop()
 			else:
+				#selected.visible = false
 				selected.animation.play(\"highlight_red\")
 				
 	#	if event is InputEventMouseButton and event.pressed:
@@ -110,11 +132,14 @@ func handle_input(event: InputEvent) -> void:
 	#			var u := battle.get_unit_at(Vector2(1, 1))
 	#			battle.remove_unit(u)
 	#
-			get_tree().root.set_input_as_handled()
+			#get_tree().root.set_input_as_handled()
 			
-		elif event is InputEventMouseButton and !event.is_pressed() and event.button_index == 1:
+		if event is InputEventMouseButton and !event.is_pressed() and event.button_index == 1:
 			battle.character_list.get_button(selected).release()
-	pass
+	
+	#if event is InputEventMouseButton and !event.is_pressed() and event.button_index == 2:
+	#	var u := battle.get_unit_at(Vector2(1, 1))
+		
 	
 func update(delta: float) -> void:
 	pass
@@ -126,6 +151,11 @@ func physics_update(delta: float) -> void:
 var test_units
 var dragging := false
 var selected: Unit
+var selected_moved := false
+var selected_original_pos := Vector2.ZERO
+var selected_offset := Vector2.ZERO
+var heading_adjusted: Unit
+
 func enter(kwargs := {}) -> void:
 	print(\"enter prep\")
 	battle = kwargs.battle
@@ -149,6 +179,11 @@ func enter(kwargs := {}) -> void:
 		for u in test_units:
 			battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
 			battle.character_list.add_unit(u)
+		
+		for o in battle.map.get_objects():
+			if o.get_meta(\"spawn_point\", \"\") == \"player\":
+				o.no_show = false
+			
 		player_fill_slots()
 		
 	battle.character_list.visible = true
@@ -179,12 +214,12 @@ func exit() -> void:
 	
 
 func can_spawn(unit: Unit, pos: Vector2) -> bool:
+	if !battle.map.is_inside_bounds(pos):
+		return false
+		
 	var obj := battle.map.get_object_at(pos)
-	if strict_spawning:
-		return obj != null and is_unit_spawn_point(unit, obj)
-	else:
-		# no object -> spawnable tile -> not impassable
-		return obj == null or is_unit_spawn_point(unit, obj) or !obj.impassable
+	
+	return obj != null and is_unit_spawn_point(unit, obj)
 
 
 func is_unit_spawn_point(unit: Unit, obj: MapObject) -> bool:
@@ -194,33 +229,93 @@ func is_unit_spawn_point(unit: Unit, obj: MapObject) -> bool:
 		return obj.get_meta(\"spawn_point\", \"\") == \"ai\"
 
 
+func _add_unit(unit: Unit, pos: Vector2):
+	battle.add_unit(unit, pos)
+	
+	var cb = [null, null]
+	cb[0] = func(button: int):
+		match button:
+			1:
+				if unit != selected:
+					selected = unit
+					selected_moved = true
+					selected_original_pos = unit.map_pos
+					selected_offset = unit.map_pos - battle.map.world.screen_to_uniform(get_global_mouse_position())
+			2:
+				_remove_unit(unit)
+			3:
+				heading_adjusted = unit
+		
+	cb[1] = func(button: int):
+		pass
+	
+	# inject callbacks
+	unit.button_pressed.connect(cb[0])
+	unit.button_released.connect(cb[1])
+	unit.set_meta(\"prep_phase_callbacks\", cb)
+	
+func _remove_unit(unit: Unit):
+	battle.remove_unit(unit)
+	
+	# remove callbacks
+	var cb = unit.get_meta(\"prep_phase_callbacks\")
+	if cb:
+		unit.button_pressed.disconnect(cb[0])
+		unit.button_released.disconnect(cb[1])
+		unit.remove_meta(\"prep_phase_callbacks\")
+	
+
+
 func _on_character_list_unit_selected(unit: Unit, pos: Vector2):
+	pos = battle.viewport.canvas_transform.affine_inverse() * pos
+	
 	selected = unit
-	battle.add_unit(selected, battle.map.world.screen_to_uniform(pos))
+	selected_moved = false
+	selected_original_pos = Vector2.ZERO
+	selected_offset = Vector2.ZERO
+	if heading_adjusted:
+		heading_adjusted.heading = Unit.Heading.West
+		heading_adjusted = null
+	
+	_add_unit(selected, battle.map.world.screen_to_uniform(pos))
+	
+	#unit.visible = false
 	
 	unit.modulate = Color(1, 1, 1, 0.5)
+	
 
 
 func _on_character_list_unit_released(unit: Unit, pos: Vector2):
+	pos = battle.viewport.canvas_transform.affine_inverse() * pos
+	
 	unit.snap()
 		
 	# remove the unit temporarily. if we can spawn there, add it again
-	battle.remove_unit(unit)
+	_remove_unit(unit)
 	if can_spawn(unit, unit.map_pos):
 		var unit2 := battle.map.get_object_at(unit.map_pos, false) as Unit
 		if unit2:
-			battle.remove_unit(unit2)
-		battle.add_unit(unit, unit.map_pos)
+			if selected_moved:
+				unit2.map_pos = selected_original_pos
+			else:
+				_remove_unit(unit2)
+		_add_unit(unit, unit.map_pos)
 		
 	
 	unit.animation.stop()
 	unit.modulate = Color(1, 1, 1, 1)
 	
 	selected = null
+	if selected_moved:
+		selected_moved = false
+	else:
+		#heading_adjusted = unit
+		pass
 
 
 func _on_character_list_unit_dragged(unit: Unit, pos: Vector2):
 	pos = battle.viewport.canvas_transform.affine_inverse() * pos
+	
 	var mp := battle.map.world.screen_to_uniform(pos)
 	unit.map_pos = mp
 	
@@ -228,11 +323,20 @@ func _on_character_list_unit_dragged(unit: Unit, pos: Vector2):
 		unit.animation.stop()
 	else:
 		unit.animation.play(\"highlight_red\")
+		
+	unit.visible = true
 
 
-func _on_character_list_unit_cancelled(unit):
-	battle.remove_unit(unit)
+func _on_character_list_unit_cancelled(unit: Unit):
+	_remove_unit(unit)
 	selected = null
+
+
+func _on_character_list_unit_highlight_changed(unit: Unit, value: bool):
+	if value:
+		unit.animation.play(\"highlight\")
+	else:
+		unit.animation.stop()
 "
 
 [sub_resource type="GDScript" id="GDScript_18fha"]
@@ -397,5 +501,6 @@ label_settings = SubResource("LabelSettings_6nd0a")
 
 [connection signal="unit_cancelled" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_cancelled"]
 [connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]
+[connection signal="unit_highlight_changed" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_highlight_changed"]
 [connection signal="unit_released" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_released"]
 [connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]

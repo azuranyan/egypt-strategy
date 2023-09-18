@@ -15,6 +15,9 @@ signal unit_dragged(unit, pos)
 ## Emitted when interaction is cancelled.
 signal unit_cancelled(unit)
 
+## Emitted when interaction is cancelled.
+signal unit_highlight_changed(unit, value)
+
 
 var units: Array[Unit] = []
 #var selected: Unit
@@ -44,6 +47,7 @@ func add_unit(unit: Unit):
 	cb.released.connect(func(pos: Vector2): _on_released(cb, pos))
 	cb.dragged.connect(func(pos: Vector2): _on_dragged(cb, pos))
 	cb.cancelled.connect(func(): _on_cancelled(cb))
+	cb.highlight_changed.connect(func(): _on_highlight_changed(cb))
 	
 	container.add_child(cb)
 	units.append(unit)
@@ -122,3 +126,9 @@ func _on_dragged(which: CharacterButton, pos: Vector2):
 
 func _on_cancelled(which: CharacterButton):
 	unit_cancelled.emit(which.get_meta("unit"))
+
+
+func _on_highlight_changed(which: CharacterButton):
+	unit_highlight_changed.emit(which.get_meta("unit"), which.highlight)
+	
+	

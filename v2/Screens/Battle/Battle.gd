@@ -99,7 +99,7 @@ func load_map(res: String):
 	
 func load_map_scene(scene: PackedScene):
 	# we need to be in the tree for everything to work, so do that first
-	Globals.get_tree().root.add_child(self)
+	#Globals.get_tree().root.add_child(self)
 	
 	map = scene.instantiate() as Map
 	
@@ -188,7 +188,7 @@ func _start_quick_battle(attacker: Empire, defender: Empire, territory: Territor
 
 
 func _start_real_battle(attacker: Empire, defender: Empire, territory: Territory):
-	get_tree().current_scene = self
+	#get_tree().current_scene = self
 	
 	state_machine.transition_to("Init", {battle=self, attacker=attacker, defender=defender, territory=territory})
 
