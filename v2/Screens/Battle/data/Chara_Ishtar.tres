@@ -1,15 +1,15 @@
 [gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://huxgesii8gou"]
 
-[ext_resource type="Texture2D" uid="uid://2ayfybrmfgnx" path="res://Screens/Overworld/Portraits/ZahraF.png" id="1_kyo4a"]
+[ext_resource type="Texture2D" uid="uid://bwqmd8t1njkys" path="res://Screens/Overworld/Portraits/IshtarF.png" id="1_o1kry"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_537t0"]
 
 [resource]
 script = ExtResource("2_537t0")
-name = "Zahra"
+name = "Ishtar"
 gender = "F"
-avatar = "Avatar of Sobek"
-title = "Cruel Crocodile God"
-map_color = Color(0, 0.501961, 0.501961, 1)
-portrait = ExtResource("1_kyo4a")
+avatar = "Avatar of Isis"
+title = "Selfless Scorpion Goddess"
+map_color = Color(0.74902, 0.25098, 0.74902, 1)
+portrait = ExtResource("1_o1kry")
 metadata/territory_selection = true
 metadata/god = true

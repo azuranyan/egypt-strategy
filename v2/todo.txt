@@ -8,3 +8,25 @@ finish turn phase
 finish battle sequence
 
 back to main world, connect
+
+#############################################
+
+empire
+  territory units
+
+entrypoint
+  load participants
+
+ai placement
+
+player placement
+
+done prep phase
+
+allow quit (no penalty) from prep 
+
+#############################################
+
+turn eval
+
+player action

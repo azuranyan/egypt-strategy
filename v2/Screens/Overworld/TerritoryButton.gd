@@ -1,43 +1,40 @@
 @tool
 extends Node 
 
-# TODO add icon if home territory
+class_name TerritoryButton
 
-# TODO global space where all predefined data are accessible
-@export_enum(
-	# if adjusted, adjust everything with territory_names
-	# grep territory_names
-		"Zetennu",
-		"Neru-Khisi",
-		"Satayi",
-		"Khel-Et",
-		"Medjed's Beacon",
-		"Fort Zaka",
-		"Forsaken Temple",
-		"Ruins of Atesh",
-		"Nekhet's Rest",
-		"Cursed Stronghold"
-	) var territory: String:
-		get:
-			return territory
-		set(value):
-			territory = value
-			#if Engine.is_editor_hint():
-			#	$Label.text = value
-	
-@export var mapscene: String
+signal territory_changed
 
-var _territory: Territory = null
+
 var stored_z_index: int
+
+var territory: Territory:
+	set(value):
+		territory = value
+		territory_changed.emit()
+		
+
+@onready var highlight := $ColorRect
+@onready var label := $Label
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if territory == null:
+		warnings.append("Missing Territory child")
+	
+	return warnings
+
 
 func _ready():
 	if Engine.is_editor_hint():
 		print("[editor] ready: %s <%s> button" % [self, territory])
 	else:
 		print("ready: %s <%s> button" % [self, territory])
-		_territory = Territory.get_territory(territory)
-		
-	$Label.text = territory
+	
+	# this has to be here and cannot be connected through inspector. we only
+	territory_changed.connect(_on_territory_changed)
+	territory = territory
 	
 	# you can't do this here because we're initialized first before overworld
 	# there should be a messagebus object or node that gets initialized before
@@ -49,32 +46,6 @@ func _ready():
 	OverworldEvents.connect("cycle_turn_start", _on_cycle_turn_start)
 	
 	OverworldEvents.connect("cycle_turn_end", _on_cycle_turn_end)
-
-
-func _get_button_image(chara: Chara) -> Image:
-	var image := Image.new()
-	image.load("res://Screens/Overworld/ButtonImage/%s.png" % chara.name)
-	#image.generate_mipmaps()
-	return image
-	
-func _on_owner_change(old_owner: Empire, new_owner: Empire, territory: Territory):
-	# everyone is subscribed to the event so we only proceed
-	# if this event is actually about our territory
-	if territory != _territory:
-		return
-	
-	var image := _get_button_image(new_owner.leader)
-	$TextureButton.texture_normal = ImageTexture.create_from_image(image)
-	
-	var mask := BitMap.new()
-	mask.create_from_image_alpha(image)
-	$TextureButton.texture_click_mask = mask
-	
-	if territory.is_player_owned():
-		pass
-	else:
-		$ExtendedEnemyPanel/LeaderLabel.text = "Enemy Leader: %s" % new_owner.leader.name
-		$ExtendedEnemyPanel/ForceLabel.text = "Force Strength: %s" % territory.get_force_strength()
 
 
 func show_extended_enemy_panel(show_attack: bool):
@@ -90,7 +61,7 @@ func show_extended_enemy_panel(show_attack: bool):
 		$ExtendedEnemyPanel/Background2.hide()
 		$ExtendedEnemyPanel/AttackButton.hide()
 		
-	if _territory.owner.home_territory == _territory:
+	if territory.is_home_territory():
 		$ExtendedEnemyPanel/Home.show()
 	else:
 		$ExtendedEnemyPanel/Home.hide()
@@ -107,15 +78,32 @@ func hide_extended_panel():
 	$ExtendedEnemyPanel.hide()
 
 
+func _on_owner_change(old_owner: Empire, new_owner: Empire, _territory: Territory):
+	# all the buttons are subscribed to the event so we first check if it's ours
+	if territory == _territory:
+		_update_territory_owner()
+		
+		
+func _on_cycle_turn_start(empire: Empire):
+	if empire == territory.empire:
+		highlight.show()
+	else:
+		highlight.hide()
+	
+	
+func _on_cycle_turn_end(empire: Empire):
+	# hides all panels
+	hide_extended_panel()
+	
+	
 func _on_texture_button_toggled(button_pressed):
-	var player_owned := self._territory.owner.is_player_owned()
 	if button_pressed:
 		# raise z so it is over all other buttons
 		self.z_index += 1
-		if player_owned:
+		if territory.is_player_owned():
 			show_extended_player_panel()
 		else:
-			var adjacent: bool = Globals.empires[1].is_territory_adjacent(self._territory)
+			var adjacent: bool = Globals.empires["Lysandra"].is_territory_adjacent(self.territory)
 			show_extended_enemy_panel(adjacent)
 	else:
 		self.z_index -= 1
@@ -127,8 +115,8 @@ func _on_attack_button_pressed():
 	
 	# this button should appear only for player and therefore is
 	# always the player empire triggering this
-	OverworldEvents.emit_signal("empire_attack", Globals.empires[1], _territory)
-	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires[1])
+	OverworldEvents.emit_signal("empire_attack", Globals.empires["Lysandra"], territory)
+	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires["Lysandra"])
 
 
 func _on_inspect_button_pressed():
@@ -142,13 +130,55 @@ func _on_rest_button_pressed():
 func _on_train_button_pressed():
 	OverworldEvents.emit_signal("train")
 	
-	
-func _on_cycle_turn_start(empire: Empire):
-	if empire == _territory.owner:
-		$ColorRect.show()
+
+func _on_child_entered_tree(node: Node):
+	# we only connect if territory is null
+	if node is Territory and territory == null:
+		node.renamed.connect(_update_territory_name)
+		territory = node
+
+
+func _on_child_exiting_tree(node: Node):
+	# we only disconnect if it is the territory
+	if territory == node:
+		node.renamed.disconnect(_update_territory_name)
+		territory = null
+		
+
+func _on_territory_changed():
+	_update_territory_name()
+	_update_territory_owner()
+
+
+func _update_territory_name():
+	label.text = territory.name if territory else ""
+
+
+func _get_button_texture(chara: Chara) -> Texture2D:
+	if chara:
+		return load("res://Screens/Overworld/ButtonImage/%s.png" % chara.name)
 	else:
-		$ColorRect.hide()
-	
-func _on_cycle_turn_end(empire: Empire):
-	# hides all panels
-	hide_extended_panel()
+		return preload("res://Screens/Overworld/ButtonImage/Base.png")
+		
+		
+func _update_territory_owner():
+	if territory:
+		var texture := _get_button_texture(territory.get_leader())
+		
+		$TextureButton.texture_normal = texture
+		
+		var mask := BitMap.new()
+		mask.create_from_image_alpha(texture.get_image())
+		$TextureButton.texture_click_mask = mask
+		
+		if territory.is_player_owned():
+			pass
+		else:
+			$ExtendedEnemyPanel/LeaderLabel.text = "Enemy Leader: %s" % territory.get_leader()
+			$ExtendedEnemyPanel/ForceLabel.text = "Force Strength: %s" % territory.get_force_strength()
+	else:
+		$TextureButton.texture_normal = null
+		$TextureButton.texture_click_mask = null
+		$ExtendedEnemyPanel/LeaderLabel.text = "Enemy Leader: None"
+		$ExtendedEnemyPanel/ForceLabel.text = "Force Strength: None"
+		

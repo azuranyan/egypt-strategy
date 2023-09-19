@@ -26,7 +26,8 @@ func show_rest():
 #	$Inspect.hide()
 #	$Rest.show()
 #	$Train.hide()
-	get_parent().empire_rest(Globals.empires[1])
+	# TODO fix ugly code
+	get_parent().empire_rest(Globals.empires["Lysandra"])
 	_end_turn()
 
 
@@ -40,7 +41,7 @@ func show_train():
 	_end_turn()
 
 func _end_turn():
-	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires[1])
+	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires["Lysandra"])
 	
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

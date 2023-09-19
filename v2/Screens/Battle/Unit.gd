@@ -18,6 +18,9 @@ enum {
 }
 
 
+enum Heading { North, East, West, South }
+
+
 class AppliedStatusEffect:
 	var status_effect: StatusEffect
 	var duration: int
@@ -49,6 +52,19 @@ class AppliedStatusEffect:
 @export var mov: int
 @export var dmg: int
 
+
+var heading: Heading:
+	set(value):
+		heading = value
+		if sprite != null:
+			sprite.flip_h = heading == Heading.North or heading == Heading.East
+			if heading == Heading.North or heading == Heading.West:
+				sprite.animation = "BackIdle"
+			else:
+				sprite.animation = "FrontIdle"
+	get:
+		return heading
+		
 var rng: int
 
 var bond: int
@@ -65,19 +81,12 @@ var unit_owner: Empire
 @onready var color_rect = $HUD/ColorRect
 @onready var animation := $AnimationPlayer as AnimationPlayer
 
-enum Heading { North, East, West, South }
 
-var heading: Heading:
-	set(value):
-		heading = value
-		if sprite != null:
-			sprite.flip_h = heading == Heading.North or heading == Heading.East
-			if heading == Heading.North or heading == Heading.West:
-				sprite.animation = "BackIdle"
-			else:
-				sprite.animation = "FrontIdle"
-	get:
-		return heading
+
+
+func _ready():
+	reset(RESET_ALL)
+
 
 func face_towards(target: Vector2):
 	var v := target - map_pos
@@ -116,41 +125,12 @@ func reset(flags: int=RESET_STATS | RESET_HP | RESET_STATUS_EFFECTS):
 	unit_name = unit_type.name
 	if is_inside_tree():
 		color_rect.color = unit_type.map_color
-		
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	reset(RESET_ALL)
 
 
 func is_static() -> bool:
 	return false
 	
-#func _unhandled_input(event):
-#	if event is InputEventKey and event.pressed:
-#		match event.keycode:
-#			KEY_Q:
-#				hp -= 1
-#			KEY_E:
-#				hp += 1
-#			KEY_W:
-#				heading = Heading.North
-#			KEY_A:
-#				heading = Heading.West
-#			KEY_S:
-#				heading = Heading.South
-#			KEY_D:
-#				heading = Heading.East
-#
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	map_pos = position
-#	var target = get_global_mouse_position()
-#	target.y = 1080 - target.y
-#	$HUD/Label2.text = "pos = %s\nheading = %s\nx = %s\ny = %s" % [position, Heading.keys()[heading], target.x, target.y]
-#	face_towards(target)
-
-
+	
 func _on_control_gui_input(event: InputEvent):
 	if event is InputEventMouseButton:
 		if event.pressed:

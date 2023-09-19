@@ -1,50 +1,64 @@
-extends Resource
 class_name Empire
 
 var leader: Chara = null
 var territories: Array[Territory] = []
-var base_aggression: float = 0.5 # this might have to be a God stat
+var base_aggression: float
 var aggression: float = base_aggression
 var hp_multiplier: float = 1.0
 var home_territory: Territory = null
 
+var units: Array[Unit] = []
+
 func _init():
 	base_aggression = randf()/2
 	
+
+## Returns all the adjacent territories.
 func get_adjacent() -> Array[Territory]:
 	var re: Array[Territory] = []
-	var tmp: Array[int] = []
+	var tmp: Array[Territory] = []
 	
-	# append everything
-	for e in territories:
-		tmp.append_array(e.adjacent)
+	# append all adjacent territories
+	for t in territories:
+		tmp.append_array(t.adjacent)
 		
-#	# add unique
-#	for i in tmp:
-#		if Territory.all[i] not in re and:
-#			re.append(Territory.all[i])
-
-	# add unique and not self owned
-	for idx in tmp:
-		var t: Territory = Territory.all[idx]
-		if (t not in re) and (t.owner != self):
+	# only append unique and not self owned
+	for t in tmp:
+		if (t not in re) and (t.empire != self):
 			re.append(t)
 	
 	return re
 
+
+## Returns true if player owned.
 func is_player_owned() -> bool:
 	return leader.get_meta("player", false)
 	
+	
+## Returns true if territory is adjacent.
 func is_territory_adjacent(territory: Territory) -> bool:
-	# terrible efficiency lol
-	return territory in get_adjacent()
+	if territory.empire == self:
+		return false
+		
+	for t in territories:
+		for adj in t.adjacent:
+			if adj == territory:
+				return true
+				
+	return false
 
-func get_controlled_units() -> Array[String]: # TODO array string for now until we make class
-	var controlled_units: Array[String] = []
-	for territory in territories:
-		controlled_units.append_array(territory.units)
+
+## Returns all the controlled units... TODO to be fixed
+func get_controlled_units() -> PackedStringArray:
+	var controlled_units := PackedStringArray()
+	
+	for t in territories:
+		controlled_units.append_array(t.get_spawn_units())
+		
 	return controlled_units
 	
+	
+## Returns true if the empire is beaten.
 func is_beaten() -> bool:
 	return territories.is_empty()
 	

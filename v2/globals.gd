@@ -1,17 +1,15 @@
 extends Node
 
-# Populated after Overworld._ready()
-var empires: Array[Empire] = []
+#var territories: Array[Territory] = []
 
-var territories: Array[Territory] = []
 #var gods: Array[God] = []
 var units: Array[Unit] = []
 var hp_multiplier: float = 1.0
 
 var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
 
-const charas = {
-	"Player" = preload("res://Screens/Battle/data/Chara_Lysandra.tres"),
+const charas := {
+	"Lysandra" = preload("res://Screens/Battle/data/Chara_Lysandra.tres"),
 	"Maia" = preload("res://Screens/Battle/data/Chara_Maia.tres"),
 	"Zahra" = preload("res://Screens/Battle/data/Chara_Zahra.tres"),
 	"Ishtar" = preload("res://Screens/Battle/data/Chara_Ishtar.tres"),
@@ -25,11 +23,18 @@ const charas = {
 	"Nebet" = preload("res://Screens/Battle/data/Chara_Nebet.tres"),
 }
 
+var territories := {
+	# This will be auto populated in Overworld._ready
+}
+
+var empires := {
+	# This will be auto populated in Overworld._ready
+}
+
 var prefs := {
 	'defeat_if_home_territory_captured': true,
 }
 
-var chara := {}
 var doodad_type := {}
 var status_effect := {}
 var unit_type := {}

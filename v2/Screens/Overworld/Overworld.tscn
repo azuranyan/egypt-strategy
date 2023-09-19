@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://c11gexecl1hvb"]
+[gd_scene load_steps=7 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
 [ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://bgqlbxk6ulnwb" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
 [ext_resource type="PackedScene" uid="uid://deoum6p0ur60e" path="res://Screens/Overworld/CombinedPlayerMenu.tscn" id="4_j3r5l"]
+[ext_resource type="Script" path="res://Screens/Overworld/Territory.gd" id="4_xerix"]
+[ext_resource type="PackedScene" uid="uid://cf36ibjmq5ufb" path="res://Screens/Battle/maps/StartingZone.tscn" id="5_oqdnn"]
 
 [node name="Overworld" type="Control"]
 layout_mode = 3
@@ -33,6 +35,11 @@ offset_right = 5736.0
 offset_bottom = 3214.0
 scale = Vector2(0.063, 0.063)
 
+[node name="Zetennu" type="Node" parent="Territory1" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory2/Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("5_oqdnn")])
+
 [node name="Territory2" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
 anchors_preset = 0
@@ -45,7 +52,10 @@ offset_top = 477.0
 offset_right = 5759.0
 offset_bottom = 2969.0
 scale = Vector2(0.063, 0.063)
-territory = "Neru-Khisi"
+
+[node name="Neru-Khisi" type="Node" parent="Territory2" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory3/Satayi"), NodePath("../../Territory5/Medjed\'s Beacon"), NodePath("../../Territory1/Zetennu")]
 
 [node name="Territory3" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -59,7 +69,10 @@ offset_top = 186.0
 offset_right = 5815.0
 offset_bottom = 2678.0
 scale = Vector2(0.063, 0.063)
-territory = "Satayi"
+
+[node name="Satayi" type="Node" parent="Territory3" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory4/Khel-Et"), NodePath("../../Territory2/Neru-Khisi")]
 
 [node name="Territory4" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -73,7 +86,10 @@ offset_top = 171.0
 offset_right = 5479.0
 offset_bottom = 2663.0
 scale = Vector2(0.063, 0.063)
-territory = "Khel-Et"
+
+[node name="Khel-Et" type="Node" parent="Territory4" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory7/Forsaken Temple"), NodePath("../../Territory3/Satayi")]
 
 [node name="Territory5" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -87,7 +103,10 @@ offset_top = 451.0
 offset_right = 5323.0
 offset_bottom = 2943.0
 scale = Vector2(0.063, 0.063)
-territory = "Medjed's Beacon"
+
+[node name="Medjed\'s Beacon" type="Node" parent="Territory5" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory7/Forsaken Temple"), NodePath("../../Territory8/Ruins of Atesh"), NodePath("../../Territory6/Fort Zaka"), NodePath("../../Territory2/Neru-Khisi")]
 
 [node name="Territory6" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -101,7 +120,10 @@ offset_top = 711.0
 offset_right = 5237.0
 offset_bottom = 3203.0
 scale = Vector2(0.063, 0.063)
-territory = "Fort Zaka"
+
+[node name="Fort Zaka" type="Node" parent="Territory6" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory5/Medjed\'s Beacon"), NodePath("../../Territory9/Nekhet\'s Rest")]
 
 [node name="Territory7" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -115,7 +137,10 @@ offset_top = 181.0
 offset_right = 5053.0
 offset_bottom = 2673.0
 scale = Vector2(0.063, 0.063)
-territory = "Forsaken Temple"
+
+[node name="Forsaken Temple" type="Node" parent="Territory7" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory4/Khel-Et"), NodePath("../../Territory5/Medjed\'s Beacon")]
 
 [node name="Territory8" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -129,7 +154,10 @@ offset_top = 419.0
 offset_right = 4843.0
 offset_bottom = 2911.0
 scale = Vector2(0.063, 0.063)
-territory = "Ruins of Atesh"
+
+[node name="Ruins of Atesh" type="Node" parent="Territory8" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory5/Medjed\'s Beacon")]
 
 [node name="Territory9" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -143,7 +171,10 @@ offset_top = 676.0
 offset_right = 4582.0
 offset_bottom = 3168.0
 scale = Vector2(0.063, 0.063)
-territory = "Nekhet's Rest"
+
+[node name="Nekhet\'s Rest" type="Node" parent="Territory9" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("4_xerix")
+adjacent = [NodePath("../../Territory6/Fort Zaka")]
 
 [node name="Territory10" parent="." instance=ExtResource("3_aby1e")]
 layout_mode = 0
@@ -157,7 +188,9 @@ offset_top = 168.0
 offset_right = 4544.0
 offset_bottom = 2660.0
 scale = Vector2(0.063, 0.063)
-territory = "Cursed Stronghold"
+
+[node name="Cursed Stronghold" type="Node" parent="Territory10"]
+script = ExtResource("4_xerix")
 
 [node name="CombinedPlayerMenu" parent="." instance=ExtResource("4_j3r5l")]
 z_index = 2
@@ -169,3 +202,5 @@ offset_left = -2.0
 offset_top = -2.0
 offset_right = 1922.0
 offset_bottom = 1082.0
+
+[connection signal="child_exiting_tree" from="Territory1" to="Territory1" method="_on_child_exiting_tree"]

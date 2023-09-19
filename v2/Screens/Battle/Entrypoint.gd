@@ -35,4 +35,4 @@ func _on_button_pressed():
 	register_objects()
 	
 	
-	Globals.battle.start_battle(Globals.empires[1], Globals.empires[2], Territory.Neru_Khisi)
+	#Globals.battle.start_battle(Globals.empires[1], Globals.empires[2], Territory.Neru_Khisi)

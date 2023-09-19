@@ -21,7 +21,6 @@ offset_top = -726.84
 offset_right = -2772.48
 offset_bottom = -2050.92
 script = ExtResource("1_vyiyw")
-territory = "Zetennu"
 
 [node name="ColorRect" type="ColorRect" parent="."]
 visible = false
@@ -204,6 +203,7 @@ text = "Zetennu"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="pressed" from="ExtendedEnemyPanel/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="ExtendedPlayerPanel/VBoxContainer/InspectButton" to="." method="_on_inspect_button_pressed"]
 [connection signal="pressed" from="ExtendedPlayerPanel/VBoxContainer/RestButton" to="." method="_on_rest_button_pressed"]

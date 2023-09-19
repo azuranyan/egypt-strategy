@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="TerritoryInfo" load_steps=2 format=3 uid="uid://5qvlxc22sga3"]
+[gd_resource type="Resource" script_class="TerritoryInfo" load_steps=3 format=3 uid="uid://c6vpw2vym76np"]
 
+[ext_resource type="PackedScene" uid="uid://croehem610ycj" path="res://Screens/MainMenu/MainMenu.tscn" id="1_5dbvi"]
 [ext_resource type="Script" path="res://Screens/Overworld/types/TerritoryInfo.gd" id="1_emdyb"]
 
 [resource]
 script = ExtResource("1_emdyb")
-name = ""
-battlemap = null
+name = "Zetennu"
+levels = Array[PackedScene]([ExtResource("1_5dbvi")])
 adjacent = Array[ExtResource("1_emdyb")]([])
-units = Array[Resource("res://Screens/Battle/types/UnitType.gd")]([])

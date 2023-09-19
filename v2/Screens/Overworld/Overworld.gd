@@ -15,6 +15,7 @@ const all_territories_taken := 'overworld.all_territories_taken'
 var manager: Manager
 var battle_manager: BattleManager
 
+	
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if Engine.is_editor_hint():
@@ -22,11 +23,14 @@ func _ready():
 	else:
 		print("ready: overworld")
 		
-	assign_empires_to_territory()
-	for e in Territory.all:
+	register_territories_to_globals()
+	
+	register_empires_to_globals()
+		
+	for e in Globals.territories.values():
 		var territory: String = e.name
-		var leader: String = e.owner.leader.name
-		var player_controlled: bool = e.owner.leader.get_meta("player", false)
+		var leader: String = e.empire.leader.name
+		var player_controlled: bool = e.empire.leader.get_meta("player", false)
 		print("Territory: <%s>; Leader: <%s>; PlayerControlled: <%s>" %
 			[territory, leader, player_controlled])
 	
@@ -40,7 +44,7 @@ func _ready():
 	# connect overworld events
 	OverworldEvents.connect("empire_attack", _empire_attack)
 	#OverworldEvents.connect("empire_attack", battle_manager.initiate_attack)
-	OverworldEvents.connect("all_territories_taken", _boss_spawn)
+	OverworldEvents.connect("all_territories_taken", spawn_boss)
 	OverworldEvents.connect("battle_result", _battle_result)
 	
 	# connect cycle events
@@ -69,7 +73,7 @@ func _turn_start(empire: Empire):
 		
 
 func _end_turn():
-	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires[manager.current_turn])
+	OverworldEvents.emit_signal("cycle_turn_end", manager.turn_order[manager.current_turn])
 
 	
 func _do_ai_turn(empire: Empire):
@@ -106,13 +110,13 @@ func empire_rest(empire: Empire):
 	
 # TODO put into battle manager or something
 func _empire_attack(empire: Empire, territory: Territory):
-	print("%s attacks %s (%s)!" % [empire.leader.name, territory.name, territory.owner.leader.name])
+	print("%s attacks %s (%s)!" % [empire.leader.name, territory.name, territory.empire.leader.name])
 	battle_manager.initiate_attack(empire, territory)
 
 
 func _attacker_victory(empire: Empire, territory: Territory):
 	print("territory taken!")
-	var old_owner := territory.owner
+	var old_owner := territory.empire
 	
 	# change owners
 	territory_set_owner(territory, empire)
@@ -144,7 +148,7 @@ func _attacker_victory(empire: Empire, territory: Territory):
 			
 func _battle_result(empire: Empire, territory: Territory, result: BattleManager.Result):
 	var attacker := empire
-	var defender := territory.owner
+	var defender := territory.empire
 	#print("YE? AM STUPID THIS WOT I GOT ", result)
 	match result:
 		BattleManager.Result.AttackerVictory:
@@ -160,78 +164,67 @@ func _battle_result(empire: Empire, territory: Territory, result: BattleManager.
 
 
 func update_boss_spawn_condition():
-	for i in range(2, 10):
-		if !Territory.all[i].is_player_owned():
+	for t in Globals.territories.values():
+		if t.get_leader() != Globals.charas["Sitri"] and !t.is_player_owned():
 			return
 	
 	OverworldEvents.emit_signal("all_territories_taken")
 	
 		
-func _boss_spawn():
-	# do some animation maybe
-	# insert animation here yadayada
+func spawn_boss():
+	# await boss spawn animation
 	
-	# put cursed stronghold adjacent to relevant territories
-	Territory.all[-1].connect_adjacent(Territory.all[8])
-	#Territory.all[-1].connect_adjacent(Territory.all[5])
-	#Territory.all[-1].connect_adjacent(Territory.all[9])
+	connect_territories(Globals.territories["Cursed Stronghold"], Globals.territories["Ruins of Atesh"])
 	
-	# add to turn order
-	
-	# empires[0] = unused, [1] = player, [2] = boss
-	# this ordering is confusing because territory[0] and territory[1]
-	# both correspond to empires [0] and [1] respectively, but territory[-1]
-	# corresponds to empire[2]
-	
-	# manager.turn_order.append(Globals.empires[2])
-	manager.turn_order.append(Territory.all[-1].owner)
+	manager.turn_order.append(Globals.empires["Sitri"])
 	
 
+## Connects two territories together
+func connect_territories(a: Territory, b: Territory):
+	if b not in a.adjacent:
+		a.adjacent.append(b)
+	if a not in b.adjacent:
+		b.adjacent.append(a)
 
-func assign_empires_to_territory():	# for now the empires are created here, later when we have
-	# level and unit definitions they will have their own place
+
+## Adds the territories to the global registry.
+func register_territories_to_globals():
+	Globals.territories.clear()
+	for c in get_children():
+		if c is TerritoryButton:
+			Globals.territories[c.territory.name] = c.territory
+			
+
+## Assign territories and adds the empires to the global registry
+func register_empires_to_globals():
+	Globals.empires.clear()
 	
-	# special territories
-	# [0] = unused/hesra, [1] = player, [-1] = final boss
-	var dummy_empire = Empire.new()
-	dummy_empire.leader = Globals.charas.Hesra
-	empire_give_territory(null, dummy_empire, Territory.all[0], true)
-	Globals.empires.push_back(dummy_empire)
+	_register_new_empire(Globals.charas["Lysandra"], Globals.territories["Zetennu"])
+	_register_new_empire(Globals.charas["Sitri"], Globals.territories["Cursed Stronghold"])
 	
-	var player_empire = Empire.new()
-	player_empire.leader = Globals.charas.Player
-	empire_give_territory(null, player_empire, Territory.all[1], true)
-	Globals.empires.push_back(player_empire)
-	
-	var boss_empire = Empire.new()
-	boss_empire.leader = Globals.charas.Sitri
-	empire_give_territory(null, boss_empire, Territory.all[-1], true)
-	Globals.empires.push_back(boss_empire)
-	
-	# randomized selection
 	var selection: Array[Chara] = []
 	for c in Globals.charas.values():
+		print("charas ", c)
 		if c.get_meta("territory_selection", false):
 			selection.append(c)
-	
-	selection.shuffle()
-	
-	# we're assigning random gods starting from [2] up to [9]
-	# there's an unenforced coupling in the number of gods and territories
-	# (at least gods >= territory) so this should work fine
-	var i = 2
-	while !selection.is_empty():
-		var chara: Chara = selection.pop_back()
+			
+	for p in selection:
+		print("selection ", p)
 		
-		var random_empire = Empire.new()
-		random_empire.leader = chara
-		empire_give_territory(null, random_empire, Territory.all[i], true)
-		Globals.empires.push_back(random_empire)
-		i += 1
+	selection.shuffle()
+	var i := 0
+	for t in Globals.territories.values():
+		if t.empire == null:
+			t.empire = _register_new_empire(selection[i], t)
+			i = (i + 1) % selection.size()
 
 
-#func _process(delta):
-#	pass
+func _register_new_empire(leader: Chara, home_territory: Territory) -> Empire:
+	var empire := Empire.new()
+	empire.leader = leader
+	empire_give_territory(null, empire, home_territory, true)
+	Globals.empires[leader.name] = empire
+	return empire
 	
 	
 # api functions?
@@ -250,14 +243,14 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 		to_empire.home_territory = territory
 		
 	# change owner
-	territory.owner = to_empire
+	territory.empire = to_empire
 	
 	# broadcast
 	OverworldEvents.territory_owner_changed.emit(from_empire, to_empire, territory)
 	
 	
 func territory_set_owner(territory: Territory, new_empire: Empire):
-	var old_empire: Empire = territory.owner
+	var old_empire: Empire = territory.empire
 	empire_give_territory(old_empire, new_empire, territory)
 	
 

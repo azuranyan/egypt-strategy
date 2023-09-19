@@ -27,3 +27,7 @@ func get_avatar_name() -> String:
 	if split[0] == 'Avatar':# or split[0] == 'Priestess':
 		return split[-1]
 	return avatar
+	
+
+func _to_string() -> String:
+	return name

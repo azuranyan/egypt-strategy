@@ -24,14 +24,18 @@ func _init():
 
 
 func refresh_turn_order():
+	var ot := turn_order
+	
 	turn_order = []
 	
-	# TODO implementation detail
-	# [0] = dummy; [1] = player; [2] = boss; ...
-	turn_order.append(Globals.empires[1])
+	if Globals.empires["Sitri"] in ot:
+		turn_order.append(Globals.empires["Sitri"])
+		
+	turn_order.append(Globals.empires["Lysandra"])
 	
-	for i in range(3, Globals.empires.size()):
-		turn_order.append(Globals.empires[i])
+	for ename in Globals.empires:
+		if ename != "Lysandra" and ename != "Sitri":
+			turn_order.append(Globals.empires[ename])
 	
 	
 func remove_from_turn_order(empire: Empire):
