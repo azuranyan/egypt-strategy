@@ -1,11 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://bgqlbxk6ulnwb"]
+[gd_scene load_steps=9 format=3 uid="uid://bgqlbxk6ulnwb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/TerritoryButton.gd" id="1_vyiyw"]
 [ext_resource type="Texture2D" uid="uid://c1tjvvva43kas" path="res://Screens/Overworld/ExpandedButton/BGColor - Outline.png" id="3_24emm"]
 [ext_resource type="Texture2D" uid="uid://b75cl1cl5ds5e" path="res://Screens/Overworld/ExpandedButton/BGColor.png" id="4_b4fx5"]
 [ext_resource type="ButtonGroup" uid="uid://de7k1tuawexim" path="res://Screens/Overworld/TerritoryButtonGroup.tres" id="5_6xcty"]
 [ext_resource type="Texture2D" uid="uid://k1lgvb5f4f0l" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="5_ij8ad"]
-[ext_resource type="Texture2D" uid="uid://ck3oa8ftfyfga" path="res://Screens/Overworld/ButtonImage/Alara.png" id="6_2p5nu"]
 [ext_resource type="Texture2D" uid="uid://bnk231ahs1kmg" path="res://Screens/Overworld/ExpandedButton/spacing.png" id="6_q4oxn"]
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="7_y88vb"]
 [ext_resource type="Texture2D" uid="uid://en77gxcfd3r0" path="res://Screens/Overworld/ExpandedButton/home.png" id="9_f1dxg"]
@@ -81,7 +80,7 @@ offset_bottom = 3110.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("7_y88vb")
 theme_override_font_sizes/font_size = 350
-text = "Enemy Leader: %s"
+text = "Enemy Leader: None"
 horizontal_alignment = 1
 
 [node name="ForceLabel" type="Label" parent="ExtendedEnemyPanel"]
@@ -93,7 +92,7 @@ offset_bottom = 3549.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("7_y88vb")
 theme_override_font_sizes/font_size = 350
-text = "Force Strength: %s"
+text = "Force Strength: None"
 horizontal_alignment = 1
 
 [node name="AttackButton" type="TextureButton" parent="ExtendedEnemyPanel"]
@@ -185,7 +184,6 @@ offset_right = 4314.0
 offset_bottom = 2492.0
 toggle_mode = true
 button_group = ExtResource("5_6xcty")
-texture_normal = ExtResource("6_2p5nu")
 metadata/_edit_lock_ = true
 
 [node name="Label" type="Label" parent="."]
@@ -199,7 +197,6 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 13
 theme_override_fonts/font = ExtResource("7_y88vb")
 theme_override_font_sizes/font_size = 400
-text = "Zetennu"
 horizontal_alignment = 1
 vertical_alignment = 1
 

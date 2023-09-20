@@ -14,7 +14,8 @@ func register_objects():
 		if !dir.current_is_dir() and filename.ends_with(".tres"):
 			var res = load("res://Screens/Battle/data/" + filename)
 			if res is Chara:
-				Globals.chara[res.name] = res
+				#Globals.chara[res.name] = res
+				pass 
 			elif res is DoodadType:
 				Globals.doodad_type[res.resource_name] = res
 			elif res is StatusEffect:
@@ -26,7 +27,9 @@ func register_objects():
 			else:
 				print("unrecognized resource file %s" % filename)
 		filename = dir.get_next()
-
+	
+	Globals.chara = Globals.charas.duplicate()
+	
 
 func _on_button_pressed():
 	#Globals.battle.load_map_scene(map_scene
@@ -35,4 +38,4 @@ func _on_button_pressed():
 	register_objects()
 	
 	
-	#Globals.battle.start_battle(Globals.empires[1], Globals.empires[2], Territory.Neru_Khisi)
+	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])
