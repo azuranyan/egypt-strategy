@@ -27,7 +27,7 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 [resource]
 script = ExtResource("1_lcic4")
 chara = ExtResource("1_86ubo")
-name = ""
+name = "Lysandra"
 behavior = 0
 avatar = ""
 title = ""

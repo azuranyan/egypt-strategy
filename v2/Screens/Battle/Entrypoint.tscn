@@ -16,7 +16,6 @@ script = ExtResource("1_5clfs")
 map_scene = ExtResource("2_dcep5")
 
 [node name="Overworld" parent="." instance=ExtResource("3_xo6ed")]
-visible = false
 layout_mode = 1
 
 [node name="Button" type="Button" parent="."]
@@ -52,10 +51,6 @@ alignment = 1
 
 [node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-item_count = 1
-selected = 0
-popup/item_0/text = "Lysandra"
-popup/item_0/id = 0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -63,10 +58,6 @@ text = "vs"
 
 [node name="OptionButton2" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-item_count = 1
-selected = 0
-popup/item_0/text = "Lysandra"
-popup/item_0/id = 0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -74,9 +65,5 @@ alignment = 1
 
 [node name="OptionButton3" type="OptionButton" parent="VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-item_count = 1
-selected = 0
-popup/item_0/text = "Starting Zone"
-popup/item_0/id = 0
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

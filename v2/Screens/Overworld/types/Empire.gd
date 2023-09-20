@@ -49,13 +49,8 @@ func is_territory_adjacent(territory: Territory) -> bool:
 
 
 ## Returns all the controlled units... TODO to be fixed
-func get_controlled_units() -> PackedStringArray:
-	var controlled_units := PackedStringArray()
-	
-	for t in territories:
-		controlled_units.append_array(t.get_spawn_units())
-		
-	return controlled_units
+func build_unit_list():
+	pass
 	
 	
 ## Returns true if the empire is beaten.

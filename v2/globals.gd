@@ -31,6 +31,11 @@ var empires := {
 	# This will be auto populated in Overworld._ready
 }
 
+var maps := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+
 var prefs := {
 	'defeat_if_home_territory_captured': true,
 }

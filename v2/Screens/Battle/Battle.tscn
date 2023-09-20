@@ -168,6 +168,7 @@ func auto_fill_slots() -> void:
 	# units = all_qualified_units_in_empire
 	# fill_required_slots(units)
 	# fill_slots(units)
+	
 	pass
 	
 func player_fill_slots():

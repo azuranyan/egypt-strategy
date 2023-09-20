@@ -27,11 +27,6 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _ready():
-	if Engine.is_editor_hint():
-		print("[editor] ready: %s <%s> button" % [self, territory])
-	else:
-		print("ready: %s <%s> button" % [self, territory])
-	
 	# this has to be here and cannot be connected through inspector. we only
 	territory_changed.connect(_on_territory_changed)
 	territory = territory

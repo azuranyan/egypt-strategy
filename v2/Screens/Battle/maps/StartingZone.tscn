@@ -220,6 +220,7 @@ map_pos = Vector2(3, 2)
 impassable = false
 no_show = true
 metadata/spawn_point = "ai"
+metadata/spawn_unit = PackedStringArray("Maia", "Zahra")
 
 [node name="AISpawn2" type="Node2D" parent="."]
 visibility_layer = 512

@@ -83,3 +83,27 @@ func remove_object(object: MapObject):
 ## Returns true if uniform pos is inside bounds.
 func is_inside_bounds(pos: Vector2) -> bool:
 	return pos.x >= 0 and pos.y >= 0 and pos.x <= world.map_size.x-1 and pos.y <= world.map_size.y-1
+	
+
+## Returns a list of spawnable units.
+func get_spawn_units(spawn_point: String) -> PackedStringArray:
+	var re := PackedStringArray()
+	
+	var arr = []
+	for obj in get_objects():
+		if obj.has_meta("spawn_point") and obj.get_meta("spawn_point") == spawn_point:
+			var spawn = obj.get_meta("spawn_unit", null)
+			if spawn is PackedStringArray:
+				arr.append_array(spawn)
+			elif spawn is Array:
+				for s in spawn:
+					if s is String:
+						arr.append(s)
+			elif spawn is String:
+				arr.append(spawn)
+				
+	for s in arr:
+		if s not in re:
+			re.append(s)
+			
+	return re

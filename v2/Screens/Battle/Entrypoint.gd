@@ -6,6 +6,30 @@ extends Control
 @export var map_scene: PackedScene
 
 
+@onready var label_attacker := $VBoxContainer/HBoxContainer/OptionButton
+@onready var label_defender := $VBoxContainer/HBoxContainer/OptionButton2
+@onready var label_territory := $VBoxContainer/HBoxContainer2/OptionButton3
+
+
+func _ready():
+	register_objects()
+	register_maps()
+	
+	
+	for empire in Globals.empires.values():
+		if empire.is_player_owned():
+			label_attacker.add_item(empire.leader.name)
+		else:
+			label_defender.add_item(empire.leader.name)
+			
+	for map in Globals.maps.values():
+		label_territory.add_item(map.scene_file_path if map.scene_file_path != "" else map.name)
+	
+
+func register_maps():
+	Globals.maps["Starting Zone"] = preload("res://Screens/Battle/maps/StartingZone.tscn").instantiate()
+	
+	
 func register_objects():
 	var dir := DirAccess.open("res://Screens/Battle/data/")
 	dir.list_dir_begin()
@@ -32,10 +56,8 @@ func register_objects():
 	
 
 func _on_button_pressed():
-	#Globals.battle.load_map_scene(map_scene
 	add_child(Globals.battle)
 	
-	register_objects()
-	
+	# TODO when starting battle, close all overworld interactions
 	
 	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])

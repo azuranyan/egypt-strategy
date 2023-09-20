@@ -1,49 +1,49 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://db07m7y1a3tmi"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://b5spvvgwm508l"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_2ipdn"]
-[ext_resource type="Resource" uid="uid://c77i5p06r7021" path="res://Screens/Battle/data/Chara_Zahra.tres" id="2_5xca7"]
+[ext_resource type="Resource" uid="uid://huxgesii8gou" path="res://Screens/Battle/data/Chara_Ishtar.tres" id="2_vdmxq"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_ifk28"]
 
 [sub_resource type="Resource" id="Resource_obwcd"]
 script = ExtResource("1_2ipdn")
-name = "Cleave"
-description = "Zahra's basic attack."
+name = "Magic Bonk"
+description = "Ishtar's basic attack."
 range = 1
-status_effect = "None"
+status_effect = "STN"
 target_melee = true
-target_unit = 3
-target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(-1, 0), Vector2i(1, 0)])
+target_unit = 6
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [sub_resource type="Resource" id="Resource_7evmx"]
 script = ExtResource("1_2ipdn")
-name = "Vulnerable"
-description = "Zahra special"
-range = 1
-status_effect = "VUL"
-target_melee = true
+name = "Magic Missile"
+description = "Ishtar's special"
+range = 2
+status_effect = "None"
+target_melee = false
 target_unit = 2
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [resource]
 script = ExtResource("3_ifk28")
-chara = ExtResource("2_5xca7")
-name = ""
-behavior = 1
+chara = ExtResource("2_vdmxq")
+name = "Ishtar"
+behavior = 3
 avatar = ""
 title = ""
 map_color = Color(1, 1, 1, 1)
-stat_hp = 4
-stat_mov = 2
-stat_dmg = 2
+stat_hp = 3
+stat_mov = 3
+stat_dmg = 1
 stat_growth_1 = {
 "dmg": 0,
 "hp": 1,
 "mov": 0
 }
 stat_growth_2 = {
-"dmg": 1,
+"dmg": 0,
 "hp": 0,
-"mov": 0
+"mov": 1
 }
 basic_attack = SubResource("Resource_obwcd")
 special_attack = SubResource("Resource_7evmx")
