@@ -39,6 +39,7 @@ var facing: float:
 @onready var _hud_hp_label = $HUD/hp_label
 @onready var _hud_name = $HUD/name
 @onready var _hud_rect = $HUD/rect
+@onready var _hud_status_effects = $HUB/StatusEffects
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -102,7 +103,7 @@ func _on_unit_changed():
 		_hud_hp_label.text = ""
 		_hud_name.text = ""
 		_hud_rect.color = Color.BLACK
-		
+
 
 func _on_facing_changed():
 	var h := get_heading()
@@ -123,15 +124,22 @@ func _on_unit_stat_changed(stat):
 	
 
 func _on_unit_status_effect_added(effect):
-	pass
-	
-	
+	var icon = preload("res://Screens/Battle/StatusEffectIcon.tscn").instantiate()
+	_hud_status_effects.add_child(icon)
+	icon.texture = effect.status_effect.icon
+	effect.set_meta("hud_icon", icon)
+
+
 func _on_unit_status_effect_changed(effect):
-	pass
-	
-	
-func _on_unit_status_effect_removed(effect):
-	pass
+	if effect.duration <= 1:
+		effect.get_meta("hud_icon").play("blink")
+
+
+func _on_unit_status_effect_removed(effect: Object):
+	var icon = effect.get_meta("hud_icon")
+	effect.remove_meta("hud_icon")
+	_hud_status_effects.remove_child(icon)
+	icon.free()
 
 
 func _on_unit_empire_changed():

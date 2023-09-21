@@ -138,9 +138,9 @@ func get_leader() -> Chara:
 	return empire.leader if empire else null
 
 
-
 ## Simple class for holding status effect instance information.
 class AppliedStatusEffect:
 	var status_effect: StatusEffect
 	var duration: int
+	var stacks: int
 	

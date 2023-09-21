@@ -124,6 +124,21 @@ offset = Vector2(0, -64)
 flip_h = true
 
 [node name="HUD" type="Node2D" parent="."]
+position = Vector2(0, -15)
+
+[node name="StatusEffects" type="HBoxContainer" parent="HUD"]
+custom_minimum_size = Vector2(112, 32)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -56.0
+offset_top = -159.0
+offset_right = 84.0
+offset_bottom = -127.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="rect" type="ColorRect" parent="HUD"]
 offset_left = -57.0
@@ -174,6 +189,7 @@ offset_top = -196.0
 offset_right = 4.0
 offset_bottom = -170.0
 text = "Zahra"
+metadata/_edit_use_anchors_ = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
