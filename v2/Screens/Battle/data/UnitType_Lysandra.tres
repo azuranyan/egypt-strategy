@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://cpbfkmumc5lef"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://cpbfkmumc5lef"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_2t34a"]
 [ext_resource type="Resource" uid="uid://dm37wpgx22flt" path="res://Screens/Battle/data/Chara_Lysandra.tres" id="1_86ubo"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_lcic4"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_1n4b3"]
 
 [sub_resource type="Resource" id="Resource_obwcd"]
 script = ExtResource("1_2t34a")
@@ -27,11 +28,12 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 [resource]
 script = ExtResource("1_lcic4")
 chara = ExtResource("1_86ubo")
+sprite_frames = ExtResource("4_1n4b3")
 name = "Lysandra"
 behavior = 0
-avatar = ""
-title = ""
-map_color = Color(1, 1, 1, 1)
+avatar = "Priestess of Ra"
+title = "Supreme Sun God"
+map_color = Color(0.666667, 0.352941, 0.2, 1)
 stat_hp = 5
 stat_mov = 2
 stat_dmg = 2

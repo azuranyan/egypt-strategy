@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://bjboq0txrh33r"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://bjboq0txrh33r"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_0xis3"]
 [ext_resource type="Resource" uid="uid://dveq80t2bfh4s" path="res://Screens/Battle/data/Chara_Maia.tres" id="2_3vqr0"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_do15t"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_u8ad4"]
 
 [sub_resource type="Resource" id="Resource_obwcd"]
 script = ExtResource("1_0xis3")
@@ -27,11 +28,12 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 [resource]
 script = ExtResource("3_do15t")
 chara = ExtResource("2_3vqr0")
+sprite_frames = ExtResource("4_u8ad4")
 name = "Maia"
 behavior = 1
-avatar = ""
-title = ""
-map_color = Color(1, 1, 1, 1)
+avatar = "Avatar of Osiris"
+title = "Dualistic Death God"
+map_color = Color(0.313726, 0.784314, 0.470588, 1)
 stat_hp = 4
 stat_mov = 2
 stat_dmg = 1

@@ -223,12 +223,12 @@ func add_unit(unit: Unit, pos := Vector2.ZERO):
 	# TODO spawned_units is a misnomer and should be changed later
 	# what policy do we even use for spawned and added units?
 	context.spawned_units.append(unit)
-	map.place_object(unit, pos)
+	#map.place_object(unit, pos)
 	
 	
 ## Removes a unit from the map.
 func remove_unit(unit: Unit):
-	map.remove_object(unit)
+	#map.remove_object(unit)
 	context.spawned_units.erase(unit)
 	
 

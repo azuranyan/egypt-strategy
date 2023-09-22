@@ -26,73 +26,82 @@ metadata/_edit_lock_ = true
 position = Vector2(1397, 734)
 scale = Vector2(0.05, 0.05)
 
-[node name="Zetennu" type="Node" parent="TerritoryButton1"]
+[node name="Zetennu" type="Node" parent="TerritoryButton1" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton2/Neru-Khisi")]
 maps = Array[PackedScene]([ExtResource("5_oqdnn")])
-units = PackedStringArray("Maia", "Zahra")
+units = PackedStringArray("Zahra", "Maia")
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1504, 453)
 scale = Vector2(0.05, 0.05)
 
-[node name="Neru-Khisi" type="Node" parent="TerritoryButton2"]
+[node name="Neru-Khisi" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton3/Satayi"), NodePath("../../TerritoryButton5/Medjed\'s Beacon"), NodePath("../../TerritoryButton1/Zetennu")]
 units = PackedStringArray()
 
 [node name="TerritoryButton3" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1545, 160)
 scale = Vector2(0.05, 0.05)
 
-[node name="Satayi" type="Node" parent="TerritoryButton3"]
+[node name="Satayi" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton4/Khel-Et"), NodePath("../../TerritoryButton2/Neru-Khisi")]
 units = PackedStringArray()
 
 [node name="TerritoryButton4" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1244, 125)
 scale = Vector2(0.05, 0.05)
 
-[node name="Khel-Et" type="Node" parent="TerritoryButton4"]
+[node name="Khel-Et" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton7/Forsaken Temple"), NodePath("../../TerritoryButton3/Satayi")]
 units = PackedStringArray()
 
 [node name="TerritoryButton5" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(982, 419)
 scale = Vector2(0.05, 0.05)
 
-[node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton5"]
+[node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton5" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton7/Forsaken Temple"), NodePath("../../TerritoryButton8/Ruins of Atesh"), NodePath("../../TerritoryButton6/Fort Zaka"), NodePath("../../TerritoryButton2/Neru-Khisi")]
 units = PackedStringArray()
 
 [node name="TerritoryButton6" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(880, 672)
 scale = Vector2(0.05, 0.05)
 
-[node name="Fort Zaka" type="Node" parent="TerritoryButton6"]
+[node name="Fort Zaka" type="Node" parent="TerritoryButton6" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton5/Medjed\'s Beacon"), NodePath("../../TerritoryButton9/Nekhet\'s Rest")]
 units = PackedStringArray()
 
 [node name="TerritoryButton7" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(702, 123)
 scale = Vector2(0.05, 0.05)
 
-[node name="Forsaken Temple" type="Node" parent="TerritoryButton7"]
+[node name="Forsaken Temple" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton5/Medjed\'s Beacon"), NodePath("../../TerritoryButton4/Khel-Et")]
 units = PackedStringArray()
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(608, 401)
 scale = Vector2(0.05, 0.05)
 
-[node name="Ruins of Atesh" type="Node" parent="TerritoryButton8"]
+[node name="Ruins of Atesh" type="Node" parent="TerritoryButton8" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton5/Medjed\'s Beacon")]
 units = PackedStringArray()
 
 [node name="TerritoryButton9" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(337, 634)
 scale = Vector2(0.05, 0.05)
 
-[node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton9"]
+[node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton9" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
+adjacent = [NodePath("../../TerritoryButton6/Fort Zaka")]
 units = PackedStringArray()
 
 [node name="TerritoryButton10" parent="." instance=ExtResource("3_aby1e")]

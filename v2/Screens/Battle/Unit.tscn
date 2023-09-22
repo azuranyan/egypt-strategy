@@ -1,71 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://ckc3yfrlty6nj"]
+[gd_scene load_steps=10 format=3 uid="uid://b6fvp0wup6fkc"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Unit.gd" id="1_bbiad"]
-[ext_resource type="Texture2D" uid="uid://cuaqb1irywx58" path="res://Screens/Battle/sprites/BaseSpriteTesterBackAttack.png" id="3_ij2ke"]
-[ext_resource type="Texture2D" uid="uid://c8dlgbjvo7rjx" path="res://Screens/Battle/sprites/BaseSpriteTesterBackIdle.png" id="4_4woqw"]
-[ext_resource type="Texture2D" uid="uid://bxs83jfee0p2l" path="res://Screens/Battle/sprites/BaseSpriteTesterBackWalk.png" id="5_hv4kt"]
-[ext_resource type="Texture2D" uid="uid://b20yest7yawen" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontAttack.png" id="6_ihu41"]
-[ext_resource type="Texture2D" uid="uid://bjbxk1841dsf8" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontIdle.png" id="7_yob5h"]
-[ext_resource type="Texture2D" uid="uid://dautgftolmkg" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontWalk.png" id="8_of6eb"]
+[ext_resource type="Script" path="res://Screens/Battle/UnitInstance.gd" id="2_lvi3s"]
+[ext_resource type="Resource" uid="uid://db07m7y1a3tmi" path="res://Screens/Battle/data/UnitType_Zahra.tres" id="3_rfi1m"]
+[ext_resource type="PackedScene" uid="uid://ce6s6ofk01nub" path="res://Screens/Battle/UnitModel.tscn" id="6_hejk3"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_jjgb4"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("3_ij2ke")
-}],
-"loop": true,
-"name": &"BackAttack",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("4_4woqw")
-}],
-"loop": true,
-"name": &"BackIdle",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("5_hv4kt")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_4woqw")
-}],
-"loop": true,
-"name": &"BackWalk",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_ihu41")
-}],
-"loop": true,
-"name": &"FrontAttack",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("7_yob5h")
-}],
-"loop": true,
-"name": &"FrontIdle",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_of6eb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_yob5h")
-}],
-"loop": true,
-"name": &"FrontWalk",
-"speed": 5.0
-}]
+[sub_resource type="Curve2D" id="Curve2D_g60p7"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_expkq"]
+[sub_resource type="LabelSettings" id="LabelSettings_cytam"]
 font_size = 20
 outline_size = 2
 outline_color = Color(0, 0, 0, 1)
@@ -73,34 +15,10 @@ outline_color = Color(0, 0, 0, 1)
 [sub_resource type="Animation" id="Animation_4d8wl"]
 resource_name = "highlight"
 loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5, 1),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
-}
 
 [sub_resource type="Animation" id="Animation_1evga"]
 resource_name = "highlight_red"
 loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5, 1),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1)]
-}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xege1"]
 _data = {
@@ -108,26 +26,51 @@ _data = {
 "highlight_red": SubResource("Animation_1evga")
 }
 
-[node name="Unit" type="Node2D"]
-z_index = 1
-z_as_relative = false
-position = Vector2(887, 522)
+[node name="Unit" type="Path2D"]
+position = Vector2(505.554, 543.329)
+curve = SubResource("Curve2D_g60p7")
 script = ExtResource("1_bbiad")
+walk_speed = 200.0
+facing = 0.0
 
-[node name="Sprite" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_jjgb4")
-animation = &"BackWalk"
-offset = Vector2(0, -64)
+[node name="Zahra" type="Node" parent="."]
+script = ExtResource("2_lvi3s")
+unit_type = ExtResource("3_rfi1m")
 
-[node name="HUD" type="Node2D" parent="."]
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+rotates = false
+loop = false
+metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="HUD"]
+[node name="UnitModel" parent="PathFollow2D" instance=ExtResource("6_hejk3")]
+
+[node name="HUD" type="Node2D" parent="PathFollow2D"]
+position = Vector2(0, -15)
+
+[node name="StatusEffects" type="HBoxContainer" parent="PathFollow2D/HUD"]
+custom_minimum_size = Vector2(112, 32)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -56.0
+offset_top = -159.0
+offset_right = 84.0
+offset_bottom = -127.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="rect" type="ColorRect" parent="PathFollow2D/HUD"]
 offset_left = -57.0
 offset_top = -189.0
 offset_right = -47.0
 offset_bottom = -179.0
+color = Color(0, 0.501961, 0.501961, 1)
+metadata/_edit_use_anchors_ = true
 
-[node name="MaxHP" type="ColorRect" parent="HUD"]
+[node name="maxhp_bar" type="ColorRect" parent="PathFollow2D/HUD"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -140,8 +83,9 @@ offset_bottom = -164.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.14902, 0.211765, 0.180392, 1)
+metadata/_edit_use_anchors_ = true
 
-[node name="HP" type="ColorRect" parent="HUD"]
+[node name="hp_bar" type="ColorRect" parent="PathFollow2D/HUD"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -154,36 +98,27 @@ offset_bottom = -165.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.384314, 0.819608, 0.470588, 1)
+metadata/_edit_use_anchors_ = true
 
-[node name="Label" type="Label" parent="HUD"]
+[node name="hp_label" type="Label" parent="PathFollow2D/HUD"]
 offset_left = 14.0
 offset_top = -181.0
 offset_right = 54.0
 offset_bottom = -150.0
-text = "5/5"
-label_settings = SubResource("LabelSettings_expkq")
+text = "4/4"
+label_settings = SubResource("LabelSettings_cytam")
 horizontal_alignment = 2
+metadata/_edit_use_anchors_ = true
 
-[node name="Label2" type="Label" parent="HUD"]
-offset_left = 5.0
-offset_top = 33.0
-offset_right = 45.0
-offset_bottom = 59.0
-text = "x, y"
-
-[node name="Label3" type="Label" parent="HUD"]
+[node name="name" type="Label" parent="PathFollow2D/HUD"]
 offset_left = -43.0
 offset_top = -196.0
 offset_right = 4.0
 offset_bottom = -170.0
-text = "Name"
+text = "Zahra"
+metadata/_edit_use_anchors_ = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_xege1")
-}
-
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="PathFollow2D"]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -197,5 +132,16 @@ offset_bottom = 14.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 1
+metadata/_edit_use_anchors_ = true
 
-[connection signal="gui_input" from="Control" to="." method="_on_control_gui_input"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_xege1")
+}
+
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
+[connection signal="facing_changed" from="." to="." method="_on_facing_changed"]
+[connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
+[connection signal="walking_started" from="." to="." method="_on_walking_started"]
+[connection signal="gui_input" from="PathFollow2D/Control" to="." method="_on_control_gui_input"]

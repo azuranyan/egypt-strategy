@@ -14,7 +14,11 @@ class_name Territory
 		maps = value
 		update_configuration_warnings()
 
-@export var units: PackedStringArray = []
+## List of unit names given to empire.
+@export var units: PackedStringArray = []:
+	set(value):
+		units = value
+		update_configuration_warnings()
 
 ## The empire this territory belongs to.
 var empire: Empire
@@ -32,14 +36,29 @@ func _get_configuration_warnings() -> PackedStringArray:
 			if not instance is Map:
 				warnings.append("%s is not a Map" % instance.name)
 			else:
-				for s in instance.get_spawn_units("ai"):
-					if s not in units:
-						warnings.append("Map %s spawn_unit '%s' not in units list" % [i, s])
+				var validation_warnings := _validate_map_unit_list(instance)
+				for ws in validation_warnings:
+					warnings.append("Map %s: %s" % [i, ws])
 			instance.free()
 		else:
 			warnings.append("Map %s is null" % i)
 	
 	return warnings
+
+
+func _validate_map_unit_list(map: Map) -> PackedStringArray:
+	var re := PackedStringArray()
+	
+	for name in map.get_spawn_units("ai"):
+		match name:
+			"*":
+				pass
+				
+			_:
+				if name not in units:
+					re.append("spawn_unit '%s' not in units list" % name)
+	
+	return re
 	
 
 ## Returns true if player owned.

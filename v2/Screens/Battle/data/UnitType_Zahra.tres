@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://db07m7y1a3tmi"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://db07m7y1a3tmi"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_mxg5a"]
 [ext_resource type="Resource" uid="uid://c77i5p06r7021" path="res://Screens/Battle/data/Chara_Zahra.tres" id="2_ftxe1"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_sp700"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_io3ex"]
 
 [sub_resource type="Resource" id="Resource_obwcd"]
 script = ExtResource("1_mxg5a")
@@ -27,11 +28,12 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 [resource]
 script = ExtResource("3_sp700")
 chara = ExtResource("2_ftxe1")
+sprite_frames = ExtResource("4_io3ex")
 name = "Zahra"
 behavior = 1
-avatar = ""
-title = ""
-map_color = Color(1, 1, 1, 1)
+avatar = "Avatar of Sobek"
+title = "Cruel Crocodile God"
+map_color = Color(0, 0.501961, 0.501961, 1)
 stat_hp = 4
 stat_mov = 2
 stat_dmg = 2

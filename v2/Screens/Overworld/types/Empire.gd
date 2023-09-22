@@ -7,11 +7,17 @@ var aggression: float = base_aggression
 var hp_multiplier: float = 1.0
 var home_territory: Territory = null
 
-var units: Array[Unit] = []
+var units: Array[UnitInstance] = []
 
 func _init():
 	base_aggression = randf()/2
 	
+
+## Internal function to build the initial unit list.
+func build_unit_list():
+	for t in territories:
+		pass
+		
 
 ## Returns all the adjacent territories.
 func get_adjacent() -> Array[Territory]:
@@ -47,11 +53,6 @@ func is_territory_adjacent(territory: Territory) -> bool:
 				
 	return false
 
-
-## Returns all the controlled units... TODO to be fixed
-func build_unit_list():
-	pass
-	
 	
 ## Returns true if the empire is beaten.
 func is_beaten() -> bool:

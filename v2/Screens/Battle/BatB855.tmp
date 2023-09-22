@@ -270,14 +270,14 @@ func _on_character_list_unit_released(unit: Unit, pos: Vector2):
 		
 	# remove the unit temporarily. if we can spawn there, add it again
 	_remove_unit(unit)
-#	if can_spawn(unit, unit.map_pos):
-#		var unit2 := battle.map.get_object_at(unit.map_pos, false) as Unit
-#		if unit2:
-#			if selected_moved:
-#				unit2.map_pos = selected_original_pos
-#			else:
-#				_remove_unit(unit2)
-#		_add_unit(unit, unit.map_pos)
+	if can_spawn(unit, unit.map_pos):
+		#var unit2 := battle.map.get_object_at(unit.map_pos, false) as Unit
+		if unit2:
+			if selected_moved:
+				unit2.map_pos = selected_original_pos
+			else:
+				_remove_unit(unit2)
+		_add_unit(unit, unit.map_pos)
 		
 	
 	unit.animation.stop()

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://b5spvvgwm508l"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://b5spvvgwm508l"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_2ipdn"]
 [ext_resource type="Resource" uid="uid://huxgesii8gou" path="res://Screens/Battle/data/Chara_Ishtar.tres" id="2_vdmxq"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_ifk28"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_0f4qp"]
 
 [sub_resource type="Resource" id="Resource_obwcd"]
 script = ExtResource("1_2ipdn")
@@ -27,11 +28,12 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 [resource]
 script = ExtResource("3_ifk28")
 chara = ExtResource("2_vdmxq")
+sprite_frames = ExtResource("4_0f4qp")
 name = "Ishtar"
 behavior = 3
-avatar = ""
-title = ""
-map_color = Color(1, 1, 1, 1)
+avatar = "Avatar of Isis"
+title = "Selfless Scorpion Goddess"
+map_color = Color(0.74902, 0.25098, 0.74902, 1)
 stat_hp = 3
 stat_mov = 3
 stat_dmg = 1

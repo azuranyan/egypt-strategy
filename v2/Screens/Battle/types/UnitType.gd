@@ -1,4 +1,6 @@
+@tool
 extends Resource
+
 ## Flyweight class for a unit.
 class_name UnitType
 
@@ -36,6 +38,9 @@ enum Behavior {
 ## The character this unit represents.
 @export var chara: Chara = null
 
+## The sprite frames.
+@export var sprite_frames: SpriteFrames = preload("res://Screens/Battle/sprites/Placeholder.tres")
+
 ## The name of this unit.
 @export var name: String = "":
 	set(value):
@@ -67,6 +72,7 @@ enum Behavior {
 		if title == "" and chara != null:
 			return chara.title
 		return title
+		
 	
 ## Color override.
 @export var map_color: Color = Color.WHITE:

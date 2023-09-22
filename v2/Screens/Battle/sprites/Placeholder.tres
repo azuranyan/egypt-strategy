@@ -1,0 +1,65 @@
+[gd_resource type="SpriteFrames" load_steps=7 format=3 uid="uid://bqwdhsbsyl6vv"]
+
+[ext_resource type="Texture2D" uid="uid://cuaqb1irywx58" path="res://Screens/Battle/sprites/BaseSpriteTesterBackAttack.png" id="1_r86gb"]
+[ext_resource type="Texture2D" uid="uid://c8dlgbjvo7rjx" path="res://Screens/Battle/sprites/BaseSpriteTesterBackIdle.png" id="2_1jh81"]
+[ext_resource type="Texture2D" uid="uid://bxs83jfee0p2l" path="res://Screens/Battle/sprites/BaseSpriteTesterBackWalk.png" id="3_swcbg"]
+[ext_resource type="Texture2D" uid="uid://b20yest7yawen" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontAttack.png" id="4_d2kfb"]
+[ext_resource type="Texture2D" uid="uid://bjbxk1841dsf8" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontIdle.png" id="5_dssaf"]
+[ext_resource type="Texture2D" uid="uid://dautgftolmkg" path="res://Screens/Battle/sprites/BaseSpriteTesterFrontWalk.png" id="6_7433e"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r86gb")
+}],
+"loop": true,
+"name": &"BackAttack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_1jh81")
+}],
+"loop": true,
+"name": &"BackIdle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_swcbg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_1jh81")
+}],
+"loop": true,
+"name": &"BackWalk",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_d2kfb")
+}],
+"loop": true,
+"name": &"FrontAttack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_dssaf")
+}],
+"loop": true,
+"name": &"FrontIdle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_7433e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_dssaf")
+}],
+"loop": true,
+"name": &"FrontWalk",
+"speed": 5.0
+}]

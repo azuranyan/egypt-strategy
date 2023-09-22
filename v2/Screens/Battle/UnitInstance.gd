@@ -12,8 +12,6 @@ signal status_effect_removed(effect: AppliedStatusEffect)
 signal empire_changed
 
 
-enum Heading { East, North, West, South }
-
 enum {
 	RESET_HP = 1 << 0,
 	RESET_STATS = 1 << 1,
@@ -105,13 +103,14 @@ func reset(flags := RESET_ALL):
 	
 
 ## Adds a status effect.
-func add_status_effect(status_effect: StatusEffect, duration: int):
+func add_status_effect(status_effect: StatusEffect, duration: int) -> AppliedStatusEffect:
 	var effect := AppliedStatusEffect.new()
 	effect.status_effect = status_effect
 	effect.duration = duration
 	
 	status_effects.append(effect)
 	status_effect_added.emit(effect)
+	return effect
 	
 	
 ## Ticks down the duration of a status effect.

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="StatusEffect" load_steps=3 format=3 uid="uid://j5pp3bxuuqv3"]
 
-[ext_resource type="Texture2D" uid="uid://ck46vkarhd85d" path="res://Screens/Battle/data/status_effect_vulnerable.png" id="1_j3olo"]
+[ext_resource type="Texture2D" uid="uid://4di7613aoofc" path="res://Screens/Battle/data/status_effect_poison.png" id="1_yv44u"]
 [ext_resource type="Script" path="res://Screens/Battle/types/StatusEffect.gd" id="2_urp2t"]
 
 [resource]
@@ -9,4 +9,4 @@ name = "Poison"
 description = "Takes 1 damage per turn."
 short_name = "PSN"
 short_description = "Poisoned"
-icon = ExtResource("1_j3olo")
+icon = ExtResource("1_yv44u")
