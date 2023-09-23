@@ -1,0 +1,91 @@
+[gd_scene load_steps=6 format=3 uid="uid://q8vgsodvjet4"]
+
+[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/WorldInstance.tscn" id="1_75fh4"]
+[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="2_g8hs2"]
+[ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/Unit.tscn" id="3_b07tu"]
+
+[sub_resource type="GDScript" id="GDScript_b0al4"]
+script/source = "extends Node2D
+
+
+@onready var unit := $Unit as Unit
+@onready var world := $WorldInstance.world as World
+
+
+## TODO code to be put somewhere else, unit just trusts that the path provided
+## are of right angles and not passing through objects
+static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
+	var re := PackedVector2Array()
+	var prev := Vector2.ZERO
+	
+	re.append(prev)
+	for p in path:
+		if p.x != prev.x and p.y != prev.y:
+			if p.x < p.y:
+				re.append(Vector2(p.x, prev.y))
+			else:
+				re.append(Vector2(prev.x, p.y))
+		re.append(p)
+		prev = p
+	return re
+			
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	unit.world = world
+	
+	$X.transform = world._world_to_screen_transform
+	$X.position = world.uniform_to_screen(Vector2.ZERO)
+	$Y.transform = world._world_to_screen_transform
+	$Y.position = world.uniform_to_screen(Vector2.ZERO)
+	
+	if not Engine.is_editor_hint():
+		var points: PackedVector2Array = [
+			Vector2(0, 3),
+			Vector2(3, 3),
+			Vector2(4, 5),
+			Vector2(3, 4),
+			Vector2(7, 2),
+			Vector2(0, 0),
+		]
+		
+		unit.walk_along.call_deferred(make_square_path(points))
+
+
+func _unhandled_input(event):
+	if event is InputEventMouseMotion and not unit.is_walking:
+		var mouse_pos: Vector2 = event.position
+		var target := world.screen_to_uniform(mouse_pos)
+		unit.face_towards(target)
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+"
+
+[sub_resource type="Curve2D" id="Curve2D_w2f0v"]
+
+[node name="Test" type="Node2D"]
+script = SubResource("GDScript_b0al4")
+
+[node name="WorldInstance" parent="." instance=ExtResource("1_75fh4")]
+world = ExtResource("2_g8hs2")
+
+[node name="Unit" parent="." instance=ExtResource("3_b07tu")]
+position = Vector2(1011.36, 251.987)
+curve = SubResource("Curve2D_w2f0v")
+
+[node name="X" type="Line2D" parent="."]
+visible = false
+points = PackedVector2Array(0, 0, 123.745, 0, 218, 0)
+width = 2.0
+default_color = Color(1, 0, 0, 1)
+
+[node name="Y" type="Line2D" parent="."]
+visible = false
+position = Vector2(0, -1)
+points = PackedVector2Array(0, 0, 0, 218)
+width = 2.0
+default_color = Color(0, 1, 0, 1)

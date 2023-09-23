@@ -9,4 +9,4 @@ resource_name = "Cactus_01"
 script = ExtResource("1_3s8x4")
 texture = ExtResource("2_w5f17")
 world = ExtResource("3_0wyb1")
-source_pos = Vector2(7, 0)
+source_pos = Vector2(7, 7)

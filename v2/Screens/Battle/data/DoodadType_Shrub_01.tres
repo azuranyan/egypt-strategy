@@ -9,4 +9,4 @@ resource_name = "Shrub_01"
 script = ExtResource("1_pwtu5")
 texture = ExtResource("2_udqyi")
 world = ExtResource("3_3npek")
-source_pos = Vector2(4, 6)
+source_pos = Vector2(4, 1)

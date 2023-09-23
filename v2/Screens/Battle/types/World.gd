@@ -89,7 +89,8 @@ func recalculate_uniform_transforms():
 	
 	# reverse y direction
 	m = m.translated(Vector2(0.5 - map_size.x/2, 0.5 - map_size.y/2))
-	m = m.scaled(Vector2(scaling, -scaling))
+	#m = m.scaled(Vector2(scaling, -scaling))
+	m = m.scaled(Vector2(scaling, scaling))
 	#m = m.rotated(deg_to_rad(-90))
 	
 	_uniform_world_transform = m

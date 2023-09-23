@@ -10,6 +10,8 @@ class_name WorldInstance
 @export var world: World:
 	set(value):
 		world = value
+		if not grid:
+			await self.ready
 		_update_world()
 	get:
 		return world
@@ -24,6 +26,7 @@ func _ready():
 
 
 func _update_world():
+	grid.world = world
 	#if world:
 	#	world.recalculate_uniform_transforms()
 	#	world.recalculate_world_transforms()

@@ -4,6 +4,7 @@ extends Path2D
 ## Object that renders a UnitInstance.
 class_name Unit
 
+signal world_changed
 
 signal unit_changed
 signal world_pos_changed
@@ -22,7 +23,10 @@ enum Heading { East, South, West, North }
 @export var walk_speed := 600.0
 
 ## The world object.
-@export var world: World = preload("res://Screens/Battle/data/World_StartingZone.tres")
+@export var world: World = preload("res://Screens/Battle/data/World_StartingZone.tres"):
+	set(value):
+		world = value
+		world_changed.emit()
 
 ## The position of this unit in the world.
 @export var world_pos := Vector2.ZERO:
@@ -36,18 +40,18 @@ enum Heading { East, South, West, North }
 	set(value):
 		facing = value
 		facing_changed.emit()
-		
-		
+
+
 ## The unit instance component.
-var unit: UnitInstance:
+var unit_instance: UnitInstance:
 	set(value):
-		if unit:
-			_disconnect_unit(unit)
-		unit = value
-		if unit:
-			_connect_unit(unit)
+		if unit_instance:
+			_disconnect_unit(unit_instance)
+		unit_instance = value
+		if unit_instance:
+			_connect_unit(unit_instance)
 		unit_changed.emit()
-		
+
 ## If this unit is walking.
 var is_walking := false:
 	set(value):
@@ -61,6 +65,7 @@ var _old_pos: Vector2
 
 
 @onready var model := $PathFollow2D/UnitModel as UnitModel
+@onready var shadow := $PathFollow2D/Shadow
 @onready var animation := $AnimationPlayer as AnimationPlayer
 @onready var path_follow := $PathFollow2D as PathFollow2D
 @onready var hud := $PathFollow2D/HUD
@@ -74,11 +79,11 @@ var _old_pos: Vector2
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	
-	if unit == null:
+	if unit_instance == null:
 		warnings.append("This node needs a UnitInstance component")
 	else:
 		for child in get_children():
-			if child is UnitInstance and child != unit:
+			if child is UnitInstance and child != unit_instance:
 				warnings.append("Multiple unit nodes detected")
 			
 	return warnings
@@ -86,25 +91,21 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# we can only connect after _ready
 	unit_changed.connect(_on_unit_changed)
-	
-	unit = unit
+	facing_changed.connect(_on_facing_changed)
+	walking_started.connect(_on_walking_started)
+	walking_finished.connect(_on_walking_finished)
+
+	world = world
+	world_pos = world_pos
+	unit_instance = unit_instance
+	facing = facing
 	
 	# keeping a reference to curve resource makes it extremely buggy
-	# because the points get saved. this is why we're creating a new
-	# curve every reload.
+	# because points is a resource that get saved with the scene. this
+	# is why we're creating a new curve every _ready.
 	curve = Curve2D.new()
-	
-	if not Engine.is_editor_hint():
-		var points: PackedVector2Array = [
-			Vector2(3, 3),
-			Vector2(4, 5),
-			Vector2(3, 4),
-			Vector2(7, 2),
-			Vector2(0, 0),
-		]
-		
-		walk_along.call_deferred(make_square_path(points))
 
 
 func _process(delta: float):
@@ -118,30 +119,12 @@ func _process(delta: float):
 	if path_follow.progress_ratio >= 1:
 		walking_finished.emit()
 
-	
+
 ## Faces towards target.
 func face_towards(target: Vector2):
 	var v := target - world_pos
 	facing = atan2(v.y, v.x)
-	
 
-## TODO code to be put somewhere else, unit just trusts that the path provided
-## are of right angles and not passing through objects
-func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
-	var re := PackedVector2Array()
-	var prev := Vector2.ZERO
-	
-	re.append(prev)
-	for p in path:
-		if p.x != prev.x and p.y != prev.y:
-			if p.x < p.y:
-				re.append(Vector2(p.x, prev.y))
-			else:
-				re.append(Vector2(prev.x, p.y))
-		re.append(p)
-		prev = p
-	return re
-			
 
 func walk_along(path: PackedVector2Array):
 	if path.is_empty():
@@ -163,34 +146,52 @@ func walk_along(path: PackedVector2Array):
 	world_pos = path[-1]
 	path_follow.progress = 0
 	curve.clear_points()
+
+
+func _connect_unit(_unit_instance: UnitInstance):
+	_unit_instance.renamed.connect(_on_unit_renamed)
+	_unit_instance.stat_changed.connect(_on_unit_stat_changed)
+	_unit_instance.status_effect_added.connect(_on_unit_status_effect_added)
+	_unit_instance.status_effect_changed.connect(_on_unit_status_effect_changed)
+	_unit_instance.status_effect_removed.connect(_on_unit_status_effect_removed)
+	_unit_instance.empire_changed.connect(_on_unit_empire_changed)
+
+
+func _disconnect_unit(_unit_instance: UnitInstance):
+	_unit_instance.renamed.disconnect(_on_unit_renamed)
+	_unit_instance.stat_changed.disconnect(_on_unit_stat_changed)
+	_unit_instance.status_effect_added.disconnect(_on_unit_status_effect_added)
+	_unit_instance.status_effect_changed.disconnect(_on_unit_status_effect_changed)
+	_unit_instance.status_effect_removed.disconnect(_on_unit_status_effect_removed)
+	_unit_instance.empire_changed.disconnect(_on_unit_empire_changed)
+
+
+func _on_world_changed():
+	position = world.uniform_to_screen(world_pos)
 	
+	var m = Transform2D()
 	
-func _connect_unit(_unit: UnitInstance):
-	_unit.renamed.connect(_on_unit_renamed)
-	_unit.stat_changed.connect(_on_unit_stat_changed)
-	_unit.status_effect_added.connect(_on_unit_status_effect_added)
-	_unit.status_effect_changed.connect(_on_unit_status_effect_changed)
-	_unit.status_effect_removed.connect(_on_unit_status_effect_removed)
-	_unit.empire_changed.connect(_on_unit_empire_changed)
+	# scale to downsize to unit vector
+	var shadow_scale := 1.0
+	m = m.scaled(Vector2(shadow_scale, shadow_scale)/shadow.texture.get_size())
+
+	# scale to tile size
+	m = m.scaled(Vector2(world.tile_size, world.tile_size))
+
+	shadow.transform = world._world_to_screen_transform * m
 	
-	
-func _disconnect_unit(_unit: UnitInstance):
-	_unit.renamed.disconnect(_on_unit_renamed)
-	_unit.stat_changed.disconnect(_on_unit_stat_changed)
-	_unit.status_effect_added.disconnect(_on_unit_status_effect_added)
-	_unit.status_effect_changed.disconnect(_on_unit_status_effect_changed)
-	_unit.status_effect_removed.disconnect(_on_unit_status_effect_removed)
-	_unit.empire_changed.disconnect(_on_unit_empire_changed)
-	
-	
+	# offset shadow
+	shadow.position = Vector2.ZERO
+
+
 func _on_unit_changed():
 	facing = PI
-	if unit:
-		model.sprite_frames = unit.unit_type.sprite_frames
+	if unit_instance:
+		model.sprite_frames = unit_instance.unit_type.sprite_frames
 		
 		_on_unit_stat_changed("hp")
-		_hud_name.text = unit.name
-		_hud_rect.color = unit.unit_type.map_color
+		_hud_name.text = unit_instance.name
+		_hud_rect.color = unit_instance.unit_type.map_color
 	else:
 		_hud_hp_label.text = ""
 		_hud_name.text = ""
@@ -198,15 +199,15 @@ func _on_unit_changed():
 
 
 func _on_unit_renamed():
-	_hud_name.text = unit.name
-	
-	
+	_hud_name.text = unit_instance.name
+
+
 func _on_unit_stat_changed(stat):
 	match stat:
 		"hp", "maxhp":
-			_hud_hp_bar.scale = Vector2(unit.hp/float(unit.maxhp), 1)
-			_hud_hp_label.text = "%s/%s" % [unit.hp, unit.maxhp]
-	
+			_hud_hp_bar.scale = Vector2(unit_instance.hp/float(unit_instance.maxhp), 1)
+			_hud_hp_label.text = "%s/%s" % [unit_instance.hp, unit_instance.maxhp]
+
 
 func _on_unit_status_effect_added(effect):
 	var icon = preload("res://Screens/Battle/StatusEffectIcon.tscn").instantiate()
@@ -233,15 +234,15 @@ func _on_unit_empire_changed():
 
 func _on_child_entered_tree(node: Node):
 	# we only connect if our unit is null
-	if node is UnitInstance and unit == null:
-		unit = node
+	if node is UnitInstance and unit_instance == null:
+		unit_instance = node
 	update_configuration_warnings()
 
 
 func _on_child_exiting_tree(node: Node):
 	# we only disconnect if node is our unit
-	if node == unit:
-		unit = null
+	if node == unit_instance:
+		unit_instance = null
 	update_configuration_warnings()
 		
 

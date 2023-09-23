@@ -202,7 +202,6 @@ func set_debug_tile_visible(debug_tile_visible: bool):
 	viewport.set_canvas_cull_mask_bit(9, debug_tile_visible)
 
 
-
 ## Spawns a unit of type tag with name at pos, facing x.
 func spawn_unit(tag: String, owner: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
 	assert(owner == context.attacker or owner == context.defender, "owner is neither empire!")	

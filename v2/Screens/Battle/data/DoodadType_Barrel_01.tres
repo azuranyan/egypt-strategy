@@ -9,4 +9,4 @@ resource_name = "Barrel_01"
 script = ExtResource("1_pybad")
 texture = ExtResource("2_rmjla")
 world = ExtResource("3_1xi15")
-source_pos = Vector2(2, 4)
+source_pos = Vector2(2, 3)

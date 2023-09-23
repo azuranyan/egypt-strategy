@@ -9,4 +9,4 @@ resource_name = "Barrel_02"
 script = ExtResource("1_mdbd8")
 texture = ExtResource("2_05hmi")
 world = ExtResource("3_luwme")
-source_pos = Vector2(2, 5)
+source_pos = Vector2(2, 2)
