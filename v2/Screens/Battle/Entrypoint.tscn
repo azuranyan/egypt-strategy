@@ -16,6 +16,7 @@ script = ExtResource("1_5clfs")
 map_scene = ExtResource("2_dcep5")
 
 [node name="Overworld" parent="." instance=ExtResource("3_xo6ed")]
+visible = false
 layout_mode = 1
 
 [node name="Button" type="Button" parent="."]

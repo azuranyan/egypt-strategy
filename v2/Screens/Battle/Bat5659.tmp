@@ -151,9 +151,8 @@ func enter(kwargs := {}) -> void:
 			battle.spawn_unit(\"Maia\", battle.context.attacker, \"\", Vector2(0, 2)),
 			battle.spawn_unit(\"Zahra\", battle.context.attacker, \"\", Vector2(0, 3)),
 		]
-		
-		for u in prep.units:
-			#battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
+		for u in test_units:
+			battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
 			battle.character_list.add_unit(u)
 		
 		for o in battle.map.get_objects():
@@ -208,9 +207,8 @@ func is_unit_spawn_point(unit: Unit, obj: MapObject) -> bool:
 
 
 ## Adds unit. Should be used within interactions.
-func _add_unit(unit: UnitInstance, pos: Vector2):
-	#battle.add_unit(unit, pos)
-	
+func _add_unit(unit: Unit, pos: Vector2):
+	battle.add_unit(unit, pos)
 	
 	var cb = [null, null]
 	cb[0] = func(button: int):
@@ -237,7 +235,7 @@ func _add_unit(unit: UnitInstance, pos: Vector2):
 
 ## Removes unit. Should be used within interactions.
 func _remove_unit(unit: Unit):
-	#battle.remove_unit(unit)
+	battle.remove_unit(unit)
 	
 	# remove callbacks
 	var cb = unit.get_meta(\"prep_phase_callbacks\")
@@ -247,7 +245,7 @@ func _remove_unit(unit: Unit):
 		unit.remove_meta(\"prep_phase_callbacks\")
 	
 
-func _on_character_list_unit_selected(unit: UnitInstance, pos: Vector2):
+func _on_character_list_unit_selected(unit: Unit, pos: Vector2):
 	pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	
 	selected = unit
@@ -264,7 +262,7 @@ func _on_character_list_unit_selected(unit: UnitInstance, pos: Vector2):
 	unit.modulate = Color(1, 1, 1, 0.5)
 	
 
-func _on_character_list_unit_released(unit: UnitInstance, pos: Vector2):
+func _on_character_list_unit_released(unit: Unit, pos: Vector2):
 	pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	
 	unit.snap()
@@ -289,7 +287,7 @@ func _on_character_list_unit_released(unit: UnitInstance, pos: Vector2):
 		selected_moved = false
 
 
-func _on_character_list_unit_dragged(unit: UnitInstance, pos: Vector2):
+func _on_character_list_unit_dragged(unit: Unit, pos: Vector2):
 	pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	
 	var mp := battle.map.world.screen_to_uniform(pos)
@@ -303,12 +301,12 @@ func _on_character_list_unit_dragged(unit: UnitInstance, pos: Vector2):
 	unit.visible = true
 
 
-func _on_character_list_unit_cancelled(unit: UnitInstance):
+func _on_character_list_unit_cancelled(unit: Unit):
 	_remove_unit(unit)
 	selected = null
 
 
-func _on_character_list_unit_highlight_changed(unit: UnitInstance, value: bool):
+func _on_character_list_unit_highlight_changed(unit: Unit, value: bool):
 	if value:
 		unit.animation.play(\"highlight\")
 	else:

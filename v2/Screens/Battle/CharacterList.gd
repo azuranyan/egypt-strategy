@@ -19,7 +19,7 @@ signal unit_cancelled(unit)
 signal unit_highlight_changed(unit, value)
 
 
-var units: Array[Unit] = []
+var units: Array[UnitInstance] = []
 #var selected: Unit
 
 
@@ -27,20 +27,20 @@ var units: Array[Unit] = []
 	
 
 ## Set the list of the units.
-func set_units(arr: Array[Unit]):
+func set_units(arr: Array[UnitInstance]):
 	clear_units()
 	for a in arr:
 		add_unit(a)
 	
 	
 ## Adds a unit to the character list.
-func add_unit(unit: Unit):
+func add_unit(unit: UnitInstance):
 	if has_unit(unit):
 		return
 		
 	var cb := load("res://Screens/Battle/CharacterButton.tscn").instantiate() as CharacterButton
 	cb.portrait = unit.unit_type.chara.portrait
-	cb.display_name = unit.unit_name
+	cb.display_name = unit.name
 	cb.set_meta("unit", unit)
 	
 	cb.selected.connect(func(pos: Vector2): _on_selected(cb, pos))
@@ -54,7 +54,7 @@ func add_unit(unit: Unit):
 	
 
 ## Removes a unit from the character list.
-func remove_unit(unit: Unit):
+func remove_unit(unit: UnitInstance):
 	var cb = get_button(unit)
 	if cb != null:
 		remove_child(cb)
@@ -71,12 +71,12 @@ func clear_units():
 	
 
 ## Returns true if the unit is in the list.
-func has_unit(unit: Unit) -> bool:
+func has_unit(unit: UnitInstance) -> bool:
 	return get_button(unit) != null
 
 
 ## Returns the button associated with the unit.
-func get_button(unit: Unit) -> CharacterButton:
+func get_button(unit: UnitInstance) -> CharacterButton:
 	for cb in container.get_children():
 		if cb.get_meta("unit") == unit:
 			return cb

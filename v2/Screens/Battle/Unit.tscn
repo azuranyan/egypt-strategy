@@ -1,12 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://b6fvp0wup6fkc"]
+[gd_scene load_steps=10 format=3 uid="uid://b6fvp0wup6fkc"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Unit.gd" id="1_bbiad"]
-[ext_resource type="Script" path="res://Screens/Battle/UnitInstance.gd" id="2_lvi3s"]
-[ext_resource type="Resource" uid="uid://db07m7y1a3tmi" path="res://Screens/Battle/data/UnitType_Zahra.tres" id="3_rfi1m"]
 [ext_resource type="Texture2D" uid="uid://drlkpesis0pbn" path="res://Screens/Battle/sprites/unit_shadow.png" id="4_7cqii"]
 [ext_resource type="PackedScene" uid="uid://ce6s6ofk01nub" path="res://Screens/Battle/UnitModel.tscn" id="6_hejk3"]
 
-[sub_resource type="Curve2D" id="Curve2D_5q1xe"]
+[sub_resource type="Curve2D" id="Curve2D_anla6"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cytam"]
 font_size = 20
@@ -15,21 +13,51 @@ outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="Animation" id="Animation_4d8wl"]
 resource_name = "highlight"
+length = 1.4
 loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PathFollow2D/UnitModel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1.5, 1.5, 1.5, 0), Color(1.5, 1.5, 1.5, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_1evga"]
 resource_name = "highlight_red"
+length = 1.4
 loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PathFollow2D/UnitModel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0, 0, 0), Color(1, 0, 0, 0.431373)]
+}
+
+[sub_resource type="Animation" id="Animation_l7nvc"]
+length = 0.001
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xege1"]
 _data = {
+"RESET": SubResource("Animation_l7nvc"),
 "highlight": SubResource("Animation_4d8wl"),
 "highlight_red": SubResource("Animation_1evga")
 }
 
 [node name="Unit" type="Path2D"]
 position = Vector2(1011.36, 251.987)
-curve = SubResource("Curve2D_5q1xe")
+curve = SubResource("Curve2D_anla6")
 script = ExtResource("1_bbiad")
 walk_speed = 200.0
 
@@ -47,10 +75,6 @@ grow_horizontal = 2
 grow_vertical = 0
 color = Color(0, 1, 0, 1)
 
-[node name="Zahra" type="Node" parent="."]
-script = ExtResource("2_lvi3s")
-unit_type = ExtResource("3_rfi1m")
-
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
 rotates = false
 loop = false
@@ -64,6 +88,7 @@ skew = 0.525625
 texture = ExtResource("4_7cqii")
 
 [node name="UnitModel" parent="PathFollow2D" instance=ExtResource("6_hejk3")]
+modulate = Color(1, 0, 0, 0.0323889)
 
 [node name="HUD" type="Node2D" parent="PathFollow2D"]
 position = Vector2(0, -15)
@@ -160,5 +185,4 @@ libraries = {
 
 [connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
-[connection signal="world_changed" from="." to="." method="_on_world_changed"]
 [connection signal="gui_input" from="PathFollow2D/Control" to="." method="_on_control_gui_input"]

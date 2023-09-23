@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_mdbd8"]
 [ext_resource type="Texture2D" uid="uid://db32pyc8xwr41" path="res://Screens/Battle/maps/StartingZoneObj8.png" id="2_05hmi"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_luwme"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_luwme"]
 
 [resource]
 resource_name = "Barrel_02"

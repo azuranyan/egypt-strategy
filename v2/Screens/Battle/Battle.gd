@@ -206,13 +206,21 @@ func set_debug_tile_visible(debug_tile_visible: bool):
 func spawn_unit(tag: String, owner: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
 	assert(owner == context.attacker or owner == context.defender, "owner is neither empire!")	
 	
-	var unit := load("res://Screens/Battle/Unit.tscn").instantiate() as Unit
-	unit.unit_type = Globals.unit_type[tag]
-	unit.unit_name = name if name != "" else tag
-	unit.unit_owner = owner
-	unit.heading = heading
-	
-	add_unit(unit, pos)
+	var unit := Unit.add_unit_type(map, Globals.unit_type[tag], {
+		empire = owner,
+		world = map.world,
+		world_pos = pos,
+#		facing = 0,
+#		hud = true,
+#		color = Color.WHITE,
+#		shadow = true,
+#		debug = false,
+		name = name if name != "" else tag,
+		heading = heading,
+	})
+		
+	#add_unit(unit, pos)
+	#map.add_child(unit)
 	
 	return unit
 	
@@ -222,6 +230,7 @@ func add_unit(unit: Unit, pos := Vector2.ZERO):
 	# TODO spawned_units is a misnomer and should be changed later
 	# what policy do we even use for spawned and added units?
 	context.spawned_units.append(unit)
+	
 	#map.place_object(unit, pos)
 	
 	

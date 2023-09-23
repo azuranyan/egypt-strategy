@@ -15,15 +15,19 @@ func _ready():
 	register_objects()
 	register_maps()
 	
+	var post_ready := func():
+		for empire in Globals.empires.values():
+			if empire.is_player_owned():
+				label_attacker.add_item(empire.leader.name)
+			else:
+				label_defender.add_item(empire.leader.name)
+				
+		for map in Globals.maps.values():
+			label_territory.add_item(map.scene_file_path if map.scene_file_path != "" else map.name)
 	
-	for empire in Globals.empires.values():
-		if empire.is_player_owned():
-			label_attacker.add_item(empire.leader.name)
-		else:
-			label_defender.add_item(empire.leader.name)
-			
-	for map in Globals.maps.values():
-		label_territory.add_item(map.scene_file_path if map.scene_file_path != "" else map.name)
+	# TODO overworld is waiting for us to finish, but the functions here require
+	# overworld to have run. this is ugly and should be changed.
+	post_ready.call_deferred()
 	
 
 func register_maps():

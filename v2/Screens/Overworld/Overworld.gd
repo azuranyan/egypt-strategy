@@ -23,6 +23,12 @@ func _ready():
 	else:
 		print("ready: overworld")
 		
+	# TODO parent._ready is what initializes the global variables, so having
+	# stuff set here means that parent._ready hasnt ran yet and we'd have
+	# nothing, that's why we wait for it to be ready. this is ugly and should
+	# be changed later to a better loading sequence
+	await get_parent().ready
+		
 	register_territories_to_globals()
 	
 	register_empires_to_globals()
@@ -240,7 +246,19 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 	
 	# assign home if needed
 	if home_territory:
+		assert(to_empire.home_territory == null, "home_territory set multiple times")
 		to_empire.home_territory = territory
+		to_empire.units.clear()
+		for unit_name in territory.units:
+			if not Globals.unit_type.has(unit_name):
+				for _un in Globals.unit_type:
+					print("found ", _un)
+				push_error("unit '%s' not found" % unit_name)
+				break
+			var unit_instance = UnitInstance.new()
+			unit_instance.empire = to_empire
+			unit_instance.unit_type = Globals.unit_type[unit_name]
+			to_empire.units.append(unit_instance)
 		
 	# change owner
 	territory.empire = to_empire

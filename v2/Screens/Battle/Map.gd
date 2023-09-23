@@ -4,7 +4,9 @@ class_name Map
 
 
 ## The world. Populated when world enters the scene tree.
-@export var world: World
+@export var world: World:
+	set(value):
+		world = value
 
 
 var dynamic_objects: Array[MapObject] = []

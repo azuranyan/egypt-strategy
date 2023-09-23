@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_q77gy"]
 [ext_resource type="Texture2D" uid="uid://w6y7na6ovo84" path="res://Screens/Battle/maps/StartingZoneObj3.png" id="2_77jmm"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_sxwef"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_sxwef"]
 
 [resource]
 resource_name = "Rock_01"

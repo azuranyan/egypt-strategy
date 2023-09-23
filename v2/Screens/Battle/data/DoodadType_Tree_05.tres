@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_3uqcl"]
 [ext_resource type="Texture2D" uid="uid://uocma8in3ofo" path="res://Screens/Battle/maps/StartingZoneObj13.png" id="2_2eyeo"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6s6gp"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6s6gp"]
 
 [resource]
 resource_name = "Tree_05"

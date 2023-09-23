@@ -1,7 +1,7 @@
-@tool
 extends Path2D
 
-## Object that renders a UnitInstance.
+## Object that renders a UnitInstance. This is not meant to be used directly
+## and instead use add_unit_type, add_unit_instance or add_ghost.
 class_name Unit
 
 signal world_changed
@@ -23,7 +23,7 @@ enum Heading { East, South, West, North }
 @export var walk_speed := 600.0
 
 ## The world object.
-@export var world: World = preload("res://Screens/Battle/data/World_StartingZone.tres"):
+@export var world: World:
 	set(value):
 		world = value
 		world_changed.emit()
@@ -32,7 +32,6 @@ enum Heading { East, South, West, North }
 @export var world_pos := Vector2.ZERO:
 	set(value):
 		world_pos = value
-		position = world.uniform_to_screen(world_pos)
 		world_pos_changed.emit()
 
 ## Where this unit is facing.
@@ -62,18 +61,87 @@ var is_walking := false:
 
 
 var _old_pos: Vector2
-
+var _kwargs: Dictionary
 
 @onready var model := $PathFollow2D/UnitModel as UnitModel
 @onready var shadow := $PathFollow2D/Shadow
 @onready var animation := $AnimationPlayer as AnimationPlayer
 @onready var path_follow := $PathFollow2D as PathFollow2D
+@onready var debug := $Debug
 @onready var hud := $PathFollow2D/HUD
 @onready var _hud_hp_bar = hud.get_node("hp_bar")
 @onready var _hud_hp_label = hud.get_node("hp_label")
 @onready var _hud_name = hud.get_node("name")
 @onready var _hud_rect = hud.get_node("rect")
 @onready var _hud_status_effects = hud.get_node("StatusEffects")
+
+
+## Creates a unit with a given type.
+static func add_unit_type(node: Node, unit_type: UnitType, kwargs := {}) -> Unit:
+	var unit_instance := UnitInstance.new()
+	unit_instance.unit_type = unit_type
+	unit_instance.empire = kwargs.get("empire", null)
+	
+	return add_unit_instance(node, unit_instance, kwargs)
+
+
+## Creates a unit with an already existing unit instance.
+static func add_unit_instance(node: Node, unit_instance: UnitInstance, kwargs := {}) -> Unit:
+	var unit := load("res://Screens/Battle/Unit.tscn").instantiate() as Unit
+	
+	# add unit instance to unit
+	if unit_instance.get_parent():
+		unit_instance.get_parent().remove_child(unit_instance)
+	unit.add_child(unit_instance)
+	
+	# initialize variables that need to be present on ready
+	unit.world = kwargs.get("world", null)
+	unit.world_pos = kwargs.get("world_pos", Vector2.ZERO)
+	unit.facing = kwargs.get("facing", 0)
+	
+	if kwargs.has("heading"):
+		unit.set_heading(kwargs.get("heading"))
+	
+	if kwargs.has("color"):
+		unit.modulate = kwargs.get("color", Color.WHITE)
+	
+	# add unit to map (calls ready)
+	node.add_child(unit)
+	
+	# initialize stuff that relies on stuff available after ready
+	unit.hud.visible = kwargs.get("hud", true)
+	unit.shadow.visible = kwargs.get("shadow", true)
+	unit.debug.visible = kwargs.get("debug", false)
+	
+	if kwargs.has("name"):
+		unit.unit_instance.name = kwargs.get("name")
+	
+	return unit
+	
+
+## Creates a ghost of a unit, unit instance or unit type.
+static func add_ghost(node: Node, variant: Variant) -> Unit:
+	var kwargs := {
+		hud = false,
+		shadow = false,
+		debug = false,
+		color = Color(1, 1, 1, 0.5),
+	}
+	
+	if variant is Unit:
+		kwargs.world = variant.world
+		kwargs.world_pos = variant.world_pos
+		kwargs.facing = variant.facing
+		return add_unit_instance(node, variant, kwargs)
+		
+	elif variant is UnitInstance:
+		return add_unit_instance(node, variant, kwargs)
+		
+	elif variant is UnitType:
+		return add_unit_type(node, variant, kwargs)
+	
+	else:
+		return null
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -92,11 +160,14 @@ func _get_configuration_warnings() -> PackedStringArray:
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# we can only connect after _ready
+	world_changed.connect(_on_world_changed)
+	world_pos_changed.connect(_on_world_pos_changed)
+	
 	unit_changed.connect(_on_unit_changed)
 	facing_changed.connect(_on_facing_changed)
 	walking_started.connect(_on_walking_started)
 	walking_finished.connect(_on_walking_finished)
-
+	
 	world = world
 	world_pos = world_pos
 	unit_instance = unit_instance
@@ -109,6 +180,9 @@ func _ready():
 
 
 func _process(delta: float):
+	if not is_walking:
+		return # because fuckface still processes even when set_process(false)
+	
 	_old_pos = path_follow.position
 	
 	path_follow.progress += walk_speed * delta
@@ -126,6 +200,7 @@ func face_towards(target: Vector2):
 	facing = atan2(v.y, v.x)
 
 
+## Walks along a path.
 func walk_along(path: PackedVector2Array):
 	if path.is_empty():
 		return
@@ -146,6 +221,16 @@ func walk_along(path: PackedVector2Array):
 	world_pos = path[-1]
 	path_follow.progress = 0
 	curve.clear_points()
+
+
+## Sets the general direction of this object.
+func set_heading(value: Heading):
+	facing = value * PI/2
+	
+	
+## Returns the general direction of this object.
+func get_heading() -> Heading:
+	return model.get_heading()
 
 
 func _connect_unit(_unit_instance: UnitInstance):
@@ -183,6 +268,10 @@ func _on_world_changed():
 	# offset shadow
 	shadow.position = Vector2.ZERO
 
+
+func _on_world_pos_changed():
+	position = world.uniform_to_screen(world_pos)
+	
 
 func _on_unit_changed():
 	facing = PI
@@ -264,3 +353,4 @@ func _on_walking_started():
 
 func _on_walking_finished():
 	model.animation = "idle"
+

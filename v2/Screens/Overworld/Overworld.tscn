@@ -14,13 +14,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_mrexs")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
 position = Vector2(-36, -21)
 texture = ExtResource("2_gnts6")
 centered = false
-metadata/_edit_lock_ = true
 
 [node name="TerritoryButton1" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1397, 734)

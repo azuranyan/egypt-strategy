@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="World" load_steps=3 format=3 uid="uid://b1yesan3xqitj"]
+[gd_resource type="Resource" script_class="World" load_steps=3 format=3 uid="uid://m5o65p1f51ex"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="1_x5tba"]
-[ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_4vtrt"]
+[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="1_wtk87"]
+[ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_qp2xy"]
 
 [resource]
-resource_name = "StartingZone"
-script = ExtResource("1_x5tba")
-texture = ExtResource("2_4vtrt")
+script = ExtResource("1_wtk87")
+texture = ExtResource("2_qp2xy")
 map_size = Vector2i(8, 8)
 tile_size = 218
 offset = Vector2(109.56, 12.33)

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_v0ek6"]
 [ext_resource type="Texture2D" uid="uid://csc47u6o4u3x8" path="res://Screens/Battle/maps/StartingZoneObj10.png" id="2_xirha"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_h1bye"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_h1bye"]
 
 [resource]
 resource_name = "Post_01"

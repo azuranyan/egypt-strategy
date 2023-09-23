@@ -191,4 +191,8 @@ vertical_alignment = 1
 
 [connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
+[connection signal="pressed" from="ExtendedEnemyPanel/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="ExtendedPlayerPanel/VBoxContainer/InspectButton" to="." method="_on_inspect_button_pressed"]
+[connection signal="pressed" from="ExtendedPlayerPanel/VBoxContainer/RestButton" to="." method="_on_rest_button_pressed"]
+[connection signal="pressed" from="ExtendedPlayerPanel/VBoxContainer/TrainButton" to="." method="_on_train_button_pressed"]
 [connection signal="toggled" from="TextureButton" to="." method="_on_texture_button_toggled"]

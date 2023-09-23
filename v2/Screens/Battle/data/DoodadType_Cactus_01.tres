@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_3s8x4"]
 [ext_resource type="Texture2D" uid="uid://djdhfk0vmrsjf" path="res://Screens/Battle/maps/StartingZoneObj2.png" id="2_w5f17"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_0wyb1"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_0wyb1"]
 
 [resource]
 resource_name = "Cactus_01"
