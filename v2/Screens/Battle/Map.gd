@@ -88,8 +88,8 @@ func is_inside_bounds(pos: Vector2) -> bool:
 	
 
 ## Returns a list of spawnable units.
-func get_spawn_units(spawn_point: String) -> PackedStringArray:
-	var re := PackedStringArray()
+func get_spawn_units(spawn_point: String) -> Array[String]:
+	var re: Array[String] = []
 	
 	var arr = []
 	for obj in get_objects():

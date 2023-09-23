@@ -69,7 +69,7 @@ var empire: Empire:
 ## Visible properties.
 
 ## Custom name for this unit.
-var unit_name: String = "":
+var unit_name: String:
 	set(value):
 		unit_name = value
 		unit_name_changed.emit()
@@ -322,6 +322,11 @@ func get_heading() -> Heading:
 	return model.get_heading()
 
 
+## Snaps self to grid.
+func snap_to_grid():
+	world_pos = Vector2(roundi(world_pos.x), roundi(world_pos.y))
+	
+
 func _on_world_changed():
 	position = world.uniform_to_screen(world_pos)
 	
@@ -343,7 +348,9 @@ func _on_world_changed():
 func _on_unit_type_changed():
 	# stuff that don't get reset are reset here
 	model.sprite_frames = unit_type.sprite_frames
-	_hud_name.text = unit_type.name
+	
+	unit_name = unit_type.name
+	
 	_hud_rect.color = unit_type.map_color
 	
 	reset()
@@ -354,6 +361,9 @@ func _on_unit_name_changed():
 	
 	
 func _on_world_pos_changed():
+#	if not world.in_bounds(world_pos):
+#		world_pos = world.clamp_pos(world_pos)
+#	else:
 	position = world.uniform_to_screen(world_pos)
 	
 

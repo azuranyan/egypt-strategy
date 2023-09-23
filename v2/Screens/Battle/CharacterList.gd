@@ -19,7 +19,7 @@ signal unit_cancelled(unit)
 signal unit_highlight_changed(unit, value)
 
 
-var units: PackedStringArray = []
+var units: Array[String] = []
 #var selected: Unit
 
 
@@ -59,7 +59,7 @@ func remove_unit(unit: String):
 	if cb != null:
 		remove_child(cb)
 		cb.queue_free()
-		units.remove_at(units.find(unit))
+		units.erase(unit)
 
 
 ## Removes all the units in the character list.

@@ -39,6 +39,7 @@ func _ready():
 	})
 	
 	unit2.world = world
+	unit2.world_pos = Vector2(3, 3)
 	unit2.unit_type = load(\"res://Screens/Battle/data/UnitType_Lysandra.tres\")
 	
 	
@@ -77,6 +78,14 @@ func _unhandled_input(event):
 func _process(delta):
 	pass
 
+
+
+func _on_unit_button_down(button):
+	print(button, \" button down\")
+
+
+func _on_unit_button_up(button):
+	print(button, \" button up\")
 "
 
 [sub_resource type="Curve2D" id="Curve2D_m2vta"]
@@ -109,3 +118,6 @@ skew = 0.525625
 points = PackedVector2Array(0, 0, 0, 218)
 width = 2.0
 default_color = Color(0, 1, 0, 1)
+
+[connection signal="button_down" from="Unit" to="." method="_on_unit_button_down"]
+[connection signal="button_up" from="Unit" to="." method="_on_unit_button_up"]

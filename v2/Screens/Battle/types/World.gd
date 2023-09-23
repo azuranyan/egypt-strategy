@@ -155,3 +155,12 @@ func get_viewport_offset() -> Vector2:
 	#return BattleAPI.get_viewport_size()/2
 	return Vector2(1920, 1080)/2
 
+
+## Clamps value to stay within bounds of world.
+func clamp_pos(pos: Vector2) -> Vector2:
+	return Vector2(clamp(pos.x, 0, map_size.x - 1), clamp(pos.y, 0, map_size.y - 1))
+
+
+## Returns true if value is within world bounds.
+func in_bounds(pos: Vector2) -> bool:
+	return pos.x >= 0 and pos.y >= 0 and pos.x <= (map_size.x - 1) and pos.y <= (map_size.y - 1)

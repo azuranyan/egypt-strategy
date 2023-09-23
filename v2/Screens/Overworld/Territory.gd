@@ -15,7 +15,7 @@ class_name Territory
 		update_configuration_warnings()
 
 ## List of unit names given to empire.
-@export var units: PackedStringArray = []:
+@export var units: Array[String] = []:
 	set(value):
 		units = value
 		update_configuration_warnings()
