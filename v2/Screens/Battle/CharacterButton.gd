@@ -82,7 +82,7 @@ enum State {
 var state := State.IDLE
 
 
-func _to_global_mouse_pos(pos: Vector2) -> Vector2:
+func _to_global_mouse_pos(_pos: Vector2) -> Vector2:
 	# TODO we're using global coordinates cos i can't fix the event.position issue with global rect
 	return get_global_mouse_position()
 	

@@ -75,7 +75,7 @@ func _unhandled_input(event: InputEvent):
 	#	cursor._last_position = cursor.position
 				
 				
-func _process(delta):
+func _process(_delta):
 	frames += 1
 	
 	
@@ -203,12 +203,13 @@ func set_debug_tile_visible(debug_tile_visible: bool):
 
 
 ## Spawns a unit of type tag with name at pos, facing x.
-func spawn_unit(tag: String, owner: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
-	assert(owner == context.attacker or owner == context.defender, "owner is neither empire!")	
+func spawn_unit(tag: String, empire: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
+	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
 	
-	var unit := Unit.add_unit_type(map, Globals.unit_type[tag], {
-		empire = owner,
+	var unit := Unit.create(map, {
 		world = map.world,
+		unit_type = Globals.unit_type[tag],
+		empire = empire,
 		world_pos = pos,
 #		facing = 0,
 #		hud = true,

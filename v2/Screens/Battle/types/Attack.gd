@@ -19,6 +19,7 @@ enum {
 @export var description: String
 
 ## The range hint for this attack.
+@warning_ignore("shadowed_global_identifier")
 @export var range: int
 
 ## Status effect this attack may inflict.

@@ -73,7 +73,7 @@ func hide_extended_panel():
 	$ExtendedEnemyPanel.hide()
 
 
-func _on_owner_change(old_owner: Empire, new_owner: Empire, _territory: Territory):
+func _on_owner_change(_old_owner: Empire, _new_owner: Empire, _territory: Territory):
 	# all the buttons are subscribed to the event so we first check if it's ours
 	if territory == _territory:
 		_update_territory_owner()
@@ -86,7 +86,7 @@ func _on_cycle_turn_start(empire: Empire):
 		highlight.hide()
 	
 	
-func _on_cycle_turn_end(empire: Empire):
+func _on_cycle_turn_end(_empire: Empire):
 	# hides all panels
 	hide_extended_panel()
 	
@@ -146,7 +146,10 @@ func _on_territory_changed():
 
 
 func _update_territory_name():
-	label.text = territory.name if territory else ""
+	if territory:
+		label.text = territory.name
+	else:
+		label.text = ""
 
 
 func _get_button_texture(chara: Chara) -> Texture2D:

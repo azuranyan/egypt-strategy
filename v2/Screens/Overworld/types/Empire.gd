@@ -7,7 +7,7 @@ var aggression: float = base_aggression
 var hp_multiplier: float = 1.0
 var home_territory: Territory = null
 
-var units: Array[UnitInstance] = []
+var units: PackedStringArray = []
 
 func _init():
 	base_aggression = randf()/2

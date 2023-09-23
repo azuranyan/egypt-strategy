@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Screens/Battle/Map.gd" id="1_p1bo2"]
 [ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/WorldInstance.tscn" id="2_oubso"]
 [ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="2_r8b63"]
-[ext_resource type="Resource" uid="uid://b1yesan3xqitj" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_4jwoh"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_4jwoh"]
 [ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_4vqh3"]
 [ext_resource type="Script" path="res://Screens/Battle/Doodad.gd" id="4_7ntfy"]
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="5_fbwek"]

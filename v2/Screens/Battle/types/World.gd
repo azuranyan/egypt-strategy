@@ -34,8 +34,9 @@ var _uniform_world_transform: Transform2D
 var _uniform_world_transform_inverse: Transform2D
 
 ## This is an engine hack. Do not touch.
+@warning_ignore("unused_private_class_variable")
 @export var _post_init_hook_hack: int:
-	set(value):
+	set(_value):
 		# 1. init will be called before the values are loaded in from file
 		# 2. there are no hooks for post init after file is loaded
 		# 3. export vars are loaded in order, so this setter will be called
@@ -85,10 +86,10 @@ func recalculate_uniform_transforms():
 	var m = Transform2D()
 	
 	# more det==0 safeguards
-	var scaling = 1.0 if tile_size == 0 else tile_size
+	var scaling: float = 1 if tile_size == 0 else tile_size
 	
 	# reverse y direction
-	m = m.translated(Vector2(0.5 - map_size.x/2, 0.5 - map_size.y/2))
+	m = m.translated(Vector2(0.5 - map_size.x/2.0, 0.5 - map_size.y/2.0))
 	#m = m.scaled(Vector2(scaling, -scaling))
 	m = m.scaled(Vector2(scaling, scaling))
 	#m = m.rotated(deg_to_rad(-90))

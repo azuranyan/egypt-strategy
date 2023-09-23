@@ -49,14 +49,14 @@ func _get_configuration_warnings() -> PackedStringArray:
 func _validate_map_unit_list(map: Map) -> PackedStringArray:
 	var re := PackedStringArray()
 	
-	for name in map.get_spawn_units("ai"):
-		match name:
+	for nem in map.get_spawn_units("ai"):
+		match nem:
 			"*":
 				pass
 				
 			_:
-				if name not in units:
-					re.append("spawn_unit '%s' not in units list" % name)
+				if nem not in units:
+					re.append("spawn_unit '%s' not in units list" % nem)
 	
 	return re
 	

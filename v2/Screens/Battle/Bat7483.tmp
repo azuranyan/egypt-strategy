@@ -309,7 +309,6 @@ func _on_character_list_unit_cancelled(unit: Unit):
 
 
 func _on_character_list_unit_highlight_changed(unit: Unit, value: bool):
-	print(\"unit highlight changed \", unit)
 	if value:
 		unit.animation.play(\"highlight\")
 	else:

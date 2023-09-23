@@ -19,7 +19,7 @@ signal unit_cancelled(unit)
 signal unit_highlight_changed(unit, value)
 
 
-var units: Array[UnitInstance] = []
+var units: PackedStringArray = []
 #var selected: Unit
 
 
@@ -27,20 +27,20 @@ var units: Array[UnitInstance] = []
 	
 
 ## Set the list of the units.
-func set_units(arr: Array[UnitInstance]):
+func set_units(arr: PackedStringArray):
 	clear_units()
 	for a in arr:
 		add_unit(a)
 	
 	
 ## Adds a unit to the character list.
-func add_unit(unit: UnitInstance):
+func add_unit(unit: String):
 	if has_unit(unit):
 		return
 		
 	var cb := load("res://Screens/Battle/CharacterButton.tscn").instantiate() as CharacterButton
-	cb.portrait = unit.unit_type.chara.portrait
-	cb.display_name = unit.name
+	cb.portrait = Globals.unit_type[unit].chara.portrait
+	cb.display_name = Globals.unit_type[unit].name
 	cb.set_meta("unit", unit)
 	
 	cb.selected.connect(func(pos: Vector2): _on_selected(cb, pos))
@@ -54,12 +54,12 @@ func add_unit(unit: UnitInstance):
 	
 
 ## Removes a unit from the character list.
-func remove_unit(unit: UnitInstance):
+func remove_unit(unit: String):
 	var cb = get_button(unit)
 	if cb != null:
 		remove_child(cb)
 		cb.queue_free()
-		units.erase(unit)
+		units.remove_at(units.find(unit))
 
 
 ## Removes all the units in the character list.
@@ -71,36 +71,17 @@ func clear_units():
 	
 
 ## Returns true if the unit is in the list.
-func has_unit(unit: UnitInstance) -> bool:
+func has_unit(unit: String) -> bool:
 	return get_button(unit) != null
 
 
 ## Returns the button associated with the unit.
-func get_button(unit: UnitInstance) -> CharacterButton:
+func get_button(unit: String) -> CharacterButton:
 	for cb in container.get_children():
 		if cb.get_meta("unit") == unit:
 			return cb
 	return null
 
-#
-### Sets the unit as the selected item.
-#func select_unit(unit: Unit):
-#	var button := get_button(unit)
-#	if button:
-#		_unselect_others(button)
-#		selected = unit
-#		unit_selected.emit(unit)
-#
-#
-### Returns the selected unit.
-#func get_selected() -> Unit:
-#	return selected
-#
-#
-### Unselects currently selected.
-#func release_selected():
-#	_unselect_others(null)
-#
 
 ## Helper function to unselect everything that isn't the button.
 func _unselect_others(which: CharacterButton):

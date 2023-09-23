@@ -238,27 +238,19 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 	# take
 	if from_empire != null:
 		from_empire.territories.erase(territory)
+		for unit in territory.units:
+			from_empire.units.erase(unit)
 	
 	assert(to_empire != null, "to_empire is null")
 	
 	# give
 	to_empire.territories.append(territory)
+	to_empire.units.append_array(territory.units)
 	
 	# assign home if needed
 	if home_territory:
 		assert(to_empire.home_territory == null, "home_territory set multiple times")
 		to_empire.home_territory = territory
-		to_empire.units.clear()
-		for unit_name in territory.units:
-			if not Globals.unit_type.has(unit_name):
-				for _un in Globals.unit_type:
-					print("found ", _un)
-				push_error("unit '%s' not found" % unit_name)
-				break
-			var unit_instance = UnitInstance.new()
-			unit_instance.empire = to_empire
-			unit_instance.unit_type = Globals.unit_type[unit_name]
-			to_empire.units.append(unit_instance)
 		
 	# change owner
 	territory.empire = to_empire
@@ -266,7 +258,7 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 	# broadcast
 	OverworldEvents.territory_owner_changed.emit(from_empire, to_empire, territory)
 	
-	
+
 func territory_set_owner(territory: Territory, new_empire: Empire):
 	var old_empire: Empire = territory.empire
 	empire_give_territory(old_empire, new_empire, territory)

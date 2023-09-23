@@ -72,9 +72,9 @@ func stop_animation():
 	sprite.stop()
 
 
-func _calculate_heading() -> int:
+func _calculate_heading() -> Unit.Heading:
 	var angle := fmod(facing + PI*2 + PI/4, PI*2)
-	return int(angle/PI*2)
+	return (angle/PI*2) as int as Unit.Heading
 		
 
 func _on_sprite_frames_changed():
