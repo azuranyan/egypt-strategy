@@ -45,107 +45,83 @@ script = ExtResource("1_p1bo2")
 world = SubResource("Resource_5gkei")
 
 [node name="WorldInstance" parent="." instance=ExtResource("2_oubso")]
+z_index = -1
+z_as_relative = true
 world = ExtResource("3_4jwoh")
 
 [node name="Tree_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1517.16, 543.329)
 script = ExtResource("4_7ntfy")
 doodad_type = SubResource("Resource_csp86")
 map_pos = Vector2(7, 0)
 
 [node name="Cactus_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1011.36, 834.671)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("6_vx4lr")
 map_pos = Vector2(7, 7)
 
 [node name="Rock_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(939.099, 793.051)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("7_0qh25")
 map_pos = Vector2(6, 7)
 
 [node name="Tree_02" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1444.9, 501.709)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("8_ktusk")
 map_pos = Vector2(6, 0)
 
 [node name="Tree_03" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1083.61, 626.57)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("9_cgujp")
 map_pos = Vector2(5, 4)
 
 [node name="Shrub_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1228.13, 460.089)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("10_mplqb")
 map_pos = Vector2(4, 1)
 
 [node name="Barrel_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(939.099, 460.089)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("11_4vp4a")
 map_pos = Vector2(2, 3)
 
 [node name="Barrel_02" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1011.36, 418.468)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("12_i6pc8")
 map_pos = Vector2(2, 2)
 
 [node name="Shrub_02" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(866.841, 418.468)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("13_hlmxc")
 map_pos = Vector2(1, 3)
 
 [node name="Post_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(794.584, 460.089)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("14_1v6mg")
 map_pos = Vector2(1, 4)
 
 [node name="Tree_04" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(577.811, 584.949)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("15_uwd81")
 map_pos = Vector2(1, 7)
 
 [node name="Building_01" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(1011.36, 335.228)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("16_qhm6y")
 map_pos = Vector2(1, 1)
 
 [node name="Tree_05" type="Node2D" parent="."]
-z_index = 1
-z_as_relative = false
 position = Vector2(505.554, 543.329)
 script = ExtResource("4_7ntfy")
 doodad_type = ExtResource("17_6esm7")
@@ -153,8 +129,6 @@ map_pos = Vector2(0, 7)
 
 [node name="Impassable" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(722.326, 418.468)
 script = ExtResource("19_5ojx1")
 texture = ExtResource("17_mky4j")
@@ -164,8 +138,6 @@ no_show = true
 
 [node name="Impassable2" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1228.13, 376.848)
 script = ExtResource("19_5ojx1")
 texture = ExtResource("17_mky4j")
@@ -175,8 +147,6 @@ no_show = true
 
 [node name="Impassable3" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1155.87, 418.468)
 script = ExtResource("19_5ojx1")
 texture = ExtResource("17_mky4j")
@@ -186,8 +156,6 @@ no_show = true
 
 [node name="PlayerSpawn" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1155.87, 584.949)
 script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
@@ -198,8 +166,6 @@ metadata/spawn_point = "player"
 
 [node name="PlayerSpawn2" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1011.36, 668.19)
 script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
@@ -210,8 +176,6 @@ metadata/spawn_point = "player"
 
 [node name="PlayerSpawn3" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1228.13, 626.57)
 script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
@@ -222,8 +186,6 @@ metadata/spawn_point = "player"
 
 [node name="PlayerSpawn4" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1083.61, 709.81)
 script = ExtResource("21_21af1")
 color = Color(0.396078, 0.462745, 0.827451, 0.490196)
@@ -234,8 +196,6 @@ metadata/spawn_point = "player"
 
 [node name="AISpawn" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(939.099, 543.329)
 script = ExtResource("21_21af1")
 color = Color(0.929412, 0, 0.192157, 0.490196)
@@ -247,8 +207,6 @@ metadata/spawn_unit = PackedStringArray("Maia", "Zahra")
 
 [node name="AISpawn2" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(866.841, 584.949)
 script = ExtResource("21_21af1")
 color = Color(0.929412, 0, 0.192157, 0.490196)
@@ -260,8 +218,6 @@ metadata/spawn_unit = "Zahra"
 
 [node name="AISpawn3" type="Node2D" parent="."]
 visibility_layer = 512
-z_index = 1
-z_as_relative = false
 position = Vector2(1011.36, 501.709)
 script = ExtResource("21_21af1")
 color = Color(0.929412, 0, 0.192157, 0.490196)
