@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnn16cu6p28yb"]
+
+[ext_resource type="Script" path="res://Screens/Battle/Map.gd" id="1_u6ov8"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="2_7drm0"]
+
+[node name="Map" type="Node2D"]
+script = ExtResource("1_u6ov8")
+world = ExtResource("2_7drm0")
+
+[connection signal="world_changed" from="." to="." method="_on_world_changed"]
+[connection signal="world_changed" from="WorldInstance" to="WorldInstance" method="_on_world_changed" flags=18]

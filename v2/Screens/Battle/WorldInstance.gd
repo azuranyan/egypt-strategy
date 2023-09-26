@@ -11,11 +11,20 @@ signal world_changed
 @export var world: World:
 	set(value):
 		world = value
+		update_configuration_warnings()
 		world_changed.emit()
 		
 
 @onready var sprite := $BaseSprite
 @onready var grid := $Grid
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var re := PackedStringArray()
+	if not world:
+		re.append("no world assigned")
+	
+	return re
 
 
 func _ready():
