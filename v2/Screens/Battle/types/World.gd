@@ -164,3 +164,8 @@ func clamp_pos(pos: Vector2) -> Vector2:
 ## Returns true if value is within world bounds.
 func in_bounds(pos: Vector2) -> bool:
 	return pos.x >= 0 and pos.y >= 0 and pos.x <= (map_size.x - 1) and pos.y <= (map_size.y - 1)
+
+
+## Returns the pos as 1D array index
+func to_index(pos: Vector2) -> int:
+	return int(pos.y*map_size.x + pos.x)
