@@ -1,7 +1,7 @@
 [gd_scene load_steps=26 format=3 uid="uid://cf36ibjmq5ufb"]
 
-[ext_resource type="Script" path="res://Screens/Battle/Map.gd" id="1_p1bo2"]
-[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/WorldInstance.tscn" id="2_oubso"]
+[ext_resource type="Script" path="res://Screens/Battle/_Map.gd" id="1_q8mf8"]
+[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/map/WorldInstance.tscn" id="2_oubso"]
 [ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="2_r8b63"]
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_4jwoh"]
 [ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_4vqh3"]
@@ -22,7 +22,7 @@
 [ext_resource type="Resource" uid="uid://ucbncq7yami4" path="res://Screens/Battle/data/DoodadType_Tree_05.tres" id="17_6esm7"]
 [ext_resource type="Texture2D" uid="uid://i1jlix6q5ohf" path="res://Screens/Battle/crossed-circle.png" id="17_mky4j"]
 [ext_resource type="Script" path="res://Screens/Battle/SpriteObject.gd" id="19_5ojx1"]
-[ext_resource type="Script" path="res://Screens/Battle/TileObject.gd" id="21_21af1"]
+[ext_resource type="Script" path="res://Screens/Battle/map/TileObject.gd" id="21_21af1"]
 
 [sub_resource type="Resource" id="Resource_5gkei"]
 script = ExtResource("2_r8b63")
@@ -41,12 +41,11 @@ source_pos = Vector2(7, 0)
 
 [node name="Map" type="Node2D"]
 y_sort_enabled = true
-script = ExtResource("1_p1bo2")
+script = ExtResource("1_q8mf8")
 world = SubResource("Resource_5gkei")
 
 [node name="WorldInstance" parent="." instance=ExtResource("2_oubso")]
 z_index = -1
-z_as_relative = true
 world = ExtResource("3_4jwoh")
 
 [node name="Tree_01" type="Node2D" parent="."]

@@ -5,7 +5,7 @@
 [node name="Cursor" type="Node2D"]
 z_index = 1
 z_as_relative = false
-position = Vector2(505.554, 543.329)
+position = Vector2(1011.36, 251.987)
 script = ExtResource("2_r1hcp")
 
 [node name="Node2D" type="Node2D" parent="."]

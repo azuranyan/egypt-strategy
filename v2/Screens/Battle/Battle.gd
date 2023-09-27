@@ -23,7 +23,7 @@ var frames: int = 0
 
 #var current_map: Node2D
 
-@onready var map: Map
+@onready var map: _Map
 @onready var viewport: Viewport = $SubViewportContainer/Viewport
 var cursor: Cursor
 
@@ -101,7 +101,7 @@ func load_map_scene(scene: PackedScene):
 	# we need to be in the tree for everything to work, so do that first
 	#Globals.get_tree().root.add_child(self)
 	
-	map = scene.instantiate() as Map
+	map = scene.instantiate() as _Map
 	
 	# do not set owner, as we don't want it to be saved along with the scene
 	viewport.add_child(map)

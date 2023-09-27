@@ -38,7 +38,7 @@ func map_init():
 #
 #var enable_mouse_control := false
 #
-#var map: Map
+#var map: _Map
 #
 #func _enter_tree():
 #	set_process_input(true)
@@ -63,7 +63,7 @@ func map_init():
 #
 #
 #
-##func get_map() -> Map:
+##func get_map() -> _Map:
 ##	var node = get_parent()
 ##	while node != null:
 ##		if node is Battle:

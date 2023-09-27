@@ -27,26 +27,26 @@ var empire: Empire
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	if maps.is_empty():
-		warnings.append("level (Map) is empty")
+		warnings.append("level (_Map) is empty")
 	
 	for i in range(maps.size()):
 		var ps := maps[i]
 		if ps:
 			var instance := ps.instantiate()
-			if not instance is Map:
-				warnings.append("%s is not a Map" % instance.name)
+			if not instance is _Map:
+				warnings.append("%s is not a _Map" % instance.name)
 			else:
 				var validation_warnings := _validate_map_unit_list(instance)
 				for ws in validation_warnings:
-					warnings.append("Map %s: %s" % [i, ws])
+					warnings.append("_Map %s: %s" % [i, ws])
 			instance.free()
 		else:
-			warnings.append("Map %s is null" % i)
+			warnings.append("_Map %s is null" % i)
 	
 	return warnings
 
 
-func _validate_map_unit_list(map: Map) -> PackedStringArray:
+func _validate_map_unit_list(map: _Map) -> PackedStringArray:
 	var re := PackedStringArray()
 	
 	for nem in map.get_spawn_units("ai"):

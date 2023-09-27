@@ -1,7 +1,7 @@
 @tool
 extends Node2D
 
-## Base class for objects in a Map.
+## Base class for objects in a _Map.
 class_name MapObject
 
 
@@ -29,7 +29,7 @@ signal no_show_changed
 
 
 ## Reference to the map.
-var map: Map
+var map: _Map
 
 ## Reference to the world.
 var world: World
@@ -42,7 +42,7 @@ var _setup_done := false
 
 
 ## Called by map when adding to this node.
-func _map_enter(_map: Map):
+func _map_enter(_map: _Map):
 	map = _map
 	world = _map.world
 	

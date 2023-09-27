@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://b2dwrqycqblmj"]
-
-[ext_resource type="Script" path="res://Screens/Battle/UnitPath.gd" id="1_gl87x"]
-
-[node name="UnitPath" type="TileMap"]
-format = 2
-script = ExtResource("1_gl87x")
