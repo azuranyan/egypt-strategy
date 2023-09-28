@@ -1,5 +1,5 @@
 @tool
-extends Path2D
+extends MapObject
 
 ## Object that renders a UnitInstance. This is not meant to be used directly
 ## and instead use add_unit_type, add_unit_instance or add_ghost.
@@ -7,12 +7,10 @@ class_name Unit
 
 
 # Internal important signals
-signal world_changed
 signal unit_type_changed
 signal empire_changed
 
 # Visible properties
-signal map_pos_changed
 signal unit_name_changed
 signal facing_changed
 signal selectable_changed
@@ -49,14 +47,6 @@ enum {
 
 ## Internal properties.
 
-## The world object.
-var world: World:
-	set(value):
-		_world = value
-		world_changed.emit()
-	get:
-		return _world
-
 ## This objects unit type.
 var unit_type: UnitType:
 	set(value):
@@ -77,14 +67,6 @@ var unit_name: String:
 	set(value):
 		unit_name = value
 		unit_name_changed.emit()
-
-## The position of this unit in the world.
-var map_pos := Vector2.ZERO:
-	set(value):
-		_map_pos = value
-		map_pos_changed.emit()
-	get:
-		return _map_pos
 
 ## Where this unit is facing.
 var facing: float = PI:
@@ -155,10 +137,6 @@ var status_effects: Array[AppliedStatusEffect] = []
 # Private properties
 
 var _old_pos: Vector2
-var _map_pos: Vector2
-var _world: World
-
-@onready var mapobject := $MapObject as MapObjectComponent
 
 @onready var model := $PathFollow2D/UnitModel as UnitModel
 @onready var shadow := $PathFollow2D/Shadow as Sprite2D
@@ -394,40 +372,28 @@ func can_stand(node: Node) -> bool:
 			return false
 
 
-## Used for the awkward syncing of component properties.
-func _update_map_pos(__pos: Vector2):
-	_map_pos = __pos
-	position = _world.uniform_to_screen(_map_pos)
-	
-	
-## Used for the awkward syncing of component properties.
-func _update_world(__world: World):
-	_world = __world
-	
-	position = _world.uniform_to_screen(_map_pos)
-	
-	var m = Transform2D()
-	
-	# scale to downsize to unit vector
-	var shadow_scale := 1.0
-	m = m.scaled(Vector2(shadow_scale, shadow_scale)/shadow.texture.get_size())
-
-	# scale to tile size
-	m = m.scaled(Vector2(_world.tile_size, _world.tile_size))
-
-	shadow.transform = _world._world_to_screen_transform * m
-	
-	# offset shadow
-	shadow.position = Vector2.ZERO
-
-
 ################################################################################
 # Signals
 ################################################################################
 
 
 func _on_world_changed():
-	mapobject.world = world
+	var m = Transform2D()
+	
+	if world:
+		# scale to downsize to unit vector
+		var shadow_scale := 1.0
+		m = m.scaled(Vector2(shadow_scale, shadow_scale)/shadow.texture.get_size())
+
+		# scale to tile size
+		m = m.scaled(Vector2(world.tile_size, world.tile_size))
+		
+		m = world._world_to_screen_transform * m
+
+	shadow.transform = m
+	
+	# offset shadow
+	shadow.position = Vector2.ZERO
 
 
 func _on_unit_type_changed():
@@ -446,7 +412,8 @@ func _on_unit_name_changed():
 	
 	
 func _on_map_pos_changed():
-	mapobject.map_pos = map_pos
+	#mapobject.map_pos = map_pos
+	pass
 	
 	
 func _on_selectable_changed():
@@ -505,11 +472,13 @@ func _on_walking_finished():
 
 
 func _on_map_object_map_pos_changed():
-	_update_map_pos(mapobject.map_pos)
+	#_update_map_pos(mapobject.map_pos)
+	pass
 	
 
 func _on_map_object_world_changed():
-	_update_world(mapobject.world)
+	#_update_world(mapobject.world)
+	pass
 
 
 ################################################################################

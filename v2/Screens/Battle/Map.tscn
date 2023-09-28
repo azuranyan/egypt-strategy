@@ -1,18 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://bnn16cu6p28yb"]
+[gd_scene load_steps=2 format=3 uid="uid://yogx0cijn3hw"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Map.gd" id="1_u6ov8"]
-[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="2_7drm0"]
-[ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="3_eb1qg"]
-
-[sub_resource type="Curve2D" id="Curve2D_u571v"]
 
 [node name="Map" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_u6ov8")
-world = ExtResource("2_7drm0")
-
-[node name="Unit" parent="." instance=ExtResource("3_eb1qg")]
-curve = SubResource("Curve2D_u571v")
 
 [connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
+[connection signal="world_changed" from="." to="." method="_on_world_changed"]
 [connection signal="world_changed" from="WorldInstance" to="WorldInstance" method="_on_world_changed" flags=18]

@@ -1,14 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bp1nvlsojoyl3"]
+[gd_scene load_steps=2 format=3 uid="uid://bp1nvlsojoyl3"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Doodad.gd" id="1_qpaxr"]
-[ext_resource type="Script" path="res://Screens/Battle/map/MapObject.gd" id="2_87013"]
 
 [node name="Doodad" type="Node2D"]
 script = ExtResource("1_qpaxr")
 
-[node name="MapObject" type="Node" parent="."]
-script = ExtResource("2_87013")
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
 
 [connection signal="doodad_type_changed" from="." to="." method="_on_doodad_type_changed"]
+[connection signal="world_changed" from="." to="." method="_on_world_changed"]

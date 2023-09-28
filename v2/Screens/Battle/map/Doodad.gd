@@ -1,6 +1,7 @@
 @tool
-extends Node2D
+extends MapObject
 
+class_name Doodad
 
 signal doodad_type_changed
 
@@ -11,28 +12,37 @@ signal doodad_type_changed
 		doodad_type = value
 		doodad_type_changed.emit()
 
-## Uses source_pos as map_pos on ready.
-@export var use_source_pos := true
+## Whether to use the source position as map position on load.
+@export var use_source_pos: bool = true
 
 
 @onready var sprite := $Sprite2D as Sprite2D 
 
-@onready var mapobject := $MapObject
 
-
-func _on_doodad_type_changed():
+func _refresh():
+	if not is_node_ready():
+		await self.ready
+	
 	if doodad_type:
 		sprite.texture = doodad_type.texture
-		sprite.scale = mapobject.world.get_viewport_scale()
-		sprite.position = mapobject.world.get_viewport_offset() - mapobject.world.uniform_to_screen(doodad_type.source_pos)
 		
+		if world:
+			sprite.position = world.get_viewport_offset() - world.uniform_to_screen(doodad_type.source_pos)
+		else:
+			sprite.position = Vector2.ZERO
+			
+		sprite.scale = world.get_viewport_scale()
 		if use_source_pos:
-			mapobject.map_pos = doodad_type.source_pos
+			map_pos = doodad_type.source_pos
 	else:
 		sprite.texture = null
 		sprite.scale = Vector2.ONE
 		sprite.position = Vector2.ZERO
-		
-		if use_source_pos:
-			mapobject.map_pos = Vector2.ZERO
-		
+
+
+func _on_doodad_type_changed():
+	_refresh()
+
+
+func _on_world_changed():
+	_refresh()

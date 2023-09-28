@@ -9,32 +9,26 @@ signal texture_changed()
 signal fit_to_grid_changed()
 
 
+## The texture of the sprite.
 @export var texture: Texture2D:
 	set(value):
 		texture = value
 		texture_changed.emit()
 
+## Fit the sprite in the grid.
 @export var fit_to_grid: bool = false:
 	set(value):
 		fit_to_grid = value
 		fit_to_grid_changed.emit()
 
 
-var sprite: Sprite2D
+@onready var sprite: Sprite2D = $Sprite2D
 
 
 func _ready():
-	sprite = Sprite2D.new()
-	#sprite.z_index = 1
-	add_child(sprite)
-
-
-func map_init():
-	# connect properties
 	texture_changed.connect(_update_texture)
 	fit_to_grid_changed.connect(_update_fit_to_grid)
-	
-	# refresh properties
+
 	texture = texture
 	fit_to_grid = fit_to_grid
 
@@ -44,6 +38,10 @@ func _update_texture():
 	
 	
 func _update_fit_to_grid():
+	_refresh()
+
+		
+func _refresh():
 	var m = Transform2D()
 	
 	if fit_to_grid:
@@ -59,3 +57,13 @@ func _update_fit_to_grid():
 		sprite.scale = world.get_viewport_scale()
 		
 	sprite.position = Vector2()
+	
+
+func _on_world_changed():
+	if not is_node_ready():
+		await self.ready
+	if world:
+		_refresh()
+	else:
+		sprite.transform = Transform2D()
+		

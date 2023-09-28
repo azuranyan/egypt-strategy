@@ -1,0 +1,14 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8hnq14gobm4f"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
+[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/map/WorldInstance.tscn" id="2_e60nv"]
+[ext_resource type="PackedScene" uid="uid://bor1tchrocrxh" path="res://Screens/Battle/map/Unit2.tscn" id="2_q3ypt"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_ugin7"]
+
+[node name="Test" type="Node2D"]
+script = ExtResource("1_rejdj")
+
+[node name="WorldInstance" parent="." instance=ExtResource("2_e60nv")]
+world = ExtResource("3_ugin7")
+
+[node name="Unit" parent="." instance=ExtResource("2_q3ypt")]

@@ -1,0 +1,431 @@
+[gd_scene load_steps=27 format=3 uid="uid://cf36ibjmq5ufb"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="2_rcxcb"]
+[ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_auxwu"]
+[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/map/WorldInstance.tscn" id="4_rxuar"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="5_x5jbm"]
+[ext_resource type="PackedScene" uid="uid://bp1nvlsojoyl3" path="res://Screens/Battle/map/Doodad.tscn" id="6_a0p3r"]
+[ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="7_kilo4"]
+[ext_resource type="Texture2D" uid="uid://gyhrm6q5msig" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="8_lb6jk"]
+[ext_resource type="Resource" uid="uid://w1dikkjdlw0p" path="res://Screens/Battle/data/DoodadType_Cactus_01.tres" id="9_1lmtw"]
+[ext_resource type="Resource" uid="uid://co0kb7nsxpfbc" path="res://Screens/Battle/data/DoodadType_Rock_01.tres" id="10_fajyv"]
+[ext_resource type="Resource" uid="uid://dwb06qhgy5fx5" path="res://Screens/Battle/data/DoodadType_Tree_02.tres" id="11_4kvmf"]
+[ext_resource type="Resource" uid="uid://c8c3hpl0p4to6" path="res://Screens/Battle/data/DoodadType_Tree_03.tres" id="12_gyc07"]
+[ext_resource type="Resource" uid="uid://dahk72jrmjfq2" path="res://Screens/Battle/data/DoodadType_Shrub_01.tres" id="13_pf51m"]
+[ext_resource type="Resource" uid="uid://c665nhyf51gdp" path="res://Screens/Battle/data/DoodadType_Barrel_01.tres" id="14_kl1ol"]
+[ext_resource type="Resource" uid="uid://dkgqkncp3i6jd" path="res://Screens/Battle/data/DoodadType_Barrel_02.tres" id="15_volb1"]
+[ext_resource type="Resource" uid="uid://c6vinubtcwotu" path="res://Screens/Battle/data/DoodadType_Shrub_02.tres" id="16_ti76l"]
+[ext_resource type="Resource" uid="uid://bafwh6ta733hr" path="res://Screens/Battle/data/DoodadType_Post_01.tres" id="17_igebo"]
+[ext_resource type="Resource" uid="uid://c0hoxtmwt55p2" path="res://Screens/Battle/data/DoodadType_Tree_04.tres" id="18_hr134"]
+[ext_resource type="Resource" uid="uid://de7lrgsuw64kn" path="res://Screens/Battle/data/DoodadType_Building_01.tres" id="19_j2lrd"]
+[ext_resource type="Resource" uid="uid://ucbncq7yami4" path="res://Screens/Battle/data/DoodadType_Tree_05.tres" id="20_81tmb"]
+[ext_resource type="Script" path="res://Screens/Battle/map/SpriteObject.gd" id="20_x28sd"]
+[ext_resource type="Texture2D" uid="uid://i1jlix6q5ohf" path="res://Screens/Battle/crossed-circle.png" id="22_44ask"]
+[ext_resource type="Script" path="res://Screens/Battle/map/TileObject.gd" id="23_u47ft"]
+
+[sub_resource type="GDScript" id="GDScript_5eaw0"]
+script/source = "@tool
+extends Node2D
+class_name _Map
+
+
+## The world. Populated when world enters the scene tree.
+@export var world: World:
+	set(value):
+		world = value
+
+
+var dynamic_objects: Array[MapObject] = []
+
+var static_objects: Array[MapObject] = []
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	static_objects.resize(world.map_size.x * world.map_size.y)
+	var ss := get_objects(true)
+	for c in ss:
+		c._map_enter(self)
+		static_objects[c.map_pos.y*world.map_size.x + c.map_pos.x] = c
+		
+	var dd := get_objects(false)
+	for c in dd:
+		c._map_enter(self)
+		dynamic_objects.append(c)
+
+
+## Returns a list of objects in the map.
+func get_objects(is_static := true) -> Array[MapObject]:
+	var v: Array[MapObject] = []
+	for c in get_children():
+		if c is MapObject and c.is_static() == is_static:
+			v.append(c)
+	return v
+	
+	
+## Returns the object at a given position
+func get_object_at(pos := Vector2.ZERO, is_static := true) -> MapObject:
+	var x := roundi(pos.x)
+	var y := roundi(pos.y)
+	
+	if is_static:
+		if is_inside_bounds(Vector2(x, y)):
+			return static_objects[y*world.map_size.x + x]
+	else:
+		for c in dynamic_objects:
+			if roundi(c.map_pos.x) == x and roundi(c.map_pos.y) == y:
+				return c
+	return null
+
+
+## Places the object in the map.
+func place_object(object: MapObject, pos := Vector2.ZERO):
+	if object in get_children():
+		return # silence the annoying already in map error
+		
+	add_child(object)
+	# TODO what to do with reentry?
+	object._map_enter(self)
+	
+	if object.is_static():
+		object.snap()
+		if is_inside_bounds(object.map_pos):
+			static_objects[object.map_pos.y*world.map_size.x + object.map_pos.x] = object
+		else:
+			push_error(\"static object out of bounds: \", object)
+	else:
+		object.map_pos = pos
+		dynamic_objects.append(object)
+		
+	
+## Removes the object from the map.
+func remove_object(object: MapObject):
+	if object and object in get_children():
+		remove_child(object)
+		if object.is_static():
+			static_objects.erase(object)
+		else:
+			dynamic_objects.erase(object)
+	
+
+## Returns true if uniform pos is inside bounds.
+func is_inside_bounds(pos: Vector2) -> bool:
+	return pos.x >= 0 and pos.y >= 0 and pos.x <= world.map_size.x-1 and pos.y <= world.map_size.y-1
+	
+
+## Returns a list of spawnable units.
+func get_spawn_units(spawn_point: String) -> Array[String]:
+	var re: Array[String] = []
+	
+	var arr = []
+	for obj in get_objects():
+		if obj.has_meta(\"spawn_point\") and obj.get_meta(\"spawn_point\") == spawn_point:
+			var spawn = obj.get_meta(\"spawn_unit\", null)
+			if spawn is PackedStringArray:
+				arr.append_array(spawn)
+			elif spawn is Array:
+				for s in spawn:
+					if s is String:
+						arr.append(s)
+			elif spawn is String:
+				arr.append(spawn)
+				
+	for s in arr:
+		if s not in re:
+			re.append(s)
+			
+	return re
+"
+
+[sub_resource type="Resource" id="Resource_5gkei"]
+script = ExtResource("2_rcxcb")
+texture = ExtResource("3_auxwu")
+map_size = Vector2i(8, 8)
+tile_size = 218
+offset = Vector2(109.56, 12.33)
+y_ratio = 0.576
+_post_init_hook_hack = 0
+
+[sub_resource type="GDScript" id="GDScript_nhsqy"]
+script/source = "@tool
+extends MapObject
+
+## A MapObject for objects exported together with the world image asset.
+class_name Doodad
+
+
+## The type of doodad to use.
+@export var doodad_type: DoodadType
+		
+## Uses source_pos as map_pos on ready.
+@export var use_source_pos := true
+
+
+var sprite: Sprite2D
+
+
+func _ready():
+	sprite = Sprite2D.new()
+	#sprite.z_index = 1
+	add_child(sprite)
+	
+	
+func map_init():
+	sprite.texture = doodad_type.texture
+	sprite.scale = world.get_viewport_scale()
+	sprite.position = world.get_viewport_offset() - world.uniform_to_screen(doodad_type.source_pos)
+	
+	if use_source_pos:
+		map_pos = doodad_type.source_pos
+
+	# connect properties
+	
+	# refresh properties
+"
+
+[sub_resource type="Resource" id="Resource_csp86"]
+script = ExtResource("7_kilo4")
+texture = ExtResource("8_lb6jk")
+world = ExtResource("5_x5jbm")
+source_pos = Vector2(7, 0)
+
+[node name="Map" type="Node2D"]
+y_sort_enabled = true
+script = SubResource("GDScript_5eaw0")
+world = SubResource("Resource_5gkei")
+
+[node name="WorldInstance" parent="." instance=ExtResource("4_rxuar")]
+z_index = -1
+world = ExtResource("5_x5jbm")
+
+[node name="Tree_01" parent="." instance=ExtResource("6_a0p3r")]
+
+[node name="Tree_01x" type="Node2D" parent="."]
+visible = false
+z_as_relative = false
+position = Vector2(1517.16, 543.329)
+script = SubResource("GDScript_nhsqy")
+doodad_type = SubResource("Resource_csp86")
+use_source_pos = true
+map_pos = Vector2(7, 0)
+impassable = true
+no_show = false
+
+[node name="Cactus_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1011.36, 834.671)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("9_1lmtw")
+use_source_pos = true
+map_pos = Vector2(7, 7)
+impassable = true
+no_show = false
+
+[node name="Rock_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(939.099, 793.051)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("10_fajyv")
+use_source_pos = true
+map_pos = Vector2(6, 7)
+impassable = true
+no_show = false
+
+[node name="Tree_02" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1444.9, 501.709)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("11_4kvmf")
+use_source_pos = true
+map_pos = Vector2(6, 0)
+impassable = true
+no_show = false
+
+[node name="Tree_03" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1083.61, 626.57)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("12_gyc07")
+use_source_pos = true
+map_pos = Vector2(5, 4)
+impassable = true
+no_show = false
+
+[node name="Shrub_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1228.13, 460.089)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("13_pf51m")
+use_source_pos = true
+map_pos = Vector2(4, 1)
+impassable = true
+no_show = false
+
+[node name="Barrel_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(939.099, 460.089)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("14_kl1ol")
+use_source_pos = true
+map_pos = Vector2(2, 3)
+impassable = true
+no_show = false
+
+[node name="Barrel_02" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1011.36, 418.468)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("15_volb1")
+use_source_pos = true
+map_pos = Vector2(2, 2)
+impassable = true
+no_show = false
+
+[node name="Shrub_02" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(866.841, 418.468)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("16_ti76l")
+use_source_pos = true
+map_pos = Vector2(1, 3)
+impassable = true
+no_show = false
+
+[node name="Post_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(794.584, 460.089)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("17_igebo")
+use_source_pos = true
+map_pos = Vector2(1, 4)
+impassable = true
+no_show = false
+
+[node name="Tree_04" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(577.811, 584.949)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("18_hr134")
+use_source_pos = true
+map_pos = Vector2(1, 7)
+impassable = true
+no_show = false
+
+[node name="Building_01" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(1011.36, 335.228)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("19_j2lrd")
+use_source_pos = true
+map_pos = Vector2(1, 1)
+impassable = true
+no_show = false
+
+[node name="Tree_05" type="Node2D" parent="."]
+z_as_relative = false
+position = Vector2(505.554, 543.329)
+script = SubResource("GDScript_nhsqy")
+doodad_type = ExtResource("20_81tmb")
+use_source_pos = true
+map_pos = Vector2(0, 7)
+impassable = true
+no_show = false
+
+[node name="Impassable" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+position = Vector2(722.326, 418.468)
+script = ExtResource("20_x28sd")
+texture = ExtResource("22_44ask")
+fit_to_grid = true
+world = SubResource("Resource_5gkei")
+map_pos = Vector2(0, 4)
+no_show = true
+
+[node name="Impassable2" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+position = Vector2(1228.13, 376.848)
+script = ExtResource("20_x28sd")
+texture = ExtResource("22_44ask")
+fit_to_grid = true
+world = SubResource("Resource_5gkei")
+map_pos = Vector2(3, 0)
+no_show = true
+
+[node name="Impassable3" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+position = Vector2(1155.87, 418.468)
+script = ExtResource("20_x28sd")
+texture = ExtResource("22_44ask")
+fit_to_grid = true
+world = SubResource("Resource_5gkei")
+map_pos = Vector2(3, 1)
+no_show = true
+
+[node name="PlayerSpawn" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(5, 3)
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="PlayerSpawn2" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(5, 5)
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="PlayerSpawn3" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(6, 3)
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="PlayerSpawn4" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.396078, 0.462745, 0.827451, 0.490196)
+map_pos = Vector2(6, 5)
+no_show = true
+metadata/spawn_point = "player"
+
+[node name="AISpawn" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.929412, 0, 0.192157, 0.490196)
+map_pos = Vector2(3, 4)
+no_show = true
+metadata/spawn_point = "ai"
+metadata/spawn_unit = PackedStringArray("Maia", "Zahra")
+
+[node name="AISpawn2" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.929412, 0, 0.192157, 0.490196)
+map_pos = Vector2(3, 5)
+no_show = true
+metadata/spawn_point = "ai"
+metadata/spawn_unit = "Zahra"
+
+[node name="AISpawn3" type="Node2D" parent="."]
+visibility_layer = 512
+z_as_relative = false
+script = ExtResource("23_u47ft")
+color = Color(0.929412, 0, 0.192157, 0.490196)
+map_pos = Vector2(3, 3)
+no_show = true
+metadata/spawn_point = "ai"
+metadata/spawn_unit = "Zahra"

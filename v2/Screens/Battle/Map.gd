@@ -26,12 +26,15 @@ enum Pathing {
 }
 
 
+## A special out of bounds position.
 const OUT_OF_BOUNDS := Vector2(69, 420)
 
 
+## A reference to the world variable.
 @export var world: World:
 	set(value):
 		world = value
+		update_configuration_warnings()
 		world_changed.emit()
 
 
@@ -39,6 +42,13 @@ var world_instance: WorldInstance
 
 var _objects_by_group := {}
 var _objects_by_pos := {}
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var re := PackedStringArray()
+	if not world:
+		re.append("world is null")
+	return re
 
 
 func _ready():
@@ -63,15 +73,14 @@ func remove_map_object(node: Node):
 	
 
 func _add_map_object(node: Node):
-	node.mapobject.world = world
-	get_objects_of(node.mapobject.pathing_group).append(node)
-	get_objects_at(node.mapobject.map_pos).append(node)
+	node.world = world
+	get_objects_of(node.pathing).append(node)
+	get_objects_at(node.map_pos).append(node)
 	
 
 func _remove_map_object(node: Node):
-	node.mapobject.world = world
-	get_objects_of(node.mapobject.pathing_group).erase(node)
-	get_objects_at(node.mapobject.map_pos).erase(node)
+	get_objects_of(node.pathing).erase(node)
+	get_objects_at(node.map_pos).erase(node)
 	
 	
 ## Returns the objects of specified pathing type.
@@ -121,10 +130,12 @@ func get_spawn_units(spawn_point: String) -> Array[String]:
 	
 
 func _is_map_object(node: Node) -> bool:
-	return "mapobject" in node
+	return node is MapObject
 
 
 func _on_world_changed():
+	if not is_node_ready():
+		await self.ready
 	world_instance.world = world
 
 

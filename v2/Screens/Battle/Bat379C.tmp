@@ -195,8 +195,8 @@ func exit() -> void:
 func can_spawn(unit: Unit, pos: Vector2) -> bool:
 	if !battle.map.is_inside_bounds(pos):
 		return false
-		
-	var obj := battle.map.get_object_at(pos)
+		# TODO FUCK OFF
+	# var obj := battle.map.get_object_at(pos)
 	
 	return obj != null and is_unit_spawn_point(unit, obj)
 

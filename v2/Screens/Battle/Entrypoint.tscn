@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dcd0kq31m2hxk"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Entrypoint.gd" id="1_5clfs"]
-[ext_resource type="PackedScene" uid="uid://cf36ibjmq5ufb" path="res://Screens/Battle/maps/StartingZone.tscn" id="2_dcep5"]
+[ext_resource type="PackedScene" uid="uid://cf36ibjmq5ufb" path="res://Screens/Battle/maps/StartingZonex.tscn" id="2_dcep5"]
 [ext_resource type="PackedScene" uid="uid://c11gexecl1hvb" path="res://Screens/Overworld/Overworld.tscn" id="3_xo6ed"]
 
 [node name="Entrypoint" type="Control"]

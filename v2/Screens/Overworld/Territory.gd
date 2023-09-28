@@ -33,8 +33,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 		var ps := maps[i]
 		if ps:
 			var instance := ps.instantiate()
-			if not instance is _Map:
-				warnings.append("%s is not a _Map" % instance.name)
+			if not instance is Map:
+				warnings.append("%s is not a Map" % instance.name)
 			else:
 				var validation_warnings := _validate_map_unit_list(instance)
 				for ws in validation_warnings:
@@ -46,7 +46,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
-func _validate_map_unit_list(map: _Map) -> PackedStringArray:
+func _validate_map_unit_list(map: Map) -> PackedStringArray:
 	var re := PackedStringArray()
 	
 	for nem in map.get_spawn_units("ai"):
