@@ -116,7 +116,7 @@ func _on_unit_button_up(button):
 	print(button, \" button up\")
 "
 
-[sub_resource type="Curve2D" id="Curve2D_j7k7y"]
+[sub_resource type="Curve2D" id="Curve2D_x42wx"]
 
 [node name="Test" type="Node2D"]
 y_sort_enabled = true
@@ -126,7 +126,7 @@ script = SubResource("GDScript_b0al4")
 world = ExtResource("2_0bm51")
 
 [node name="Unit" parent="." instance=ExtResource("3_b07tu")]
-curve = SubResource("Curve2D_j7k7y")
+curve = SubResource("Curve2D_x42wx")
 
 [node name="X" type="Line2D" parent="."]
 visible = false

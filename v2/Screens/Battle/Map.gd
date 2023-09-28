@@ -26,6 +26,9 @@ enum Pathing {
 }
 
 
+const OUT_OF_BOUNDS := Vector2(69, 420)
+
+
 @export var world: World:
 	set(value):
 		world = value
@@ -34,8 +37,8 @@ enum Pathing {
 
 var world_instance: WorldInstance
 
-var objects: Array[Node] = []
-
+var _objects_by_group := {}
+var _objects_by_pos := {}
 
 
 func _ready():
@@ -45,6 +48,7 @@ func _ready():
 	world_instance.z_index = -1
 	
 
+## Adds a map object. Node must have MapObject component.
 func add_map_object(node: Node):
 	if node.get_parent():
 		node.get_parent().remove_child(node)
@@ -52,28 +56,63 @@ func add_map_object(node: Node):
 	_add_map_object(node)
 	
 
+## Removes a map object.
 func remove_map_object(node: Node):
 	remove_child(node)
 	_remove_map_object(node)
 	
 
 func _add_map_object(node: Node):
-	objects.append(node)
+	node.mapobject.world = world
+	get_objects_of(node.mapobject.pathing_group).append(node)
+	get_objects_at(node.mapobject.map_pos).append(node)
 	
 
 func _remove_map_object(node: Node):
-	objects.erase(node)
-
-
-## Returns the object at a given position
-func get_object_at(pos: Vector2) -> MapObject:
+	node.mapobject.world = world
+	get_objects_of(node.mapobject.pathing_group).erase(node)
+	get_objects_at(node.mapobject.map_pos).erase(node)
 	
+	
+## Returns the objects of specified pathing type.
+func get_objects_of(type: Pathing) -> Array[Node]:
+	if not _objects_by_group.has(type):
+		var arr: Array[Node] = []
+		_objects_by_group[type] = arr
+		
+	return _objects_by_group[type]
+
+
+## Returns the objects at specified position.
+func get_objects_at(pos: Vector2) -> Array[Node]:
+	var cell := Vector2i(pos)
+	if not (pos == OUT_OF_BOUNDS or world.in_bounds(cell)):
+		push_error("%s out of bounds" % pos)
+		
+	if not _objects_by_pos.has(cell):
+		var arr: Array[Node] = []
+		_objects_by_pos[cell] = arr
+		
+	return _objects_by_pos[cell]
+	
+
+## Returns all the objects.
+func get_map_objects() -> Array[Node]:
+	return _objects_by_group.values()
+	
+	
+## Returns the object at a given position
+func get_object_at(pos: Vector2, type: Pathing) -> Node:
+	var arr := get_objects_at(pos)
+	for obj in arr:
+		if obj.mapobject.pathing_group == type:
+			return obj
 	return null
 
 
 ## Returns true if uniform pos is inside bounds.
 func is_inside_bounds(pos: Vector2) -> bool:
-	return pos.x >= 0 and pos.y >= 0 and pos.x <= world.map_size.x-1 and pos.y <= world.map_size.y-1
+	return world.in_bounds(pos)
 	
 	
 ## Returns a list of spawnable units.
@@ -82,7 +121,6 @@ func get_spawn_units(spawn_point: String) -> Array[String]:
 	
 
 func _is_map_object(node: Node) -> bool:
-	#return "world" in node and "map_pos" in node and ""
 	return "mapobject" in node
 
 
