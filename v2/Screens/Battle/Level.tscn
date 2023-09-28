@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://d04s70dligkar"]
+
+[node name="SubViewportContainer" type="SubViewportContainer"]
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="Viewport" type="SubViewport" parent="."]
+disable_3d = true
+handle_input_locally = false
+canvas_cull_mask = 4294966783
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4

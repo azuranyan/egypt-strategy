@@ -1,23 +1,29 @@
-[gd_scene load_steps=6 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=7 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
 [ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
 [ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="2_x2o88"]
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
-[ext_resource type="PackedScene" uid="uid://dch52hwfqs2tk" path="res://Screens/Battle/map/UnitDriver.tscn" id="5_2m3bq"]
+[ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="4_a2yrc"]
+[ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="5_gyrky"]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_rejdj")
 
+[node name="Drivers" type="Node" parent="."]
+
 [node name="Map" parent="." instance=ExtResource("2_x2o88")]
+world = ExtResource("3_6wws0")
+
+[node name="Cursor" parent="Map" instance=ExtResource("4_a2yrc")]
+z_index = -1
+position = Vector2(1011.36, 251.987)
+texture = ExtResource("5_gyrky")
+fit_to_grid = true
 world = ExtResource("3_6wws0")
 
 [node name="Unit" parent="Map" instance=ExtResource("2_dv3bt")]
 position = Vector2(1011.36, 251.987)
 world = ExtResource("3_6wws0")
-
-[node name="Drivers" type="Node" parent="."]
-
-[node name="UnitDriver" parent="Drivers" instance=ExtResource("5_2m3bq")]
 
 [connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]

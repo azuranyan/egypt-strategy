@@ -3,7 +3,7 @@ extends Node2D
 
 @onready var world := $Map.world as World
 @onready var unit := $Map/Unit as Unit
-@onready var driver := $Drivers/UnitDriver
+@onready var drivers := $Drivers
 
 
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
@@ -47,12 +47,6 @@ static func make_random_path(
 	return re
 
 
-func random_path(length: int) -> PackedVector2Array:
-	if driver.walking:
-		return make_random_path(length, unit.curve.get_point_out(unit.curve.point_count), Vector2.ZERO, world.map_size - Vector2i.ONE, true)
-	else:
-		return make_random_path(length, unit.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
-
 
 func _ready():
 	unit.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
@@ -60,8 +54,29 @@ func _ready():
 		test.call_deferred()
 
 
-func test():
+func random_path(length: int) -> PackedVector2Array:
+#	if driver.walking:
+#		return make_random_path(length, unit.curve.get_point_out(unit.curve.point_count), Vector2.ZERO, world.map_size - Vector2i.ONE, true)
+#	else:
+	return make_random_path(length, unit.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
+
+
+func walk_along(path: PackedVector2Array):
+	var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
 	driver.unit = unit
-	driver.walk_along(random_path(5))
+	unit.set_meta("driver", driver)
+	drivers.add_child(driver)
+	await driver.walk_along(path)
+	drivers.remove_child(driver)
+	unit.remove_meta("driver")
+	driver.queue_free()
+	
+	
+func stop_walking():
+	unit.get_meta("driver").stop_walking()
+	
+	
+func test():
+	walk_along(random_path(randi_range(1, 10)))
 
 

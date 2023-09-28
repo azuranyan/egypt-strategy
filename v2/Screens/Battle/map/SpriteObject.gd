@@ -48,13 +48,17 @@ func _refresh():
 		# scale to downsize to unit vector
 		m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
 
-		# scale to tile size
-		m = m.scaled(Vector2(world.tile_size, world.tile_size))
+		if world:
+			# scale to tile size
+			m = m.scaled(Vector2(world.tile_size, world.tile_size))
 
 		sprite.transform = world._world_to_screen_transform * m
 	else:
 		sprite.transform = m
-		sprite.scale = world.get_viewport_scale()
+		if world:
+			sprite.scale = world.get_viewport_scale()
+		else:
+			sprite.scale = Vector2.ONE
 		
 	sprite.position = Vector2()
 	
@@ -62,8 +66,5 @@ func _refresh():
 func _on_world_changed():
 	if not is_node_ready():
 		await self.ready
-	if world:
-		_refresh()
-	else:
-		sprite.transform = Transform2D()
+	_refresh()
 		

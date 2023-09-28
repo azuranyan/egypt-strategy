@@ -1,5 +1,7 @@
 extends Path2D
 
+class_name UnitDriver
+
 
 signal walking_started
 signal walking_finished

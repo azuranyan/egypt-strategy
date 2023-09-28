@@ -40,6 +40,8 @@ const OUT_OF_BOUNDS := Vector2(69, 420)
 
 var world_instance: WorldInstance
 
+# trading space for more efficient lookups
+var _objects: Array[Node] = []
 var _objects_by_group := {}
 var _objects_by_pos := {}
 
@@ -59,7 +61,7 @@ func _ready():
 	
 
 ## Adds a map object. Node must have MapObject component.
-func add_map_object(node: Node):
+func add_object(node: Node):
 	if node.get_parent():
 		node.get_parent().remove_child(node)
 	add_child(node)
@@ -67,7 +69,7 @@ func add_map_object(node: Node):
 	
 
 ## Removes a map object.
-func remove_map_object(node: Node):
+func remove_object(node: Node):
 	remove_child(node)
 	_remove_map_object(node)
 	
@@ -76,11 +78,18 @@ func _add_map_object(node: Node):
 	node.world = world
 	get_objects_of(node.pathing).append(node)
 	get_objects_at(node.map_pos).append(node)
+	_objects.append(node)
 	
 
 func _remove_map_object(node: Node):
 	get_objects_of(node.pathing).erase(node)
 	get_objects_at(node.map_pos).erase(node)
+	_objects.erase(node)
+	
+	
+## Returns all the objects.
+func get_objects() -> Array[Node]:
+	return _objects
 	
 	
 ## Returns the objects of specified pathing type.
@@ -104,14 +113,9 @@ func get_objects_at(pos: Vector2) -> Array[Node]:
 		
 	return _objects_by_pos[cell]
 	
-
-## Returns all the objects.
-func get_map_objects() -> Array[Node]:
-	return _objects_by_group.values()
 	
-	
-## Returns the object at a given position
-func get_object_at(pos: Vector2, type: Pathing) -> Node:
+## Returns the object of given type at a given position.
+func get_object(pos: Vector2, type: Pathing) -> Node:
 	var arr := get_objects_at(pos)
 	for obj in arr:
 		if obj.mapobject.pathing_group == type:
@@ -119,6 +123,12 @@ func get_object_at(pos: Vector2, type: Pathing) -> Node:
 	return null
 
 
+## Returns the object at a given position.
+func get_object_at(pos: Vector2) -> Node:
+	var arr := get_objects_at(pos)
+	return arr[0] if not arr.is_empty() else null
+	
+	
 ## Returns true if uniform pos is inside bounds.
 func is_inside_bounds(pos: Vector2) -> bool:
 	return world.in_bounds(pos)

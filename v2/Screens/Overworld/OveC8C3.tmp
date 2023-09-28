@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://c11gexecl1hvb"]
+[gd_scene load_steps=6 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
 [ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://d2jpf34a0pcc2" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
 [ext_resource type="PackedScene" uid="uid://deoum6p0ur60e" path="res://Screens/Overworld/CombinedPlayerMenu.tscn" id="4_j3r5l"]
 [ext_resource type="Script" path="res://Screens/Overworld/Territory.gd" id="4_xerix"]
-[ext_resource type="PackedScene" uid="uid://btf3bu5kpnvls" path="res://Screens/Battle/maps/StartingZone.tscn" id="5_xwig8"]
 
 [node name="Overworld" type="Control"]
 layout_mode = 3
@@ -29,7 +28,6 @@ scale = Vector2(0.05, 0.05)
 [node name="Zetennu" type="Node" parent="TerritoryButton1" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
 adjacent = [NodePath("../../TerritoryButton2/Neru-Khisi")]
-maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Zahra", "Maia", "Lysandra"])
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("3_aby1e")]
