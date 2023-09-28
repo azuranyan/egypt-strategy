@@ -34,7 +34,11 @@ func _process(delta: float):
 	
 	path_follow.progress += walk_speed * delta
 	
-	unit.map_pos = unit.world.screen_to_uniform(path_follow.position)
+	# update map_pos
+	unit.map_pos = unit.world.screen_to_uniform(position + path_follow.position)
+	
+	# overwrite position because map_pos computation sometimes makes it choppy
+	unit.position = position + path_follow.position
 	
 	var v := unit.world.screen_to_world(path_follow.position) - unit.world.screen_to_world(_old_pos)
 	unit.facing = atan2(v.y, v.x)
@@ -57,17 +61,20 @@ func walk_along(path: PackedVector2Array):
 	
 	# start walk cycle
 	walking = true
+	unit.model.play_animation("walk")
 	walking_started.emit()
 	
 	# await until walking is done
 	await self.walking_finished
 	
 	# cleanup code
+	unit.model.play_animation("idle")
+	unit.model.stop_animation()
 	walking = false
 	unit.map_pos = path[-1]
 	path_follow.progress = 0
 	curve.clear_points()
-	
+
 
 ## Stops walking
 func stop_walking():

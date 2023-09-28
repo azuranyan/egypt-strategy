@@ -18,8 +18,8 @@ signal selectable_changed
 # Control signals
 signal button_down(button: int)
 signal button_up(button: int)
-signal walking_started
-signal walking_finished
+#signal walking_started
+#signal walking_finished
 
 # Data signals
 signal stat_changed(stat: String)
@@ -74,13 +74,13 @@ var facing: float = PI:
 		facing = value
 		facing_changed.emit()
 
-## If this unit is walking.
-var walking := false:
-	set(value):
-		walking = value
-		
-		# setting walking to false while unit is still walking may cause bugs
-		set_process(walking)
+### If this unit is walking.
+#var walking := false:
+#	set(value):
+#		walking = value
+#
+#		# setting walking to false while unit is still walking may cause bugs
+#		set_process(walking)
 		
 ## Whether to allow selection interaction with this unit.
 var selectable := true:
@@ -138,19 +138,18 @@ var status_effects: Array[AppliedStatusEffect] = []
 
 var _old_pos: Vector2
 
-@onready var model := $PathFollow2D/UnitModel as UnitModel
-@onready var shadow := $PathFollow2D/Shadow as Sprite2D
+@onready var model := $UnitModel as UnitModel
+@onready var shadow := $Shadow as Sprite2D
 @onready var animation := $AnimationPlayer as AnimationPlayer
-@onready var path_follow := $PathFollow2D as PathFollow2D
 @onready var debug := $Debug
-@onready var hud := $PathFollow2D/HUD
-@onready var input_control := $PathFollow2D/Control as Control
+@onready var hud := $HUD
+@onready var input_control := $Control as Control
 
-@onready var _hud_hp_bar = $PathFollow2D/HUD/hp_bar
-@onready var _hud_hp_label = $PathFollow2D/HUD/hp_label
-@onready var _hud_name =  $PathFollow2D/HUD/name
-@onready var _hud_rect =  $PathFollow2D/HUD/rect
-@onready var _hud_status_effects =  $PathFollow2D/HUD/StatusEffects
+@onready var _hud_hp_bar = $HUD/hp_bar
+@onready var _hud_hp_label = $HUD/hp_label
+@onready var _hud_name =  $HUD/name
+@onready var _hud_rect =  $HUD/rect
+@onready var _hud_status_effects =  $HUD/StatusEffects
 
 
 ##
@@ -170,30 +169,30 @@ func _ready():
 	unit_name_changed.connect(_on_unit_name_changed)
 	
 	facing_changed.connect(_on_facing_changed)
-	walking_started.connect(_on_walking_started)
-	walking_finished.connect(_on_walking_finished)
+#	walking_started.connect(_on_walking_started)
+#	walking_finished.connect(_on_walking_finished)
 	
 	stat_changed.connect(_on_stat_changed)
 	
 	# keeping a reference to curve resource makes it extremely buggy
 	# because curve is a resource that get saved with the scene. this
 	# is why we're creating a new curve every _ready.
-	curve = Curve2D.new()
+#	curve = Curve2D.new()
 
 
-func _process(delta: float):
-	if not walking:
-		return # because fuckface still processes even when set_process(false)
-	
-	_old_pos = path_follow.position
-	
-	path_follow.progress += walk_speed * delta
-	
-	var v := world.screen_to_world(path_follow.position) - world.screen_to_world(_old_pos)
-	facing = atan2(v.y, v.x)
-	
-	if path_follow.progress_ratio >= 1:
-		walking_finished.emit()
+#func _process(delta: float):
+#	if not walking:
+#		return # because fuckface still processes even when set_process(false)
+#
+#	_old_pos = path_follow.position
+#
+#	path_follow.progress += walk_speed * delta
+#
+#	var v := world.screen_to_world(path_follow.position) - world.screen_to_world(_old_pos)
+#	facing = atan2(v.y, v.x)
+#
+#	if path_follow.progress_ratio >= 1:
+#		walking_finished.emit()
 
 
 ################################################################################
@@ -299,33 +298,33 @@ func face_towards(target: Vector2):
 	facing = atan2(v.y, v.x)
 
 
-## Walks along a path.
-func walk_along(path: PackedVector2Array):
-	if path.is_empty():
-		return
-	
-	# create the path
-	for point in path:
-		curve.add_point(world.uniform_to_screen(point) - position)
-	
-	# start walk cycle
-	walking = true
-	walking_started.emit()
-	
-	# await until walking is done
-	await self.walking_finished
-	
-	# cleanup code
-	walking = false
-	map_pos = path[-1]
-	path_follow.progress = 0
-	curve.clear_points()
+### Walks along a path.
+#func walk_along(path: PackedVector2Array):
+#	if path.is_empty():
+#		return
+#
+#	# create the path
+#	for point in path:
+#		curve.add_point(world.uniform_to_screen(point) - position)
+#
+#	# start walk cycle
+#	walking = true
+#	walking_started.emit()
+#
+#	# await until walking is done
+#	await self.walking_finished
+#
+#	# cleanup code
+#	walking = false
+#	map_pos = path[-1]
+#	path_follow.progress = 0
+#	curve.clear_points()
 	
 
 ## Stops walking
-func stop_walking():
-	if walking:
-		walking_finished.emit()
+#func stop_walking():
+#	if walking:
+#		walking_finished.emit()
 
 
 ## Sets the general direction of this object.

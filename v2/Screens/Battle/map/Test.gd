@@ -1,7 +1,9 @@
+@tool
 extends Node2D
 
-@onready var world := $WorldInstance.world as World
-@onready var unit := $Unit as Unit
+@onready var world := $Map.world as World
+@onready var unit := $Map/Unit as Unit
+@onready var driver := $Drivers/UnitDriver
 
 
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
@@ -18,8 +20,8 @@ static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
 		re.append(p)
 		prev = p
 	return re
-	
-	
+
+
 static func make_random_path(
 		length: int,
 		start: Vector2,
@@ -43,20 +45,23 @@ static func make_random_path(
 		prev = p
 	
 	return re
-	
+
 
 func random_path(length: int) -> PackedVector2Array:
-	if unit.walking:
+	if driver.walking:
 		return make_random_path(length, unit.curve.get_point_out(unit.curve.point_count), Vector2.ZERO, world.map_size - Vector2i.ONE, true)
 	else:
 		return make_random_path(length, unit.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
 
 
 func _ready():
-	test.call_deferred()
-	
-	
+	unit.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
+	if not Engine.is_editor_hint():
+		test.call_deferred()
+
+
 func test():
-	pass
+	driver.unit = unit
+	driver.walk_along(random_path(5))
 
 

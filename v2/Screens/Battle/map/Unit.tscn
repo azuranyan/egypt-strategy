@@ -1,10 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://b6fvp0wup6fkc"]
+[gd_scene load_steps=9 format=3 uid="uid://b6fvp0wup6fkc"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Unit.gd" id="1_ggmfr"]
 [ext_resource type="Texture2D" uid="uid://drlkpesis0pbn" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_n2i2l"]
 [ext_resource type="PackedScene" uid="uid://ce6s6ofk01nub" path="res://Screens/Battle/map/UnitModel.tscn" id="4_q3tgg"]
-
-[sub_resource type="Curve2D" id="Curve2D_oev7a"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cytam"]
 font_size = 20
@@ -16,7 +14,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("PathFollow2D/UnitModel:modulate")
+tracks/0/path = NodePath("UnitModel:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -33,7 +31,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("PathFollow2D/UnitModel:modulate")
+tracks/0/path = NodePath("UnitModel:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -50,7 +48,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("PathFollow2D/UnitModel:modulate")
+tracks/0/path = NodePath("UnitModel:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -67,9 +65,8 @@ _data = {
 "highlight_red": SubResource("Animation_1evga")
 }
 
-[node name="Unit" type="Path2D"]
+[node name="Unit" type="Node2D"]
 position = Vector2(1011.36, 251.987)
-curve = SubResource("Curve2D_oev7a")
 script = ExtResource("1_ggmfr")
 walk_speed = 200.0
 
@@ -87,24 +84,19 @@ grow_horizontal = 2
 grow_vertical = 0
 color = Color(0, 1, 0, 1)
 
-[node name="PathFollow2D" type="PathFollow2D" parent="."]
-rotates = false
-loop = false
-metadata/_edit_group_ = true
-
-[node name="Shadow" type="Sprite2D" parent="PathFollow2D"]
+[node name="Shadow" type="Sprite2D" parent="."]
 modulate = Color(0, 0, 0, 0.329412)
 rotation = 0.522585
 scale = Vector2(0.32573, 0.32573)
 skew = 0.525625
 texture = ExtResource("3_n2i2l")
 
-[node name="UnitModel" parent="PathFollow2D" instance=ExtResource("4_q3tgg")]
+[node name="UnitModel" parent="." instance=ExtResource("4_q3tgg")]
 
-[node name="HUD" type="Node2D" parent="PathFollow2D"]
+[node name="HUD" type="Node2D" parent="."]
 position = Vector2(0, -15)
 
-[node name="StatusEffects" type="HBoxContainer" parent="PathFollow2D/HUD"]
+[node name="StatusEffects" type="HBoxContainer" parent="HUD"]
 custom_minimum_size = Vector2(112, 32)
 anchors_preset = 8
 anchor_left = 0.5
@@ -119,7 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="rect" type="ColorRect" parent="PathFollow2D/HUD"]
+[node name="rect" type="ColorRect" parent="HUD"]
 offset_left = -57.0
 offset_top = -189.0
 offset_right = -47.0
@@ -127,7 +119,7 @@ offset_bottom = -179.0
 color = Color(0, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="maxhp_bar" type="ColorRect" parent="PathFollow2D/HUD"]
+[node name="maxhp_bar" type="ColorRect" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -142,7 +134,7 @@ grow_vertical = 2
 color = Color(0.14902, 0.211765, 0.180392, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="hp_bar" type="ColorRect" parent="PathFollow2D/HUD"]
+[node name="hp_bar" type="ColorRect" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -157,7 +149,7 @@ grow_vertical = 2
 color = Color(0.384314, 0.819608, 0.470588, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="hp_label" type="Label" parent="PathFollow2D/HUD"]
+[node name="hp_label" type="Label" parent="HUD"]
 offset_left = 14.0
 offset_top = -181.0
 offset_right = 54.0
@@ -166,14 +158,14 @@ label_settings = SubResource("LabelSettings_cytam")
 horizontal_alignment = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="name" type="Label" parent="PathFollow2D/HUD"]
+[node name="name" type="Label" parent="HUD"]
 offset_left = -43.0
 offset_top = -196.0
 offset_right = 4.0
 offset_bottom = -170.0
 metadata/_edit_use_anchors_ = true
 
-[node name="Control" type="Control" parent="PathFollow2D"]
+[node name="Control" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -192,6 +184,3 @@ metadata/_edit_use_anchors_ = true
 libraries = {
 "": SubResource("AnimationLibrary_xege1")
 }
-
-[connection signal="selectable_changed" from="." to="." method="_on_selectable_changed"]
-[connection signal="gui_input" from="PathFollow2D/Control" to="." method="_on_control_gui_input"]

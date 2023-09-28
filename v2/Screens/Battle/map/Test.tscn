@@ -1,14 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8hnq14gobm4f"]
+[gd_scene load_steps=6 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
-[ext_resource type="PackedScene" uid="uid://bvn5edllk4u7g" path="res://Screens/Battle/map/WorldInstance.tscn" id="2_e60nv"]
-[ext_resource type="PackedScene" uid="uid://bor1tchrocrxh" path="res://Screens/Battle/map/Unit2.tscn" id="2_q3ypt"]
-[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_ugin7"]
+[ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
+[ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="2_x2o88"]
+[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
+[ext_resource type="PackedScene" uid="uid://dch52hwfqs2tk" path="res://Screens/Battle/map/UnitDriver.tscn" id="5_2m3bq"]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_rejdj")
 
-[node name="WorldInstance" parent="." instance=ExtResource("2_e60nv")]
-world = ExtResource("3_ugin7")
+[node name="Map" parent="." instance=ExtResource("2_x2o88")]
+world = ExtResource("3_6wws0")
 
-[node name="Unit" parent="." instance=ExtResource("2_q3ypt")]
+[node name="Unit" parent="Map" instance=ExtResource("2_dv3bt")]
+position = Vector2(1011.36, 251.987)
+world = ExtResource("3_6wws0")
+
+[node name="Drivers" type="Node" parent="."]
+
+[node name="UnitDriver" parent="Drivers" instance=ExtResource("5_2m3bq")]
+
+[connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]
