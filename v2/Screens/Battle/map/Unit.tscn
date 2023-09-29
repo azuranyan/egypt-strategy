@@ -82,6 +82,7 @@ offset_top = -139.0
 offset_right = 30.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 color = Color(0, 1, 0, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
@@ -185,3 +186,5 @@ metadata/_edit_use_anchors_ = true
 libraries = {
 "": SubResource("AnimationLibrary_xege1")
 }
+
+[connection signal="gui_input" from="Control" to="." method="_on_control_gui_input"]

@@ -168,4 +168,6 @@ func in_bounds(pos: Vector2) -> bool:
 
 ## Returns the pos as 1D array index
 func to_index(pos: Vector2) -> int:
-	return int(pos.y*map_size.x + pos.x)
+	var cell := Vector2i(roundi(pos.x), roundi(pos.y))
+	return cell.y*map_size.x + cell.x
+	#return int(pos.y*map_size.x + pos.x)

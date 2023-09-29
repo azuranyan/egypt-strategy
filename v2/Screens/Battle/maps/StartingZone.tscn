@@ -116,6 +116,7 @@ pathing = 2
 
 [node name="Impassable_01" parent="." index="13" instance=ExtResource("17_054x2")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(722.326, 418.468)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
@@ -126,6 +127,7 @@ no_show = true
 
 [node name="Impassable_02" parent="." index="14" instance=ExtResource("17_054x2")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1155.87, 418.468)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
@@ -136,6 +138,7 @@ no_show = true
 
 [node name="Impassable_03" parent="." index="15" instance=ExtResource("17_054x2")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1228.13, 376.848)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
@@ -146,6 +149,7 @@ no_show = true
 
 [node name="Player_Spawn_01" parent="." index="16" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1011.36, 668.19)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -155,6 +159,7 @@ metadata/spawn_point = "player"
 
 [node name="Player_Spawn_02" parent="." index="17" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1083.61, 709.81)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -164,6 +169,7 @@ metadata/spawn_point = "player"
 
 [node name="Player_Spawn_03" parent="." index="18" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1155.87, 584.949)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -173,6 +179,7 @@ metadata/spawn_point = "player"
 
 [node name="Player_Spawn_04" parent="." index="19" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1228.13, 626.57)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -182,6 +189,7 @@ metadata/spawn_point = "player"
 
 [node name="AI_Spawn_01" parent="." index="20" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(1300.39, 501.709)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -192,6 +200,7 @@ metadata/spawn_unit = "Maia"
 
 [node name="AI_Spawn_02" parent="." index="21" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(939.099, 543.329)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -202,6 +211,7 @@ metadata/spawn_unit = PackedStringArray("Lysandra", "Zahra")
 
 [node name="AI_Spawn_03" parent="." index="22" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(794.584, 626.57)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("3_4jwoh")
@@ -211,6 +221,7 @@ metadata/spawn_point = "ai"
 
 [node name="AI_Spawn_04" parent="." index="23" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
+z_index = -1
 position = Vector2(722.326, 501.709)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("3_4jwoh")

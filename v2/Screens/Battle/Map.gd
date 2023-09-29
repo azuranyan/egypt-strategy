@@ -103,7 +103,7 @@ func get_objects_of(type: Pathing) -> Array[Node]:
 
 ## Returns the objects at specified position.
 func get_objects_at(pos: Vector2) -> Array[Node]:
-	var cell := Vector2i(pos)
+	var cell := cell(pos)
 	if not (pos == OUT_OF_BOUNDS or world.in_bounds(cell)):
 		push_error("%s out of bounds" % pos)
 		
@@ -131,12 +131,26 @@ func get_object_at(pos: Vector2) -> Node:
 	
 ## Returns true if uniform pos is inside bounds.
 func is_inside_bounds(pos: Vector2) -> bool:
-	return world.in_bounds(pos)
+	var cell := cell(pos)
+	return world.in_bounds(cell)
 	
 	
 ## Returns a list of spawnable units.
 func get_spawn_units(spawn_point: String) -> Array[String]:
 	return []
+	
+
+## Returns the cell of a given pos.
+func cell(pos: Vector2) -> Vector2i:
+	return Vector2i(roundi(pos.x), roundi(pos.y))
+
+
+## Returns the index of a given pos.
+func index(pos: Vector2) -> int:
+	# TODO to_index works with trunc but we need round
+	#return world.to_index(pos)
+	var cell := cell(pos)
+	return cell.y*world.map_size.x + cell.x
 	
 
 func _is_map_object(node: Node) -> bool:

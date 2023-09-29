@@ -107,7 +107,14 @@ func handle_input(event: InputEvent) -> void:
 		if event is InputEventMouseMotion:
 			#pos = battle.viewport.canvas_transform.affine_inverse() * pos
 			selected.map_pos = battle.map.world.screen_to_uniform(event.position) + selected_offset
-			selected.snap_to_grid()
+		
+#			var closest_snap_point := Vector2(roundi(selected.map_pos.x), roundi(selected.map_pos.y))
+#			var snap_distance := 0.75
+#
+#			print(selected.map_pos, \" \", closest_snap_point, \" \", selected.map_pos.distance_to(closest_snap_point))
+#			if selected.map_pos.distance_to(closest_snap_point) > snap_distance:
+#				selected.snap_to_grid()
+			print(selected.map_pos, \" \", can_spawn(selected, selected.map_pos))
 			
 			if can_spawn(selected, selected.map_pos):
 				selected.animation.play(\"RESET\")
@@ -150,9 +157,9 @@ func enter(kwargs := {}) -> void:
 	else:
 		$UI.visible = true
 		
-		units[\"Lysandra\"] = battle.spawn_unit(\"Lysandra\", battle.context.attacker, \"\", Vector2(0, 1))
-		units[\"Maia\"] = battle.spawn_unit(\"Maia\", battle.context.attacker, \"\", Vector2(0, 1))
-		units[\"Zahra\"] = battle.spawn_unit(\"Zahra\", battle.context.attacker, \"\", Vector2(0, 1))
+		units[\"Lysandra\"] = battle.spawn_unit(\"Lysandra\", battle.context.attacker, \"\")
+		units[\"Maia\"] = battle.spawn_unit(\"Maia\", battle.context.attacker, \"\")
+		units[\"Zahra\"] = battle.spawn_unit(\"Zahra\", battle.context.attacker, \"\")
 		
 		for u in prep.units:
 			#battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
@@ -197,9 +204,18 @@ func can_spawn(unit: Unit, pos: Vector2) -> bool:
 	if !battle.map.is_inside_bounds(pos):
 		return false
 		
-	var obj := battle.map.get_object_at(pos)
+	var objs := battle.map.get_objects_at(pos)
 	
-	return obj != null and is_unit_spawn_point(unit, obj)
+	# can spawn iff on a spawn point, regardless of what's there;
+	# it's not for this function to check or care
+	for obj in objs:
+		if is_unit_spawn_point(unit, obj):
+			return true
+	return false
+	
+	#var obj := battle.map.get_object_at(pos)
+	
+	#return obj != null and is_unit_spawn_point(unit, obj)
 
 
 func is_unit_spawn_point(unit: Unit, obj: MapObject) -> bool:
@@ -268,8 +284,8 @@ func _on_character_list_unit_selected(unit: String, pos: Vector2):
 func _on_character_list_unit_released(unit: String, pos: Vector2):
 	pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	
-	#units[unit].map_pos = battle.map.world.screen_to_uniform(pos) 
 	units[unit].snap_to_grid()
+		
 		
 	# remove the unit temporarily. if we can spawn there, add it again
 	_remove_unit(unit)

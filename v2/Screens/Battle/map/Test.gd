@@ -4,7 +4,7 @@ extends Node2D
 @onready var world := $Map.world as World
 @onready var unit := $Map/Unit as Unit
 @onready var drivers := $Drivers
-
+@onready var unit_path := $UnitPath as UnitPath
 
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
 	var re := PackedVector2Array()
@@ -52,6 +52,43 @@ func _ready():
 	unit.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
 	if not Engine.is_editor_hint():
 		test.call_deferred()
+		
+	var m := Transform2D()
+	
+	# scale to downsize to unit vector
+	m = m.scaled(Vector2.ONE/Vector2(unit_path.tile_set.tile_size))
+	if world:
+		# scale to tile size
+		m = m.scaled(Vector2(world.tile_size, world.tile_size))
+		
+	unit_path.transform = world._world_to_screen_transform * m
+
+	unit_path.position = world.uniform_to_screen(Vector2(-0.5, -0.5))
+	
+	var arr := []
+	arr.resize(world.map_size.x * world.map_size.y)
+	var n := 0
+	for j in world.map_size.y:
+		for i in world.map_size.x:
+			var vec := Vector2(i, j)
+			# TODO if pathable, do this else not pathable
+			print(n, " ", vec, " ", world.to_index(vec))
+			arr[world.to_index(vec)] = vec
+			n += 1
+			
+	unit_path.initialize(arr)
+
+
+func _input(event):
+	if event is InputEventMouseMotion:
+		var start := unit.map_pos
+		var end := world.screen_to_uniform(event.position)
+		print("connect %s -> %s" % [start, end])
+		unit_path.draw(start, end)
+
+	if event is InputEventMouseButton:
+		if event.button_index == 1 and event.pressed:
+			walk_towards(unit, world.screen_to_uniform(event.position))
 
 
 func random_path(length: int) -> PackedVector2Array:
@@ -61,22 +98,39 @@ func random_path(length: int) -> PackedVector2Array:
 	return make_random_path(length, unit.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
 
 
-func walk_along(path: PackedVector2Array):
+## Makes the unit walk towards a point.
+func walk_towards(which: Unit, end: Vector2):
+	var start := which.map_pos
+	var path := unit_path._pathfinder.calculate_point_path(start, end)
+	walk_along(which, path)
+	
+
+## Makes the unit walk along a path.
+func walk_along(which: Unit, path: PackedVector2Array):
+	if is_walking(which):
+		stop_walking(which)
 	var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
-	driver.unit = unit
-	unit.set_meta("driver", driver)
+	driver.unit = which
+	which.set_meta("driver", driver)
 	drivers.add_child(driver)
 	await driver.walk_along(path)
 	drivers.remove_child(driver)
-	unit.remove_meta("driver")
+	which.remove_meta("driver")
 	driver.queue_free()
 	
 	
-func stop_walking():
-	unit.get_meta("driver").stop_walking()
+## Makes the unit stop walking.
+func stop_walking(which: Unit):
+	which.get_meta("driver").stop_walking()
+	
+
+## Returns true if the unit is walking.
+func is_walking(which: Unit):
+	return which.has_meta("driver")
 	
 	
 func test():
-	walk_along(random_path(randi_range(1, 10)))
+	#walk_along(random_path(randi_range(1, 10)))
+	pass
 
 

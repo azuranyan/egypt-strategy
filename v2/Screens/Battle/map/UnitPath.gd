@@ -2,7 +2,7 @@
 class_name UnitPath
 extends TileMap
 
-@export var grid: Grid
+@export var world: World
 
 # This variable holds a reference to a PathFinder object. We'll create a new one every time the 
 # player select a unit.
@@ -17,7 +17,7 @@ var current_path := PackedVector2Array()
 # among the `walkable_cells`.
 # We'll call this function every time the player selects a unit.
 func initialize(walkable_cells: Array) -> void:
-	_pathfinder = PathFinder.new(grid, walkable_cells)
+	_pathfinder = PathFinder.new(world, walkable_cells)
 	
 
 # Finds and draws the path between `cell_start` and `cell_end`.

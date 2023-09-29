@@ -204,14 +204,14 @@ func set_debug_tile_visible(debug_tile_visible: bool):
 
 
 ## Spawns a unit of type tag with name at pos, facing x.
-func spawn_unit(tag: String, empire: Empire, name := "", pos := Vector2.ZERO, heading := Unit.Heading.West) -> Unit:
+func spawn_unit(tag: String, empire: Empire, name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.West) -> Unit:
 	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
 	
 	var unit := Unit.create(map, {
 		world = map.world,
 		unit_type = Globals.unit_type[tag],
 		empire = empire,
-		world_pos = pos,
+		map_pos = pos,
 #		facing = 0,
 #		hud = true,
 #		color = Color.WHITE,

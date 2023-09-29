@@ -51,7 +51,7 @@ func _process(delta: float):
 
 ## Walks along a path.
 func walk_along(path: PackedVector2Array):
-	# place where he is
+	# place the driver where the unit is
 	position = unit.position
 	
 	if path.is_empty():

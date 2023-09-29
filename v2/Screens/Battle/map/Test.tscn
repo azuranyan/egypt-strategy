@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=8 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
 [ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
+[ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="2_phl5y"]
 [ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="2_x2o88"]
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="4_a2yrc"]
@@ -11,6 +12,12 @@
 script = ExtResource("1_rejdj")
 
 [node name="Drivers" type="Node" parent="."]
+
+[node name="UnitPath" parent="." instance=ExtResource("2_phl5y")]
+position = Vector2(1011.36, 210.367)
+rotation = 0.522586
+scale = Vector2(1.04234, 1.04234)
+skew = 0.525625
 
 [node name="Map" parent="." instance=ExtResource("2_x2o88")]
 world = ExtResource("3_6wws0")
