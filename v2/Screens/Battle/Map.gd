@@ -118,7 +118,7 @@ func get_objects_at(pos: Vector2) -> Array[Node]:
 func get_object(pos: Vector2, type: Pathing) -> Node:
 	var arr := get_objects_at(pos)
 	for obj in arr:
-		if obj.mapobject.pathing_group == type:
+		if obj.pathing == type:
 			return obj
 	return null
 
@@ -151,6 +151,11 @@ func index(pos: Vector2) -> int:
 	#return world.to_index(pos)
 	var cell := cell(pos)
 	return cell.y*world.map_size.x + cell.x
+	
+
+## Returns returns true if the cell is occupied by a unit.
+func is_occupied(pos: Vector2) -> bool:
+	return get_object(pos, Map.Pathing.UNIT) != null
 	
 
 func _is_map_object(node: Node) -> bool:

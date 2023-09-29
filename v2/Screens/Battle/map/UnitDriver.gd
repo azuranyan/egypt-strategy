@@ -13,6 +13,7 @@ signal walking_finished
 
 @onready var path_follow := $PathFollow2D as PathFollow2D
 
+var stopped := false
 
 var _old_pos: Vector2
 
@@ -65,6 +66,7 @@ func walk_along(path: PackedVector2Array):
 	walking = true
 	unit.model.play_animation("walk")
 	walking_started.emit()
+	stopped = false
 	
 	# await until walking is done
 	await self.walking_finished
@@ -81,4 +83,5 @@ func walk_along(path: PackedVector2Array):
 ## Stops walking
 func stop_walking():
 	if walking:
+		stopped = true
 		walking_finished.emit()

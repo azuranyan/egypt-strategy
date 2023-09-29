@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=12 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
 [ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
@@ -8,10 +8,37 @@
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="4_a2yrc"]
 [ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="5_gyrky"]
 
+[sub_resource type="Gradient" id="Gradient_k4rf6"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_6xs8w"]
+gradient = SubResource("Gradient_k4rf6")
+width = 80
+height = 80
+fill_to = Vector2(1, 1)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bem4x"]
+texture = SubResource("GradientTexture2D_6xs8w")
+texture_region_size = Vector2i(80, 80)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_5o5ik"]
+tile_size = Vector2i(80, 80)
+sources/0 = SubResource("TileSetAtlasSource_bem4x")
+
 [node name="Test" type="Node2D"]
 script = ExtResource("1_rejdj")
 
 [node name="Drivers" type="Node" parent="."]
+
+[node name="TerrainOverlay" type="TileMap" parent="."]
+modulate = Color(0, 0.8, 0, 0.290196)
+position = Vector2(1011.36, 210.367)
+rotation = 0.522586
+scale = Vector2(1.04234, 1.04234)
+skew = 0.525625
+tile_set = SubResource("TileSet_5o5ik")
+format = 2
 
 [node name="UnitPath" parent="." instance=ExtResource("2_phl5y")]
 position = Vector2(1011.36, 210.367)
@@ -33,4 +60,13 @@ world = ExtResource("3_6wws0")
 position = Vector2(1011.36, 251.987)
 world = ExtResource("3_6wws0")
 
+[node name="Unit2" parent="Map" instance=ExtResource("2_dv3bt")]
+position = Vector2(1155.87, 501.709)
+world = ExtResource("3_6wws0")
+map_pos = Vector2(4, 2)
+
+[connection signal="location_selected" from="." to="." method="_on_location_selected"]
+[connection signal="rmb_pressed" from="." to="." method="_on_rmb_pressed"]
+[connection signal="unit_selected" from="." to="." method="_on_unit_selected"]
+[connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
 [connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]
