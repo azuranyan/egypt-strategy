@@ -69,6 +69,7 @@ _data = {
 position = Vector2(1011.36, 251.987)
 script = ExtResource("1_ggmfr")
 walk_speed = 200.0
+pathing = 1
 
 [node name="Debug" type="ColorRect" parent="."]
 visible = false
@@ -86,7 +87,7 @@ mouse_filter = 2
 color = Color(0, 1, 0, 1)
 
 [node name="Shadow" type="Sprite2D" parent="."]
-modulate = Color(0, 0, 0, 0.329412)
+modulate = Color(0, 0, 0, 0.392157)
 rotation = 0.522585
 scale = Vector2(0.32573, 0.32573)
 skew = 0.525625
@@ -187,4 +188,8 @@ libraries = {
 "": SubResource("AnimationLibrary_xege1")
 }
 
+[connection signal="selectable_changed" from="." to="." method="_on_selectable_changed"]
+[connection signal="status_effect_added" from="." to="." method="_on_status_effect_added"]
+[connection signal="status_effect_changed" from="." to="." method="_on_status_effect_changed"]
+[connection signal="status_effect_removed" from="." to="." method="_on_status_effect_removed"]
 [connection signal="gui_input" from="Control" to="." method="_on_control_gui_input"]

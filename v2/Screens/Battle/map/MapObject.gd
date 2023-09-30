@@ -39,6 +39,12 @@ signal map_pos_changed
 			visibility_layer = 1 << 9
 		else:
 			visibility_layer = 1
+			
+## Vertical offset.
+@export var vertical_offset: float = 0:
+	set(value):
+		vertical_offset = value
+		_refresh_position()
 		
 
 func _refresh_position():
@@ -46,3 +52,4 @@ func _refresh_position():
 		position = world.uniform_to_screen(map_pos)
 	else:
 		position = Vector2.ZERO
+	position.y += vertical_offset

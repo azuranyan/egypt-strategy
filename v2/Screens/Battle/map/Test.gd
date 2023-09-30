@@ -152,10 +152,10 @@ func is_walking(unit: Unit):
 	
 ## Returns an array of walkable cells in range.
 func get_walkable_cells(unit: Unit) -> PackedVector2Array:
-	return _flood_fill(map.cell(unit.map_pos), unit.mov)
+	return _flood_fill(unit, map.cell(unit.map_pos), unit.mov)
+	
 
-
-func _flood_fill(cell: Vector2, max_distance: int) -> PackedVector2Array:
+func _flood_fill(unit: Unit, cell: Vector2, max_distance: int) -> PackedVector2Array:
 	var re := PackedVector2Array()
 	
 	var stack := [cell]
@@ -176,8 +176,10 @@ func _flood_fill(cell: Vector2, max_distance: int) -> PackedVector2Array:
 		var dist := int(diff.x + diff.y)
 		if dist > max_distance:
 			continue
-		
-		# TODO dont add the first cell
+			
+		if not is_pathable(unit, current):
+			continue
+			
 		re.append(current)
 		
 		for direction in DIRECTIONS:
@@ -186,13 +188,13 @@ func _flood_fill(cell: Vector2, max_distance: int) -> PackedVector2Array:
 			if not world.in_bounds(coords):
 				continue
 			
-			if map.is_occupied(coords):
-				continue
+			#if map.is_occupied(coords):
+			#	continue
 			
 			if coords in re:
 				continue
 			
-			re.append(coords)
+			stack.append(coords)
 	return re
 	
 	
@@ -240,6 +242,11 @@ enum {
 	STATE_DONE,
 }
 
+class UnitMoveAction:
+	var unit: Unit
+	var pos: Vector2
+	var facing: float
+
 
 func _transition_to(state: int, kwargs: Dictionary = {}):
 	_on_exit(context.state, kwargs)
@@ -271,7 +278,17 @@ func _on_enter(state: int, kwargs: Dictionary):
 			walk_towards(context.unit, context.location_selected)
 			
 		STATE_DONE:
+			# TODO place somewhere appropriate
+			map.get_objects_at(context.old_pos).erase(context.unit)
+			map.get_objects_at(context.unit.map_pos).append(context.unit)
+			
+			context.unit = null
+			context.old_pos = Vector2.ZERO
+			context.old_facing = 0
+			context.walkable = []
+			
 			# TODO commit_action
+			
 			_transition_to.call_deferred(STATE_IDLE)
 			
 			
@@ -293,8 +310,14 @@ func _on_exit(state: int, kwargs: Dictionary):
 
 
 func _on_unit_selected(unit: Unit):
+	print("selected ", unit)
 	if context.state == STATE_IDLE:
-		_transition_to(STATE_UNIT_SELECTED, {unit=unit})
+		print("  %s == %s? %s" % [context.unit, unit, context.unit == unit])
+		if context.unit == unit:
+			print("  same unit")
+		else:
+			print("  transition")
+			_transition_to(STATE_UNIT_SELECTED, {unit=unit})
 
 
 func _on_rmb_pressed():
@@ -304,7 +327,8 @@ func _on_rmb_pressed():
 			pass
 			
 		STATE_UNIT_SELECTED:
-			_transition_to(STATE_IDLE)
+			#_transition_to(STATE_IDLE)
+			_transition_to(STATE_DONE)
 			
 		STATE_WALKING:
 			stop_walking(context.unit)
@@ -318,10 +342,11 @@ func _on_rmb_pressed():
 
 func _on_location_selected(pos: Vector2):
 	if context.state == STATE_UNIT_SELECTED:
-		if pos != context.old_pos:
-			_transition_to(STATE_WALKING)
+		if pos == context.old_pos:
+			pass
+			#_transition_to(STATE_DONE)
 		else:
-			_transition_to(STATE_DONE)
+			_transition_to(STATE_WALKING)
 			
 			
 func _on_walking_finished(unit: Unit, cancelled: bool):
@@ -332,6 +357,24 @@ func _on_walking_finished(unit: Unit, cancelled: bool):
 	else:
 		_transition_to(STATE_DONE)
 
+
+## Returns true if pos is pathable.
+func is_pathable(unit: Unit, pos: Vector2) -> bool:
+	for obj in map.get_objects_at(pos):
+		if not unit.can_path(obj):
+			return false
+	return true
+	
+
+## Returns true if this unit can be placed on pos.
+func is_placeable(unit: Unit, pos: Vector2) -> bool:
+	if map.cell(unit.map_pos) == map.cell(pos):
+		return false
+	for obj in map.get_objects_at(pos):
+		if not unit.can_place(obj):
+			return false
+	return true
+	
 			
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == 2 and event.pressed:
@@ -345,18 +388,19 @@ func _input(event):
 			if event is InputEventMouseMotion:
 				var end := world.screen_to_uniform(event.position, true)
 				if end != context.location_hovered:
-					if end in context.walkable:
-						if end == context.old_pos:
-							unit_path.clear()
-						else:
-							var start := context.old_pos
-							unit_path.draw(start, end)
+					if end != context.old_pos and \
+							end in context.walkable and \
+							is_placeable(context.unit, end):
+						var start := context.old_pos
+						unit_path.draw(start, end)
+					else:
+						unit_path.clear()
 					context.location_hovered = end
 				
 			if event is InputEventMouseButton:
 				if event.button_index == 1 and event.pressed:
 					var pos := world.screen_to_uniform(event.position, true)
-					if pos in context.walkable:
+					if pos in context.walkable and is_placeable(context.unit, pos):
 						context.location_selected = pos
 						location_selected.emit(pos)
 			

@@ -41,7 +41,7 @@ const OUT_OF_BOUNDS := Vector2(69, 420)
 var world_instance: WorldInstance
 
 # trading space for more efficient lookups
-var _objects: Array[Node] = []
+var _objects: Array[MapObject] = []
 var _objects_by_group := {}
 var _objects_by_pos := {}
 
@@ -60,8 +60,8 @@ func _ready():
 	world_instance.z_index = -1
 	
 
-## Adds a map object. Node must have MapObject component.
-func add_object(node: Node):
+## Adds a map object.
+func add_object(node: MapObject):
 	if node.get_parent():
 		node.get_parent().remove_child(node)
 	add_child(node)
@@ -69,53 +69,53 @@ func add_object(node: Node):
 	
 
 ## Removes a map object.
-func remove_object(node: Node):
+func remove_object(node: MapObject):
 	remove_child(node)
 	_remove_map_object(node)
 	
 
-func _add_map_object(node: Node):
+func _add_map_object(node: MapObject):
 	node.world = world
 	get_objects_of(node.pathing).append(node)
 	get_objects_at(node.map_pos).append(node)
 	_objects.append(node)
 	
 
-func _remove_map_object(node: Node):
+func _remove_map_object(node: MapObject):
 	get_objects_of(node.pathing).erase(node)
 	get_objects_at(node.map_pos).erase(node)
 	_objects.erase(node)
 	
 	
 ## Returns all the objects.
-func get_objects() -> Array[Node]:
+func get_objects() -> Array[MapObject]:
 	return _objects
 	
 	
 ## Returns the objects of specified pathing type.
-func get_objects_of(type: Pathing) -> Array[Node]:
+func get_objects_of(type: Pathing) -> Array[MapObject]:
 	if not _objects_by_group.has(type):
-		var arr: Array[Node] = []
+		var arr: Array[MapObject] = []
 		_objects_by_group[type] = arr
 		
 	return _objects_by_group[type]
 
 
 ## Returns the objects at specified position.
-func get_objects_at(pos: Vector2) -> Array[Node]:
+func get_objects_at(pos: Vector2) -> Array[MapObject]:
 	var cell := cell(pos)
 	if not (pos == OUT_OF_BOUNDS or world.in_bounds(cell)):
 		push_error("%s out of bounds" % pos)
 		
 	if not _objects_by_pos.has(cell):
-		var arr: Array[Node] = []
+		var arr: Array[MapObject] = []
 		_objects_by_pos[cell] = arr
 		
 	return _objects_by_pos[cell]
 	
 	
 ## Returns the object of given type at a given position.
-func get_object(pos: Vector2, type: Pathing) -> Node:
+func get_object(pos: Vector2, type: Pathing) -> MapObject:
 	var arr := get_objects_at(pos)
 	for obj in arr:
 		if obj.pathing == type:
@@ -124,7 +124,7 @@ func get_object(pos: Vector2, type: Pathing) -> Node:
 
 
 ## Returns the object at a given position.
-func get_object_at(pos: Vector2) -> Node:
+func get_object_at(pos: Vector2) -> MapObject:
 	var arr := get_objects_at(pos)
 	return arr[0] if not arr.is_empty() else null
 	

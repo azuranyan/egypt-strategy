@@ -40,15 +40,10 @@ enum {
 	RESET_ALL = RESET_HP | RESET_STATS | RESET_STATUS_EFFECTS | RESET_BOND | RESET_ANIMATION,
 }
 
-
-## How fast the unit walks.
-@export var walk_speed := 600.0
-
-
 ## Internal properties.
 
 ## This objects unit type.
-var unit_type: UnitType:
+@export var unit_type: UnitType:
 	set(value):
 		unit_type = value
 		unit_type_changed.emit()
@@ -62,14 +57,19 @@ var empire: Empire:
 
 ## Visible properties.
 
+@export_subgroup("Display")
+
+## How fast the unit walks.
+@export var walk_speed := 600.0
+
 ## Custom name for this unit.
-var unit_name: String:
+@export var unit_name: String:
 	set(value):
 		unit_name = value
 		unit_name_changed.emit()
 
 ## Where this unit is facing.
-var facing: float = PI:
+@export var facing: float = PI:
 	set(value):
 		facing = value
 		facing_changed.emit()
@@ -83,50 +83,54 @@ var facing: float = PI:
 #		set_process(walking)
 		
 ## Whether to allow selection interaction with this unit.
-var selectable := true:
+@export var selectable := true:
 	set(value):
 		selectable = value
 		selectable_changed.emit()
 		
+		
+@export_subgroup("Pathing")
 
 ## Allows the unit to phase through units.
-var phase_units: bool = false
+@export var phase_units: bool = false
 
 ## Allows the unit to phase through objects.
-var phase_doodads: bool = false
+@export var phase_doodads: bool = false
 
 ## Allows the unit to phase and stand on everything.
-var flying: bool = false
+@export var flying: bool = false
 
 
 # Data properties
 
-var maxhp: int:
+@export_subgroup("Stats")
+
+@export var maxhp: int:
 	set(value):
 		maxhp = value
 		stat_changed.emit("maxhp")
 		
-var hp: int:
+@export var hp: int:
 	set(value):
 		hp = value
 		stat_changed.emit("hp")
 		
-var mov: int:
+@export var mov: int:
 	set(value):
 		mov = value
 		stat_changed.emit("mov")
 		
-var dmg: int:
+@export var dmg: int:
 	set(value):
 		dmg = value
 		stat_changed.emit("dmg")
 		
-var rng: int:
+@export var rng: int:
 	set(value):
 		rng = value
 		stat_changed.emit("rng")
 		
-var bond: int:
+@export var bond: int:
 	set(value):
 		bond = value
 		stat_changed.emit("bond")
@@ -165,10 +169,10 @@ func _ready():
 	world_changed.connect(_on_world_changed)
 	unit_type_changed.connect(_on_unit_type_changed)
 	
-	map_pos_changed.connect(_on_map_pos_changed)
 	unit_name_changed.connect(_on_unit_name_changed)
 	
 	facing_changed.connect(_on_facing_changed)
+	#selectable_changed.connect(_on_selectable_changed)
 #	walking_started.connect(_on_walking_started)
 #	walking_finished.connect(_on_walking_finished)
 	
@@ -342,34 +346,47 @@ func snap_to_grid():
 	map_pos = Vector2(roundi(map_pos.x), roundi(map_pos.y))
 	
 
-## Returns true if unit can path through node.
-func can_path(node: Node) -> bool:
-	match node.mapobject.pathing_group:
-		Map.Pathing.NONE:
-			return true
-		Map.Pathing.UNIT:
-			if node.empire == empire:
-				return true
-			else:
-				return phase_units
-		Map.Pathing.DOODAD:
-			return phase_doodads
-		Map.Pathing.TERRAIN:
-			return flying
-		Map.Pathing.IMPASSABLE, _:
-			return false
+################################################################################
+# Convenience functions
+################################################################################
 
 
-## Returns true if unit can stand on node.
-func can_stand(node: Node) -> bool:
-	match node.mapobject.pathing_group:
-		Map.Pathing.NONE:
-			return true
-		Map.Pathing.DOODAD, Map.Pathing.TERRAIN:
-			return flying
-		Map.Pathing.UNIT, Map.Pathing.IMPASSABLE, _:
-			return false
+## Returns true if unit can path through obj.
+func can_path(obj: MapObject) -> bool:
+	if obj:
+		match obj.pathing:
+			Map.Pathing.UNIT:
+				if is_enemy(obj):
+					return phase_units
+			Map.Pathing.DOODAD:
+				return phase_doodads
+			Map.Pathing.TERRAIN:
+				return flying
+			Map.Pathing.IMPASSABLE:
+				return false
+	return true
 
+
+## Returns true if unit can be placed on top of obj.
+func can_place(obj: MapObject) -> bool:
+	if obj:
+		match obj.pathing:
+			Map.Pathing.DOODAD, Map.Pathing.TERRAIN:
+				return flying
+			Map.Pathing.UNIT, Map.Pathing.IMPASSABLE:
+				return false
+	return true
+
+
+## Returns true if the other unit is an ally.
+func is_ally(other: Unit) -> bool:
+	return other.empire == empire
+	
+
+## Returns true if the other unit is an enemy.
+func is_enemy(other: Unit) -> bool:
+	return other.empire != empire
+	
 
 ################################################################################
 # Signals
@@ -410,12 +427,9 @@ func _on_unit_name_changed():
 	_hud_name.text = unit_name
 	
 	
-func _on_map_pos_changed():
-	#mapobject.map_pos = map_pos
-	pass
-	
-	
 func _on_selectable_changed():
+	if not is_node_ready():
+		await self.ready
 	# there's no set_process_gui_input
 	# input_control.set_process_gui_input()
 	if selectable:
@@ -460,24 +474,6 @@ func _on_control_gui_input(event):
 
 func _on_facing_changed():
 	model.facing = facing
-
-
-func _on_walking_started():
-	model.animation = "walk"
-
-
-func _on_walking_finished():
-	model.animation = "idle"
-
-
-func _on_map_object_map_pos_changed():
-	#_update_map_pos(mapobject.map_pos)
-	pass
-	
-
-func _on_map_object_world_changed():
-	#_update_world(mapobject.world)
-	pass
 
 
 ################################################################################
