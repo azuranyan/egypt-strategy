@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=27 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
 [ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
@@ -7,13 +7,11 @@
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="4_a2yrc"]
 [ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="5_gyrky"]
-[ext_resource type="PackedScene" uid="uid://diu2xhfofh1m1" path="res://Screens/Battle/camera_2d.tscn" id="7_ne3x8"]
 [ext_resource type="Texture2D" uid="uid://c6tj66mut11o3" path="res://Screens/Battle/down_arrow.png" id="7_rxukt"]
 [ext_resource type="PackedScene" uid="uid://bp1nvlsojoyl3" path="res://Screens/Battle/map/Doodad.tscn" id="9_8i4j3"]
 [ext_resource type="Resource" uid="uid://cpbfkmumc5lef" path="res://Screens/Battle/data/UnitType_Lysandra.tres" id="9_xg3xs"]
 [ext_resource type="Resource" uid="uid://bjboq0txrh33r" path="res://Screens/Battle/data/UnitType_Maia.tres" id="10_dd4y3"]
 [ext_resource type="Resource" uid="uid://b3l0n53fl6pgq" path="res://Screens/Battle/data/DoodadType_Tree_01.tres" id="10_n571j"]
-[ext_resource type="Resource" uid="uid://db07m7y1a3tmi" path="res://Screens/Battle/data/UnitType_Zahra.tres" id="11_luj3e"]
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="13_ghghu"]
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="14_fmghe"]
 [ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="14_j1xct"]
@@ -115,17 +113,6 @@ rotation = 0.522586
 scale = Vector2(1.04234, 1.04234)
 skew = 0.525625
 
-[node name="Camera2D" parent="." instance=ExtResource("7_ne3x8")]
-position = Vector2(1011.36, 247.987)
-drag_left_margin = 0.8
-drag_top_margin = 0.44
-drag_right_margin = 0.8
-drag_bottom_margin = 0.44
-metadata/follow_func = Callable()
-metadata/target = Object(Node2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":-1,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(1011.36, 247.987),"rotation":0.0,"scale":Vector2(1, 1),"skew":0.0,"script":Resource("res://Screens/Battle/map/SpriteObject.gd"),"texture":ExtResource("5_gyrky"),"fit_to_grid":true,"sprite":Object(Sprite2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(0, 0),"rotation":0.522585,"scale":Vector2(0.651461, 0.651461),"skew":0.525625,"texture":ExtResource("5_gyrky"),"centered":true,"offset":Vector2(0, 0),"flip_h":false,"flip_v":false,"hframes":1,"vframes":1,"frame":0,"region_enabled":false,"region_rect":Rect2(0, 0, 0, 0),"region_filter_clip_enabled":false,"script":null)
-,"display_name":"","display_icon":null,"world":ExtResource("3_6wws0"),"map_pos":Vector2(0, 0),"pathing":0,"no_show":false,"vertical_offset":-4.0)
-
-
 [node name="Map" parent="." instance=ExtResource("2_x2o88")]
 world = ExtResource("3_6wws0")
 
@@ -174,18 +161,6 @@ rng = 1
 world = ExtResource("3_6wws0")
 map_pos = Vector2(3, 3)
 
-[node name="Unit3" parent="Map" instance=ExtResource("2_dv3bt")]
-position = Vector2(1155.87, 418.468)
-unit_type = ExtResource("11_luj3e")
-unit_name = "Zahra"
-maxhp = 4
-hp = 4
-mov = 2
-dmg = 2
-rng = 1
-world = ExtResource("3_6wws0")
-map_pos = Vector2(3, 1)
-
 [node name="Doodad" parent="Map" instance=ExtResource("9_8i4j3")]
 position = Vector2(1517.16, 543.329)
 doodad_type = ExtResource("10_n571j")
@@ -193,9 +168,7 @@ use_source_pos = false
 world = ExtResource("3_6wws0")
 map_pos = Vector2(7, 0)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="UI" type="Control" parent="CanvasLayer"]
+[node name="UI" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -207,7 +180,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="SpecialAttackList" type="VBoxContainer" parent="CanvasLayer/UI"]
+[node name="SpecialAttackList" type="VBoxContainer" parent="UI"]
 visible = false
 layout_mode = 0
 offset_left = 1312.0
@@ -215,25 +188,25 @@ offset_top = 205.0
 offset_right = 1534.0
 offset_bottom = 409.0
 
-[node name="Special1" type="Button" parent="CanvasLayer/UI/SpecialAttackList"]
+[node name="Special1" type="Button" parent="UI/SpecialAttackList"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "Special1"
 
-[node name="Special2" type="Button" parent="CanvasLayer/UI/SpecialAttackList"]
+[node name="Special2" type="Button" parent="UI/SpecialAttackList"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "Special2
 "
 
-[node name="Name" type="Control" parent="CanvasLayer/UI"]
+[node name="Name" type="Control" parent="UI"]
 anchors_preset = 0
 offset_left = 101.0
 offset_top = 764.0
 offset_right = 273.0
 offset_bottom = 790.0
 
-[node name="ColorRect2" type="ColorRect" parent="CanvasLayer/UI/Name"]
+[node name="ColorRect2" type="ColorRect" parent="UI/Name"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -244,7 +217,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.870588, 0.839216, 0.784314, 1)
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Name"]
+[node name="Label" type="Label" parent="UI/Name"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -262,14 +235,14 @@ label_settings = SubResource("LabelSettings_md6lc")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Portrait" type="Control" parent="CanvasLayer/UI"]
+[node name="Portrait" type="Control" parent="UI"]
 anchors_preset = 0
 offset_left = 101.0
 offset_top = 808.0
 offset_right = 273.0
 offset_bottom = 980.0
 
-[node name="ColorRect2" type="ColorRect" parent="CanvasLayer/UI/Portrait"]
+[node name="ColorRect2" type="ColorRect" parent="UI/Portrait"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -278,7 +251,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.870588, 0.839216, 0.784314, 1)
 
-[node name="Control" type="Control" parent="CanvasLayer/UI/Portrait"]
+[node name="Control" type="Control" parent="UI/Portrait"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -290,7 +263,7 @@ offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UI/Portrait/Control"]
+[node name="TextureRect" type="TextureRect" parent="UI/Portrait/Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -301,32 +274,32 @@ texture = ExtResource("14_fmghe")
 expand_mode = 3
 stretch_mode = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/Portrait"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Portrait"]
 layout_mode = 1
 offset_left = 8.0
 offset_top = 31.0
 offset_right = 33.0
 offset_bottom = 141.0
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UI/Portrait/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="UI/Portrait/VBoxContainer"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 texture = ExtResource("14_j1xct")
 expand_mode = 3
 
-[node name="TextureRect2" type="TextureRect" parent="CanvasLayer/UI/Portrait/VBoxContainer"]
+[node name="TextureRect2" type="TextureRect" parent="UI/Portrait/VBoxContainer"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 texture = ExtResource("14_j1xct")
 expand_mode = 3
 
-[node name="TextureRect3" type="TextureRect" parent="CanvasLayer/UI/Portrait/VBoxContainer"]
+[node name="TextureRect3" type="TextureRect" parent="UI/Portrait/VBoxContainer"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 texture = ExtResource("15_3h5x1")
 expand_mode = 3
 
-[node name="Move" type="Control" parent="CanvasLayer/UI"]
+[node name="Move" type="Control" parent="UI"]
 custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 anchors_preset = 0
@@ -338,7 +311,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Move"]
+[node name="ColorRect" type="ColorRect" parent="UI/Move"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -347,7 +320,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.867188, 0.835938, 0.78125, 1)
 
-[node name="Button" type="Button" parent="CanvasLayer/UI/Move"]
+[node name="Button" type="Button" parent="UI/Move"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
 anchors_preset = 15
@@ -358,7 +331,7 @@ grow_vertical = 2
 focus_mode = 0
 flat = true
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Move"]
+[node name="Label" type="Label" parent="UI/Move"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -370,7 +343,7 @@ label_settings = SubResource("LabelSettings_jpde8")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Attack" type="Control" parent="CanvasLayer/UI"]
+[node name="Attack" type="Control" parent="UI"]
 custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 anchors_preset = 0
@@ -382,7 +355,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Attack"]
+[node name="ColorRect" type="ColorRect" parent="UI/Attack"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -391,7 +364,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.867188, 0.835938, 0.78125, 1)
 
-[node name="Button" type="Button" parent="CanvasLayer/UI/Attack"]
+[node name="Button" type="Button" parent="UI/Attack"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
 anchors_preset = 15
@@ -402,7 +375,7 @@ grow_vertical = 2
 focus_mode = 0
 flat = true
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Attack"]
+[node name="Label" type="Label" parent="UI/Attack"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -414,7 +387,7 @@ label_settings = SubResource("LabelSettings_jpde8")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Special" type="Control" parent="CanvasLayer/UI"]
+[node name="Special" type="Control" parent="UI"]
 custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 anchors_preset = 0
@@ -426,7 +399,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Special"]
+[node name="ColorRect" type="ColorRect" parent="UI/Special"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -435,7 +408,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.867188, 0.835938, 0.78125, 1)
 
-[node name="Button" type="Button" parent="CanvasLayer/UI/Special"]
+[node name="Button" type="Button" parent="UI/Special"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
 anchors_preset = 15
@@ -446,7 +419,7 @@ grow_vertical = 2
 focus_mode = 0
 flat = true
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Special"]
+[node name="Label" type="Label" parent="UI/Special"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -459,7 +432,7 @@ label_settings = SubResource("LabelSettings_jpde8")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Undo" type="Control" parent="CanvasLayer/UI"]
+[node name="Undo" type="Control" parent="UI"]
 layout_mode = 2
 anchors_preset = 0
 offset_left = 1682.0
@@ -470,7 +443,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Undo"]
+[node name="ColorRect" type="ColorRect" parent="UI/Undo"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -479,7 +452,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.867188, 0.835938, 0.78125, 1)
 
-[node name="Button" type="Button" parent="CanvasLayer/UI/Undo"]
+[node name="Button" type="Button" parent="UI/Undo"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
 anchors_preset = 15
@@ -490,7 +463,7 @@ grow_vertical = 2
 focus_mode = 0
 flat = true
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Undo"]
+[node name="Label" type="Label" parent="UI/Undo"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -502,7 +475,7 @@ label_settings = SubResource("LabelSettings_jpde8")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EndTurn" type="Control" parent="CanvasLayer/UI"]
+[node name="EndTurn" type="Control" parent="UI"]
 layout_mode = 2
 anchors_preset = 0
 offset_left = 1617.0
@@ -513,7 +486,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/EndTurn"]
+[node name="ColorRect" type="ColorRect" parent="UI/EndTurn"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -522,7 +495,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.867188, 0.835938, 0.78125, 1)
 
-[node name="Button" type="Button" parent="CanvasLayer/UI/EndTurn"]
+[node name="Button" type="Button" parent="UI/EndTurn"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
 anchors_preset = 15
@@ -533,7 +506,7 @@ grow_vertical = 2
 focus_mode = 0
 flat = true
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/EndTurn"]
+[node name="Label" type="Label" parent="UI/EndTurn"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -548,4 +521,8 @@ vertical_alignment = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
+[connection signal="location_selected" from="." to="." method="_on_location_selected"]
+[connection signal="rmb_pressed" from="." to="." method="_on_rmb_pressed"]
+[connection signal="unit_selected" from="." to="." method="_on_unit_selected"]
+[connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
 [connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]

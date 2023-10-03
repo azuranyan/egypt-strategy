@@ -7,6 +7,7 @@ extends TileMap
 # This variable holds a reference to a PathFinder object. We'll create a new one every time the 
 # player select a unit.
 var _pathfinder: PathFinder
+
 # This property caches a path found by the _pathfinder above.
 # We cache the path so we can reuse it from the game board. If the player decides to confirm unit
 # movement with the cursor, we can pass the path to the unit's walk_along() function.

@@ -7,6 +7,8 @@ extends Node2D
 @onready var unit_path := $UnitPath as UnitPath
 @onready var terrain_overlay := $TerrainOverlay as TileMap
 
+@onready var cursor := $Map/Cursor as SpriteObject
+
 @onready var map := $Map as Map
 
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
@@ -52,9 +54,14 @@ static func make_random_path(
 
 
 func _ready():
+	# TODO this doesnt work when set from editor
 	unit.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
 	$Map/Unit2.unit_type = preload("res://Screens/Battle/data/UnitType_Maia.tres")
+	$Map/Unit3.unit_type = preload("res://Screens/Battle/data/UnitType_Zahra.tres")
+	
+	set_camera_follow_target(cursor)
 		
+	
 	var m := Transform2D()
 	
 	# scale to downsize to unit vector
@@ -123,21 +130,32 @@ func walk_along(unit: Unit, path: PackedVector2Array):
 	if is_walking(unit):
 		stop_walking(unit)
 		
-	# initialize driver
-	var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
-	driver.unit = unit
-	unit.set_meta("driver", driver)
-	drivers.add_child(driver)
-	
-	# run and wait for driver
-	await driver.walk_along(path)
-	
-	# cleanup
-	drivers.remove_child(driver)
-	unit.remove_meta("driver")
-	driver.queue_free()
-	
-	walking_finished.emit(unit, driver.stopped)
+	match path.size():
+		0, 1:
+			walking_finished.emit(unit, false)
+		_:
+			# initialize driver
+			var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
+			driver.unit = unit
+			unit.set_meta("driver", driver)
+			drivers.add_child(driver)
+			
+			var old_pos := unit.map_pos
+			var new_pos := path[-1]
+			
+			# run and wait for driver
+			await driver.walk_along(path)
+			
+			# cleanup
+			drivers.remove_child(driver)
+			unit.remove_meta("driver")
+			driver.queue_free()
+			
+			# TODO map bug workaround
+			map.get_objects_at(old_pos).erase(unit)
+			map.get_objects_at(new_pos).append(unit)
+				
+			walking_finished.emit(unit, driver.stopped)
 	
 	
 ## Makes the unit stop walking.
@@ -156,6 +174,7 @@ func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 	
 
 func _flood_fill(unit: Unit, cell: Vector2, max_distance: int) -> PackedVector2Array:
+	# TODO pos -> cells
 	var re := PackedVector2Array()
 	
 	var stack := [cell]
@@ -310,52 +329,55 @@ func _on_exit(state: int, kwargs: Dictionary):
 
 
 func _on_unit_selected(unit: Unit):
-	print("selected ", unit)
-	if context.state == STATE_IDLE:
-		print("  %s == %s? %s" % [context.unit, unit, context.unit == unit])
-		if context.unit == unit:
-			print("  same unit")
-		else:
-			print("  transition")
-			_transition_to(STATE_UNIT_SELECTED, {unit=unit})
+#	print("selected ", unit)
+#	if context.state == STATE_IDLE:
+#		print("  %s == %s? %s" % [context.unit, unit, context.unit == unit])
+#		if context.unit == unit:
+#			print("  same unit")
+#		else:
+#			print("  transition")
+#			_transition_to(STATE_UNIT_SELECTED, {unit=unit})
+	pass
 
 
 func _on_rmb_pressed():
-	match context.state:
-		STATE_IDLE:
-			# TODO pop action
-			pass
-			
-		STATE_UNIT_SELECTED:
-			#_transition_to(STATE_IDLE)
-			_transition_to(STATE_DONE)
-			
-		STATE_WALKING:
-			stop_walking(context.unit)
-		
-		STATE_DONE:
-			_transition_to(STATE_IDLE)
-			unit.map_pos = context.old_pos
-			unit.facing = context.old_facing
-			
+#	match context.state:
+#		STATE_IDLE:
+#			# TODO pop action
+#			pass
+#
+#		STATE_UNIT_SELECTED:
+#			#_transition_to(STATE_IDLE)
+#			_transition_to(STATE_DONE)
+#
+#		STATE_WALKING:
+#			stop_walking(context.unit)
+#
+#		STATE_DONE:
+#			_transition_to(STATE_IDLE)
+#			unit.map_pos = context.old_pos
+#			unit.facing = context.old_facing
+	pass
 
 
 func _on_location_selected(pos: Vector2):
-	if context.state == STATE_UNIT_SELECTED:
-		if pos == context.old_pos:
-			pass
-			#_transition_to(STATE_DONE)
-		else:
-			_transition_to(STATE_WALKING)
+#	if context.state == STATE_UNIT_SELECTED:
+#		if pos == context.old_pos:
+#			pass
+#			#_transition_to(STATE_DONE)
+#		else:
+#			_transition_to(STATE_WALKING)
+	pass
 			
 			
 func _on_walking_finished(unit: Unit, cancelled: bool):
-	if cancelled:
-		unit.map_pos = context.old_pos
-		unit.facing = context.old_facing
-		_transition_to(STATE_UNIT_SELECTED, {unit=unit})
-	else:
-		_transition_to(STATE_DONE)
+#	if cancelled:
+#		unit.map_pos = context.old_pos
+#		unit.facing = context.old_facing
+#		_transition_to(STATE_UNIT_SELECTED, {unit=unit})
+#	else:
+#		_transition_to(STATE_DONE)
+	pass
 
 
 ## Returns true if pos is pathable.
@@ -375,39 +397,280 @@ func is_placeable(unit: Unit, pos: Vector2) -> bool:
 			return false
 	return true
 	
+
+
+
+#func _input(event):
+#	match context.state:
+#		STATE_IDLE:
+#			pass
+#
+#		STATE_UNIT_SELECTED:
+#			if event is InputEventMouseMotion:
+#				var end := world.screen_to_uniform(event.position, true)
+#				if end != context.location_hovered:
+#					if end != context.old_pos and \
+#							end in context.walkable and \
+#							is_placeable(context.unit, end):
+#						var start := context.old_pos
+#						unit_path.draw(start, end)
+#					else:
+#						unit_path.clear()
+#					context.location_hovered = end
+#
+#			if event is InputEventMouseButton:
+#				if event.button_index == 1 and event.pressed:
+#					var pos := world.screen_to_uniform(event.position, true)
+#					if pos in context.walkable and is_placeable(context.unit, pos):
+#						context.location_selected = pos
+#						location_selected.emit(pos)
+#
+#		STATE_WALKING:
+#			pass
+#
+#		STATE_DONE:
+#		
+class UnitBattleInfo:
+	var unit: Unit
+	var has_moved: bool
+	var has_attacked: bool
+	
+	
+func _is_current_empire(unit: Unit) -> bool:
+	# TODO to be replaced with real code
+	#return unit.empire == context.current
+	return unit != $Map/Unit3
+
+
+	
+func _select_cell(pos: Vector2):
+	var cell := world.clamp_pos(Vector2(roundi(pos.x), roundi(pos.y)))
+	var unit := map.get_object(cell, Map.Pathing.UNIT) as Unit
+	
+	cursor.map_pos = cell
+	
+	if active_unit_action:
+		if unit and unit != active_unit_action.unit:
+			# show unit info
+			$CanvasLayer/UI/Name/Label.text = unit.unit_type.name
+			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = unit.unit_type.chara.portrait
+			set_ui_visible(true, false)
 			
-func _input(event):
-	if event is InputEventMouseButton and event.button_index == 2 and event.pressed:
-		rmb_pressed.emit()
-		
-	match context.state:
-		STATE_IDLE:
-			pass
-			
-		STATE_UNIT_SELECTED:
-			if event is InputEventMouseMotion:
-				var end := world.screen_to_uniform(event.position, true)
-				if end != context.location_hovered:
-					if end != context.old_pos and \
-							end in context.walkable and \
-							is_placeable(context.unit, end):
-						var start := context.old_pos
-						unit_path.draw(start, end)
-					else:
-						unit_path.clear()
-					context.location_hovered = end
-				
-			if event is InputEventMouseButton:
-				if event.button_index == 1 and event.pressed:
-					var pos := world.screen_to_uniform(event.position, true)
-					if pos in context.walkable and is_placeable(context.unit, pos):
-						context.location_selected = pos
-						location_selected.emit(pos)
-			
-		STATE_WALKING:
-			pass
-		
-		STATE_DONE:
-			pass
+		else:
+			if _is_current_empire(active_unit_action.unit):
+				# show extended info
+				$CanvasLayer/UI/Name/Label.text = active_unit_action.unit.unit_type.name
+				$CanvasLayer/UI/Portrait/Control/TextureRect.texture = active_unit_action.unit.unit_type.chara.portrait
+				set_ui_visible(true, true)
+	else:
+		if unit:
+			# show unit info
+			$CanvasLayer/UI/Name/Label.text = unit.unit_type.name
+			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = unit.unit_type.chara.portrait
+			set_ui_visible(true, false)
+		else:
+			# clear unit info
+			$CanvasLayer/UI/Name/Label.text = ""
+			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = null
+			set_ui_visible(false, false)
 	
 
+	
+# TODO have consistency in cells and pos
+
+func _play_error(overlap := false):
+	if overlap or not $AudioStreamPlayer2D.is_playing():
+		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
+		$AudioStreamPlayer2D.play()
+
+
+func walk_unit_action(unit: Unit, target: Variant):
+	set_camera_follow_target(unit)
+	if Globals.prefs.camera_follow_unit_move:
+		camera.drag_horizontal_enabled = false
+		camera.drag_vertical_enabled = false
+	set_process_unhandled_input(false)
+	
+	if target is Unit:
+		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), target.map_pos)
+		path.resize(path.size() - 1)
+		if path.size() == 1:
+			unit.face_towards(target.map_pos)
+		await walk_along(unit, path)
+	
+	if target is Vector2i:
+		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), target)
+		await walk_along(unit, path)
+		
+	if target is Vector2:
+		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), map.cell(target))
+		await walk_along(unit, path)
+		
+	set_process_unhandled_input(true)
+	camera.drag_horizontal_enabled = true
+	camera.drag_vertical_enabled = true
+	set_camera_follow_target(cursor)
+
+func _accept_cell():
+	var cell := world.clamp_pos(Vector2(roundi(cursor.map_pos.x), roundi(cursor.map_pos.y)))
+	var unit: Unit = map.get_object(cell, Map.Pathing.UNIT)
+	
+	# unit selected
+	if unit:
+		if active_unit_action and _is_current_empire(active_unit_action.unit) and not _is_current_empire(unit):
+			# if there's an active unit is owned and target is valid, move
+			walk_unit_action(active_unit_action.unit, unit)
+			_clear_active_unit()
+		else:
+			# otherwise just switch selection to that unit
+			_set_active_unit(unit)
+	
+	# location selected
+	else:
+		if active_unit_action and _is_current_empire(active_unit_action.unit):
+			# if there's an active unit and it's owned, try moving
+			if cell in active_unit_action.walkable and \
+					is_pathable(active_unit_action.unit, cell) and \
+					is_placeable(active_unit_action.unit, cell): 
+				# if there's an active unit is owned and target is valid, move
+				walk_unit_action(active_unit_action.unit, cell)
+				_clear_active_unit()
+			else:
+				# otherwise just play an error
+				_play_error(true)
+		else:
+			# if there's no active unit or it is not owned, clear it
+			_clear_active_unit()
+		
+		
+func _set_active_unit(unit: Unit):
+	if active_unit_action:
+		_clear_active_unit()
+	unit.animation.play("highlight")
+	active_unit_action = UnitAction.new()
+	active_unit_action.unit = unit
+	active_unit_action.map_pos = unit.map_pos
+	active_unit_action.facing = unit.facing
+	active_unit_action.has_moved = false
+	active_unit_action.has_attacked = false
+	
+	active_unit_action.walkable = get_walkable_cells(unit)
+	
+	draw_walkable_cells(active_unit_action.walkable, _is_current_empire(unit))
+	
+	
+func _reset_active_unit():
+	if active_unit_action:
+		active_unit_action.unit.map_pos = active_unit_action.map_pos
+		active_unit_action.unit.facing = active_unit_action.facing
+	
+		
+func _clear_active_unit():
+	if active_unit_action:
+		active_unit_action.unit.animation.play("RESET")
+		active_unit_action.unit.animation.stop()
+		active_unit_action = null
+		clear_walkable_cells()
+	
+
+func _set_walk_enable(enable: bool):
+	if enable:
+		var walkable := get_walkable_cells(active_unit_action.unit)
+		
+		unit_path.initialize(walkable)
+		
+		for pos in walkable:
+			terrain_overlay.set_cell(0, Vector2i(pos), 0, Vector2i(0, 0), 0)
+			
+		active_unit_action.walkable = walkable
+	else:
+		unit_path.clear()
+		terrain_overlay.clear()
+		
+		active_unit_action.walkable.clear()
+		
+		
+func set_ui_visible(portrait: bool, actions: bool):
+	$CanvasLayer/UI/Name.visible = portrait
+	$CanvasLayer/UI/Portrait.visible = portrait
+	$CanvasLayer/UI/Move.visible = actions
+	$CanvasLayer/UI/Attack.visible = actions
+	$CanvasLayer/UI/Special.visible = actions
+	$CanvasLayer/UI/Undo.visible = actions
+	$CanvasLayer/UI/EndTurn.visible = actions
+
+
+func draw_walkable_cells(cells: PackedVector2Array, show_path: bool):
+	for pos in cells:
+		terrain_overlay.set_cell(0, Vector2i(pos), 0, Vector2i(0, 0), 0)
+	if show_path:
+		unit_path.initialize(cells)
+	
+		
+func clear_walkable_cells():
+	terrain_overlay.clear()
+	unit_path.stop()
+	
+	
+@onready var camera := $Camera2D as Camera2D
+
+func set_camera_follow_target(obj: MapObject):
+	if camera.get_meta("target", null):
+		obj.map_pos_changed.disconnect(camera.get_meta("follow_func"))
+		camera.set_meta("follow_func", null)
+		camera.set_meta("target", null)
+		
+	if obj:
+		var follow_func := func():
+			camera.position = world.uniform_to_screen(obj.map_pos)
+		obj.map_pos_changed.connect(follow_func)
+		
+		camera.set_meta("follow_func", follow_func)
+		camera.set_meta("target", obj)
+
+
+class UnitAction:
+	var unit: Unit
+	var map_pos: Vector2
+	var facing: float
+	var has_moved: bool
+	var has_attacked: bool
+	var walkable: PackedVector2Array
+	
+var active_unit_action: UnitAction
+
+func _unhandled_input(event):
+	
+	if event is InputEventKey:
+		if event.pressed:
+			match event.keycode:
+				KEY_W:
+					_select_cell(cursor.map_pos + Vector2(0, -1))
+				KEY_S:
+					_select_cell(cursor.map_pos + Vector2(0, +1))
+				KEY_A:
+					_select_cell(cursor.map_pos + Vector2(-1, 0))
+				KEY_D:
+					_select_cell(cursor.map_pos + Vector2(+1, 0))
+				KEY_ESCAPE:
+					#_reset_active_unit()
+					#_clear_active_unit()
+					#rmb_pressed.emit()
+					pass
+	
+	if event is InputEventMouseButton:
+		event = make_input_local(event)
+		if event.pressed:
+			match event.button_index:
+				1:
+					_select_cell(map.cell(world.screen_to_uniform(event.position)))
+					_accept_cell()
+				2:
+					#_reset_active_unit()
+					#_clear_active_unit()
+					#rmb_pressed.emit()
+					pass
+				
+	if event is InputEventMouseMotion:
+		event = make_input_local(event)
+		_select_cell(world.screen_to_uniform(event.position))

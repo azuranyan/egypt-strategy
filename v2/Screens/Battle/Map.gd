@@ -57,7 +57,7 @@ func _ready():
 	world_instance = preload("res://Screens/Battle/map/WorldInstance.tscn").instantiate()
 	add_child(world_instance, false, Node.INTERNAL_MODE_BACK)
 	world_instance.world = world
-	world_instance.z_index = -1
+	world_instance.z_index = -10
 	
 
 ## Adds a map object.

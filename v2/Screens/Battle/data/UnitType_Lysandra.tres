@@ -35,7 +35,7 @@ avatar = "Priestess of Ra"
 title = "Supreme Sun God"
 map_color = Color(0.666667, 0.352941, 0.2, 1)
 stat_hp = 5
-stat_mov = 2
+stat_mov = 5
 stat_dmg = 2
 stat_growth_1 = {
 "dmg": 0,
