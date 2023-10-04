@@ -63,6 +63,12 @@ func _ready():
 	$Map/Unit1.empire = empire
 	$Map/Unit2.empire = empire
 	$Map/Unit3.empire = null
+	on_turn = empire
+	
+	set_can_move($Map/Unit1, true)
+	set_can_move($Map/Unit2, true)
+	set_can_attack($Map/Unit1, true)
+	set_can_attack($Map/Unit2, true)
 	
 	set_camera_follow_target(cursor)
 		
@@ -89,7 +95,8 @@ func _ready():
 #			print(n, " ", vec, " ", map.index(vec))
 #			arr[map.index(vec)] = vec
 #			n += 1
-	
+	$CanvasLayer/UI/UndoButton.pressed.connect(_cancel)
+		
 	add_unit_callbacks($Map/Unit1)
 	add_unit_callbacks($Map/Unit2)
 	
@@ -243,19 +250,6 @@ signal rmb_pressed()
 signal location_selected(pos: Vector2)
 signal walking_finished(unit: Unit, cancelled: bool)
 
-class Context:
-	var state := 1
-	var unit: Unit
-	var old_pos: Vector2
-	var old_facing: float
-	var walkable: PackedVector2Array
-	
-	var location_selected: Vector2
-	var location_hovered: Vector2
-	
-
-var context := Context.new()
-
 
 func _on_unit_selected(unit: Unit):
 	pass
@@ -284,46 +278,92 @@ func is_pathable(unit: Unit, pos: Vector2) -> bool:
 ## Returns true if this unit can be placed on pos.
 func is_placeable(unit: Unit, pos: Vector2) -> bool:
 	if map.cell(unit.map_pos) == map.cell(pos):
-		return false
+		return true
 	for obj in map.get_objects_at(pos):
 		if not unit.can_place(obj):
 			return false
 	return true
 	
 
-signal interact(tag: String, msg: Dictionary)
-
-class UnitBattleInfo:
-	var has_moved: bool
-	var has_attacked: bool
-	var walkable: PackedVector2Array
-	
 var active_unit: Unit
-var change_facing: Unit = null
+var active_cell: Vector2i
+var active_facing: float
+var active_walkable: PackedVector2Array
 
-var unit_info := {}
+var change_facing: Unit
 
+var unit_move_list: Array[Unit] = []
+var unit_attack_list: Array[Unit] = []
 
-func has_moved(unit: Unit) -> bool:
-	# return unit_info[unit].has_moved
-	return false
+var on_turn: Empire
+
+var action_stack: Array[UnitMovedAction] = []
+
+class UnitMovedAction:
+	var unit: Unit
+	var cell: Vector2i
+	var facing: float
+	var can_move: bool
+	var can_attack: bool
 	
-func has_attacked(unit: Unit) -> bool:
-	# return unit_info[unit].has_attacked
-	return false
 
-func set_move_enabled(unit: Unit, enable: bool):
-	if enable:
-		unit_info[unit].walkable = get_walkable_cells(unit)
+func _push_move_action():
+	var action := UnitMovedAction.new()
+	action.unit = active_unit
+	action.cell = active_cell
+	action.facing = active_facing
+	action.can_move = can_move(active_unit)
+	action.can_attack = can_attack(active_unit)
+	action_stack.append(action)
+	
+
+func _undo_move_action():
+	if not action_stack.is_empty():
+		var action: UnitMovedAction = action_stack.pop_back()
+		
+		var old_pos := map.cell(action.unit.map_pos)
+		var new_pos := action.cell
+		
+		action.unit.map_pos = action.cell
+		action.unit.facing = action.facing
+		
+		# TODO map bug workaround
+		map.get_objects_at(old_pos).erase(action.unit)
+		map.get_objects_at(new_pos).append(action.unit)
+			
+		set_can_move(action.unit, action.can_move)
+		set_can_attack(action.unit, action.can_attack)
+		
+		_set_active_unit(action.unit)
+	
+func _commit_action():
+	action_stack.clear()
+
+
+func can_move(unit: Unit) -> bool:
+	return unit in unit_move_list
+	
+func can_attack(unit: Unit) -> bool:
+	return unit in unit_attack_list
+	
+func set_can_move(unit: Unit, can: bool):
+	if can:
+		if unit not in unit_move_list:
+			unit_move_list.append(unit)
 	else:
-		unit_info[unit].walkable.clear()
-	# return unit_info[unit].has_attacked
+		unit_move_list.erase(unit)
+		
 	
+func set_can_attack(unit: Unit, can: bool):
+	if can:
+		if unit not in unit_attack_list:
+			unit_attack_list.append(unit)
+	else:
+		unit_attack_list.erase(unit)
+		
 	
 func _is_current_empire(unit: Unit) -> bool:
-	# TODO to be replaced with real code
-	#return unit.empire == context.current
-	return unit.empire == empire
+	return unit.empire == on_turn
 
 
 func _select_cell(pos: Vector2):
@@ -333,19 +373,25 @@ func _select_cell(pos: Vector2):
 	# set cursor position
 	cursor.map_pos = cell
 	
-	if active_unit_action:
-		if unit and unit != active_unit_action.unit:
+	if active_unit:
+		# draw path
+		if is_placeable(active_unit, cell) and _is_current_empire(active_unit) and can_move(active_unit):
+			unit_path.draw(active_cell, cell)
+		else:
+			unit_path.clear()
+			
+		# draw ui
+		if unit and unit != active_unit:
 			# show unit info
 			$CanvasLayer/UI/Name/Label.text = unit.unit_type.name
 			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = unit.unit_type.chara.portrait
 			set_ui_visible(true, false)
 		else:
-			if _is_current_empire(active_unit_action.unit):
+			if _is_current_empire(active_unit):
 				# show extended info
-				$CanvasLayer/UI/Name/Label.text = active_unit_action.unit.unit_type.name
-				$CanvasLayer/UI/Portrait/Control/TextureRect.texture = active_unit_action.unit.unit_type.chara.portrait
+				$CanvasLayer/UI/Name/Label.text = active_unit.unit_type.name
+				$CanvasLayer/UI/Portrait/Control/TextureRect.texture = active_unit.unit_type.chara.portrait
 				set_ui_visible(true, true)
-				unit_path.draw(map.cell(active_unit_action.unit.map_pos), cell)
 	else:
 		if unit:
 			# show unit info
@@ -358,6 +404,15 @@ func _select_cell(pos: Vector2):
 			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = null
 			set_ui_visible(false, false)
 	
+enum Bits {
+	HAS_UNIT = 1 << 0,
+	HAS_ACTIVE_UNIT = 1 << 1,
+	IS_UNIT_OWNED = 1 << 2,
+	IS_ACTIVE_UNIT_OWNED = 1 << 3,
+	HAS_ACTIVE_MOVED = 1 << 4,
+	IS_TARGET_VALID = 1 << 5,
+	IS_SAME_UNIT = 1 << 6,
+}
 
 func _accept_cell():
 	var cell := world.clamp_pos(Vector2(roundi(cursor.map_pos.x), roundi(cursor.map_pos.y)))
@@ -365,38 +420,43 @@ func _accept_cell():
 	
 	# unit selected
 	if unit:
-		if active_unit_action:
+		if not active_unit or not can_move(active_unit):
+			_set_active_unit(unit)
+		else:
 			if _is_current_empire(unit):
-				if active_unit_action.unit == unit:
-					active_unit_action.has_moved = true
+				if active_unit == unit:
+					# if the selected cell is the same cell with the
+					# active unit, just "move" it in place
+					_push_move_action()
+					set_can_move(active_unit, false)
 					_clear_active_unit()
 				else:
+					# if same unit, swap
 					_set_active_unit(unit)
 			else:
 				_play_error(true)
-		else:
-			_set_active_unit(unit)
 	
 	# location selected
 	else:
-		if active_unit_action and _is_current_empire(active_unit_action.unit):
-			# if there's an active unit and it's owned, try moving
-			if cell in active_unit_action.walkable and \
-					is_pathable(active_unit_action.unit, cell) and \
-					is_placeable(active_unit_action.unit, cell): 
-				# if there's an active unit is owned and target is valid, move
-				walk_unit_action(active_unit_action.unit, cell)
-				active_unit_action.has_moved = true
+		# if we own the active unit and it hasnt moved yet, try moving
+		if active_unit and _is_current_empire(active_unit) and can_move(active_unit):
+			# check if target cell is valid
+			if cell in active_walkable and is_pathable(active_unit, cell) and is_placeable(active_unit, cell): 
+				walk_unit_action(active_unit, cell)
+				_push_move_action()
+				set_can_move(active_unit, false)
 				_clear_active_unit()
 			else:
-				# otherwise just play an error
 				_play_error(true)
+		# no active unit, not owned, or has already moved
 		else:
-			# if there's no active unit or it is not owned, clear it
 			_clear_active_unit()
 	
 func _cancel():
-	pass
+	if active_unit:
+		_clear_active_unit()
+	else:
+		_undo_move_action()
 	
 # TODO have consistency in cells and pos
 
@@ -406,28 +466,25 @@ func _play_error(overlap := false):
 		$AudioStreamPlayer2D.play()
 
 
-func walk_unit_action(unit: Unit, target: Variant):
+func walk_unit_action(unit: Unit, cell: Vector2i):
+	# pre walk set-up
 	set_camera_follow_target(unit)
 	if Globals.prefs.camera_follow_unit_move:
 		camera.drag_horizontal_enabled = false
 		camera.drag_vertical_enabled = false
 	set_process_unhandled_input(false)
 	
-	if target is Unit:
-		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), target.map_pos)
-		path.resize(path.size() - 1)
-		if path.size() == 1:
-			unit.face_towards(target.map_pos)
-		await walk_along(unit, path)
+	$CanvasLayer.visible = false
 	
-	if target is Vector2i:
-		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), target)
-		await walk_along(unit, path)
+	# walk
+	var start := map.cell(unit.map_pos)
+	var end := cell
+	var path := unit_path._pathfinder.calculate_point_path(start, cell)
+	await walk_along(unit, path)
 		
-	if target is Vector2:
-		var path := unit_path._pathfinder.calculate_point_path(map.cell(unit.map_pos), map.cell(target))
-		await walk_along(unit, path)
-		
+	$CanvasLayer.visible = true
+	
+	# post walk set-up
 	set_process_unhandled_input(true)
 	camera.drag_horizontal_enabled = true
 	camera.drag_vertical_enabled = true
@@ -436,53 +493,29 @@ func walk_unit_action(unit: Unit, target: Variant):
 		
 		
 func _set_active_unit(unit: Unit):
-	if active_unit_action:
+	if active_unit:
 		_clear_active_unit()
 	unit.animation.play("highlight")
-	active_unit_action = UnitAction.new()
-	active_unit_action.unit = unit
-	active_unit_action.map_pos = unit.map_pos
-	active_unit_action.facing = unit.facing
-	active_unit_action.has_moved = false
-	active_unit_action.has_attacked = false
+	active_unit = unit
+	active_cell = map.cell(unit.map_pos)
+	active_facing = unit.facing
 	
-	var walkable := get_walkable_cells(unit)
-	active_unit_action.walkable = walkable
+	active_walkable = get_walkable_cells(unit)
+	unit_path.initialize(active_walkable)
+	draw_walkable_cells(active_walkable)
 	
-	unit_path.initialize(walkable)
-	
-	draw_walkable_cells(walkable)
-	
-	
-func _reset_active_unit():
-	if active_unit_action:
-		active_unit_action.unit.map_pos = active_unit_action.map_pos
-		active_unit_action.unit.facing = active_unit_action.facing
+	if can_move(unit) and _is_current_empire(unit):
+		terrain_overlay.modulate = Color(0, 0.8, 0, 0.29)
+	else:
+		terrain_overlay.modulate = Color(0, 0.231, 0.761, 0.29)
 	
 		
 func _clear_active_unit():
-	if active_unit_action:
-		active_unit_action.unit.animation.play("RESET")
-		active_unit_action.unit.animation.stop()
-		active_unit_action = null
+	if active_unit:
+		active_unit.animation.play("RESET")
+		active_unit.animation.stop()
+		active_unit = null
 		clear_walkable_cells()
-	
-
-func _set_walk_enable(enable: bool):
-	if enable:
-		var walkable := get_walkable_cells(active_unit_action.unit)
-		
-		unit_path.initialize(walkable)
-		
-		for pos in walkable:
-			terrain_overlay.set_cell(0, Vector2i(pos), 0, Vector2i(0, 0), 0)
-			
-		active_unit_action.walkable = walkable
-	else:
-		unit_path.clear()
-		terrain_overlay.clear()
-		
-		active_unit_action.walkable.clear()
 		
 		
 func set_ui_visible(portrait: bool, actions: bool):
@@ -490,8 +523,8 @@ func set_ui_visible(portrait: bool, actions: bool):
 	$CanvasLayer/UI/Portrait.visible = portrait
 	$CanvasLayer/UI/AttackButton.visible = actions
 	$CanvasLayer/UI/SpecialButton.visible = actions
-	$CanvasLayer/UI/UndoButton.visible = actions
-	$CanvasLayer/UI/EndTurnButton.visible = actions
+	#$CanvasLayer/UI/UndoButton.visible = actions
+	#$CanvasLayer/UI/EndTurnButton.visible = actions
 
 
 func draw_walkable_cells(cells: PackedVector2Array):
@@ -521,18 +554,6 @@ func set_camera_follow_target(obj: MapObject):
 		camera.set_meta("battle_target", obj)
 
 
-class UnitAction:
-	var unit: Unit
-	var map_pos: Vector2
-	var facing: float
-	var has_moved: bool
-	var has_attacked: bool
-	var walkable: PackedVector2Array
-	
-	
-var active_unit_action: UnitAction
-
-
 func _unhandled_input(event):
 	# Make input local, imporant because we're using a camera
 	event = make_input_local(event)
@@ -540,10 +561,11 @@ func _unhandled_input(event):
 	# Mouse input
 	if event is InputEventMouseMotion:
 		if change_facing:
-			if change_facing and _is_current_empire(change_facing) and not has_attacked(change_facing):
+			if change_facing and _is_current_empire(change_facing) and can_attack(change_facing):
 				var target := world.screen_to_uniform(event.position)
 				if change_facing.map_pos.distance_to(target) > 0.6:
 					change_facing.face_towards(target)
+					print("asdasd", change_facing)
 		else:
 			_select_cell(world.screen_to_uniform(event.position))
 		
@@ -558,6 +580,7 @@ func _unhandled_input(event):
 					_cancel()
 				3:
 					change_facing = map.get_object(world.screen_to_uniform(event.position), Map.Pathing.UNIT)
+					print("change facing ", change_facing)
 		else:
 			match event.button_index:
 				3:
@@ -573,7 +596,7 @@ func _unhandled_input(event):
 			return
 		
 		if event.pressed:
-			if change_facing and _is_current_empire(change_facing) and not has_attacked(change_facing):
+			if change_facing and _is_current_empire(change_facing) and can_attack(change_facing):
 				match event.keycode:
 					KEY_W:
 						change_facing.face_towards(change_facing.map_pos + Vector2(0, -1))
@@ -599,11 +622,3 @@ func _unhandled_input(event):
 					KEY_ESCAPE:
 						_cancel()
 				
-
-
-
-
-
-
-
-

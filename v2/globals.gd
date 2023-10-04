@@ -40,6 +40,7 @@ var prefs := {
 	'defeat_if_home_territory_captured': true,
 	'camera_follow_unit_move': true,
 	'mouse_edge_scrolling': true, # TODO
+	'auto_end_turn': false, # TODO
 }
 
 var chara := {}

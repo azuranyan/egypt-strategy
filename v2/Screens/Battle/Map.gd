@@ -27,7 +27,7 @@ enum Pathing {
 
 
 ## A special out of bounds position.
-const OUT_OF_BOUNDS := Vector2(69, 420)
+const OUT_OF_BOUNDS := Vector2i(69, 420)
 
 
 ## A reference to the world variable.
@@ -77,13 +77,13 @@ func remove_object(node: MapObject):
 func _add_map_object(node: MapObject):
 	node.world = world
 	get_objects_of(node.pathing).append(node)
-	get_objects_at(node.map_pos).append(node)
+	get_objects_at(cell(node.map_pos)).append(node)
 	_objects.append(node)
 	
 
 func _remove_map_object(node: MapObject):
 	get_objects_of(node.pathing).erase(node)
-	get_objects_at(node.map_pos).erase(node)
+	get_objects_at(cell(node.map_pos)).erase(node)
 	_objects.erase(node)
 	
 	
@@ -102,10 +102,9 @@ func get_objects_of(type: Pathing) -> Array[MapObject]:
 
 
 ## Returns the objects at specified position.
-func get_objects_at(pos: Vector2) -> Array[MapObject]:
-	var cell := cell(pos)
-	if not (pos == OUT_OF_BOUNDS or world.in_bounds(cell)):
-		push_error("%s out of bounds" % pos)
+func get_objects_at(cell: Vector2i) -> Array[MapObject]:
+	if not (cell == OUT_OF_BOUNDS or world.in_bounds(cell)):
+		push_error("%s out of bounds" % cell)
 		
 	if not _objects_by_pos.has(cell):
 		var arr: Array[MapObject] = []
@@ -115,23 +114,21 @@ func get_objects_at(pos: Vector2) -> Array[MapObject]:
 	
 	
 ## Returns the object of given type at a given position.
-func get_object(pos: Vector2, type: Pathing) -> MapObject:
-	var arr := get_objects_at(pos)
-	for obj in arr:
+func get_object(cell: Vector2i, type: Pathing) -> MapObject:
+	for obj in get_objects_at(cell):
 		if obj.pathing == type:
 			return obj
 	return null
 
 
 ## Returns the object at a given position.
-func get_object_at(pos: Vector2) -> MapObject:
-	var arr := get_objects_at(pos)
+func get_object_at(cell: Vector2i) -> MapObject:
+	var arr := get_objects_at(cell)
 	return arr[0] if not arr.is_empty() else null
 	
 	
 ## Returns true if uniform pos is inside bounds.
-func is_inside_bounds(pos: Vector2) -> bool:
-	var cell := cell(pos)
+func is_inside_bounds(cell: Vector2i) -> bool:
 	return world.in_bounds(cell)
 	
 	
