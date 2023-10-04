@@ -54,10 +54,11 @@ static func make_random_path(
 
 var empire: Empire
 func _ready():
-	# TODO this doesnt work when set from editor
-	$Map/Unit1.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
+	# TODO this doesnt work when set from editor because units are intended to
+	# be created via code..
+	$Map/Unit1.unit_type = preload("res://Screens/Battle/data/UnitType_Zahra.tres")
 	$Map/Unit2.unit_type = preload("res://Screens/Battle/data/UnitType_Maia.tres")
-	$Map/Unit3.unit_type = preload("res://Screens/Battle/data/UnitType_Zahra.tres")
+	$Map/Unit3.unit_type = preload("res://Screens/Battle/data/UnitType_Lysandra.tres")
 	
 	empire = Empire.new() 
 	$Map/Unit1.empire = empire
@@ -225,7 +226,6 @@ func _flood_fill(unit: Unit, cell: Vector2, max_distance: int) -> PackedVector2A
 			stack.append(coords)
 	return re
 	
-	
 
 func add_unit_callbacks(unit: Unit):
 	var cb := func(button):
@@ -290,6 +290,10 @@ var active_cell: Vector2i
 var active_facing: float
 var active_walkable: PackedVector2Array
 
+var active_attack: Attack
+var active_target: PackedVector2Array
+var active_targetable: PackedVector2Array
+
 var change_facing: Unit
 
 var unit_move_list: Array[Unit] = []
@@ -297,7 +301,7 @@ var unit_attack_list: Array[Unit] = []
 
 var on_turn: Empire
 
-var action_stack: Array[UnitMovedAction] = []
+var action_stack: Array = []
 
 class UnitMovedAction:
 	var unit: Unit
@@ -317,34 +321,43 @@ func _push_move_action():
 	action_stack.append(action)
 	
 
-func _undo_move_action():
+func _do_undo_moved_action(action: UnitMovedAction):
+	var old_pos := map.cell(action.unit.map_pos)
+	var new_pos := action.cell
+	
+	action.unit.map_pos = action.cell
+	action.unit.facing = action.facing
+	
+	# TODO map bug workaround
+	map.get_objects_at(old_pos).erase(action.unit)
+	map.get_objects_at(new_pos).append(action.unit)
+		
+	set_can_move(action.unit, action.can_move)
+	set_can_attack(action.unit, action.can_attack)
+	
+	_set_active_unit(action.unit)
+		
+
+## Undo's an action.
+func undo_action():
 	if not action_stack.is_empty():
 		var action: UnitMovedAction = action_stack.pop_back()
+		if action is UnitMovedAction:
+			_do_undo_moved_action(action)
 		
-		var old_pos := map.cell(action.unit.map_pos)
-		var new_pos := action.cell
-		
-		action.unit.map_pos = action.cell
-		action.unit.facing = action.facing
-		
-		# TODO map bug workaround
-		map.get_objects_at(old_pos).erase(action.unit)
-		map.get_objects_at(new_pos).append(action.unit)
-			
-		set_can_move(action.unit, action.can_move)
-		set_can_attack(action.unit, action.can_attack)
-		
-		_set_active_unit(action.unit)
 	
-func _commit_action():
+## Commits the action, preventing undos.
+func commit_action():
 	action_stack.clear()
 
 
 func can_move(unit: Unit) -> bool:
 	return unit in unit_move_list
 	
+	
 func can_attack(unit: Unit) -> bool:
 	return unit in unit_attack_list
+	
 	
 func set_can_move(unit: Unit, can: bool):
 	if can:
@@ -366,12 +379,83 @@ func _is_current_empire(unit: Unit) -> bool:
 	return unit.empire == on_turn
 
 
+func use_attack(unit: Unit, attack: Attack):
+	# TODO cell should be Vector2i, change name
+	var cell := Vector2(map.cell(unit.map_pos)) 
+	
+	clear_walkable_cells()
+	
+	active_attack = attack
+	active_target = attack.target_shape.duplicate()
+	active_targetable = PackedVector2Array()
+	
+	# TODO duplicated flood fill code cos i got lazy
+	var stack := [cell]
+	while not stack.is_empty():
+		var current = stack.pop_back()
+		
+		# bounds check
+		if not world.in_bounds(current):
+			continue
+		
+		# dupe check
+		if current in active_targetable:
+			continue
+			
+		# distance check
+		var diff: Vector2 = (current - cell).abs()
+		var dist := int(diff.x + diff.y)
+		if dist > attack.range:
+			continue
+			
+		active_targetable.append(current)
+		
+		for direction in DIRECTIONS:
+			var coords: Vector2 = current + direction
+			
+			if not world.in_bounds(coords):
+				continue
+			
+			if coords in active_targetable:
+				continue
+			
+			stack.append(coords)
+		
+	if attack.target_melee:
+		_select_cell(unit.map_pos)
+	else:
+		_select_cell(cursor.map_pos)
+	#active_attack = null
+	
+	
+func closest_multiple(n: float, x: float) -> float:
+	if x > n:
+		return x
+	var z := int(x/2)
+	n = n + z
+	n = n - (n*x)
+	return n
+
 func _select_cell(pos: Vector2):
+	# TODO cell should be Vector2i, change name
 	var cell := world.clamp_pos(Vector2(roundi(pos.x), roundi(pos.y)))
 	var unit := map.get_object(cell, Map.Pathing.UNIT) as Unit
 	
 	# set cursor position
-	cursor.map_pos = cell
+	cursor.map_pos = map.cell(Vector2(clamp(pos.x, -4, world.map_size.x + 3), clamp(pos.y, -4, world.map_size.y + 3)))
+	
+	if active_attack:
+		draw_terrain_overlay(active_targetable, TERRAIN_RED, true)
+		
+		for offs in active_attack.target_shape:
+			var p := Vector2(map.cell(pos))
+			var m := Transform2D()
+			m = m.translated(offs)
+			m = m.rotated(active_unit.get_heading() * PI/2)
+			m = m.translated(pos)
+			terrain_overlay.set_cell(0, map.cell(m * Vector2.ZERO), 0, Vector2i(1, 0), 0)
+		
+		return
 	
 	if active_unit:
 		# draw path
@@ -404,20 +488,25 @@ func _select_cell(pos: Vector2):
 			$CanvasLayer/UI/Portrait/Control/TextureRect.texture = null
 			set_ui_visible(false, false)
 	
-enum Bits {
-	HAS_UNIT = 1 << 0,
-	HAS_ACTIVE_UNIT = 1 << 1,
-	IS_UNIT_OWNED = 1 << 2,
-	IS_ACTIVE_UNIT_OWNED = 1 << 3,
-	HAS_ACTIVE_MOVED = 1 << 4,
-	IS_TARGET_VALID = 1 << 5,
-	IS_SAME_UNIT = 1 << 6,
-}
 
 func _accept_cell():
+	# TODO cell should be Vector2i, change name
 	var cell := world.clamp_pos(Vector2(roundi(cursor.map_pos.x), roundi(cursor.map_pos.y)))
 	var unit: Unit = map.get_object(cell, Map.Pathing.UNIT)
 	
+	if active_attack:
+		# hide ui
+		# face target
+		# play hurt animation
+		# await attack animation
+		# attack signal
+		print("attack ", active_attack.name)
+		active_attack = null
+		set_can_move(active_unit, false)
+		set_can_attack(active_unit, false)
+		_clear_active_unit()
+		return
+		
 	# unit selected
 	if unit:
 		if not active_unit or not can_move(active_unit):
@@ -456,7 +545,7 @@ func _cancel():
 	if active_unit:
 		_clear_active_unit()
 	else:
-		_undo_move_action()
+		undo_action()
 	
 # TODO have consistency in cells and pos
 
@@ -502,13 +591,14 @@ func _set_active_unit(unit: Unit):
 	
 	active_walkable = get_walkable_cells(unit)
 	unit_path.initialize(active_walkable)
-	draw_walkable_cells(active_walkable)
 	
-	if can_move(unit) and _is_current_empire(unit):
-		terrain_overlay.modulate = Color(0, 0.8, 0, 0.29)
+	if _is_current_empire(unit):
+		if can_move(unit):
+			draw_terrain_overlay(active_walkable, TERRAIN_GREEN, true)
+		else:
+			pass
 	else:
-		terrain_overlay.modulate = Color(0, 0.231, 0.761, 0.29)
-	
+		draw_terrain_overlay(active_walkable, TERRAIN_BLUE, true)
 		
 func _clear_active_unit():
 	if active_unit:
@@ -527,14 +617,27 @@ func set_ui_visible(portrait: bool, actions: bool):
 	#$CanvasLayer/UI/EndTurnButton.visible = actions
 
 
+## depreciated
 func draw_walkable_cells(cells: PackedVector2Array):
-	for pos in cells:
-		terrain_overlay.set_cell(0, Vector2i(pos), 0, Vector2i(0, 0), 0)
-		
+	draw_terrain_overlay(cells)
+
+enum {
+	TERRAIN_WHITE,
+	TERRAIN_BLUE,
+	TERRAIN_GREEN,
+	TERRAIN_RED,
+}
+
+func draw_terrain_overlay(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear := false):
+	if clear:
+		terrain_overlay.clear()
+	for cell in cells:
+		terrain_overlay.set_cell(0, Vector2i(cell), 0, Vector2i(idx, 0), 0)
+
 
 func clear_walkable_cells():
 	terrain_overlay.clear()
-	unit_path.stop()
+	unit_path.clear()
 	
 	
 @onready var camera := $Camera2D as Camera2D
@@ -558,6 +661,55 @@ func _unhandled_input(event):
 	# Make input local, imporant because we're using a camera
 	event = make_input_local(event)
 	
+	if active_attack:
+		if event is InputEventMouseButton and event.button_index == 1 or \
+			event is InputEventKey and (event.keycode == KEY_KP_1 or event.keycode == KEY_ENTER) and event.pressed:
+			_accept_cell()
+			return
+		
+		if active_attack.target_melee:
+			if event is InputEventMouseMotion:
+				var target := world.screen_to_uniform(event.position)
+				if active_unit.map_pos.distance_to(target) > 0.6:
+					active_unit.face_towards(target)
+				_select_cell(target)
+					
+			elif event is InputEventKey and event.pressed:
+				match event.keycode:
+					KEY_W:
+						active_unit.set_heading(Unit.Heading.North)
+					KEY_S:
+						active_unit.set_heading(Unit.Heading.South)
+					KEY_A:
+						active_unit.set_heading(Unit.Heading.West)
+					KEY_D:
+						active_unit.set_heading(Unit.Heading.East)
+			match active_unit.get_heading():
+				Unit.Heading.North:
+					_select_cell(active_unit.map_pos + Vector2(0, -1))
+				Unit.Heading.South:
+					_select_cell(active_unit.map_pos + Vector2(0, +1))
+				Unit.Heading.West:
+					_select_cell(active_unit.map_pos + Vector2(-1, 0))
+				Unit.Heading.East:
+					_select_cell(active_unit.map_pos + Vector2(+1, 0))
+		else:
+			if event is InputEventMouseMotion:
+				_select_cell(world.screen_to_uniform(event.position))
+			elif event is InputEventKey and event.pressed:
+				match event.keycode:
+					KEY_W:
+						_select_cell(cursor.map_pos + Vector2(0, -1))
+					KEY_S:
+						_select_cell(cursor.map_pos + Vector2(0, +1))
+					KEY_A:
+						_select_cell(cursor.map_pos + Vector2(-1, 0))
+					KEY_D:
+						_select_cell(cursor.map_pos + Vector2(+1, 0))
+			
+		return
+	
+	
 	# Mouse input
 	if event is InputEventMouseMotion:
 		if change_facing:
@@ -565,7 +717,6 @@ func _unhandled_input(event):
 				var target := world.screen_to_uniform(event.position)
 				if change_facing.map_pos.distance_to(target) > 0.6:
 					change_facing.face_towards(target)
-					print("asdasd", change_facing)
 		else:
 			_select_cell(world.screen_to_uniform(event.position))
 		
@@ -622,3 +773,11 @@ func _unhandled_input(event):
 					KEY_ESCAPE:
 						_cancel()
 				
+
+
+func _on_attack_button_pressed():
+	use_attack(active_unit, active_unit.unit_type.basic_attack)
+
+
+func _on_special_button_pressed():
+	use_attack(active_unit, active_unit.unit_type.special_attack)
