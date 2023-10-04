@@ -1,0 +1,22 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://wlic4ks3f85i"]
+
+[ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="1_iccm4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lnkxh"]
+bg_color = Color(1, 0.976471, 0.941176, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0c4ds"]
+bg_color = Color(0.863281, 0.832031, 0.777344, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bx07k"]
+
+[resource]
+default_font = ExtResource("1_iccm4")
+default_font_size = 22
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_pressed_color = Color(0, 0, 0, 0.768627)
+Button/colors/font_pressed_color = Color(0, 0, 0, 0.768627)
+Button/styles/hover = SubResource("StyleBoxFlat_lnkxh")
+Button/styles/normal = SubResource("StyleBoxFlat_0c4ds")
+Button/styles/pressed = SubResource("StyleBoxFlat_bx07k")

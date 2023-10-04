@@ -1,7 +1,7 @@
-[gd_scene load_steps=29 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=36 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
-[ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
+[ext_resource type="PackedScene" uid="uid://vepx0idu10w8" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="2_phl5y"]
 [ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="2_x2o88"]
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="14_fmghe"]
 [ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="14_j1xct"]
 [ext_resource type="Texture2D" uid="uid://cc4r8g2175acd" path="res://Screens/Battle/hp_empty.png" id="15_3h5x1"]
+[ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="19_qcxye"]
 
 [sub_resource type="Gradient" id="Gradient_k4rf6"]
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
@@ -88,10 +89,33 @@ font = ExtResource("13_ghghu")
 font_size = 20
 font_color = Color(0.00784314, 0.00784314, 0.00784314, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_jpde8"]
-font = ExtResource("13_ghghu")
-font_size = 22
-font_color = Color(0.0745098, 0.0745098, 0.0745098, 1)
+[sub_resource type="InputEventKey" id="InputEventKey_dqmi4"]
+device = -1
+keycode = 81
+unicode = 113
+
+[sub_resource type="Shortcut" id="Shortcut_hvd4i"]
+events = [SubResource("InputEventKey_dqmi4")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_4ao6f"]
+keycode = 69
+
+[sub_resource type="Shortcut" id="Shortcut_e2k1n"]
+events = [SubResource("InputEventKey_4ao6f")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_4apw1"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="InputEventMouseButton" id="InputEventMouseButton_p1kbt"]
+button_mask = 2
+position = Vector2(308, 19)
+global_position = Vector2(312, 62)
+button_index = 2
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_y0vuj"]
+events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_rejdj")
@@ -125,6 +149,8 @@ metadata/follow_func = Callable()
 metadata/target = Object(Node2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":-1,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(1011.36, 247.987),"rotation":0.0,"scale":Vector2(1, 1),"skew":0.0,"script":Resource("res://Screens/Battle/map/SpriteObject.gd"),"texture":ExtResource("5_gyrky"),"fit_to_grid":true,"sprite":Object(Sprite2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(0, 0),"rotation":0.522585,"scale":Vector2(0.651461, 0.651461),"skew":0.525625,"texture":ExtResource("5_gyrky"),"centered":true,"offset":Vector2(0, 0),"flip_h":false,"flip_v":false,"hframes":1,"vframes":1,"frame":0,"region_enabled":false,"region_rect":Rect2(0, 0, 0, 0),"region_filter_clip_enabled":false,"script":null)
 ,"display_name":"","display_icon":null,"world":ExtResource("3_6wws0"),"map_pos":Vector2(0, 0),"pathing":0,"no_show":false,"vertical_offset":-4.0)
 
+metadata/battle_follow_func = Callable()
+metadata/battle_target = null
 
 [node name="Map" parent="." instance=ExtResource("2_x2o88")]
 world = ExtResource("3_6wws0")
@@ -151,13 +177,13 @@ libraries = {
 }
 script = SubResource("GDScript_ub7ps")
 
-[node name="Unit" parent="Map" instance=ExtResource("2_dv3bt")]
+[node name="Unit1" parent="Map" instance=ExtResource("2_dv3bt")]
 position = Vector2(1011.36, 251.987)
 unit_type = ExtResource("9_xg3xs")
 unit_name = "Lysandra"
 maxhp = 5
 hp = 5
-mov = 2
+mov = 5
 dmg = 2
 rng = 2
 world = ExtResource("3_6wws0")
@@ -326,225 +352,55 @@ layout_mode = 2
 texture = ExtResource("15_3h5x1")
 expand_mode = 3
 
-[node name="Move" type="Control" parent="CanvasLayer/UI"]
+[node name="AttackButton" type="Button" parent="CanvasLayer/UI"]
 custom_minimum_size = Vector2(130, 130)
-layout_mode = 2
-anchors_preset = 0
+layout_mode = 1
 offset_left = 290.0
 offset_top = 829.0
 offset_right = 420.0
 offset_bottom = 959.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-metadata/_edit_group_ = true
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Move"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.867188, 0.835938, 0.78125, 1)
-
-[node name="Button" type="Button" parent="CanvasLayer/UI/Move"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 focus_mode = 0
-flat = true
+theme = ExtResource("19_qcxye")
+shortcut = SubResource("Shortcut_hvd4i")
+text = "Attack
+[q]"
 
-[node name="Label" type="Label" parent="CanvasLayer/UI/Move"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Move"
-label_settings = SubResource("LabelSettings_jpde8")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Attack" type="Control" parent="CanvasLayer/UI"]
+[node name="SpecialButton" type="Button" parent="CanvasLayer/UI"]
 custom_minimum_size = Vector2(130, 130)
-layout_mode = 2
-anchors_preset = 0
+layout_mode = 1
 offset_left = 429.0
 offset_top = 829.0
 offset_right = 559.0
 offset_bottom = 959.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-metadata/_edit_group_ = true
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Attack"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.867188, 0.835938, 0.78125, 1)
-
-[node name="Button" type="Button" parent="CanvasLayer/UI/Attack"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 focus_mode = 0
-flat = true
-
-[node name="Label" type="Label" parent="CanvasLayer/UI/Attack"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Attack"
-label_settings = SubResource("LabelSettings_jpde8")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Special" type="Control" parent="CanvasLayer/UI"]
-custom_minimum_size = Vector2(130, 130)
-layout_mode = 2
-anchors_preset = 0
-offset_left = 568.0
-offset_top = 829.0
-offset_right = 698.0
-offset_bottom = 959.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-metadata/_edit_group_ = true
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Special"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.867188, 0.835938, 0.78125, 1)
-
-[node name="Button" type="Button" parent="CanvasLayer/UI/Special"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 0
-flat = true
-
-[node name="Label" type="Label" parent="CanvasLayer/UI/Special"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+theme = ExtResource("19_qcxye")
+shortcut = SubResource("Shortcut_e2k1n")
 text = "Special
-"
-label_settings = SubResource("LabelSettings_jpde8")
-horizontal_alignment = 1
-vertical_alignment = 1
+[e]"
 
-[node name="Undo" type="Control" parent="CanvasLayer/UI"]
-layout_mode = 2
-anchors_preset = 0
-offset_left = 1682.0
-offset_top = 815.0
-offset_right = 1842.0
-offset_bottom = 865.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-metadata/_edit_group_ = true
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/Undo"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.867188, 0.835938, 0.78125, 1)
-
-[node name="Button" type="Button" parent="CanvasLayer/UI/Undo"]
+[node name="UndoButton" type="Button" parent="CanvasLayer/UI"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 1684.0
+offset_top = 815.0
+offset_right = 1844.0
+offset_bottom = 865.0
 focus_mode = 0
-flat = true
-
-[node name="Label" type="Label" parent="CanvasLayer/UI/Undo"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+theme = ExtResource("19_qcxye")
+shortcut = SubResource("Shortcut_y0vuj")
 text = "Undo Move"
-label_settings = SubResource("LabelSettings_jpde8")
-horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="EndTurn" type="Control" parent="CanvasLayer/UI"]
-layout_mode = 2
-anchors_preset = 0
+[node name="EndTurnButton" type="Button" parent="CanvasLayer/UI"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 1
 offset_left = 1617.0
 offset_top = 881.0
-offset_right = 1842.0
-offset_bottom = 953.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-metadata/_edit_group_ = true
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/EndTurn"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.867188, 0.835938, 0.78125, 1)
-
-[node name="Button" type="Button" parent="CanvasLayer/UI/EndTurn"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 1844.0
+offset_bottom = 952.0
 focus_mode = 0
-flat = true
-
-[node name="Label" type="Label" parent="CanvasLayer/UI/EndTurn"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+theme = ExtResource("19_qcxye")
 text = "End Turn
 "
-label_settings = SubResource("LabelSettings_jpde8")
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
