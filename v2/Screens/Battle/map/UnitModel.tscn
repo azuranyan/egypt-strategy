@@ -9,7 +9,8 @@ sprite_frames = ExtResource("2_v0wcy")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("2_v0wcy")
-animation = &"FrontWalk"
+animation = &"FrontAttack"
+frame_progress = 0.323805
 offset = Vector2(0, -64)
 
 [connection signal="facing_changed" from="." to="." method="_on_facing_changed"]

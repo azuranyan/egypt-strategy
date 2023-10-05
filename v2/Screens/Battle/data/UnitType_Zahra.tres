@@ -9,7 +9,7 @@
 script = ExtResource("1_mxg5a")
 name = "Cleave"
 description = "Zahra's basic attack."
-range = 1
+range = 3
 status_effect = "None"
 target_melee = true
 target_unit = 3

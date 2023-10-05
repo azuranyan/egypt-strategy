@@ -145,6 +145,7 @@ metadata/target = Object(Node2D,"_import_path":NodePath(""),"unique_name_in_owne
 ,"display_name":"","display_icon":null,"world":ExtResource("3_6wws0"),"map_pos":Vector2(0, 0),"pathing":0,"no_show":false,"vertical_offset":-4.0)
 
 metadata/battle_follow_func = Callable()
+metadata/battle_target = null
 
 [node name="Map" parent="." instance=ExtResource("2_x2o88")]
 world = ExtResource("3_6wws0")
@@ -172,15 +173,16 @@ libraries = {
 script = SubResource("GDScript_ub7ps")
 
 [node name="Unit1" parent="Map" instance=ExtResource("2_dv3bt")]
-position = Vector2(1011.36, 251.987)
+position = Vector2(1011.36, 335.228)
 unit_type = ExtResource("11_luj3e")
 unit_name = "Zahra"
 maxhp = 4
 hp = 4
-mov = 2
+mov = 14
 dmg = 2
 rng = 1
 world = ExtResource("3_6wws0")
+map_pos = Vector2(1, 1)
 metadata/Map_unit_selected = Callable()
 
 [node name="Unit2" parent="Map" instance=ExtResource("2_dv3bt")]

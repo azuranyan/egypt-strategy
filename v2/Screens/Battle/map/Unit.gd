@@ -31,6 +31,13 @@ signal status_effect_removed(effect: AppliedStatusEffect)
 ## The general direction.
 enum Heading { East, South, West, North }
 
+const Directions := [
+	Vector2(1, 0),
+	Vector2(0, 1),
+	Vector2(-1, 0),
+	Vector2(0, -1),
+]
+
 enum {
 	RESET_HP = 1 << 0,
 	RESET_STATS = 1 << 1,
