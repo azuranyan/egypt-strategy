@@ -78,7 +78,7 @@ var empire: Empire:
 ## Where this unit is facing.
 @export var facing: float:
 	set(value):
-		facing = value
+		facing = fmod(value, 2*PI)
 		facing_changed.emit()
 
 ### If this unit is walking.

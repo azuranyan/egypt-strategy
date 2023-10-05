@@ -721,42 +721,39 @@ func _unhandled_input(event):
 					active_unit.face_towards(target)
 				
 				var c := (target - active_unit.map_pos).abs()
+				
 				if c.x > c.y:
 					target.y = active_unit.map_pos.y
 				else:
 					target.x = active_unit.map_pos.x
+				
+				target = Vector2(map.cell(target))
+				
+				var d := active_unit.map_pos.distance_to(target)
+				
+				if d == 0:
+					target = active_unit.map_pos + Unit.Directions[active_unit.get_heading()]
+				elif d > active_attack.range:
+					target = (target - active_unit.map_pos).normalized() * active_attack.range + active_unit.map_pos
+
 					
 			elif event is InputEventKey and event.pressed:
 				var d := active_unit.map_pos.distance_to(target)
 				match event.keycode:
 					KEY_W:
-						if target.x == active_unit.map_pos.x and (target.y - 1 != active_unit.map_pos.y):
-							target.y -= 1
-						else:
-							target.x = active_unit.map_pos.x
-							target.y = active_unit.map_pos.y - d
-							active_unit.set_heading(Unit.Heading.North)
+						if (d + 1) <= active_attack.range:
+							d += 1
+							target = (target - active_unit.map_pos).normalized() * d + active_unit.map_pos
 					KEY_S:
-						if target.x == active_unit.map_pos.x and (target.y + 1 != active_unit.map_pos.y):
-							target.y += 1
-						else:
-							target.x = active_unit.map_pos.x
-							target.y = active_unit.map_pos.y + d
-							active_unit.set_heading(Unit.Heading.South)
+						if (d - 1) > 0:
+							d -= 1
+							target = (target - active_unit.map_pos).normalized() * d + active_unit.map_pos
 					KEY_A:
-						if target.y == active_unit.map_pos.y and (target.x - 1 != active_unit.map_pos.x):
-							target.x -= 1
-						else:
-							target.x = active_unit.map_pos.x - d
-							target.y = active_unit.map_pos.y 
-							active_unit.set_heading(Unit.Heading.West)
+						active_unit.facing -= PI/2
+						target = (target - active_unit.map_pos).rotated(-PI/2) + active_unit.map_pos
 					KEY_D:
-						if target.y == active_unit.map_pos.y and (target.x + 1 != active_unit.map_pos.x):
-							target.x += 1
-						else:
-							target.x = active_unit.map_pos.x + d
-							target.y = active_unit.map_pos.y
-							active_unit.set_heading(Unit.Heading.East)
+						active_unit.facing += PI/2
+						target = (target - active_unit.map_pos).rotated(+PI/2) + active_unit.map_pos
 #
 			_select_cell(target)
 #			_select_cell(active_unit.map_pos + Unit.Directions[active_unit.get_heading()])
