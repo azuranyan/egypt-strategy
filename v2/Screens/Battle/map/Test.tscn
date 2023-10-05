@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=52 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
 [ext_resource type="Texture2D" uid="uid://cwgqwhhofgv6l" path="res://Screens/Battle/terrain_overlay.png" id="2_123xd"]
@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://cc4r8g2175acd" path="res://Screens/Battle/hp_empty.png" id="15_3h5x1"]
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="19_qcxye"]
 [ext_resource type="PackedScene" uid="uid://clvishebthqco" path="res://Screens/Battle/AttackInfo.tscn" id="19_sd3dd"]
+[ext_resource type="Texture2D" uid="uid://33ts5p2mx0ql" path="res://Screens/Battle/sprites/Fire2.png" id="22_k58mb"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bem4x"]
 texture = ExtResource("2_123xd")
@@ -112,6 +113,112 @@ pressed = true
 
 [sub_resource type="Shortcut" id="Shortcut_y0vuj"]
 events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(384, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pu3je"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_scqe4"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w78rl"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ct87q"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yx4vd"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ov5f7"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(0, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i564b"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(192, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftog0"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(384, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbwm4"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(576, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mlqwc"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(768, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0qgvj"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(0, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d7hp"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(192, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnuru"]
+atlas = ExtResource("22_k58mb")
+region = Rect2(576, 384, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6uqsk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxo64")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pu3je")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_scqe4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w78rl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ct87q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yx4vd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ov5f7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i564b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftog0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbwm4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mlqwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0qgvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d7hp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnuru")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_rejdj")
@@ -417,6 +524,10 @@ offset_bottom = 145.0
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_6uqsk")
+
+[connection signal="attack_used" from="." to="." method="_on_attack_used"]
 [connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]
 [connection signal="pressed" from="CanvasLayer/UI/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UI/SpecialButton" to="." method="_on_special_button_pressed"]

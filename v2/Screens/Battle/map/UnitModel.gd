@@ -63,7 +63,7 @@ func play_animation(_animation: String):
 		sprite.play("Back" + anim)
 	else:
 		sprite.play("Front" + anim)
-		
+	
 	animation = _animation
 
 

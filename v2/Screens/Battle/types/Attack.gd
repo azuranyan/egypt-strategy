@@ -22,6 +22,12 @@ enum {
 @warning_ignore("shadowed_global_identifier")
 @export var range: int
 
+## Cast animation string.
+@export var cast_animation: String = "attack"
+
+## Target animation string.
+@export var target_animation: String = "hurt"
+
 ## Status effect this attack may inflict.
 @export_enum("None", "PSN", "STN", "VUL") var status_effect: String = "None"
 

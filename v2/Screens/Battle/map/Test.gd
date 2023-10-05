@@ -1,6 +1,8 @@
 @tool
 extends Node2D
 
+signal attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+
 @onready var world := $Map.world as World
 @onready var drivers := $Drivers
 @onready var unit_path := $UnitPath as UnitPath
@@ -420,9 +422,9 @@ func use_attack():
 	
 	# play error if no valid targets
 	var found_valid := false
-	for u in targets:
-		if active_attack.target_unit & 1 and active_unit.is_enemy(u) or \
-			active_attack.target_unit & 2 and not active_unit.is_enemy(u) or \
+	for t in targets:
+		if active_attack.target_unit & 1 and active_unit.is_enemy(t) or \
+			active_attack.target_unit & 2 and not active_unit.is_enemy(t) or \
 			active_attack.target_unit & 4 and active_unit == self:
 			found_valid = true
 			break
@@ -430,18 +432,17 @@ func use_attack():
 		_play_error(true)
 		return
 
-			
 	$CanvasLayer.visible = false
-	# hide ui
-	# face target
-	# play hurt animation
-	# await attack animation
+	
 	# attack signal
-	print("attack ", active_attack.name)
+	attack_used.emit(active_unit, active_attack, cell, targets)
+	
+	# cleanup
 	active_attack = null
 	set_can_move(active_unit, false)
 	set_can_attack(active_unit, false)
 	_clear_active_unit()
+	
 	$CanvasLayer.visible = true
 	
 	
@@ -491,8 +492,7 @@ func _select_cell(pos: Vector2):
 
 func _accept_cell():
 	# TODO cell should be Vector2i, change name
-	#var cell := world.clamp_pos(Vector2(roundi(cursor.map_pos.x), roundi(cursor.map_pos.y)))
-	var cell := cursor.map_pos
+	var cell := world.clamp_pos(Vector2(roundi(cursor.map_pos.x), roundi(cursor.map_pos.y)))
 	var unit: Unit = map.get_object(cell, Map.Pathing.UNIT)
 	
 	if active_attack:
@@ -860,3 +860,27 @@ func _on_special_button_pressed():
 
 func _on_undo_button_pressed():
 	_cancel()
+
+
+# This will be in the animation engine/handler
+func _on_attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	# play animations
+	for t in targets:
+		t.model.play_animation(attack.target_animation)
+		
+	unit.model.play_animation(attack.cast_animation)
+	
+	# add animation
+	$AnimatedSprite2D.position = world.uniform_to_screen(target)
+	$AnimatedSprite2D.position.y -= 50
+	$AnimatedSprite2D.play("default")
+	
+	await $AnimatedSprite2D.animation_finished
+	
+	# play animations
+	for t in targets:
+		t.model.play_animation("idle")
+		t.model.stop_animation()
+	unit.model.play_animation("idle")
+	unit.model.stop_animation()
+	$AnimatedSprite2D.stop()
