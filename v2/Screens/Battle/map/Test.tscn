@@ -407,8 +407,17 @@ theme = ExtResource("19_qcxye")
 text = "End Turn
 "
 
+[node name="Errbox" type="VBoxContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_left = 34.0
+offset_top = 29.0
+offset_right = 341.0
+offset_bottom = 145.0
+
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
 [connection signal="world_changed" from="Map/WorldInstance" to="Map/WorldInstance" method="_on_world_changed" flags=18]
 [connection signal="pressed" from="CanvasLayer/UI/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UI/SpecialButton" to="." method="_on_special_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/UndoButton" to="." method="_on_undo_button_pressed"]

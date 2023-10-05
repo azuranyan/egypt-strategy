@@ -28,12 +28,12 @@ enum {
 ## If true, attack can only change direction and not freely repositioned.
 @export var target_melee: bool = false:
 	set(value):
-		target_melee = target_unit == Self or value
+		target_melee = (target_unit == Self) or value
 	get:
 		return target_melee
 
 ## Selecting valid targets.
-@export_flags("Ground", "Enemy", "Ally", "Self") var target_unit: int = 2:
+@export_flags("Enemy", "Ally", "Self") var target_unit: int = 1:
 	set(value):
 		target_unit = value
 		target_melee = target_melee
