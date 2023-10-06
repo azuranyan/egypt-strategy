@@ -406,9 +406,6 @@ func engage_attack(unit: Unit, attack: Attack):
 func use_attack():
 	var cell := cursor.map_pos
 	
-	# make actions undoable past this point
-	commit_action()
-	
 	# play error if cell is outside range 
 	if cell not in active_targetable:
 		_play_error(true)
@@ -432,6 +429,9 @@ func use_attack():
 		_play_error(true)
 		return
 
+	# make actions undoable past this point
+	commit_action()
+	
 	$CanvasLayer.visible = false
 	
 	# attack signal
