@@ -57,7 +57,7 @@ func add_unit(unit: String):
 func remove_unit(unit: String):
 	var cb = get_button(unit)
 	if cb != null:
-		remove_child(cb)
+		container.remove_child(cb)
 		cb.queue_free()
 		units.erase(unit)
 

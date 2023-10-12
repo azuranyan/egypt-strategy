@@ -43,13 +43,15 @@ var world_instance: WorldInstance
 # trading space for more efficient lookups
 var _objects: Array[MapObject] = []
 var _objects_by_group := {}
-var _objects_by_pos := {}
 
+var _spawnable := {}
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var re := PackedStringArray()
 	if not world:
 		re.append("world is null")
+	# TODO add warning when no spawn points
+	# TODO add warning when invalid spawn points
 	return re
 
 
@@ -103,14 +105,11 @@ func get_objects_of(type: Pathing) -> Array[MapObject]:
 
 ## Returns the objects at specified position.
 func get_objects_at(cell: Vector2i) -> Array[MapObject]:
-	if not (cell == OUT_OF_BOUNDS or world.in_bounds(cell)):
-		push_error("%s out of bounds" % cell)
-		
-	if not _objects_by_pos.has(cell):
-		var arr: Array[MapObject] = []
-		_objects_by_pos[cell] = arr
-		
-	return _objects_by_pos[cell]
+	var re: Array[MapObject]
+	for o in get_objects():
+		if cell(o.map_pos) == cell:
+			re.append(o)
+	return re
 	
 	
 ## Returns the object of given type at a given position.
@@ -132,9 +131,33 @@ func is_inside_bounds(cell: Vector2i) -> bool:
 	return world.in_bounds(cell)
 	
 	
-## Returns a list of spawnable units.
-func get_spawn_units(spawn_point: String) -> Array[String]:
-	return []
+## Returns a list of spawnable units. Safe to call before ready.
+func get_spawnable(spawn_point: String) -> Array[String]:
+	if not _spawnable.has(spawn_point):
+		var arr: Array[String] = []
+		var tmp = []
+
+		# TODO cannot get spawn units before ready
+		for obj in get_children():
+			if not obj is MapObject:
+				continue
+			
+			if obj.get_meta("spawn_point") == spawn_point:
+				var spawn_unit = obj.get_meta("spawn_unit")
+				if not spawn_unit:
+					tmp.append("*")
+				elif spawn_unit is String:
+					tmp.append(spawn_unit)
+				elif spawn_unit is PackedStringArray or spawn_unit is Array[String]:
+					for u in spawn_unit:
+						tmp.append(u)
+						
+		for u in tmp:
+			if u not in arr:
+				arr.append(u)
+				
+		_spawnable[spawn_point] = arr
+	return _spawnable[spawn_point]
 	
 
 ## Returns the cell of a given pos.
@@ -153,6 +176,35 @@ func index(pos: Vector2) -> int:
 ## Returns returns true if the cell is occupied by a unit.
 func is_occupied(pos: Vector2) -> bool:
 	return get_object(pos, Map.Pathing.UNIT) != null
+	
+	
+################################################################################
+# Convenience Functions
+################################################################################
+
+
+## Returns the unit at cell.
+func get_unit(cell: Vector2i) -> Unit:
+	return get_object(cell, Pathing.UNIT) as Unit
+
+
+## Returns all the units.
+func get_units(cells = null) -> Array[Unit]:
+	# this isn't pretty but i couldn't care less anymore
+	var re: Array[Unit]
+	for o in get_objects_of(Pathing.UNIT):
+		if not cells or Vector2(cell(o.map_pos)) in cells:
+			re.append(o)
+	return re
+
+
+## Returns spawn points with given types.
+func get_spawn_points(tag: String) -> PackedVector2Array:
+	var re := PackedVector2Array()
+	for obj in get_objects():
+		if obj.get_meta("spawn_point", "") == tag:
+			re.append(cell(obj.map_pos))
+	return re
 	
 
 func _is_map_object(node: Node) -> bool:

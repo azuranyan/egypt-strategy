@@ -90,6 +90,7 @@ world = ExtResource("3_4jwoh")
 map_pos = Vector2(1, 7)
 
 [node name="Building_01" parent="." index="11" instance=ExtResource("2_l1dl3")]
+visible = false
 position = Vector2(1011.36, 335.228)
 doodad_type = ExtResource("15_sqos1")
 world = ExtResource("3_4jwoh")
@@ -180,7 +181,7 @@ world = ExtResource("3_4jwoh")
 map_pos = Vector2(5, 1)
 no_show = true
 metadata/spawn_point = "ai"
-metadata/spawn_unit = "Maia"
+metadata/spawn_unit = "Ishtar"
 
 [node name="AI_Spawn_02" parent="." index="21" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
@@ -191,7 +192,6 @@ world = ExtResource("3_4jwoh")
 map_pos = Vector2(3, 4)
 no_show = true
 metadata/spawn_point = "ai"
-metadata/spawn_unit = PackedStringArray("Lysandra", "Zahra")
 
 [node name="AI_Spawn_03" parent="." index="22" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512

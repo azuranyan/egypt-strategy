@@ -45,14 +45,16 @@ func _refresh():
 	var m = Transform2D()
 	
 	if fit_to_grid:
-		# scale to downsize to unit vector
-		m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
-
 		if world:
+			# scale to downsize to unit vector
+			m = m.scaled(Vector2(1/texture.get_size().x, 1/texture.get_size().y))
+
 			# scale to tile size
 			m = m.scaled(Vector2(world.tile_size, world.tile_size))
-
-		sprite.transform = world._world_to_screen_transform * m
+			
+			# transform to screen
+			m = world._world_to_screen_transform * m
+		sprite.transform = m
 	else:
 		sprite.transform = m
 		if world:

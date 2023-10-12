@@ -1,0 +1,15 @@
+[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://bim62kb8y75qx"]
+
+[ext_resource type="Texture2D" uid="uid://cwgqwhhofgv6l" path="res://Screens/Battle/terrain_overlay.png" id="1_q0ra6"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bem4x"]
+texture = ExtResource("1_q0ra6")
+texture_region_size = Vector2i(80, 80)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[resource]
+tile_size = Vector2i(80, 80)
+sources/0 = SubResource("TileSetAtlasSource_bem4x")

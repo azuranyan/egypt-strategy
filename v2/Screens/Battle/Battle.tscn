@@ -1,7 +1,16 @@
-[gd_scene load_steps=13 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=24 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
+[ext_resource type="PackedScene" uid="uid://diu2xhfofh1m1" path="res://Screens/Battle/camera_2d.tscn" id="2_rnoma"]
+[ext_resource type="Script" path="res://Screens/Battle/Battle_Prep.gd" id="2_t55sd"]
+[ext_resource type="PackedScene" uid="uid://b7wt1gpod4rjo" path="res://Screens/Battle/Battle_TurnEval.tscn" id="3_uathk"]
+[ext_resource type="TileSet" uid="uid://bim62kb8y75qx" path="res://Screens/Battle/terrainfyuckingsavethisshit.tres" id="3_vfrdl"]
+[ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="4_4ux0f"]
+[ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="5_773tr"]
+[ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="6_itebx"]
+[ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="8_b0ewm"]
+[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="9_j1ncc"]
 
 [sub_resource type="GDScript" id="GDScript_nspcd"]
 script/source = "extends StateMachine
@@ -72,280 +81,6 @@ func enter(kwargs := {}) -> void:
 [sub_resource type="LabelSettings" id="LabelSettings_c22gi"]
 font_size = 30
 
-[sub_resource type="GDScript" id="GDScript_jipoe"]
-script/source = "extends State
-
-# Prep state
-
-var battle: Battle
-
-var prep_queue: Array = []
-var prep: Empire
-
-
-func handle_gui_input(event: InputEvent) -> void:
-	#state_machine.accept_event()
-	pass
-		
-		
-func handle_input(event: InputEvent) -> void:
-	if heading_adjusted:
-		if event is InputEventMouseMotion:
-			var target = battle.map.world.screen_to_uniform(get_global_mouse_position(), true)
-			
-			if heading_adjusted.map_pos != target:
-				heading_adjusted.face_towards(target)
-			
-		if event is InputEventMouseButton:
-			if event.button_index == 2:
-				heading_adjusted.heading = Unit.Heading.West
-				
-			if event.button_index == 3 and !event.pressed:
-				heading_adjusted = null
-			
-	if selected:
-		if event is InputEventMouseMotion:
-			#pos = battle.viewport.canvas_transform.affine_inverse() * pos
-			selected.map_pos = battle.map.world.screen_to_uniform(event.position) + selected_offset
-		
-#			var closest_snap_point := Vector2(roundi(selected.map_pos.x), roundi(selected.map_pos.y))
-#			var snap_distance := 0.75
-#
-#			print(selected.map_pos, \" \", closest_snap_point, \" \", selected.map_pos.distance_to(closest_snap_point))
-#			if selected.map_pos.distance_to(closest_snap_point) > snap_distance:
-#				selected.snap_to_grid()
-			print(selected.map_pos, \" \", can_spawn(selected, selected.map_pos))
-			
-			if can_spawn(selected, selected.map_pos):
-				selected.animation.play(\"RESET\")
-			else:
-				selected.animation.play(\"highlight_red\")
-			
-		if event is InputEventMouseButton and !event.is_pressed() and event.button_index == 1:
-			battle.character_list.get_button(selected.unit_name).release()
-	
-	
-func update(delta: float) -> void:
-	pass
-	
-func physics_update(delta: float) -> void:
-	pass
-	
-	
-var test_units
-var dragging := false
-var selected: Unit
-var selected_moved := false
-var selected_original_pos := Vector2.ZERO
-var selected_offset := Vector2.ZERO
-var heading_adjusted: Unit
-
-var units := {}
-
-func enter(kwargs := {}) -> void:
-	print(\"enter prep\")
-	battle = kwargs.battle
-	prep_queue.append_array(kwargs.prep_queue)
-	
-	prep = prep_queue.pop_front()
-	
-	$UI/Prep.text = \"Prep: %s\" % prep.leader.name
-	
-	if !prep.is_player_owned():
-		auto_fill_slots()
-		done()
-	else:
-		$UI.visible = true
-		
-		units[\"Lysandra\"] = battle.spawn_unit(\"Lysandra\", battle.context.attacker, \"\")
-		units[\"Maia\"] = battle.spawn_unit(\"Maia\", battle.context.attacker, \"\")
-		units[\"Zahra\"] = battle.spawn_unit(\"Zahra\", battle.context.attacker, \"\")
-		
-		for u in prep.units:
-			#battle.remove_unit(u) # we just used spawn() to create units cos we lazy, so now we remove it
-			battle.character_list.add_unit(u)
-		
-		for o in battle.map.get_objects():
-			if o.get_meta(\"spawn_point\", \"\") == \"player\":
-				o.no_show = false
-			
-		player_fill_slots()
-		
-	battle.character_list.visible = true
-	
-		
-func auto_fill_slots() -> void:
-	# units = all_qualified_units_in_empire
-	# fill_required_slots(units)
-	# fill_slots(units)
-	
-	pass
-	
-func player_fill_slots():
-	pass
-
-func done() -> void:
-	if prep_queue.is_empty():
-		state_machine.transition_to(\"TurnEval\", {battle=battle})
-	else:
-		state_machine.transition_to(\"Prep\", {battle=battle, prep_queue=prep_queue})
-
-func exit() -> void:
-	$UI.visible = false
-	prep = null
-	
-	battle.character_list.visible = false
-	# we can't reset queue on exit because we're using it on done
-	# doing so will pass an empty array on next prep call
-	#prep_queue.clear()
-	
-
-func can_spawn(unit: Unit, pos: Vector2) -> bool:
-	if !battle.map.is_inside_bounds(pos):
-		return false
-		
-	var objs := battle.map.get_objects_at(pos)
-	
-	# can spawn iff on a spawn point, regardless of what's there;
-	# it's not for this function to check or care
-	for obj in objs:
-		if is_unit_spawn_point(unit, obj):
-			return true
-	return false
-	
-	#var obj := battle.map.get_object_at(pos)
-	
-	#return obj != null and is_unit_spawn_point(unit, obj)
-
-
-func is_unit_spawn_point(unit: Unit, obj: MapObject) -> bool:
-	if unit.empire.is_player_owned():
-		return obj.get_meta(\"spawn_point\", \"\") == \"player\"
-	else:
-		return obj.get_meta(\"spawn_point\", \"\") == \"ai\"
-
-
-## Adds unit. Should be used within interactions.
-func _add_unit(unit: String, pos: Vector2):
-	battle.add_unit(units[unit], pos)
-	
-	var cb = [null, null]
-	cb[0] = func(button: int):
-		match button:
-			1:
-				if units[unit] != selected:
-					selected = units[unit]
-					selected_moved = true
-					selected_original_pos = units[unit].map_pos
-					selected_offset = units[unit].map_pos - battle.map.world.screen_to_uniform(get_global_mouse_position())
-			2:
-				_remove_unit(unit)
-			3:
-				heading_adjusted = units[unit]
-		
-	cb[1] = func(button: int):
-		pass
-	
-	# inject callbacks
-	units[unit].button_down.connect(cb[0])
-	units[unit].button_up.connect(cb[1])
-	units[unit].set_meta(\"prep_phase_callbacks\", cb)
-	
-
-## Removes unit. Should be used within interactions.
-func _remove_unit(unit: String):
-	battle.remove_unit(units[unit])
-	
-	# remove callbacks
-	var cb = units[unit].get_meta(\"prep_phase_callbacks\")
-	if cb:
-		units[unit].button_down.disconnect(cb[0])
-		units[unit].button_up.disconnect(cb[1])
-		units[unit].remove_meta(\"prep_phase_callbacks\")
-	
-
-func _on_character_list_unit_selected(unit: String, pos: Vector2):
-	pos = battle.viewport.canvas_transform.affine_inverse() * pos
-	
-	selected = units[unit]
-	selected_moved = false
-	selected_original_pos = Vector2.ZERO
-	selected_offset = Vector2.ZERO
-	
-	if heading_adjusted:
-		heading_adjusted.heading = Unit.Heading.West
-		heading_adjusted = null
-	
-	_add_unit(unit, battle.map.world.screen_to_uniform(pos))
-	
-	units[unit].modulate = Color(1, 1, 1, 0.5)
-	
-
-func _on_character_list_unit_released(unit: String, pos: Vector2):
-	pos = battle.viewport.canvas_transform.affine_inverse() * pos
-	
-	units[unit].snap_to_grid()
-		
-		
-	# remove the unit temporarily. if we can spawn there, add it again
-	_remove_unit(unit)
-	if can_spawn(units[unit], units[unit].map_pos):
-		#var unit2 := battle.map.get_object_at(units[unit].map_pos, false) as Unit
-		var unit2: Unit = null
-		for u in units.values():
-			if u != units[unit] and u.map_pos == units[unit].map_pos:
-				unit2 = u
-				break
-		if unit2:
-			if selected_moved:
-				unit2.map_pos = selected_original_pos
-			else:
-				_remove_unit(unit2.unit_name)
-		_add_unit(unit, units[unit].map_pos)
-		
-	units[unit].animation.play(\"RESET\")
-	units[unit].modulate = Color(1, 1, 1, 1)
-	
-	selected = null
-	if selected_moved:
-		selected_moved = false
-
-
-func _on_character_list_unit_dragged(unit: String, pos: Vector2):
-	pos = battle.viewport.canvas_transform.affine_inverse() * pos
-	
-	var mp := battle.map.world.screen_to_uniform(pos)
-	units[unit].map_pos = mp
-	
-	if can_spawn(units[unit], mp):
-		units[unit].animation.play(\"RESET\")
-	else:
-		units[unit].animation.play(\"highlight_red\")
-		
-	units[unit].visible = true
-
-
-func _on_character_list_unit_cancelled(unit: String):
-	_remove_unit(unit)
-	selected = null
-
-
-func _on_character_list_unit_highlight_changed(unit: String, value: bool):
-	if value:
-		units[unit].animation.play(\"highlight\")
-	else:
-		units[unit].animation.play(\"RESET\")
-"
-
-[sub_resource type="GDScript" id="GDScript_18fha"]
-script/source = "extends State
-
-# TurnEval state
-
-func enter(kwargs:={}):
-	print(\"enter turn eval\")
-"
-
 [sub_resource type="GDScript" id="GDScript_t4niq"]
 script/source = "extends State
 
@@ -379,11 +114,32 @@ func exit():
 [sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
 font_size = 30
 
+[sub_resource type="InputEventKey" id="InputEventKey_4apw1"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="InputEventMouseButton" id="InputEventMouseButton_p1kbt"]
+button_mask = 2
+position = Vector2(308, 19)
+global_position = Vector2(312, 62)
+button_index = 2
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_8j76h"]
+events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
+
+[sub_resource type="LabelSettings" id="LabelSettings_vxtxp"]
+font = ExtResource("9_j1ncc")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
 [node name="Battle" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 1
 script = ExtResource("1_nfufl")
+
+[node name="Drivers" type="Node" parent="."]
 
 [node name="States" type="Control" parent="."]
 process_priority = -1
@@ -421,7 +177,7 @@ text = "%s vs %s"
 label_settings = SubResource("LabelSettings_c22gi")
 
 [node name="Prep" type="Node2D" parent="States"]
-script = SubResource("GDScript_jipoe")
+script = ExtResource("2_t55sd")
 
 [node name="UI" type="Node2D" parent="States/Prep"]
 
@@ -432,8 +188,7 @@ offset_right = 158.0
 offset_bottom = 105.0
 text = "Prep: %s"
 
-[node name="TurnEval" type="Node2D" parent="States"]
-script = SubResource("GDScript_18fha")
+[node name="TurnEval" parent="States" instance=ExtResource("3_uathk")]
 
 [node name="PlayerAction" type="Node2D" parent="States"]
 script = SubResource("GDScript_t4niq")
@@ -456,9 +211,42 @@ canvas_cull_mask = 4294966783
 size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
-[node name="UI" type="Control" parent="."]
-anchors_preset = 0
-mouse_filter = 1
+[node name="Camera2D" parent="SubViewportContainer/Viewport" instance=ExtResource("2_rnoma")]
+position = Vector2(960, 540)
+drag_left_margin = 0.8
+drag_top_margin = 0.44
+drag_right_margin = 0.8
+drag_bottom_margin = 0.44
+metadata/follow_func = Callable()
+metadata/target = Object(Node2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":-1,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(1011.36, 247.987),"rotation":0.0,"scale":Vector2(1, 1),"skew":0.0,"script":Resource("res://Screens/Battle/map/SpriteObject.gd"),"texture":ExtResource("6_itebx"),"fit_to_grid":true,"sprite":Object(Sprite2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(0, 0),"rotation":0.522585,"scale":Vector2(0.651461, 0.651461),"skew":0.525625,"texture":ExtResource("6_itebx"),"centered":true,"offset":Vector2(0, 0),"flip_h":false,"flip_v":false,"hframes":1,"vframes":1,"frame":0,"region_enabled":false,"region_rect":Rect2(0, 0, 0, 0),"region_filter_clip_enabled":false,"script":null)
+,"display_name":"","display_icon":null,"world":Resource("res://Screens/Battle/data/World_StartingZone.tres"),"map_pos":Vector2(0, 0),"pathing":0,"no_show":false,"vertical_offset":-4.0)
+
+metadata/battle_follow_func = Callable()
+
+[node name="TerrainOverlay" type="TileMap" parent="SubViewportContainer/Viewport"]
+z_index = -1
+position = Vector2(1011.36, 210.367)
+rotation = 0.522586
+scale = Vector2(1.04234, 1.04234)
+skew = 0.525625
+tile_set = ExtResource("3_vfrdl")
+format = 2
+
+[node name="UnitPath" parent="SubViewportContainer/Viewport" instance=ExtResource("4_4ux0f")]
+z_index = -1
+position = Vector2(1011.36, 210.367)
+rotation = 0.522586
+scale = Vector2(1.04234, 1.04234)
+skew = 0.525625
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Cursor" parent="UI" instance=ExtResource("5_773tr")]
+z_index = -1
+position = Vector2(0, -4)
+texture = ExtResource("6_itebx")
+fit_to_grid = true
+vertical_offset = -4.0
 
 [node name="CharacterList" parent="UI" instance=ExtResource("2_6wey6")]
 visible = false
@@ -468,7 +256,7 @@ offset_right = 1877.0
 offset_bottom = 687.0
 
 [node name="Label" type="Label" parent="UI"]
-layout_mode = 0
+visible = false
 offset_left = 146.0
 offset_top = 738.0
 offset_right = 186.0
@@ -480,7 +268,6 @@ metadata/_edit_use_anchors_ = true
 
 [node name="OnTurn" type="Label" parent="UI"]
 visible = false
-layout_mode = 0
 offset_left = 58.0
 offset_top = 79.0
 offset_right = 152.0
@@ -489,7 +276,6 @@ text = "on_turn: %s"
 
 [node name="TurnNumber" type="Label" parent="UI"]
 visible = false
-layout_mode = 0
 offset_left = 37.0
 offset_top = 34.0
 offset_right = 77.0
@@ -497,8 +283,85 @@ offset_bottom = 57.0
 text = "Turn %s"
 label_settings = SubResource("LabelSettings_6nd0a")
 
+[node name="DonePrep" type="Button" parent="UI"]
+visible = false
+custom_minimum_size = Vector2(0, 48)
+offset_left = 1617.0
+offset_top = 881.0
+offset_right = 1844.0
+offset_bottom = 952.0
+focus_mode = 0
+theme = ExtResource("8_b0ewm")
+text = "Done"
+
+[node name="CancelPrep" type="Button" parent="UI"]
+visible = false
+custom_minimum_size = Vector2(0, 48)
+offset_left = 1684.0
+offset_top = 815.0
+offset_right = 1844.0
+offset_bottom = 865.0
+focus_mode = 0
+theme = ExtResource("8_b0ewm")
+shortcut = SubResource("Shortcut_8j76h")
+text = "Cancel Battle"
+
+[node name="WarningUI" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 673.0
+offset_top = 395.0
+offset_right = -673.0
+offset_bottom = -395.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI/WarningUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.859375, 0.828125, 0.773438, 1)
+
+[node name="Label2" type="Label" parent="UI/WarningUI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 6.0
+offset_right = 24.0
+offset_bottom = 33.0
+grow_horizontal = 2
+text = "Error"
+label_settings = SubResource("LabelSettings_vxtxp")
+
+[node name="Label3" type="Label" parent="UI/WarningUI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 133.0
+offset_right = 24.0
+offset_bottom = 160.0
+grow_horizontal = 2
+text = "Error"
+label_settings = SubResource("LabelSettings_vxtxp")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
+[connection signal="battle_ended" from="." to="." method="_on_battle_ended"]
+[connection signal="battle_started" from="." to="." method="_on_battle_started"]
 [connection signal="unit_cancelled" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_cancelled"]
 [connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]
 [connection signal="unit_highlight_changed" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_highlight_changed"]
 [connection signal="unit_released" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_released"]
 [connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]
+[connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]
+[connection signal="pressed" from="UI/CancelPrep" to="." method="_on_undo_button_pressed"]

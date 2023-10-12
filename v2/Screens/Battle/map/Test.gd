@@ -13,45 +13,6 @@ signal attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[
 @onready var map := $Map as Map
 
 
-static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
-	var re := PackedVector2Array()
-	var prev := Vector2.ZERO
-	
-	re.append(prev)
-	for p in path:
-		if p.x != prev.x and p.y != prev.y:
-			if p.x < p.y:
-				re.append(Vector2(p.x, prev.y))
-			else:
-				re.append(Vector2(prev.x, p.y))
-		re.append(p)
-		prev = p
-	return re
-
-
-static func make_random_path(
-		length: int,
-		start: Vector2,
-		min: Vector2,
-		max: Vector2,
-		square := true
-		) -> PackedVector2Array:
-	var re := PackedVector2Array()
-	var prev := start
-	
-	re.append(prev)
-	for i in length:
-		var p := Vector2(randi_range(min.x, max.x), randi_range(min.y, max.y))
-		if square:
-			if p.x != prev.x and p.y != prev.y:
-				if p.x < p.y:
-					p = Vector2(p.x, prev.y)
-				else:
-					p = Vector2(prev.x, p.y)
-		re.append(p)
-		prev = p
-	
-	return re
 
 
 var empire: Empire
@@ -126,7 +87,7 @@ func random_path(length: int) -> PackedVector2Array:
 #	if driver.walking:
 #		return make_random_path(length, unit.curve.get_point_out(unit.curve.point_count), Vector2.ZERO, world.map_size - Vector2i.ONE, true)
 #	else:
-	return make_random_path(length, $Map/Unit1.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
+	return Globals.make_random_path(length, $Map/Unit1.map_pos, Vector2.ZERO, world.map_size - Vector2i.ONE, true)
 
 
 ## Makes the unit walk towards a point.
@@ -184,41 +145,10 @@ func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 	return _flood_fill(unit, map.cell(unit.map_pos), unit.mov)
 	
 	
-## TODO Misc function
-func flood_fill(cell: Vector2, max_distance: int, condition: Callable = func(_br): return true) -> PackedVector2Array:
-	var re := PackedVector2Array()
-	var stack := [cell]
-	
-	while not stack.is_empty():
-		var current = stack.pop_back()
-		
-		# diagonal distance check (not circle or square)
-		var diff: Vector2 = (current - cell).abs()
-		var dist := int(diff.x + diff.y)
-		
-		# various checks
-		var out_of_bounds: bool = not world.in_bounds(current)
-		var dupe: bool = current in re
-		var out_of_range: bool = dist > max_distance
-		
-		if out_of_bounds or dupe or out_of_range:
-			continue
-		
-		if condition.call(current):
-			re.append(current)
-		
-		for direction in DIRECTIONS:
-			var coords: Vector2 = current + direction
-			
-			if not world.in_bounds(coords) or coords in re:
-				continue
-			
-			stack.append(coords)
-	return re
-	
-	
 func _flood_fill(unit: Unit, cell: Vector2, max_distance: int) -> PackedVector2Array:
-	return flood_fill(cell, max_distance, func(p): return is_pathable(unit, p))
+	var cond := func(p): return is_pathable(unit, p)
+	var bounds := Rect2i(Vector2i.ZERO, map.world.map_size)
+	return Globals.flood_fill(cell, max_distance, bounds, cond)
 	
 
 func add_unit_callbacks(unit: Unit):
@@ -359,27 +289,19 @@ func commit_action():
 
 
 func can_move(unit: Unit) -> bool:
-	return unit in unit_move_list
+	return unit.get_meta("Battle_can_move", false)
 	
 	
 func can_attack(unit: Unit) -> bool:
-	return unit in unit_attack_list
+	return unit.get_meta("Battle_can_attack", false)
 	
 	
 func set_can_move(unit: Unit, can: bool):
-	if can:
-		if unit not in unit_move_list:
-			unit_move_list.append(unit)
-	else:
-		unit_move_list.erase(unit)
+	unit.set_meta("Battle_can_move", can)
 		
 	
 func set_can_attack(unit: Unit, can: bool):
-	if can:
-		if unit not in unit_attack_list:
-			unit_attack_list.append(unit)
-	else:
-		unit_attack_list.erase(unit)
+	unit.set_meta("Battle_can_attack", can)
 		
 	
 func _is_current_empire(unit: Unit) -> bool:
@@ -388,19 +310,21 @@ func _is_current_empire(unit: Unit) -> bool:
 
 func engage_attack(unit: Unit, attack: Attack):
 	var cell := map.cell(unit.map_pos)
+	print(cell, " ", map.cell(map.world.screen_to_uniform(unit.position)))
 	
 	clear_walkable_cells()
 	
 	active_attack = attack
 	active_target = attack.target_shape.duplicate()
-	active_targetable = flood_fill(cell, attack.range)
+	active_targetable = Globals.flood_fill(cell, attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
 	
 	if attack.target_melee:
 		select_attack_target(active_unit, active_attack, null)
 		
 	set_ui_visible(true, false)
 	
-	draw_attack_overlay(active_cell, attack, cursor.map_pos)
+	# TODO active_cell not upcated properly after move
+	draw_attack_overlay(cell, attack, cursor.map_pos)
 	
 
 func use_attack():
@@ -432,8 +356,6 @@ func use_attack():
 	# make actions undoable past this point
 	commit_action()
 	
-	$CanvasLayer.visible = false
-	
 	# attack signal
 	attack_used.emit(active_unit, active_attack, cell, targets)
 	
@@ -443,7 +365,6 @@ func use_attack():
 	set_can_attack(active_unit, false)
 	_clear_active_unit()
 	
-	$CanvasLayer.visible = true
 	
 	
 func _select_cell(pos: Vector2):
@@ -452,7 +373,7 @@ func _select_cell(pos: Vector2):
 	var unit := map.get_object(cell, Map.Pathing.UNIT) as Unit
 	
 	# set cursor position
-	cursor.map_pos = map.cell(Vector2(clamp(pos.x, -4, world.map_size.x + 3), clamp(pos.y, -4, world.map_size.y + 3)))
+	cursor.map_pos = map.cell(Vector2(clamp(pos.x, -3, world.map_size.x + 2), clamp(pos.y, -3, world.map_size.y + 2)))
 	
 	if active_attack:
 		draw_attack_overlay(active_cell, active_attack, cursor.map_pos)
@@ -527,7 +448,10 @@ func _accept_cell():
 					walk_unit_action(active_unit, cell)
 					_push_move_action()
 					set_can_move(active_unit, false)
+					var u := active_unit
 					_clear_active_unit()
+					if can_attack(u):
+						_set_active_unit(u)
 				else:
 					_play_error(true)
 			else:
@@ -636,9 +560,6 @@ enum {
 	TERRAIN_RED,
 }
 
-func draw_walkable_cells(cells: PackedVector2Array):
-	draw_terrain_overlay(cells, TERRAIN_GREEN, true)
-	
 
 ## Selects cell for attack target.
 func select_attack_target(unit: Unit, attack: Attack, target: Variant):
@@ -683,7 +604,7 @@ func get_attack_target_cells(attack: Attack, target: Vector2i, target_rotation: 
 func draw_attack_overlay(cast_point: Vector2i, attack: Attack, target: Vector2i, target_rotation: float = 0):
 	terrain_overlay.clear()
 	
-	var cells := flood_fill(cast_point, attack.range)
+	var cells := Globals.flood_fill(cast_point, attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
 	
 	if not attack.target_melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)
@@ -691,6 +612,9 @@ func draw_attack_overlay(cast_point: Vector2i, attack: Attack, target: Vector2i,
 	var target_cells := get_attack_target_cells(attack, target, target_rotation)
 	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
 
+func draw_walkable_cells(cells: PackedVector2Array):
+	draw_terrain_overlay(cells, TERRAIN_GREEN, true)
+	
 
 ## Draws terrain overlay.
 func draw_terrain_overlay(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear := false):
@@ -731,6 +655,8 @@ func set_camera_follow_target(obj: MapObject):
 func _unhandled_input(event):
 	# Make input local, imporant because we're using a camera
 	event = make_input_local(event)
+	if event is InputEventMouseMotion:
+		print(event.position)
 	
 	# TODO transform to inputs
 	if active_attack:
@@ -864,6 +790,8 @@ func _on_undo_button_pressed():
 
 # This will be in the animation engine/handler
 func _on_attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	$CanvasLayer.visible = false
+	
 	# play animations
 	for t in targets:
 		t.model.play_animation(attack.target_animation)
@@ -877,10 +805,14 @@ func _on_attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Arra
 	
 	await $AnimatedSprite2D.animation_finished
 	
-	# play animations
+	# apply attack effect
+	
+	# stop animations
 	for t in targets:
 		t.model.play_animation("idle")
 		t.model.stop_animation()
 	unit.model.play_animation("idle")
 	unit.model.stop_animation()
 	$AnimatedSprite2D.stop()
+	
+	$CanvasLayer.visible = true

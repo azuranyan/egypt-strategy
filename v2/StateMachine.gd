@@ -40,7 +40,7 @@ func transition_to(new_state: String, kwargs:={}) -> void:
 	
 	var old_state := state.name
 	state.exit()
-	state = get_node(new_state)
+	state = get_node(new_state) as State
 	state.enter(kwargs)
 	
 	transition.emit(old_state, new_state)

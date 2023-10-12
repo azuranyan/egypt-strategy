@@ -210,12 +210,9 @@ func register_empires_to_globals():
 	
 	var selection: Array[Chara] = []
 	for c in Globals.charas.values():
-		print("charas ", c)
 		if c.get_meta("territory_selection", false):
 			selection.append(c)
 			
-	for p in selection:
-		print("selection ", p)
 		
 	selection.shuffle()
 	var i := 0

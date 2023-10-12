@@ -30,7 +30,7 @@ scale = Vector2(0.05, 0.05)
 script = ExtResource("4_xerix")
 adjacent = [NodePath("../../TerritoryButton2/Neru-Khisi")]
 maps = Array[PackedScene]([ExtResource("5_xwig8")])
-units = Array[String](["Zahra", "Maia", "Lysandra"])
+units = Array[String](["Zahra", "Lysandra", "Ishtar"])
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1504, 453)
@@ -39,6 +39,7 @@ scale = Vector2(0.05, 0.05)
 [node name="Neru-Khisi" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("4_xerix")
 adjacent = [NodePath("../../TerritoryButton3/Satayi"), NodePath("../../TerritoryButton5/Medjed\'s Beacon"), NodePath("../../TerritoryButton1/Zetennu")]
+units = Array[String](["Maia"])
 
 [node name="TerritoryButton3" parent="." instance=ExtResource("3_aby1e")]
 position = Vector2(1545, 160)

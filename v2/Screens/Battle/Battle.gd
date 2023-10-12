@@ -3,14 +3,31 @@ extends Control
 class_name Battle
 
 
-## Emitted when the map is loaded to the game.
-signal map_loaded(map)
-
 ## Emitted when battle is started.
 signal battle_started(attacker, defender, territory)
 
 ## Emitted when battle ended.
 signal battle_ended(result)
+
+
+################################################################################
+
+## Emitted when a unit is selected.
+signal message_displayed(message)
+
+## Emitted when a cell is selected.
+signal cell_selected(cell: Vector2i)
+
+## Emitted when a cell is accepted.
+signal cell_accepted(cell: Vector2i)
+
+## Emitted when a unit is selected.
+signal unit_selected(unit: Unit)
+
+
+signal _end_battle_requested(result)
+
+signal _end_prep_requested(result)
 
 
 class Action:
@@ -23,56 +40,64 @@ var frames: int = 0
 
 #var current_map: Node2D
 
-@onready var map: Map
 @onready var viewport: Viewport = $SubViewportContainer/Viewport
-var cursor: SpriteObject
+
+@onready var map: Map
+@onready var camera: Camera2D = $SubViewportContainer/Viewport/Camera2D
+@onready var terrain_overlay: TileMap = $SubViewportContainer/Viewport/TerrainOverlay
+@onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
+@onready var cursor: SpriteObject = $UI/Cursor
+
 
 func _ready():
 	set_debug_tile_visible(false)
 	
 	print("battle ready")
+	
+	# TODO not ideal
 	Globals.battle = self
 
-func _unhandled_input(event: InputEvent):
-	if map == null:
-		return # can be triggered before map is loaded
-	
-	# because we're using a camera that transforms the viewport
-	# we need to make this event local to the map input!!!
-	event = map.make_input_local(event)
-	var uniform: Vector2
+
+#func _unhandled_input(event: InputEvent):
+#	if map == null:
+#		return # can be triggered before map is loaded
 #
-#	var p := viewport.get_mouse_position()
-#	if event is InputEventMouse:# and cursor.enable_mouse_control:
-#		uniform = map.world.screen_to_uniform(event.position, true)
-#
+#	# because we're using a camera that transforms the viewport
+#	# we need to make this event local to the map input!!!
+#	event = map.make_input_local(event)
+#	var uniform: Vector2
+##
+##	var p := viewport.get_mouse_position()
+##	if event is InputEventMouse:# and cursor.enable_mouse_control:
+##		uniform = map.world.screen_to_uniform(event.position, true)
+##
+##
+##		cursor.position = map.world.uniform_to_screen(uniform)
+##		cursor.get_node("Node2D/Label").text = "screen: %s\nworld: %s\nuniform: %s" % [event.position, map.world.screen_to_world(event.position), map.world.screen_to_uniform(event.position, true)]
+##
+##		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(uniform).get_name(), uniform.x, uniform.y]
+##
+#	if event is InputEventKey and event.pressed:
+#		uniform = map.world.screen_to_uniform(cursor.position, true)
+#		match event.keycode:
+#			KEY_W: 
+#				uniform.y += 1
+#			KEY_A: 
+#				uniform.x -= 1
+#			KEY_S: 
+#				uniform.y -= 1
+#			KEY_D: 
+#				uniform.x += 1
 #
 #		cursor.position = map.world.uniform_to_screen(uniform)
-#		cursor.get_node("Node2D/Label").text = "screen: %s\nworld: %s\nuniform: %s" % [event.position, map.world.screen_to_world(event.position), map.world.screen_to_uniform(event.position, true)]
+#		var tile_name = "None"
+#		if map.is_inside_bounds(uniform) and map.get_object_at(uniform):
+#			tile_name = map.get_object_at(uniform).name
+#		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [tile_name, uniform.x, uniform.y]
 #
-#		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(uniform).get_name(), uniform.x, uniform.y]
-#
-	if event is InputEventKey and event.pressed:
-		uniform = map.world.screen_to_uniform(cursor.position, true)
-		match event.keycode:
-			KEY_W: 
-				uniform.y += 1
-			KEY_A: 
-				uniform.x -= 1
-			KEY_S: 
-				uniform.y -= 1
-			KEY_D: 
-				uniform.x += 1
-				
-		cursor.position = map.world.uniform_to_screen(uniform)
-		var tile_name = "None"
-		if map.is_inside_bounds(uniform) and map.get_object_at(uniform):
-			tile_name = map.get_object_at(uniform).name
-		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [tile_name, uniform.x, uniform.y]
-			
-	#if cursor.position != cursor._last_position:
-	#	cursor.position_changed.emit(uniform)
-	#	cursor._last_position = cursor.position
+#	#if cursor.position != cursor._last_position:
+#	#	cursor.position_changed.emit(uniform)
+#	#	cursor._last_position = cursor.position
 				
 				
 func _process(_delta):
@@ -86,39 +111,14 @@ func push_action(fun: Callable, args: Array):
 	action.args = args
 	action_stack.push_back(action)
 
+
 func pop_action():
 	action_stack.pop_back()
+	
 	
 func undo():
 	pop_action()
 	action_stack[-1].fun.callv(action_stack[-1].args)
-	
-func load_map(res: String):
-	load_map_scene(load(res) as PackedScene)
-	
-	
-func load_map_scene(scene: PackedScene):
-	# we need to be in the tree for everything to work, so do that first
-	#Globals.get_tree().root.add_child(self)
-	
-	map = scene.instantiate() as Map
-	
-	# do not set owner, as we don't want it to be saved along with the scene
-	viewport.add_child(map)
-	#map.owner = self
-	
-	# only at this point we can add cursor because it relies on the map.
-	# we need to be ready for the onready map var so we can only add cursor
-	# as a child after we are ready.
-	cursor = preload("res://Screens/Battle/map/SpriteObject.tscn").instantiate()
-	#cursor.position_changed.connect(_on_cursor_position_changed)
-	cursor.name = "Cursor"
-	#viewport.add_child(cursor)
-	#map.place_object(cursor, Vector2.ZERO)
-	map.add_object(cursor)
-	
-	map_loaded.emit(map)
-	
 	
 ## The result of the battle.
 enum Result {
@@ -150,10 +150,10 @@ class Context:
 	var result: Result
 	
 	var turns: int
-	var current_turn: Empire
+	var on_turn: Empire
 
-	var spawned_units: Array[Unit] = []
-
+	var spawned_units: Array[Unit]
+	var warnings: PackedStringArray
 	
 var context: Context
 
@@ -161,39 +161,175 @@ var context: Context
 @onready var character_list: CharacterList = $UI/CharacterList
 
 
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick:=true):
-	if !_fulfills_battle_requirements(attacker, territory):
-		battle_ended.emit(Result.AttackerRequirementsError)
-		return
-
-
-	if do_quick and !(attacker.is_player_owned() or defender.is_player_owned()):
-		_start_quick_battle(attacker, defender, territory)
+## Starts a battle between two empires over a territory.
+func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick := false):
+	# initialize context
+	context = Battle.Context.new()
+	context.attacker = attacker
+	context.defender = defender
+	context.territory = territory
+	context.result = Battle.Result.Cancelled
+	context.turns = 0
+	context.on_turn = context.attacker
+	
+	if fulfills_battle_requirements(attacker, territory):
+		# do battle
+		battle_started.emit(attacker, defender, territory)
+		
+		if do_quick or !(attacker.is_player_owned() or defender.is_player_owned()):
+			_quick_battle(attacker, defender, territory)
+		else:
+			_real_battle(attacker, defender, territory)
+		
+		# wait until done
+		var result = await _end_battle_requested
+		battle_ended.emit(result)
 	else:
-		_start_real_battle.call_deferred(attacker, defender, territory)
+		display_message(context.warnings)
+		battle_ended.emit(Result.AttackerRequirementsError)
+	
+	# cleanup
+	context = null
 
 
-func _fulfills_battle_requirements(empire: Empire, territory: Territory) -> bool:
+## Returns true if the attacker fulfills battle requirements over territory.
+func fulfills_battle_requirements(empire: Empire, territory: Territory) -> bool:
+	context.warnings = []
 	return true
 
 
-func _start_quick_battle(attacker: Empire, defender: Empire, territory: Territory):
-	battle_started.emit(attacker, defender, territory)
-		
-	# we start the battle on the next frame to allow this frame end first
-	var continuation := func():
-		await get_tree().create_timer(1.0).timeout
-		battle_ended.emit(Result.AttackerVictory)
-		
-	continuation.call_deferred()
+## Returns true if the attacker fulfills prep requirements over territory.
+func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
+	context.warnings = []
+	return true
 
 
-func _start_real_battle(attacker: Empire, defender: Empire, territory: Territory):
-	#get_tree().current_scene = self
+## Request to end battle.
+func end_battle(result: Result):
+	if context:
+		_end_battle_requested.emit(result)
+	else:
+		push_warning("end_battle: battle not started!")
 	
-	state_machine.transition_to("Init", {battle=self, attacker=attacker, defender=defender, territory=territory})
+
+## Outcome is an implementation detail.
+func _quick_battle(attacker: Empire, defender: Empire, territory: Territory):
+	await get_tree().create_timer(1.0).timeout
+	end_battle(Result.AttackerVictory)
 
 
+## Real battle. 
+func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
+	_load_map(territory.maps[0])
+
+	# if defender is ai, allow them to set first so player can see the map
+	# with enemies already in place.
+	var prep_queue := []
+	if !context.defender.is_player_owned() and context.attacker.is_player_owned():
+		prep_queue.append(context.defender)
+		prep_queue.append(context.attacker)
+	else:
+		prep_queue.append(context.attacker)
+		prep_queue.append(context.defender)
+	
+	$UI/DonePrep.visible = true
+	$UI/CancelPrep.visible = true
+	
+	var rv = await _prep_phase(prep_queue)
+	
+	$UI/DonePrep.visible = false
+	$UI/CancelPrep.visible = false
+	
+	if rv != 0:
+		_unload_map()
+		_end_battle_requested.emit(Result.Cancelled)
+	else:
+		_battle_phase.call_deferred()
+		
+		await _end_battle_requested
+		_unload_map()
+	
+	
+func _load_map(scene: PackedScene):
+	print("loading map '%s'" % scene.resource_path)
+	map = scene.instantiate() as Map
+	
+	viewport.add_child(map)
+	
+	$UI.remove_child(cursor)
+	map.add_object(cursor)
+
+
+func _unload_map():
+	print("unloading map")
+	map.remove_object(cursor)
+	$UI.add_child(cursor)
+	
+	viewport.remove_child(map)
+	
+	map.queue_free()
+	map = null
+	
+	
+func _prep_phase(prep_queue: Array) -> int:
+	while not prep_queue.is_empty():
+		var prep: Empire = prep_queue.pop_front()
+		context.on_turn = prep
+		print(prep.leader.name, " is preparing units")
+		if prep.is_player_owned():
+			state_machine.transition_to("Prep", {prep_queue=[prep], battle=self})
+		else:
+			var spawnable := prep.units.duplicate()
+			
+			# fill spawn points
+			for spawn_point in map.get_spawn_points("ai"):
+				if spawnable.is_empty():
+					break
+					
+				var nem := ""
+					
+				# spawn or random
+				if map.get_object_at(spawn_point).has_meta("spawn_unit"):
+					var s = map.get_object_at(spawn_point).get_meta("spawn_unit")
+					if s not in spawnable:
+						push_error("spawn_unit '%s' not in spawnable" % s)
+						continue
+					else:
+						nem = s
+				else:
+					nem = spawnable.pick_random()
+				
+				# remove from spawnable list
+				spawnable.erase(nem)
+				
+				# spawn unit
+				var unit := spawn_unit(nem, prep, "", spawn_point)
+				
+				# make it face towards the closest spawn point
+				var p_spawn := map.get_spawn_points("player")
+				var closest := Map.OUT_OF_BOUNDS
+				var closest_dist := -1
+				while not p_spawn.is_empty():
+					var v := p_spawn[-1]
+					var v_dist := spawn_point.distance_squared_to(v)
+					if closest == Map.OUT_OF_BOUNDS or v_dist < closest_dist:
+						closest = v
+						closest_dist = v_dist
+					p_spawn.remove_at(p_spawn.size() - 1)
+						
+				unit.face_towards(closest)
+					
+	return await _end_prep_requested
+	
+	
+func _check_prep_start() -> bool:
+	return true
+
+
+func _battle_phase():
+	state_machine.transition_to("TurnEval", {battle=self})
+		
+	
 func get_viewport_size() -> Vector2i:
 	return viewport.size
 
@@ -203,10 +339,23 @@ func set_debug_tile_visible(debug_tile_visible: bool):
 	viewport.set_canvas_cull_mask_bit(9, debug_tile_visible)
 
 
+func display_message(message):
+	print(message)
+	message_displayed.emit(message)
+	
+
+func play_error(message):
+	if not $AudioStreamPlayer2D.is_playing():
+		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
+		$AudioStreamPlayer2D.play()
+	if message:
+		display_message(message)
+	
+################################################################################
+
 ## Spawns a unit of type tag with name at pos, facing x.
 func spawn_unit(tag: String, empire: Empire, name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.West) -> Unit:
 	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
-	
 	var unit := Unit.create(map, {
 		world = map.world,
 		unit_type = Globals.unit_type[tag],
@@ -220,53 +369,140 @@ func spawn_unit(tag: String, empire: Empire, name := "", pos := Map.OUT_OF_BOUND
 		name = name if name != "" else tag,
 		heading = heading,
 	})
-		
-	#add_unit(unit, pos)
-	#map.add_child(unit)
-	
+	add_unit(unit, pos)
 	return unit
 	
 
 ## Adds an already created unit to the map.
-func add_unit(unit: Unit, pos := Vector2.ZERO):
-	# TODO spawned_units is a misnomer and should be changed later
-	# what policy do we even use for spawned and added units?
-	context.spawned_units.append(unit)
-	if unit.get_parent():
-		unit.get_parent().remove_child(unit)
-	map.add_child(unit)
-	#map.place_object(unit, pos)
+func add_unit(unit: Unit, pos := Map.OUT_OF_BOUNDS):
+	var old_parent := unit.get_parent()
+	if old_parent:
+		if old_parent is Map:
+			old_parent.remove_object(unit)
+		else:
+			old_parent.remove_child(unit)
+	map.add_object(unit)
+	unit.map_pos = pos
 	
 	
 ## Removes a unit from the map.
 func remove_unit(unit: Unit):
-	#map.remove_object(unit)
-	map.remove_child(unit)
-	context.spawned_units.erase(unit)
+	if unit not in map.get_objects():
+		return
+	# TODO if removed unit is on turn, forfeit first
+	
+	map.remove_object(unit)
+
+
+## Kills a unit.
+func kill_unit(unit: Unit):
+	# TODO play death animation
+	
+	remove_unit(unit)
 	
 
-## Returns an array of units at pos.
-func get_units_at(pos: Vector2) -> Array[Unit]:
-	var x := roundi(pos.x)
-	var y := roundi(pos.y)
-	var re: Array[Unit] = []
+## Inflict damage upon a unit.
+func damage_unit(unit: Unit, source: Variant, amount: int):
+	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
+	if unit.hp == 0:
+		kill_unit(unit)
+
+
+## Selects cell for attack target.
+func select_attack_target(user: Unit, attack: Attack, target: Variant):
+	if attack.target_melee:
+		match typeof(target):
+			TYPE_VECTOR2, TYPE_VECTOR2I:
+				user.face_towards(target)
+			TYPE_FLOAT, TYPE_INT:
+				user.facing = target
+		select_cell(user.map_pos + Unit.Directions[user.get_heading()] * attack.range)
+	else:
+		select_cell(target)
 	
-	for u in context.spawned_units:
-		if roundi(u.map_pos.x) == x and roundi(u.map_pos.y) == y:
-			re.append(u)
+
+## Selects the cell.
+func select_cell(cell: Vector2i):
+	var world_margin := Vector2i(5, 5)
+	cell = cell.clamp(-world_margin, map.world.map_size + world_margin)
+	cursor.map_pos = cell
+	cell_selected.emit(cell)
+
+
+## Accepts the cell.
+func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
+	if cell != Map.OUT_OF_BOUNDS and map.cell(cursor.map_pos) != cell:
+		select_cell(cell)
+		
+	cell_accepted.emit(cell)
+	
+
+## Returns a list of targets.
+func get_attack_target_units(user: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0) -> Array[Unit]:
+	var targets: Array[Unit] = []
+	for p in get_attack_target_cells(user, attack, target):
+		var u := map.get_object(p, Map.Pathing.UNIT)
+		
+		if u:
+			targets.append(u)
+	return targets
+
+
+## Returns a list of targeted cells.
+func get_attack_target_cells(user: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0) -> PackedVector2Array:
+	if attack.target_melee:
+		target_rotation = user.get_heading() * PI/2
+		
+	var re := PackedVector2Array()
+	for offs in attack.target_shape:
+		var m := Transform2D()
+		m = m.translated(offs)
+		m = m.rotated(target_rotation)
+		m = m.translated(target)
+		re.append(map.cell(m * Vector2.ZERO))
+		
 	return re
 
 
-## Returns the first unit at pos.
-func get_unit_at(pos: Vector2) -> Unit:
-	var x := roundi(pos.x)
-	var y := roundi(pos.y)
-	
-	for u in context.spawned_units:
-		if roundi(u.map_pos.x) == x and roundi(u.map_pos.y) == y:
-			return u
-	return null
-	
+## Makes the camera follow a MapObject.
+func set_camera_follow(obj: MapObject):
+	if camera.has_meta("battle_target"):
+		camera.get_meta("battle_target").map_pos_changed.disconnect(camera.get_meta("battle_follow_func"))
+		camera.set_meta("battle_follow_func", null)
+		camera.set_meta("battle_target", null)
+		
+	if obj:
+		var follow_func := func():
+			camera.position = map.world.uniform_to_screen(obj.map_pos)
+		obj.map_pos_changed.connect(follow_func)
+		
+		camera.set_meta("battle_follow_func", follow_func)
+		camera.set_meta("battle_target", obj)
+
 
 func _on_cursor_position_changed(pos: Vector2):
 	$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(pos).get_name(), pos.x, pos.y]
+
+
+
+# TODO maybe this should be on UI code?
+func _on_battle_started(attacker, defender, territory):
+	$UI.visible = true
+	$UI/Label.text = "%s vs %s" % [attacker.leader.name, defender.leader.name]
+
+
+func _on_battle_ended(result):
+	$UI.visible = false
+
+
+func _on_done_prep_pressed():
+	if fulfills_prep_requirements(context.on_turn, context.territory):
+		state_machine.transition_to("Idle")
+		_end_prep_requested.emit(0)
+	else:
+		display_message(context.warnings)
+
+
+func _on_undo_button_pressed():
+	state_machine.transition_to("Idle")
+	_end_prep_requested.emit(1)

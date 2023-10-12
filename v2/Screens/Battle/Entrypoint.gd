@@ -12,6 +12,7 @@ extends Control
 
 
 func _ready():
+	# Overworld starts before us and registers the empires and territories
 	register_objects()
 	register_maps()
 	
@@ -20,10 +21,14 @@ func _ready():
 			if empire.is_player_owned():
 				label_attacker.add_item(empire.leader.name)
 			else:
-				label_defender.add_item(empire.leader.name)
+				if empire.leader.get_meta("territory_selection", false):
+					label_defender.add_item(empire.leader.name)
 				
-		for map in Globals.maps.values():
-			label_territory.add_item(map.scene_file_path if map.scene_file_path != "" else map.name)
+		for territory in Globals.territories.values():
+			if not territory.maps.is_empty():
+				label_territory.add_item(territory.name)
+#		for map in Globals.maps.values():
+#			label_territory.add_item(map.scene_file_path if map.scene_file_path != "" else map.name)
 	
 	# TODO overworld is waiting for us to finish, but the functions here require
 	# overworld to have run. this is ugly and should be changed.
@@ -63,5 +68,8 @@ func _on_button_pressed():
 	add_child(Globals.battle)
 	
 	# TODO when starting battle, close all overworld interactions
-	
-	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])
+	var attacker: Empire = Globals.empires[label_attacker.get_item_text(label_attacker.get_selectable_item())]
+	var defender: Empire = Globals.empires[label_defender.get_item_text(label_defender.get_selectable_item())]
+	var territory: Territory = Globals.territories[label_territory.get_item_text(label_territory.get_selectable_item())]
+	Globals.battle.start_battle(attacker, defender, territory)
+#	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])

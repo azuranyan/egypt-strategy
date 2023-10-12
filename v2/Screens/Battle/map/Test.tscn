@@ -1,8 +1,8 @@
-[gd_scene load_steps=52 format=3 uid="uid://j7xlum2x18q2"]
+[gd_scene load_steps=50 format=3 uid="uid://j7xlum2x18q2"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Test.gd" id="1_rejdj"]
-[ext_resource type="Texture2D" uid="uid://cwgqwhhofgv6l" path="res://Screens/Battle/terrain_overlay.png" id="2_123xd"]
 [ext_resource type="PackedScene" uid="uid://b6fvp0wup6fkc" path="res://Screens/Battle/map/Unit.tscn" id="2_dv3bt"]
+[ext_resource type="TileSet" uid="uid://bim62kb8y75qx" path="res://Screens/Battle/terrainfyuckingsavethisshit.tres" id="2_mn08x"]
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="2_phl5y"]
 [ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="2_x2o88"]
 [ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_6wws0"]
@@ -22,18 +22,6 @@
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="19_qcxye"]
 [ext_resource type="PackedScene" uid="uid://clvishebthqco" path="res://Screens/Battle/AttackInfo.tscn" id="19_sd3dd"]
 [ext_resource type="Texture2D" uid="uid://33ts5p2mx0ql" path="res://Screens/Battle/sprites/Fire2.png" id="22_k58mb"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bem4x"]
-texture = ExtResource("2_123xd")
-texture_region_size = Vector2i(80, 80)
-0:0/0 = 0
-1:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_5o5ik"]
-tile_size = Vector2i(80, 80)
-sources/0 = SubResource("TileSetAtlasSource_bem4x")
 
 [sub_resource type="Animation" id="Animation_fhxch"]
 length = 0.001
@@ -231,7 +219,7 @@ position = Vector2(1011.36, 210.367)
 rotation = 0.522586
 scale = Vector2(1.04234, 1.04234)
 skew = 0.525625
-tile_set = SubResource("TileSet_5o5ik")
+tile_set = ExtResource("2_mn08x")
 format = 2
 
 [node name="UnitPath" parent="." instance=ExtResource("2_phl5y")]
@@ -291,6 +279,8 @@ rng = 3
 world = ExtResource("3_6wws0")
 map_pos = Vector2(1, 1)
 metadata/Map_unit_selected = Callable()
+metadata/Battle_can_move = true
+metadata/Battle_can_attack = true
 
 [node name="Unit2" parent="Map" instance=ExtResource("2_dv3bt")]
 position = Vector2(1011.36, 501.709)
@@ -304,6 +294,8 @@ rng = 1
 world = ExtResource("3_6wws0")
 map_pos = Vector2(3, 3)
 metadata/Map_unit_selected = Callable()
+metadata/Battle_can_move = true
+metadata/Battle_can_attack = true
 
 [node name="Unit3" parent="Map" instance=ExtResource("2_dv3bt")]
 position = Vector2(1155.87, 418.468)
