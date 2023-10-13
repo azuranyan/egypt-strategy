@@ -189,7 +189,6 @@ func _ready():
 	# because curve is a resource that get saved with the scene. this
 	# is why we're creating a new curve every _ready.
 #	curve = Curve2D.new()
-	
 
 
 #func _process(delta: float):

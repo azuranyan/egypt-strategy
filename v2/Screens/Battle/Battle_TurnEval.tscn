@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://b7wt1gpod4rjo"]
+[gd_scene load_steps=31 format=3 uid="uid://b7wt1gpod4rjo"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle_TurnEval.gd" id="1_qf6je"]
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="2_rqdb6"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="4_61cap"]
 [ext_resource type="Texture2D" uid="uid://cc4r8g2175acd" path="res://Screens/Battle/hp_empty.png" id="5_ltcn2"]
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="6_h2n6j"]
+[ext_resource type="Texture2D" uid="uid://33ts5p2mx0ql" path="res://Screens/Battle/sprites/Fire2.png" id="7_066qq"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_8vpv4"]
 font = ExtResource("2_rqdb6")
@@ -40,6 +41,112 @@ pressed = true
 [sub_resource type="Shortcut" id="Shortcut_w7bme"]
 events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
+atlas = ExtResource("7_066qq")
+region = Rect2(384, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pu3je"]
+atlas = ExtResource("7_066qq")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_scqe4"]
+atlas = ExtResource("7_066qq")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w78rl"]
+atlas = ExtResource("7_066qq")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ct87q"]
+atlas = ExtResource("7_066qq")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yx4vd"]
+atlas = ExtResource("7_066qq")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ov5f7"]
+atlas = ExtResource("7_066qq")
+region = Rect2(0, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i564b"]
+atlas = ExtResource("7_066qq")
+region = Rect2(192, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftog0"]
+atlas = ExtResource("7_066qq")
+region = Rect2(384, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbwm4"]
+atlas = ExtResource("7_066qq")
+region = Rect2(576, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mlqwc"]
+atlas = ExtResource("7_066qq")
+region = Rect2(768, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0qgvj"]
+atlas = ExtResource("7_066qq")
+region = Rect2(0, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d7hp"]
+atlas = ExtResource("7_066qq")
+region = Rect2(192, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnuru"]
+atlas = ExtResource("7_066qq")
+region = Rect2(576, 384, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jxvgy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxo64")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pu3je")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_scqe4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w78rl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ct87q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yx4vd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ov5f7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i564b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftog0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbwm4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mlqwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0qgvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d7hp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnuru")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
+
 [node name="TurnEval" type="Node2D"]
 script = ExtResource("1_qf6je")
 
@@ -67,6 +174,47 @@ grow_vertical = 2
 color = Color(0.870588, 0.839216, 0.784314, 1)
 
 [node name="Label" type="Label" parent="UI/Name"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.5
+offset_top = -12.0
+offset_right = 52.5
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "LYSANDRA"
+label_settings = SubResource("LabelSettings_8vpv4")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackName" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = 52.0
+offset_right = 140.0
+offset_bottom = 78.0
+grow_horizontal = 2
+
+[node name="ColorRect2" type="ColorRect" parent="UI/AttackName"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.870588, 0.839216, 0.784314, 1)
+
+[node name="Label" type="Label" parent="UI/AttackName"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -194,6 +342,9 @@ focus_mode = 0
 theme = ExtResource("6_h2n6j")
 text = "End Turn
 "
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jxvgy")
 
 [connection signal="pressed" from="UI/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="UI/SpecialButton" to="." method="_on_special_button_pressed"]

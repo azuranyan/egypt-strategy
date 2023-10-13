@@ -62,7 +62,8 @@ func exit():
 
 func handle_input(event: InputEvent) -> void:
 	# Make input local, imporant because we're using a camera
-	event = battle.map.make_input_local(event)
+	#event = battle.map.make_input_local(event)
+	event = make_input_local(event)
 	
 	var cur: Vector2i = battle.map.cell(battle.cursor.map_pos)
 	var cell: Vector2i = cur if not event is InputEventMouse else battle.map.cell(battle.map.world.screen_to_uniform(event.position))
@@ -204,7 +205,7 @@ func select_cell(cell: Vector2i):
 	
 	# set ui elements
 	var show_portrait: bool = active_unit or unit != null
-	var show_actions: bool = active_unit and is_owned(active_unit) and can_attack(active_unit)
+	var show_actions: bool = not active_attack and active_unit and is_owned(active_unit) and can_attack(active_unit)
 	var show_undo_end: bool = battle.context.on_turn == Globals.empires["Lysandra"]
 	
 	if show_portrait:
@@ -326,8 +327,6 @@ func use_attack():
 		return
 	
 	# play error if no targets
-	print(get_attack_target_cells(active_unit, active_attack, cell))
-	print(battle.map.get_units(get_attack_target_cells(active_unit, active_attack, cell)))
 	var targets := battle.map.get_units(get_attack_target_cells(active_unit, active_attack, cell))
 	if targets.is_empty():
 		battle.play_error("No target.")
@@ -349,13 +348,76 @@ func use_attack():
 	move_stack.clear()
 	
 	# attack signal
-	attack_used.emit(active_unit, active_attack, cell, targets)
+	_activate_attack.call_deferred(active_unit, active_attack, cell, targets)
 	
 	# cleanup
 	set_can_move(active_unit, false)
 	set_can_attack(active_unit, false)
 	clear_active_unit()
 	
+	
+func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	print("%s%s used %s" % [unit.name, battle.map.cell(unit.map_pos), attack.name], ": ", target, " ", targets)
+	$UI/AttackName/Label.text = attack.name
+	$UI/AttackName.visible = true
+	set_ui_visible(false, false, false)
+	
+	# play animations
+	for t in targets:
+		t.model.play_animation(attack.target_animation)
+	unit.model.play_animation(attack.cast_animation)
+	
+	# play attack sequence
+	match attack.cast_animation:
+		"attack", "buff", "heal":
+			# add animation TODO custom scripted animation
+			var pos := battle.map.world.uniform_to_screen(target)
+			#pos = get_viewport_transform() * pos
+			$AnimatedSprite2D.position = pos
+			$AnimatedSprite2D.position.y -= 50
+			$AnimatedSprite2D.play("default")
+			
+			await $AnimatedSprite2D.animation_finished
+			$AnimatedSprite2D.stop()
+			
+	match attack.target_animation:
+		"hurt", "buff", "heal":
+			pass
+			
+	# apply attack effect
+	for t in targets:
+		_use_attack_on_target(unit, t, attack)
+	
+	# stop animations
+	for t in targets:
+		t.model.play_animation("idle")
+		t.model.stop_animation() # TODO wouldn't have to do this if there's a reset
+	unit.model.play_animation("idle")
+	unit.model.stop_animation()
+
+	$UI/AttackName.visible = false
+	
+	# This is a move (ATTACK), so check for end turn
+	check_for_auto_end_turn()
+
+
+func _use_attack_on_target(caster: Unit, target: Unit, attack: Attack):
+	match attack.type_tag:
+		"attack":
+			battle.damage_unit(target, caster, caster.dmg)
+		"heal":
+			battle.damage_unit(target, caster, -caster.dmg)
+		"other":
+			pass
+			
+	if attack.status_effect != "None":
+		var duration_table := {"PSN": 2, "STN": 1, "VUL": 2}
+		var eff = Globals.status_effect[attack.status_effect]
+		var dur = duration_table[attack.status_effect]
+		
+		target.add_status_effect(eff, dur)
+	
+
 
 ## Walks the unit.
 func walk_unit(unit: Unit, cell: Vector2i):
@@ -600,7 +662,10 @@ func select_attack_target(unit: Unit, attack: Attack, target: Variant):
 
 ## Returns a list of walkable cells.
 func get_walkable_cells(unit: Unit) -> PackedVector2Array:
-	return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
+	var cond := func(p): return is_pathable(unit, p)
+	var bounds := Rect2i(Vector2i.ZERO, battle.map.world.map_size)
+	return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, bounds, cond)
+	#return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size),  func(p): return is_pathable(unit, p))
 	
 
 ## Returns a list of targetable cells.

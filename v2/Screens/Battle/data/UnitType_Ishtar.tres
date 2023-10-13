@@ -10,9 +10,12 @@ script = ExtResource("1_2ipdn")
 name = "Magic Bonk"
 description = "Ishtar's basic attack."
 range = 1
+type_tag = "attack"
 status_effect = "STN"
+cast_animation = "attack"
+target_animation = "hurt"
 target_melee = true
-target_unit = 6
+target_unit = 1
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [sub_resource type="Resource" id="Resource_7evmx"]
@@ -20,9 +23,12 @@ script = ExtResource("1_2ipdn")
 name = "Magic Missile"
 description = "Ishtar's special"
 range = 2
+type_tag = "attack"
 status_effect = "None"
+cast_animation = "attack"
+target_animation = "hurt"
 target_melee = false
-target_unit = 2
+target_unit = 1
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [resource]

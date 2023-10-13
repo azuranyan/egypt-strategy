@@ -203,9 +203,7 @@ func get_units(filter = null) -> Array[Unit]:
 			re.append(o)
 	elif filter is PackedVector2Array:
 		for o in get_objects_of(Pathing.UNIT):
-			print("found unit ", o)
 			if Vector2(cell(o.map_pos)) in filter:
-				print("    adding ", o)
 				re.append(o)
 	elif filter is Callable:
 		for o in get_objects_of(Pathing.UNIT):

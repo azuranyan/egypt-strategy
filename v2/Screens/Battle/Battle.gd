@@ -69,7 +69,7 @@ var context: Context
 
 @onready var viewport: Viewport = $SubViewportContainer/Viewport
 @onready var map: Map
-@onready var camera: Camera2D = $SubViewportContainer/Viewport/Camera2D
+@onready var camera: Camera2D = $Camera2D
 @onready var terrain_overlay: TileMap = $SubViewportContainer/Viewport/TerrainOverlay
 @onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
 @onready var cursor: SpriteObject = $UI/Cursor
@@ -347,7 +347,6 @@ func kill_unit(unit: Unit):
 
 ## Inflict damage upon a unit.
 func damage_unit(unit: Unit, source: Variant, amount: int):
-	print("damage %s by %s: hp: %s -> %s" % [unit, amount, unit.hp, clampi(unit.hp - amount, 0, unit.maxhp)])
 	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
 	if unit.hp == 0:
 		kill_unit(unit)
@@ -454,7 +453,6 @@ func _on_undo_button_pressed():
 
 
 func _on_turn_eval_attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
-	print("%s used %s" % [unit.name, attack.name], ": ", target, " ", targets, )
 	$States/TurnEval/UI.visible = false
 	
 	# play animations

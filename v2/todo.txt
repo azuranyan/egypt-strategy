@@ -1,32 +1,18 @@
-make a couple of units
-instance them in the map through ai placement
-instance them in the map through manual placement
-finish prep phase
+## to fix
+overworld ui elements not hidden when going to battle
+ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
+where camera is parented is important
 
-finish turn phase
+## to implement
+turn end
+unit and attack data
+ - determine depth of attacks
+ - custom attack scripts if needed
+ - better attack animation handling
+enemy ai controls
+prep keyboard controls
 
-finish battle sequence
-
-back to main world, connect
-
-#############################################
-
-empire
-  territory units
-
-entrypoint
-  load participants
-
-ai placement
-
-player placement
-
-done prep phase
-
-allow quit (no penalty) from prep 
-
-#############################################
-
-turn eval
-
-player action
+## minor
+flood fill algorithm is suboptimal
+prep uses global coords to bypass camera problems
+ui elements need to be canvaslayer to bypass camera and viewport transforms

@@ -68,7 +68,7 @@ func _ready():
 	pass
 
 
-## Flood fill algorithm.
+## Simple suboptimal flood fill algorithm.
 func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var re := PackedVector2Array()
 	var stack := [cell]
@@ -94,10 +94,11 @@ func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Cal
 		for direction in DIRECTIONS:
 			var coords: Vector2 = current + direction
 			
-			if not bounds.has_point(current) or coords in re:
+			if not bounds.has_point(coords) or coords in re:
 				continue
 			
-			stack.append(coords)
+			if condition.call(current):
+				stack.append(coords) # not ideal
 	return re
 	
 
