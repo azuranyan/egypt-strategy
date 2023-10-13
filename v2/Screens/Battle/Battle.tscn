@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=40 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="4_4ux0f"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="5_773tr"]
 [ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="6_itebx"]
+[ext_resource type="Texture2D" uid="uid://33ts5p2mx0ql" path="res://Screens/Battle/sprites/Fire2.png" id="7_0u6tm"]
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="8_b0ewm"]
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="9_j1ncc"]
 
@@ -110,6 +111,112 @@ func enter(kwargs:={}):
 func exit():
 	state_machine.release_focus()
 "
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pu3je"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_scqe4"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w78rl"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ct87q"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yx4vd"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ov5f7"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i564b"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftog0"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbwm4"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mlqwc"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(768, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0qgvj"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d7hp"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnuru"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 384, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tj8df"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxo64")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pu3je")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_scqe4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w78rl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ct87q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yx4vd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ov5f7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i564b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftog0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbwm4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mlqwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0qgvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d7hp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnuru")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
 
 [sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
 font_size = 30
@@ -239,6 +346,11 @@ rotation = 0.522586
 scale = Vector2(1.04234, 1.04234)
 skew = 0.525625
 
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_tj8df")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="Cursor" parent="UI" instance=ExtResource("5_773tr")]
@@ -354,10 +466,11 @@ grow_horizontal = 2
 text = "Error"
 label_settings = SubResource("LabelSettings_vxtxp")
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-
+[connection signal="attack_sequence_ended" from="." to="." method="_on_attack_sequence_ended"]
+[connection signal="attack_sequence_started" from="." to="." method="_on_attack_sequence_started"]
 [connection signal="battle_ended" from="." to="." method="_on_battle_ended"]
 [connection signal="battle_started" from="." to="." method="_on_battle_started"]
+[connection signal="attack_used" from="States/TurnEval" to="." method="_on_turn_eval_attack_used"]
 [connection signal="unit_cancelled" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_cancelled"]
 [connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]
 [connection signal="unit_highlight_changed" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_highlight_changed"]

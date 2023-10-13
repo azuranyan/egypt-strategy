@@ -77,15 +77,21 @@ func remove_object(node: MapObject):
 	
 
 func _add_map_object(node: MapObject):
+	# seems like some function is causing to add a unit more than once
+	# root problem is not solved yet, so we're just preventing multi-append
+	if node in _objects:
+		return
 	node.world = world
 	get_objects_of(node.pathing).append(node)
-	get_objects_at(cell(node.map_pos)).append(node)
+	#get_objects_at(cell(node.map_pos)).append(node)
 	_objects.append(node)
 	
 
 func _remove_map_object(node: MapObject):
+	if node not in _objects:
+		return
 	get_objects_of(node.pathing).erase(node)
-	get_objects_at(cell(node.map_pos)).erase(node)
+	#get_objects_at(cell(node.map_pos)).erase(node)
 	_objects.erase(node)
 	
 	
@@ -189,12 +195,22 @@ func get_unit(cell: Vector2i) -> Unit:
 
 
 ## Returns all the units.
-func get_units(cells = null) -> Array[Unit]:
+func get_units(filter = null) -> Array[Unit]:
 	# this isn't pretty but i couldn't care less anymore
 	var re: Array[Unit]
-	for o in get_objects_of(Pathing.UNIT):
-		if not cells or Vector2(cell(o.map_pos)) in cells:
+	if not filter:
+		for o in get_objects_of(Pathing.UNIT):
 			re.append(o)
+	elif filter is PackedVector2Array:
+		for o in get_objects_of(Pathing.UNIT):
+			print("found unit ", o)
+			if Vector2(cell(o.map_pos)) in filter:
+				print("    adding ", o)
+				re.append(o)
+	elif filter is Callable:
+		for o in get_objects_of(Pathing.UNIT):
+			if filter.call(o):
+				re.append(o)
 	return re
 
 

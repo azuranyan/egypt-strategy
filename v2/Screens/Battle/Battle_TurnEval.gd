@@ -252,6 +252,9 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					push_move_action()
 					set_can_move(active_unit, false)
 					clear_active_unit()
+					
+					# This is a move (MOVE), so check for end turn
+					check_for_auto_end_turn()
 				else:
 					# if same unit, swap
 					set_active_unit(unit)
@@ -274,6 +277,9 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					clear_active_unit()
 					if can_attack(u):
 						set_active_unit(u)
+						
+					# This is a move (MOVE), so check for end turn
+					check_for_auto_end_turn()
 				else:
 					battle.play_error(true)
 			else:
@@ -320,6 +326,8 @@ func use_attack():
 		return
 	
 	# play error if no targets
+	print(get_attack_target_cells(active_unit, active_attack, cell))
+	print(battle.map.get_units(get_attack_target_cells(active_unit, active_attack, cell)))
 	var targets := battle.map.get_units(get_attack_target_cells(active_unit, active_attack, cell))
 	if targets.is_empty():
 		battle.play_error("No target.")
@@ -484,6 +492,20 @@ func refresh_active():
 ################################################################################
 ## Helper functions
 ################################################################################
+	
+## Checks for auto end turn
+func check_for_auto_end_turn():
+	if Globals.prefs.auto_end_turn:
+		var units := battle.map.get_units(func(o): return is_owned(o))
+		var should_end := true
+		
+		for u in units:
+			if can_move(u) or can_attack(u):
+				should_end = false
+				
+		if should_end:
+			end_turn.call_deferred()
+			
 	
 ## Makes the unit walk along a path.
 func walk_along(unit: Unit, path: PackedVector2Array):

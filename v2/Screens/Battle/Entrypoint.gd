@@ -52,7 +52,7 @@ func register_objects():
 			elif res is DoodadType:
 				Globals.doodad_type[res.resource_name] = res
 			elif res is StatusEffect:
-				Globals.status_effect[res.name] = res
+				Globals.status_effect[res.short_name] = res
 			elif res is UnitType:
 				Globals.unit_type[res.chara.name] = res
 			elif res is World:

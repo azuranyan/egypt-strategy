@@ -22,14 +22,17 @@ enum {
 @warning_ignore("shadowed_global_identifier")
 @export var range: int
 
+## Attack type.
+@export_enum("attack", "heal", "other") var type_tag: String = "attack"
+
+## Status effect this attack may inflict.
+@export_enum("None", "PSN", "STN", "VUL") var status_effect: String = "None"
+
 ## Cast animation string.
 @export var cast_animation: String = "attack"
 
 ## Target animation string.
 @export var target_animation: String = "hurt"
-
-## Status effect this attack may inflict.
-@export_enum("None", "PSN", "STN", "VUL") var status_effect: String = "None"
 
 ## If true, attack can only change direction and not freely repositioned.
 @export var target_melee: bool = false:

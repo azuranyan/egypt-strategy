@@ -24,102 +24,19 @@ signal cell_accepted(cell: Vector2i)
 ## Emitted when a unit is selected.
 signal unit_selected(unit: Unit)
 
+## Emitted when an attack sequence has started.
+signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+
+## Emitted when an attack sequence has ended.
+signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+
+signal _end_attack_sequence_requested()
 
 signal _end_battle_requested(result)
 
 signal _end_prep_requested(result)
 
 
-class Action:
-	var frame: int
-	var fun: Callable
-	var args: Array
-	
-var action_stack: Array[Action] = []
-var frames: int = 0
-
-#var current_map: Node2D
-
-@onready var viewport: Viewport = $SubViewportContainer/Viewport
-
-@onready var map: Map
-@onready var camera: Camera2D = $SubViewportContainer/Viewport/Camera2D
-@onready var terrain_overlay: TileMap = $SubViewportContainer/Viewport/TerrainOverlay
-@onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
-@onready var cursor: SpriteObject = $UI/Cursor
-
-
-func _ready():
-	set_debug_tile_visible(false)
-	
-	print("battle ready")
-	
-	# TODO not ideal
-	Globals.battle = self
-
-
-#func _unhandled_input(event: InputEvent):
-#	if map == null:
-#		return # can be triggered before map is loaded
-#
-#	# because we're using a camera that transforms the viewport
-#	# we need to make this event local to the map input!!!
-#	event = map.make_input_local(event)
-#	var uniform: Vector2
-##
-##	var p := viewport.get_mouse_position()
-##	if event is InputEventMouse:# and cursor.enable_mouse_control:
-##		uniform = map.world.screen_to_uniform(event.position, true)
-##
-##
-##		cursor.position = map.world.uniform_to_screen(uniform)
-##		cursor.get_node("Node2D/Label").text = "screen: %s\nworld: %s\nuniform: %s" % [event.position, map.world.screen_to_world(event.position), map.world.screen_to_uniform(event.position, true)]
-##
-##		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(uniform).get_name(), uniform.x, uniform.y]
-##
-#	if event is InputEventKey and event.pressed:
-#		uniform = map.world.screen_to_uniform(cursor.position, true)
-#		match event.keycode:
-#			KEY_W: 
-#				uniform.y += 1
-#			KEY_A: 
-#				uniform.x -= 1
-#			KEY_S: 
-#				uniform.y -= 1
-#			KEY_D: 
-#				uniform.x += 1
-#
-#		cursor.position = map.world.uniform_to_screen(uniform)
-#		var tile_name = "None"
-#		if map.is_inside_bounds(uniform) and map.get_object_at(uniform):
-#			tile_name = map.get_object_at(uniform).name
-#		$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [tile_name, uniform.x, uniform.y]
-#
-#	#if cursor.position != cursor._last_position:
-#	#	cursor.position_changed.emit(uniform)
-#	#	cursor._last_position = cursor.position
-				
-				
-func _process(_delta):
-	frames += 1
-	
-	
-func push_action(fun: Callable, args: Array):
-	var action := Action.new()
-	action.frame = frames
-	action.fun = fun
-	action.args = args
-	action_stack.push_back(action)
-
-
-func pop_action():
-	action_stack.pop_back()
-	
-	
-func undo():
-	pop_action()
-	action_stack[-1].fun.callv(action_stack[-1].args)
-	
 ## The result of the battle.
 enum Result {
 	## Attacker cannot fulfill battle requirements.
@@ -142,24 +59,51 @@ enum Result {
 }
 
 
-## The state of the battle.
-class Context:
-	var attacker: Empire
-	var defender: Empire
-	var territory: Territory
-	var result: Result
-	
-	var turns: int
-	var on_turn: Empire
+var action_stack: Array[Action] = []
+var frames: int = 0
 
-	var spawned_units: Array[Unit]
-	var warnings: PackedStringArray
-	
 var context: Context
 
 @onready var state_machine: StateMachine = $States
 @onready var character_list: CharacterList = $UI/CharacterList
 
+@onready var viewport: Viewport = $SubViewportContainer/Viewport
+@onready var map: Map
+@onready var camera: Camera2D = $SubViewportContainer/Viewport/Camera2D
+@onready var terrain_overlay: TileMap = $SubViewportContainer/Viewport/TerrainOverlay
+@onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
+@onready var cursor: SpriteObject = $UI/Cursor
+
+
+func _ready():
+	set_debug_tile_visible(false)
+	
+	print("battle ready")
+	
+	# TODO not ideal
+	Globals.battle = self
+	
+				
+func _process(_delta):
+	frames += 1
+	
+	
+func push_action(fun: Callable, args: Array):
+	var action := Action.new()
+	action.frame = frames
+	action.fun = fun
+	action.args = args
+	action_stack.push_back(action)
+
+
+func pop_action():
+	action_stack.pop_back()
+	
+	
+func undo():
+	pop_action()
+	action_stack[-1].fun.callv(action_stack[-1].args)
+	
 
 ## Starts a battle between two empires over a territory.
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick := false):
@@ -403,6 +347,7 @@ func kill_unit(unit: Unit):
 
 ## Inflict damage upon a unit.
 func damage_unit(unit: Unit, source: Variant, amount: int):
+	print("damage %s by %s: hp: %s -> %s" % [unit, amount, unit.hp, clampi(unit.hp - amount, 0, unit.maxhp)])
 	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
 	if unit.hp == 0:
 		kill_unit(unit)
@@ -506,3 +451,102 @@ func _on_done_prep_pressed():
 func _on_undo_button_pressed():
 	state_machine.transition_to("Idle")
 	_end_prep_requested.emit(1)
+
+
+func _on_turn_eval_attack_used(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	print("%s used %s" % [unit.name, attack.name], ": ", target, " ", targets, )
+	$States/TurnEval/UI.visible = false
+	
+	# play animations
+	for t in targets:
+		t.model.play_animation(attack.target_animation)
+	unit.model.play_animation(attack.cast_animation)
+	
+	# do attack sequence
+	attack_sequence_started.emit(unit, attack, target, targets)
+	await _end_attack_sequence_requested
+	attack_sequence_ended.emit(unit, attack, target, targets)
+	
+	# stop animations
+	for t in targets:
+		t.model.play_animation("idle")
+		t.model.stop_animation() # TODO wouldn't have to do this if there's a reset
+	unit.model.play_animation("idle")
+	unit.model.stop_animation()
+	
+	$States/TurnEval/UI.visible = true
+
+	# This is a move (ATTACK), so check for end turn
+	$States/TurnEval.check_for_auto_end_turn()
+
+
+## TODO Generic attack handler. Should make an actual attack handler that checks
+## if there are handlers, if not then this kicks in to avoid perma lock.
+func _on_attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	# play animations
+	match attack.cast_animation:
+		"attack", "buff", "heal":
+			# add animation TODO custom scripted animation
+			$AnimatedSprite2D.position = map.world.uniform_to_screen(target)
+			$AnimatedSprite2D.position.y -= 50
+			$AnimatedSprite2D.play("default")
+			
+			await $AnimatedSprite2D.animation_finished
+			$AnimatedSprite2D.stop()
+			
+	match attack.target_animation:
+		"hurt", "buff", "heal":
+			pass
+			
+	# emit signal
+	_end_attack_sequence_requested.emit()
+	
+	
+func _on_attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+	# TODO attack effects here
+	# damage_unit(flat, percentage)
+	# heal_unit(flat, percentage)
+	# give_effect(what, duration)
+	# set_stat(stat, amount)
+	# TODO create the characters and check the extents of the effect of attacks
+	for t in targets:
+		match attack.type_tag:
+			"attack":
+				damage_unit(t, unit, unit.dmg)
+			"heal":
+				damage_unit(t, unit, -unit.dmg)
+			"other":
+				pass
+	
+	# apply attack effect
+	if attack.status_effect != "None":
+		var duration_table := {"PSN": 2, "STN": 1, "VUL": 2}
+		var eff = Globals.status_effect[attack.status_effect]
+		var dur = duration_table[attack.status_effect]
+		
+		unit.add_status_effect(eff, dur)
+		
+		
+## An action.
+class Action:
+	var frame: int
+	var fun: Callable
+	var args: Array
+	
+
+## The state of the battle.
+class Context:
+	var attacker: Empire
+	var defender: Empire
+	var territory: Territory
+	var result: Result
+	
+	var turns: int
+	var on_turn: Empire
+
+	var spawned_units: Array[Unit]
+	var warnings: PackedStringArray
+	
+
+
+
