@@ -215,11 +215,13 @@ func register_empires_to_globals():
 			
 		
 	selection.shuffle()
-	var i := 0
+	# var i := 0
 	for t in Globals.territories.values():
 		if t.empire == null:
-			t.empire = _register_new_empire(selection[i], t)
-			i = (i + 1) % selection.size()
+			# t.empire = _register_new_empire(selection[i], t)
+			# i = (i + 1) % selection.size()
+			assert(not selection.is_empty(), 'not enough charas for territories')
+			t.empire = _register_new_empire(selection.pop_back(), t)
 
 
 func _register_new_empire(leader: Chara, home_territory: Territory) -> Empire:

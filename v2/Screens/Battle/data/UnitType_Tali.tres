@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://dkcjussxvqer"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_8xdc1"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_lyoxn"]
+[ext_resource type="Resource" uid="uid://t3800uynfq65" path="res://Screens/Battle/data/Chara_Tali.tres" id="2_cipkv"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_ou715"]
+
+[sub_resource type="Resource" id="Resource_y7qqb"]
+script = ExtResource("1_lyoxn")
+name = ""
+description = ""
+range = 2
+type_tag = "attack"
+status_effect = "None"
+cast_animation = "attack"
+target_animation = "hurt"
+target_melee = false
+target_unit = 1
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+
+[sub_resource type="Resource" id="Resource_odwdm"]
+script = ExtResource("1_lyoxn")
+name = ""
+description = ""
+range = 0
+type_tag = "attack"
+status_effect = "None"
+cast_animation = "attack"
+target_animation = "hurt"
+target_melee = true
+target_unit = 4
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+
+[resource]
+script = ExtResource("1_8xdc1")
+chara = ExtResource("2_cipkv")
+sprite_frames = ExtResource("2_ou715")
+name = "Tali"
+behavior = 0
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+stat_hp = 3
+stat_mov = 2
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 1
+}
+basic_attack = SubResource("Resource_y7qqb")
+special_attack = SubResource("Resource_odwdm")

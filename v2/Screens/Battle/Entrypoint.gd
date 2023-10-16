@@ -71,5 +71,6 @@ func _on_button_pressed():
 	var attacker: Empire = Globals.empires[label_attacker.get_item_text(label_attacker.get_selectable_item())]
 	var defender: Empire = Globals.empires[label_defender.get_item_text(label_defender.get_selectable_item())]
 	var territory: Territory = Globals.territories[label_territory.get_item_text(label_territory.get_selectable_item())]
+	print(attacker, defender, territory)
 	Globals.battle.start_battle(attacker, defender, territory)
 #	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])

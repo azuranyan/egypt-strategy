@@ -30,6 +30,7 @@ signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, tar
 ## Emitted when an attack sequence has ended.
 signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
 
+
 signal _end_attack_sequence_requested()
 
 signal _end_battle_requested(result)
@@ -39,11 +40,14 @@ signal _end_prep_requested(result)
 
 ## The result of the battle.
 enum Result {
+	## Attacker cancels before starting the fight.
+	Cancelled=-2,
+	
 	## Attacker cannot fulfill battle requirements.
 	AttackerRequirementsError=-1,
 	
-	## Attacker cancels before starting the fight.
-	Cancelled=0,
+	## Invalid.
+	None=0,
 	
 	## Attacker wins.
 	AttackerVictory,
@@ -115,6 +119,9 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 	context.result = Battle.Result.Cancelled
 	context.turns = 0
 	context.on_turn = context.attacker
+	context.controller[attacker] = player_action_controller if attacker.is_player_owned() else ai_action_controller
+	context.controller[defender] = player_action_controller if defender.is_player_owned() else ai_action_controller
+	context.should_end = false
 	
 	if fulfills_battle_requirements(attacker, territory):
 		# do battle
@@ -219,7 +226,7 @@ func _prep_phase(prep_queue: Array) -> int:
 	while not prep_queue.is_empty():
 		var prep: Empire = prep_queue.pop_front()
 		context.on_turn = prep
-		print(prep.leader.name, " is preparing units")
+		print("%s (%s) is preparing units" % [prep.leader.name, prep])
 		if prep.is_player_owned():
 			state_machine.transition_to("Prep", {prep_queue=[prep], battle=self})
 		else:
@@ -227,7 +234,9 @@ func _prep_phase(prep_queue: Array) -> int:
 			
 			# fill spawn points
 			for spawn_point in map.get_spawn_points("ai"):
+				print('  checking spawn point ', spawn_point)
 				if spawnable.is_empty():
+					print('  no more spawnables, stopping')
 					break
 					
 				var nem := ""
@@ -248,6 +257,7 @@ func _prep_phase(prep_queue: Array) -> int:
 				
 				# spawn unit
 				var unit := spawn_unit(nem, prep, "", spawn_point)
+				print('  spawning %s at %s' % [nem, spawn_point])
 				
 				# make it face towards the closest spawn point
 				var p_spawn := map.get_spawn_points("player")
@@ -271,7 +281,8 @@ func _check_prep_start() -> bool:
 
 
 func _battle_phase():
-	state_machine.transition_to("TurnEval", {battle=self})
+	#state_machine.transition_to("TurnEval", {battle=self})
+	_do_battle()
 		
 	
 func get_viewport_size() -> Vector2i:
@@ -297,6 +308,109 @@ func play_error(message):
 	
 ################################################################################
 
+const action_limit := 10
+var _should_end_turn: bool
+
+signal turn_started
+signal turn_ended
+signal action_started
+signal action_ended
+
+@onready var ai_action_controller := $AIActionController as BattleActionController
+@onready var player_action_controller := $PlayerActionController as BattleActionController
+
+
+func _do_battle():
+	context.controller[context.attacker].initialize(self, context.attacker)
+	context.controller[context.defender].initialize(self, context.defender)
+	
+	# loop until battle finishes
+	while true:
+		# allow both empires to take their turns
+		for empire in [context.attacker, context.defender]:
+			# things can happen before doing any actions so make sure to check first
+			if _evaluate_win_loss_condition():
+				break
+			
+			# set the empire as the one to take their turn
+			context.on_turn = empire
+			_should_end_turn = false
+			
+			# do turn (note that the attacker always attacks first)
+			context.controller[context.on_turn].turn_start()
+			turn_started.emit()
+			await _do_turn()
+			turn_ended.emit()
+			context.controller[context.on_turn].turn_end()
+		
+		# increment number of turns
+		context.turns += 1
+		
+	
+
+func _do_turn():
+	var num_actions := 0
+	while not _should_end_turn:
+		# things can happen before doing any actions so make sure to check first
+		if _evaluate_win_loss_condition():
+			return
+		
+		# do action
+		context.controller[context.on_turn].action_start()
+		action_started.emit()
+		await context.controller[context.on_turn].do_action()
+		action_ended.emit()
+		context.controller[context.on_turn].action_end()
+		
+		# action limit just in case
+		num_actions += 1
+		if num_actions >= action_limit:
+			push_warning("too many actions taken, maybe no end_turn()? force ending turn")
+			end_turn()
+			
+		# auto end turn
+		if Globals.prefs.auto_end_turn:
+			var units := map.get_units().filter(func(x): return x.empire == context.on_turn)
+			var should_end := true
+			
+			for u in units:
+				if can_move(u) or can_attack(u):
+					should_end = false
+					break
+					
+			if should_end:
+				end_turn()
+		
+		
+## Sends the signal to end the current turn.
+func end_turn():
+	_should_end_turn = true
+	
+
+func _evaluate_win_loss_condition() -> bool:
+	# once this evaluates to true, we won't reevaluate again on subsequent calls
+	if not context.should_end:
+		context.result = Result.None
+		context.should_end = false
+	return context.should_end
+		
+		
+func can_move(unit: Unit) -> bool:
+	return unit.get_meta("Battle_can_move", false)
+
+
+func can_attack(unit: Unit) -> bool:
+	return unit.get_meta("Battle_can_attack", false)
+
+
+func set_can_move(unit: Unit, value: bool):
+	unit.set_meta("Battle_can_move", value)
+	
+	
+func set_can_attack(unit: Unit, value: bool):
+	unit.set_meta("Battle_can_attack", value)
+	
+		
 ## Spawns a unit of type tag with name at pos, facing x.
 func spawn_unit(tag: String, empire: Empire, name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.West) -> Unit:
 	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
@@ -428,7 +542,6 @@ func _on_cursor_position_changed(pos: Vector2):
 	$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(pos).get_name(), pos.x, pos.y]
 
 
-
 # TODO maybe this should be on UI code?
 func _on_battle_started(attacker, defender, territory):
 	$UI.visible = true
@@ -523,15 +636,15 @@ func _on_attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, tar
 		var dur = duration_table[attack.status_effect]
 		
 		unit.add_status_effect(eff, dur)
-		
-		
+	
+	
 ## An action.
 class Action:
 	var frame: int
 	var fun: Callable
 	var args: Array
 	
-
+	
 ## The state of the battle.
 class Context:
 	var attacker: Empire
@@ -541,6 +654,8 @@ class Context:
 	
 	var turns: int
 	var on_turn: Empire
+	var controller := {}
+	var should_end: bool
 
 	var spawned_units: Array[Unit]
 	var warnings: PackedStringArray
@@ -548,3 +663,19 @@ class Context:
 
 
 
+
+
+func _on_turn_started():
+	set_process_input(false)
+	if context.on_turn.is_player_owned():
+		$UI/AnimationPlayer.play("turn_banner.player")
+		cursor.visible = true
+	else:
+		$UI/AnimationPlayer.play("turn_banner.enemy")
+		cursor.visible = false
+	await $UI/AnimationPlayer.animation_finished
+	set_process_input(true)
+
+
+func _on_turn_ended():
+	pass # Replace with function body.

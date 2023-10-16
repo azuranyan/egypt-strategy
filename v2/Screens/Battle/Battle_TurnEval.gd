@@ -4,6 +4,8 @@ extends State
 signal attack_used(unit, attack, cell, targets)
 signal battle_ended(result)
 
+signal _end_action_requested()
+
 
 const MAP_MARGIN := 3
 
@@ -37,6 +39,7 @@ var change_facing: Unit
 ## Undo stack of unit move action.
 var move_stack: Array[UnitMoveAction]
 
+var on_action: Empire
 
 @onready var drivers := $Drivers
 @onready var ui := $UI
@@ -194,6 +197,32 @@ func remove_hooks():
 ## Interaction functions
 ################################################################################
 
+
+func do_battle():
+	# while not should_end:
+	#	take_turn
+	pass
+	
+
+func do_turn():
+	# do_action
+	pass
+	
+
+func do_action():
+	on_action = battle.context.on_turn
+	# move action
+	# attack action
+	# end turn
+	# 
+	pass
+
+
+func end_action():
+	if on_action:
+		on_action = null
+		_end_action_requested.emit()
+
 	
 func select_cell(cell: Vector2i):
 	cell.x = clampi(cell.x, -MAP_MARGIN, battle.map.world.map_size.x + MAP_MARGIN - 1)
@@ -327,7 +356,10 @@ func use_attack():
 		return
 	
 	# play error if no targets
-	var targets := battle.map.get_units(get_attack_target_cells(active_unit, active_attack, cell))
+	var target_cells := get_attack_target_cells(active_unit, active_attack, cell)
+	var targets := battle.map.get_units().filter(func(x): # don't look
+		return Vector2(battle.map.cell(x.map_pos)) in target_cells
+		)
 	if targets.is_empty():
 		battle.play_error("No target.")
 		return
@@ -558,7 +590,7 @@ func refresh_active():
 ## Checks for auto end turn
 func check_for_auto_end_turn():
 	if Globals.prefs.auto_end_turn:
-		var units := battle.map.get_units(func(o): return is_owned(o))
+		var units := battle.map.get_units().filter(func(o): return is_owned(o))
 		var should_end := true
 		
 		for u in units:
@@ -746,6 +778,5 @@ class UnitMoveAction:
 	var facing: float
 	var can_move: bool
 	var can_attack: bool
-	
 	
 

@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://cyr3rqlljbdvd"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_d6gwo"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_mjx86"]
+[ext_resource type="Resource" uid="uid://d0230ikbham6e" path="res://Screens/Battle/data/Chara_Sitri.tres" id="2_hs11p"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_jvpv7"]
+
+[sub_resource type="Resource" id="Resource_h4fym"]
+script = ExtResource("1_mjx86")
+name = ""
+description = ""
+range = 1
+type_tag = "attack"
+status_effect = "PSN"
+cast_animation = "attack"
+target_animation = "hurt"
+target_melee = true
+target_unit = 1
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+
+[resource]
+script = ExtResource("1_d6gwo")
+chara = ExtResource("2_hs11p")
+sprite_frames = ExtResource("2_jvpv7")
+name = "Sitri"
+behavior = 0
+avatar = "Dark Serpent"
+title = "Vainglorious Viper Goddess"
+map_color = Color(0.470588, 0.317647, 0.662745, 1)
+stat_hp = 9
+stat_mov = 3
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0
+}
+basic_attack = SubResource("Resource_h4fym")

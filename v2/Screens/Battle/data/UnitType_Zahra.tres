@@ -9,7 +9,7 @@
 script = ExtResource("1_mxg5a")
 name = "Cleave"
 description = "Zahra's basic attack."
-range = 3
+range = 1
 type_tag = "attack"
 status_effect = "None"
 cast_animation = "attack"
@@ -41,7 +41,7 @@ avatar = "Avatar of Sobek"
 title = "Cruel Crocodile God"
 map_color = Color(0, 0.501961, 0.501961, 1)
 stat_hp = 4
-stat_mov = 14
+stat_mov = 2
 stat_dmg = 2
 stat_growth_1 = {
 "dmg": 0,

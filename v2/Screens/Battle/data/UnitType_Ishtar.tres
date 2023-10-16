@@ -14,8 +14,8 @@ type_tag = "attack"
 status_effect = "STN"
 cast_animation = "attack"
 target_animation = "hurt"
-target_melee = true
-target_unit = 1
+target_melee = false
+target_unit = 3
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [sub_resource type="Resource" id="Resource_7evmx"]

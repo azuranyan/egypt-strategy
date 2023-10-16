@@ -195,20 +195,10 @@ func get_unit(cell: Vector2i) -> Unit:
 
 
 ## Returns all the units.
-func get_units(filter = null) -> Array[Unit]:
-	# this isn't pretty but i couldn't care less anymore
+func get_units() -> Array[Unit]:
+	var objs := get_objects_of(Pathing.UNIT)
 	var re: Array[Unit]
-	if not filter:
-		for o in get_objects_of(Pathing.UNIT):
-			re.append(o)
-	elif filter is PackedVector2Array:
-		for o in get_objects_of(Pathing.UNIT):
-			if Vector2(cell(o.map_pos)) in filter:
-				re.append(o)
-	elif filter is Callable:
-		for o in get_objects_of(Pathing.UNIT):
-			if filter.call(o):
-				re.append(o)
+	re.append_array(objs)
 	return re
 
 

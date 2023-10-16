@@ -18,3 +18,4 @@
 - do NOT run path follow scripts in tools, otherwise you're stuck with it always changing the values
 	everytime you reload and rerun, unless you manually reset.
 - objects that has functionality in _ready HAVE to be added before accessing stuff.
+- camera2D location in scene tree is important cos event and other viewport transitions are
