@@ -197,32 +197,6 @@ func remove_hooks():
 ## Interaction functions
 ################################################################################
 
-
-func do_battle():
-	# while not should_end:
-	#	take_turn
-	pass
-	
-
-func do_turn():
-	# do_action
-	pass
-	
-
-func do_action():
-	on_action = battle.context.on_turn
-	# move action
-	# attack action
-	# end turn
-	# 
-	pass
-
-
-func end_action():
-	if on_action:
-		on_action = null
-		_end_action_requested.emit()
-
 	
 func select_cell(cell: Vector2i):
 	cell.x = clampi(cell.x, -MAP_MARGIN, battle.map.world.map_size.x + MAP_MARGIN - 1)

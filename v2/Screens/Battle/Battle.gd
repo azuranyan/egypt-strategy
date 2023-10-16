@@ -63,6 +63,14 @@ enum Result {
 }
 
 
+enum {
+	TERRAIN_WHITE,
+	TERRAIN_BLUE,
+	TERRAIN_GREEN,
+	TERRAIN_RED,
+}
+
+
 var action_stack: Array[Action] = []
 var frames: int = 0
 
@@ -226,7 +234,7 @@ func _prep_phase(prep_queue: Array) -> int:
 	while not prep_queue.is_empty():
 		var prep: Empire = prep_queue.pop_front()
 		context.on_turn = prep
-		print("%s (%s) is preparing units" % [prep.leader.name, prep])
+		print("%s %s is preparing units" % [prep.leader.name, prep])
 		if prep.is_player_owned():
 			state_machine.transition_to("Prep", {prep_queue=[prep], battle=self})
 		else:
@@ -311,6 +319,8 @@ func play_error(message):
 const action_limit := 10
 var _should_end_turn: bool
 
+signal turn_cycle_started
+signal turn_cycle_ended
 signal turn_started
 signal turn_ended
 signal action_started
@@ -321,11 +331,19 @@ signal action_ended
 
 
 func _do_battle():
+	$UI/Battle.visible = true # TODO signalize all ui changes
 	context.controller[context.attacker].initialize(self, context.attacker)
 	context.controller[context.defender].initialize(self, context.defender)
 	
 	# loop until battle finishes
 	while true:
+		# reset move and attack flags
+		for u in map.get_units():
+			set_can_move(u, true)
+			set_can_attack(u, true)
+			
+		turn_cycle_started.emit()
+				
 		# allow both empires to take their turns
 		for empire in [context.attacker, context.defender]:
 			# things can happen before doing any actions so make sure to check first
@@ -343,8 +361,11 @@ func _do_battle():
 			turn_ended.emit()
 			context.controller[context.on_turn].turn_end()
 		
+		turn_cycle_ended.emit()
+		
 		# increment number of turns
 		context.turns += 1
+	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
 		
 	
 
@@ -395,6 +416,8 @@ func _evaluate_win_loss_condition() -> bool:
 	return context.should_end
 		
 		
+################################################################################
+	
 func can_move(unit: Unit) -> bool:
 	return unit.get_meta("Battle_can_move", false)
 
@@ -409,6 +432,91 @@ func set_can_move(unit: Unit, value: bool):
 	
 func set_can_attack(unit: Unit, value: bool):
 	unit.set_meta("Battle_can_attack", value)
+	
+	
+func is_owned(unit: Unit) -> bool:
+	return unit.empire == context.on_turn
+	
+	
+## Returns true if pos is pathable.
+func is_pathable(unit: Unit, cell: Vector2i) -> bool:
+	for obj in map.get_objects_at(cell):
+		if not unit.can_path(obj):
+			return false
+	return true
+	
+
+## Returns true if this unit can be placed on pos.
+func is_placeable(unit: Unit, cell: Vector2i) -> bool:
+	if map.cell(unit.map_pos) == cell:
+		return true
+	for obj in map.get_objects_at(cell):
+		if not unit.can_place(obj):
+			return false
+	return true
+
+
+## Selects cell for attack target.
+func select_attack_target(unit: Unit, attack: Attack, target: Variant):
+	if attack.target_melee:
+		match typeof(target):
+			TYPE_VECTOR2, TYPE_VECTOR2I:
+				unit.face_towards(target)
+			TYPE_FLOAT, TYPE_INT:
+				unit.facing = target
+		if attack.range > 0:
+			select_cell(unit.map_pos + Unit.Directions[unit.get_heading()] * attack.range)
+		else:
+			select_cell(unit.map_pos)
+	else:
+		select_cell(target)
+
+
+## Returns a list of walkable cells.
+func get_walkable_cells(unit: Unit) -> PackedVector2Array:
+	var cond := func(p): return is_pathable(unit, p)
+	var bounds := Rect2i(Vector2i.ZERO, map.world.map_size)
+	return Globals.flood_fill(map.cell(unit.map_pos), unit.mov, bounds, cond)
+	#return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size),  func(p): return is_pathable(unit, p))
+	
+
+## Returns a list of targetable cells.
+func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
+	return Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	
+	
+## Draws target overlay. target_rotation is ignored if melee.
+func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
+	terrain_overlay.clear()
+	
+	var cells := Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	
+	if not attack.target_melee:
+		draw_terrain_overlay(cells, TERRAIN_RED, true)
+	
+	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
+	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
+
+
+## Draws terrain overlay.
+func draw_terrain_overlay(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear := false):
+	if clear:
+		terrain_overlay.clear()
+	for cell in cells:
+		terrain_overlay.set_cell(0, cell, 0, Vector2i(idx, 0), 0)
+		
+		
+## Sets the visibility of ui elements.
+func set_ui_visible(chara_info: Variant, attacks: Variant, undo_end: Variant):
+	if chara_info != null:
+		$UI/Battle/Name.visible = chara_info
+		$UI/Battle/Portrait.visible = chara_info
+	if attacks != null:
+		$UI/Battle/AttackButton.visible = attacks
+		$UI/Battle/SpecialButton.visible = attacks
+	if undo_end != null:
+		$UI/Battle/UndoButton.visible = undo_end
+		$UI/Battle/EndTurnButton.visible = undo_end
 	
 		
 ## Spawns a unit of type tag with name at pos, facing x.
@@ -465,20 +573,70 @@ func damage_unit(unit: Unit, source: Variant, amount: int):
 	if unit.hp == 0:
 		kill_unit(unit)
 
-
-## Selects cell for attack target.
-func select_attack_target(user: Unit, attack: Attack, target: Variant):
-	if attack.target_melee:
-		match typeof(target):
-			TYPE_VECTOR2, TYPE_VECTOR2I:
-				user.face_towards(target)
-			TYPE_FLOAT, TYPE_INT:
-				user.facing = target
-		select_cell(user.map_pos + Unit.Directions[user.get_heading()] * attack.range)
-	else:
-		select_cell(target)
+	
+## Walks the unit.
+func walk_unit(unit: Unit, cell: Vector2i):
+	# pre walk set-up
+	set_camera_follow(unit)
+	if Globals.prefs.camera_follow_unit_move:
+		camera.drag_horizontal_enabled = false
+		camera.drag_vertical_enabled = false
+	state_machine.set_process_unhandled_input(false)
+	
+	$UI.visible = false
+	
+	# walk
+	var start := map.cell(unit.map_pos)
+	var end := cell
+	var path := unit_path._pathfinder.calculate_point_path(start, cell)
+	await walk_along(unit, path)
+		
+	$UI.visible = true
+	
+	# post walk set-up
+	state_machine.set_process_unhandled_input(true)
+	camera.drag_horizontal_enabled = true
+	camera.drag_vertical_enabled = true
+	set_camera_follow(cursor)
+	
+	
+## Makes the unit stop walking.
+func stop_walking(unit: Unit):
+	unit.get_meta("Battle_driver").stop_walking()
 	
 
+## Returns true if the unit is walking.
+func is_walking(unit: Unit):
+	return unit.has_meta("Battle_driver")
+	
+	
+## Makes the unit walk along a path.
+func walk_along(unit: Unit, path: PackedVector2Array):
+	if is_walking(unit):
+		stop_walking(unit)
+		
+	match path.size():
+		0, 1:
+			pass
+		_:
+			# initialize driver
+			var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
+			driver.unit = unit
+			unit.set_meta("Battle_driver", driver)
+			$Drivers.add_child(driver)
+			
+			var old_pos := unit.map_pos
+			var new_pos := path[-1]
+			
+			# run and wait for driver
+			await driver.walk_along(path)
+			
+			# cleanup
+			$Drivers.remove_child(driver)
+			unit.remove_meta("Battle_driver")
+			driver.queue_free()
+			
+			
 ## Selects the cell.
 func select_cell(cell: Vector2i):
 	var world_margin := Vector2i(5, 5)
@@ -537,9 +695,6 @@ func set_camera_follow(obj: MapObject):
 		camera.set_meta("battle_follow_func", follow_func)
 		camera.set_meta("battle_target", obj)
 
-
-func _on_cursor_position_changed(pos: Vector2):
-	$UI/Label.text = "Tile: %s\nx = %s\ny = %s" % [map.get_tile(pos).get_name(), pos.x, pos.y]
 
 
 # TODO maybe this should be on UI code?
@@ -661,12 +816,10 @@ class Context:
 	var warnings: PackedStringArray
 	
 
-
-
-
-
 func _on_turn_started():
 	set_process_input(false)
+	set_camera_follow(cursor)
+	$UI/Battle/OnTurn.text = context.on_turn.leader.name
 	if context.on_turn.is_player_owned():
 		$UI/AnimationPlayer.play("turn_banner.player")
 		cursor.visible = true
@@ -679,3 +832,7 @@ func _on_turn_started():
 
 func _on_turn_ended():
 	pass # Replace with function body.
+
+
+func _on_turn_cycle_started():
+	$UI/Battle/TurnNumber.text = str(context.turns)

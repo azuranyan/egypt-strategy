@@ -27,11 +27,11 @@ keycode = 69
 [sub_resource type="Shortcut" id="Shortcut_j08fw"]
 events = [SubResource("InputEventKey_4ao6f")]
 
-[sub_resource type="InputEventKey" id="InputEventKey_4apw1"]
+[sub_resource type="InputEventKey" id="InputEventKey_tovbx"]
 device = -1
 keycode = 4194305
 
-[sub_resource type="InputEventMouseButton" id="InputEventMouseButton_p1kbt"]
+[sub_resource type="InputEventMouseButton" id="InputEventMouseButton_sfvxc"]
 button_mask = 2
 position = Vector2(308, 19)
 global_position = Vector2(312, 62)
@@ -39,7 +39,7 @@ button_index = 2
 pressed = true
 
 [sub_resource type="Shortcut" id="Shortcut_w7bme"]
-events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
+events = [SubResource("InputEventKey_tovbx"), SubResource("InputEventMouseButton_sfvxc")]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
 atlas = ExtResource("7_066qq")
@@ -153,6 +153,7 @@ script = ExtResource("1_qf6je")
 [node name="Drivers" type="Node" parent="."]
 
 [node name="UI" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="Name" type="Control" parent="UI"]
 layout_mode = 3

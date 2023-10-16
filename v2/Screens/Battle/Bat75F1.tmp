@@ -538,6 +538,7 @@ offset_right = 1877.0
 offset_bottom = 687.0
 
 [node name="Label" type="Label" parent="UI"]
+visible = false
 offset_left = 146.0
 offset_top = 738.0
 offset_right = 186.0
@@ -619,7 +620,6 @@ text = "Error"
 label_settings = SubResource("LabelSettings_vxtxp")
 
 [node name="Battle" type="CanvasLayer" parent="UI"]
-visible = false
 
 [node name="OnTurn" type="Label" parent="UI/Battle"]
 offset_left = 58.0

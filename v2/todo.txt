@@ -30,6 +30,7 @@ should behavior really need to be on unittype
 mark units with something when they have taken turn (E) in disgaea
 if enemy turn, hide cursor
 on your turn show cursor and pan to cursor
+hearts ui battle
 
 $$$$$$$$$$$$$$$
 
@@ -50,3 +51,8 @@ turn end
 enemy ai controls
 prep keyboard controls
 rotate target hotkey
+
+fix battle
+signalize ui
+update portrait with hearts
+implement attack
