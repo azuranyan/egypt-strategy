@@ -1,4 +1,4 @@
-[gd_scene load_steps=77 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=75 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -16,8 +16,6 @@
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="9_j1ncc"]
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="14_ca16r"]
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="15_41khm"]
-[ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="16_yc0nr"]
-[ext_resource type="Texture2D" uid="uid://cc4r8g2175acd" path="res://Screens/Battle/hp_empty.png" id="17_iu53r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
 atlas = ExtResource("7_0u6tm")
@@ -979,24 +977,6 @@ offset_top = 31.0
 offset_right = 33.0
 offset_bottom = 141.0
 
-[node name="TextureRect" type="TextureRect" parent="UI/Battle/Portrait/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-texture = ExtResource("16_yc0nr")
-expand_mode = 3
-
-[node name="TextureRect2" type="TextureRect" parent="UI/Battle/Portrait/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-texture = ExtResource("16_yc0nr")
-expand_mode = 3
-
-[node name="TextureRect3" type="TextureRect" parent="UI/Battle/Portrait/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-texture = ExtResource("17_iu53r")
-expand_mode = 3
-
 [node name="AttackButton" type="Button" parent="UI/Battle"]
 custom_minimum_size = Vector2(130, 130)
 offset_left = 290.0
@@ -1043,13 +1023,21 @@ theme = ExtResource("8_b0ewm")
 text = "End Turn
 "
 
+[connection signal="attack_sequence_ended" from="." to="." method="_on_attack_sequence_ended"]
 [connection signal="attack_sequence_ended" from="." to="PlayerActionController" method="_on_battle_attack_sequence_ended"]
+[connection signal="attack_sequence_started" from="." to="." method="_on_attack_sequence_started"]
 [connection signal="attack_sequence_started" from="." to="PlayerActionController" method="_on_battle_attack_sequence_started"]
 [connection signal="battle_ended" from="." to="." method="_on_battle_ended"]
 [connection signal="battle_started" from="." to="." method="_on_battle_started"]
+[connection signal="cell_accepted" from="." to="PlayerActionController" method="_on_battle_cell_accepted"]
+[connection signal="cell_selected" from="." to="PlayerActionController" method="_on_battle_cell_selected"]
 [connection signal="turn_cycle_started" from="." to="." method="_on_turn_cycle_started"]
 [connection signal="turn_ended" from="." to="." method="_on_turn_ended"]
 [connection signal="turn_started" from="." to="." method="_on_turn_started"]
+[connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
+[connection signal="walking_finished" from="." to="PlayerActionController" method="_on_battle_walking_finished"]
+[connection signal="walking_started" from="." to="." method="_on_walking_started"]
+[connection signal="walking_started" from="." to="PlayerActionController" method="_on_battle_walking_started"]
 [connection signal="attack_used" from="States/TurnEval" to="." method="_on_turn_eval_attack_used"]
 [connection signal="unit_cancelled" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_cancelled"]
 [connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]

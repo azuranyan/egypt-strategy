@@ -439,7 +439,7 @@ func walk_unit(unit: Unit, cell: Vector2i):
 	# walk
 	var start := battle.map.cell(unit.map_pos)
 	var end := cell
-	var path := battle.unit_path._pathfinder.calculate_point_path(start, cell)
+	var path := battle.unit_path._pathfinder.calculate_point_path(start, end)
 	await walk_along(unit, path)
 		
 	$UI.visible = true

@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dt38ppobyaidx"]
+
+[ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="1_mfcb2"]
+
+[node name="Heart" type="TextureRect"]
+custom_minimum_size = Vector2(0, 20)
+texture = ExtResource("1_mfcb2")
+expand_mode = 3

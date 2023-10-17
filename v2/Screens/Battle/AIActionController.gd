@@ -1,19 +1,20 @@
 extends BattleActionController
 
+var battle: Battle
 
 ## Initializes the controller. Called once every battle start.
 func initialize(_battle: Battle, _empire: Empire) -> void:
-	pass
+	battle = _battle
 	
 	
 ## Called when turn starts.
 func turn_start() -> void:
-	pass
+	battle.cursor.visible = false
 	
 
 ## Called when turn ends.
 func turn_end() -> void:
-	pass
+	battle.cursor.visible = true
 
 	
 ## Called when action is started.

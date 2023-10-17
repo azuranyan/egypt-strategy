@@ -1,7 +1,6 @@
 ## to fix
 overworld ui elements not hidden when going to battle
 ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
-where camera is parented is important
 special should only be available at bond 3
 
 ## to implement
@@ -29,8 +28,7 @@ ui elements need to be canvaslayer to bypass camera and viewport transforms
 should behavior really need to be on unittype
 mark units with something when they have taken turn (E) in disgaea
 if enemy turn, hide cursor
-on your turn show cursor and pan to cursor
-hearts ui battle
+undoing attack causes it to show the wrong movement tiles
 
 $$$$$$$$$$$$$$$
 
@@ -52,7 +50,5 @@ enemy ai controls
 prep keyboard controls
 rotate target hotkey
 
-fix battle
 signalize ui
-update portrait with hearts
 implement attack

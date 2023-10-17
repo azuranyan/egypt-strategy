@@ -147,8 +147,6 @@ var status_effects: Array[AppliedStatusEffect] = []
 
 # Private properties
 
-var _old_pos: Vector2
-
 @onready var model := $UnitModel as UnitModel
 @onready var shadow := $Shadow as Sprite2D
 @onready var animation := $AnimationPlayer as AnimationPlayer
@@ -189,21 +187,6 @@ func _ready():
 	# because curve is a resource that get saved with the scene. this
 	# is why we're creating a new curve every _ready.
 #	curve = Curve2D.new()
-
-
-#func _process(delta: float):
-#	if not walking:
-#		return # because fuckface still processes even when set_process(false)
-#
-#	_old_pos = path_follow.position
-#
-#	path_follow.progress += walk_speed * delta
-#
-#	var v := world.screen_to_world(path_follow.position) - world.screen_to_world(_old_pos)
-#	facing = atan2(v.y, v.x)
-#
-#	if path_follow.progress_ratio >= 1:
-#		walking_finished.emit()
 
 
 ################################################################################

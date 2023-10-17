@@ -31,8 +31,8 @@ var move_stack: Array[UnitMoveAction]
 
 
 ## Initializes the controller. Called once every battle start.
-func initialize(battle: Battle, _empire: Empire) -> void:
-	self.battle = battle
+func initialize(_battle: Battle, _empire: Empire) -> void:
+	self.battle = _battle
 	
 
 ## Called when action has to be executed.
@@ -79,7 +79,7 @@ func _unhandled_input(event):
 		
 		# accept
 		if (event is InputEventMouseButton and event.button_index == 1 or event is InputEventKey and (event.keycode == KEY_KP_1 or event.keycode == KEY_ENTER)) and event.pressed:
-			accept_cell()
+			battle.accept_cell()
 			return
 		
 		# cancel
@@ -104,17 +104,17 @@ func _unhandled_input(event):
 			
 		else:
 			if event is InputEventMouseMotion:
-				select_cell(cell)
+				battle.select_cell(cell)
 			elif event is InputEventKey and event.pressed:
 				match event.keycode:
 					KEY_W:
-						select_cell(cur + Vector2i(0, -1))
+						battle.select_cell(cur + Vector2i(0, -1))
 					KEY_S:
-						select_cell(cur + Vector2i(0, +1))
+						battle.select_cell(cur + Vector2i(0, +1))
 					KEY_A:
-						select_cell(cur + Vector2i(-1, 0))
+						battle.select_cell(cur + Vector2i(-1, 0))
 					KEY_D:
-						select_cell(cur + Vector2i(+1, 0))
+						battle.select_cell(cur + Vector2i(+1, 0))
 			
 		return
 	
@@ -129,15 +129,15 @@ func _unhandled_input(event):
 				if change_facing.map_pos.distance_to(target) > 0.6:
 					change_facing.face_towards(target)
 		else:
-			select_cell(cell)
+			battle.select_cell(cell)
 		
 	# Mouse button input
 	elif event is InputEventMouseButton:
 		if event.pressed:
 			match event.button_index:
 				1:
-					select_cell(cell)
-					accept_cell()
+					battle.select_cell(cell)
+					battle.accept_cell()
 				2:
 					cancel()
 				3:
@@ -172,16 +172,16 @@ func _unhandled_input(event):
 				battle.camera.drag_vertical_enabled = false
 				match event.keycode:
 					KEY_W:
-						select_cell(cur + Vector2i(0, -1))
+						battle.select_cell(cur + Vector2i(0, -1))
 					KEY_S:
-						select_cell(cur + Vector2i(0, +1))
+						battle.select_cell(cur + Vector2i(0, +1))
 					KEY_A:
-						select_cell(cur + Vector2i(-1, 0))
+						battle.select_cell(cur + Vector2i(-1, 0))
 					KEY_D:
-						select_cell(cur + Vector2i(+1, 0))
+						battle.select_cell(cur + Vector2i(+1, 0))
 					KEY_KP_1, KEY_ENTER:
-						select_cell(cur)
-						accept_cell()
+						battle.select_cell(cur)
+						battle.accept_cell()
 					KEY_KP_3, KEY_ESCAPE:
 						cancel()
 
@@ -311,10 +311,11 @@ func select_cell(cell: Vector2i):
 	var show_undo_end: bool = battle.context.on_turn == Globals.empires["Lysandra"]
 	
 	if show_portrait:
-		var punit := unit if unit else active_unit
+		battle.update_portrait(unit if unit else active_unit)
+		#var punit := unit if unit else active_unit
 		# TODO select cell? set portrait whatever? update portrait? include hearts?
-		$"../UI/Battle/Name/Label".text = punit.unit_type.name
-		$"../UI/Battle/Portrait/Control/TextureRect".texture = punit.unit_type.chara.portrait
+		#$"../UI/Battle/Name/Label".text = punit.unit_type.name
+		#$"../UI/Battle/Portrait/Control/TextureRect".texture = punit.unit_type.chara.portrait
 	battle.set_ui_visible(show_portrait, show_actions, show_undo_end)
 		
 	# if there's an active attack, interaction is select target
@@ -335,7 +336,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 	if cell == Map.OUT_OF_BOUNDS:
 		cell = battle.map.cell(battle.cursor.map_pos)
 	elif battle.map.cell(battle.cursor.map_pos) != cell:
-		select_cell(cell)
+		battle.select_cell(cell)
 		
 	cell.x = clampi(cell.x, -MAP_MARGIN, battle.map.world.map_size.x + MAP_MARGIN - 1)
 	cell.y = clampi(cell.y, -MAP_MARGIN, battle.map.world.map_size.y + MAP_MARGIN - 1)
@@ -411,7 +412,7 @@ func cancel():
 		clear_active_attack()
 		
 		# redraw stuff TODO select_active_unit?
-		battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
+		#battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
 		battle.set_ui_visible(null, true, null)
 	elif active_unit:
 		clear_active_unit()
@@ -420,6 +421,7 @@ func cancel():
 	
 
 func end_turn():
+	clear_active_unit()
 	battle.end_turn()
 	_action_completed.emit()
 	
@@ -521,7 +523,6 @@ func _on_end_turn_button_pressed():
 
 
 func _on_battle_attack_sequence_started(unit, attack, target, targets):
-	print("USED ", attack)
 	move_stack.clear()
 	clear_active_unit()
 	_activate_attack(unit, attack, target, targets)
@@ -529,3 +530,19 @@ func _on_battle_attack_sequence_started(unit, attack, target, targets):
 
 func _on_battle_attack_sequence_ended(_unit, _attack, _target, _targets):
 	action_completed.call_deferred()
+
+
+func _on_battle_walking_started(_unit):
+	set_process_unhandled_input(false)
+
+
+func _on_battle_walking_finished(_unit):
+	set_process_unhandled_input(true)
+
+
+func _on_battle_cell_selected(cell):
+	select_cell(cell)
+
+
+func _on_battle_cell_accepted(cell):
+	accept_cell(cell)

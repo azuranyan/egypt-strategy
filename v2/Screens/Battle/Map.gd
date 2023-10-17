@@ -110,31 +110,31 @@ func get_objects_of(type: Pathing) -> Array[MapObject]:
 
 
 ## Returns the objects at specified position.
-func get_objects_at(cell: Vector2i) -> Array[MapObject]:
-	var re: Array[MapObject]
+func get_objects_at(_cell: Vector2i) -> Array[MapObject]:
+	var re: Array[MapObject] = []
 	for o in get_objects():
-		if cell(o.map_pos) == cell:
+		if cell(o.map_pos) == _cell:
 			re.append(o)
 	return re
 	
 	
 ## Returns the object of given type at a given position.
-func get_object(cell: Vector2i, type: Pathing) -> MapObject:
-	for obj in get_objects_at(cell):
+func get_object(_cell: Vector2i, type: Pathing) -> MapObject:
+	for obj in get_objects_at(_cell):
 		if obj.pathing == type:
 			return obj
 	return null
 
 
 ## Returns the object at a given position.
-func get_object_at(cell: Vector2i) -> MapObject:
-	var arr := get_objects_at(cell)
+func get_object_at(_cell: Vector2i) -> MapObject:
+	var arr := get_objects_at(_cell)
 	return arr[0] if not arr.is_empty() else null
 	
 	
 ## Returns true if uniform pos is inside bounds.
-func is_inside_bounds(cell: Vector2i) -> bool:
-	return world.in_bounds(cell)
+func is_inside_bounds(_cell: Vector2i) -> bool:
+	return world.in_bounds(_cell)
 	
 	
 ## Returns a list of spawnable units. Safe to call before ready.
@@ -175,8 +175,8 @@ func cell(pos: Vector2) -> Vector2i:
 func index(pos: Vector2) -> int:
 	# TODO to_index works with trunc but we need round
 	#return world.to_index(pos)
-	var cell := cell(pos)
-	return cell.y*world.map_size.x + cell.x
+	var _cell := cell(pos)
+	return _cell.y*world.map_size.x + _cell.x
 	
 
 ## Returns returns true if the cell is occupied by a unit.
@@ -190,14 +190,14 @@ func is_occupied(pos: Vector2) -> bool:
 
 
 ## Returns the unit at cell.
-func get_unit(cell: Vector2i) -> Unit:
-	return get_object(cell, Pathing.UNIT) as Unit
+func get_unit(_cell: Vector2i) -> Unit:
+	return get_object(_cell, Pathing.UNIT) as Unit
 
 
 ## Returns all the units.
 func get_units() -> Array[Unit]:
 	var objs := get_objects_of(Pathing.UNIT)
-	var re: Array[Unit]
+	var re: Array[Unit] = []
 	re.append_array(objs)
 	return re
 
