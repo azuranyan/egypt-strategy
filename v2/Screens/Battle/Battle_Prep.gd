@@ -149,7 +149,7 @@ func _add_unit(unit_name: String, pos := Map.OUT_OF_BOUNDS):
 			3:
 				heading_adjusted = unit
 		
-	cb[1] = func(button: int):
+	cb[1] = func(_button: int):
 		pass
 	
 	# inject callbacks

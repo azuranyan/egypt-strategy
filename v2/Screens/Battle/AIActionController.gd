@@ -2,7 +2,7 @@ extends BattleActionController
 
 
 ## Initializes the controller. Called once every battle start.
-func initialize(battle: Battle, empire: Empire) -> void:
+func initialize(_battle: Battle, _empire: Empire) -> void:
 	pass
 	
 	

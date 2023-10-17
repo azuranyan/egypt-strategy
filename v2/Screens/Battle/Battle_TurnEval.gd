@@ -590,9 +590,6 @@ func walk_along(unit: Unit, path: PackedVector2Array):
 			unit.set_meta("Battle_driver", driver)
 			drivers.add_child(driver)
 			
-			var old_pos := unit.map_pos
-			var new_pos := path[-1]
-			
 			# run and wait for driver
 			await driver.walk_along(path)
 			

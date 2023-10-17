@@ -129,8 +129,8 @@ static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
 static func make_random_path(
 		length: int,
 		start: Vector2,
-		min: Vector2,
-		max: Vector2,
+		_min: Vector2,
+		_max: Vector2,
 		square := true
 		) -> PackedVector2Array:
 	var re := PackedVector2Array()
@@ -138,7 +138,7 @@ static func make_random_path(
 	
 	re.append(prev)
 	for i in length:
-		var p := Vector2(randi_range(min.x, max.x), randi_range(min.y, max.y))
+		var p := Vector2(int(randf_range(_min.x, _max.x)), int(randf_range(_min.y, _max.y)))
 		if square:
 			if p.x != prev.x and p.y != prev.y:
 				if p.x < p.y:

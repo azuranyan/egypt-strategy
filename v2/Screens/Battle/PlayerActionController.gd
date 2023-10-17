@@ -357,8 +357,9 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					battle.set_can_move(active_unit, false)
 					clear_active_unit()
 					
-					# This is a move (MOVE), so check for end turn
-					check_for_auto_end_turn()
+					# This is a move (MOVE) action
+					action_completed.call_deferred()
+					return
 				else:
 					# if same unit, swap
 					set_active_unit(unit)
@@ -382,8 +383,9 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					if battle.can_attack(u):
 						set_active_unit(u)
 						
-					# This is a move (MOVE), so check for end turn
-					check_for_auto_end_turn()
+					# This is a move (MOVE) action
+					action_completed.call_deferred()
+					return
 				else:
 					battle.play_error(true)
 			else:
@@ -423,59 +425,11 @@ func end_turn():
 	
 	
 func use_attack():
-	var cell := battle.cursor.map_pos
-	
-	# play error if cell is outside range 
-	if cell not in active_targetable:
-		battle.play_error("Target is out of range.")
-		return
-	
-	# play error if no targets
-	var target_cells := battle.get_attack_target_cells(active_unit, active_attack, cell)
-	var targets := battle.map.get_units().filter(func(x): # don't look
-		return Vector2(battle.map.cell(x.map_pos)) in target_cells
-		)
-	if targets.is_empty():
-		battle.play_error("No target.")
-		return
-	
-	# play error if no valid targets
-	var found_valid := false
-	for t in targets:
-		if  (active_attack.target_unit & 1 != 0 and active_unit.is_enemy(t)) or \
-			(active_attack.target_unit & 2 != 0 and not active_unit.is_enemy(t)) or \
-			(active_attack.target_unit & 4 != 0 and active_unit == t):
-			found_valid = true
-			break
-	if not found_valid:
-		battle.play_error("No valid targets found.")
-		return
-
-	# make actions undoable past this point
-	move_stack.clear()
-	
-	# attack signal
-	_activate_attack.call_deferred(active_unit, active_attack, cell, targets)
-	
-	# cleanup
-	battle.set_can_move(active_unit, false)
-	battle.set_can_attack(active_unit, false)
-	clear_active_unit()
+	battle.use_attack(active_unit, active_attack, battle.map.cell(battle.cursor.map_pos), 0)
 
 
-func check_for_auto_end_turn():
+func action_completed():
 	_action_completed.emit()
-	
-#	if Globals.prefs.auto_end_turn:
-#		var units := battle.map.get_units().filter(func(o): return is_owned(o))
-#		var should_end := true
-#
-#		for u in units:
-#			if can_move(u) or can_attack(u):
-#				should_end = false
-#
-#		if should_end:
-#			end_turn.call_deferred()
 	
 	
 func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
@@ -499,8 +453,8 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 			$AnimatedSprite2D.position.y -= 50
 			$AnimatedSprite2D.play("default")
 			
-			await $AnimatedSprite2D.animation_finished
-			$AnimatedSprite2D.stop()
+			#await $AnimatedSprite2D.animation_finished
+			#$AnimatedSprite2D.stop()
 			
 	match attack.target_animation:
 		"hurt", "buff", "heal":
@@ -519,8 +473,7 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 
 	$"../UI/Battle/AttackName".visible = false
 	
-	# This is a move (ATTACK), so check for end turn
-	check_for_auto_end_turn()
+	battle.notify_attack_sequence_finished()
 
 
 func _use_attack_on_target(caster: Unit, target: Unit, attack: Attack):
@@ -565,3 +518,14 @@ func _on_undo_button_pressed():
 
 func _on_end_turn_button_pressed():
 	end_turn()
+
+
+func _on_battle_attack_sequence_started(unit, attack, target, targets):
+	print("USED ", attack)
+	move_stack.clear()
+	clear_active_unit()
+	_activate_attack(unit, attack, target, targets)
+
+
+func _on_battle_attack_sequence_ended(_unit, _attack, _target, _targets):
+	action_completed.call_deferred()

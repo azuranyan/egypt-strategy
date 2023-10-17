@@ -18,9 +18,12 @@ enum {
 ## A short description for this attack.
 @export var description: String
 
-## The range hint for this attack.
+## The max range of this attack.
 @warning_ignore("shadowed_global_identifier")
 @export var range: int
+
+## The max range of this attack.
+@export var min_range: int
 
 ## Attack type.
 @export_enum("attack", "heal", "other") var type_tag: String = "attack"

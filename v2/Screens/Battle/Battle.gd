@@ -31,6 +31,8 @@ signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, tar
 signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
 
 
+signal _attack_sequence_finished()
+
 signal _end_attack_sequence_requested()
 
 signal _end_battle_requested(result)
@@ -314,6 +316,53 @@ func play_error(message):
 	if message:
 		display_message(message)
 	
+	
+func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
+	var cellf := Vector2(target_cell)
+	
+	# check for minimum range
+	if attack.min_range > 0:
+		var min_range := Globals.flood_fill(map.cell(unit.map_pos), attack.min_range, Rect2i(Vector2i.ZERO, map.world.map_size))
+		if cellf in min_range:
+			play_error("Target is inside minimum range.")
+			return
+	
+	# check for out of range
+	var target_range := Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	if cellf not in target_range:
+		play_error("Target is out of range.")
+		return
+	
+	# check for any targets
+	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
+	var targets := map.get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
+	if targets.is_empty():
+		play_error("No targets found.")
+		return
+	
+	# check for valid targets
+	for t in targets:
+		if  (attack.target_unit & 1 != 0 and unit.is_enemy(t)) or \
+			(attack.target_unit & 2 != 0 and not unit.is_enemy(t)) or \
+			(attack.target_unit & 4 != 0 and unit == t):
+				pass
+		else:
+			play_error("Invalid target")
+			return
+	
+	# commit actions
+	set_can_move(unit, false)
+	set_can_attack(unit, false)
+	
+	# attack signal
+	print("emitting start signal")
+	attack_sequence_started.emit(unit, attack, target_cell, targets)
+	print("awaiting for finish notify")
+	await _attack_sequence_finished
+	print("emitting end signal")
+	attack_sequence_ended.emit(unit, attack, target_cell, targets)
+	
+	
 ################################################################################
 
 const action_limit := 10
@@ -423,6 +472,32 @@ func _evaluate_win_loss_condition() -> bool:
 		
 		
 ################################################################################
+	
+	
+func play_floating_number(unit: Unit, number: int, color: Color):
+	var node := preload("res://Screens/Battle/FloatingNumber.tscn").instantiate()
+	var anim := node.get_node('AnimationPlayer') as AnimationPlayer
+	var label := node.get_node('Label') as Label
+	unit.add_child(node)
+	label.text = str(number)
+	node.modulate = color
+	anim.play('start')
+	await anim.animation_finished
+	node.queue_free()
+	
+	
+func notify_attack_sequence_finished():
+	# this is done so the methods called from the attack_sequence_started
+	# signal can call this function and trigger the notify on the next frame.
+	# not doing so will cause us to be stuck because we're still in the same
+	# context as the attack_sequence call and have not moved on to the next
+	# statement yet aka await for finish.
+	_notify_attack_sequence_finished.call_deferred()
+
+
+func _notify_attack_sequence_finished():
+	_attack_sequence_finished.emit()
+	
 	
 func can_move(unit: Unit) -> bool:
 	return unit.get_meta("Battle_can_move", false)
@@ -576,6 +651,13 @@ func kill_unit(unit: Unit):
 ## Inflict damage upon a unit.
 func damage_unit(unit: Unit, source: Variant, amount: int):
 	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
+	
+	var color := Color.WHITE
+	if amount > 0:
+		camera.get_node("AnimationPlayer").play('shake')
+		color = Color(0.949, 0.29, 0.392)
+	await play_floating_number(unit, abs(amount), color)
+	
 	if unit.hp == 0:
 		kill_unit(unit)
 
@@ -751,52 +833,52 @@ func _on_turn_eval_attack_used(unit: Unit, attack: Attack, target: Vector2i, tar
 	# This is a move (ATTACK), so check for end turn
 	$States/TurnEval.check_for_auto_end_turn()
 
-
-## TODO Generic attack handler. Should make an actual attack handler that checks
-## if there are handlers, if not then this kicks in to avoid perma lock.
-func _on_attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
-	# play animations
-	match attack.cast_animation:
-		"attack", "buff", "heal":
-			# add animation TODO custom scripted animation
-			$AnimatedSprite2D.position = map.world.uniform_to_screen(target)
-			$AnimatedSprite2D.position.y -= 50
-			$AnimatedSprite2D.play("default")
-			
-			await $AnimatedSprite2D.animation_finished
-			$AnimatedSprite2D.stop()
-			
-	match attack.target_animation:
-		"hurt", "buff", "heal":
-			pass
-			
-	# emit signal
-	_end_attack_sequence_requested.emit()
-	
-	
-func _on_attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
-	# TODO attack effects here
-	# damage_unit(flat, percentage)
-	# heal_unit(flat, percentage)
-	# give_effect(what, duration)
-	# set_stat(stat, amount)
-	# TODO create the characters and check the extents of the effect of attacks
-	for t in targets:
-		match attack.type_tag:
-			"attack":
-				damage_unit(t, unit, unit.dmg)
-			"heal":
-				damage_unit(t, unit, -unit.dmg)
-			"other":
-				pass
-	
-	# apply attack effect
-	if attack.status_effect != "None":
-		var duration_table := {"PSN": 2, "STN": 1, "VUL": 2}
-		var eff = Globals.status_effect[attack.status_effect]
-		var dur = duration_table[attack.status_effect]
-		
-		unit.add_status_effect(eff, dur)
+#
+### TODO Generic attack handler. Should make an actual attack handler that checks
+### if there are handlers, if not then this kicks in to avoid perma lock.
+#func _on_attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+#	# play animations
+#	match attack.cast_animation:
+#		"attack", "buff", "heal":
+#			# add animation TODO custom scripted animation
+#			$AnimatedSprite2D.position = map.world.uniform_to_screen(target)
+#			$AnimatedSprite2D.position.y -= 50
+#			$AnimatedSprite2D.play("default")
+#
+#			await $AnimatedSprite2D.animation_finished
+#			$AnimatedSprite2D.stop()
+#
+#	match attack.target_animation:
+#		"hurt", "buff", "heal":
+#			pass
+#
+#	# emit signal
+#	_end_attack_sequence_requested.emit()
+#
+#
+#func _on_attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
+#	# TODO attack effects here
+#	# damage_unit(flat, percentage)
+#	# heal_unit(flat, percentage)
+#	# give_effect(what, duration)
+#	# set_stat(stat, amount)
+#	# TODO create the characters and check the extents of the effect of attacks
+#	for t in targets:
+#		match attack.type_tag:
+#			"attack":
+#				damage_unit(t, unit, unit.dmg)
+#			"heal":
+#				damage_unit(t, unit, -unit.dmg)
+#			"other":
+#				pass
+#
+#	# apply attack effect
+#	if attack.status_effect != "None":
+#		var duration_table := {"PSN": 2, "STN": 1, "VUL": 2}
+#		var eff = Globals.status_effect[attack.status_effect]
+#		var dur = duration_table[attack.status_effect]
+#
+#		unit.add_status_effect(eff, dur)
 	
 	
 ## An action.
@@ -827,12 +909,12 @@ func _on_turn_started():
 	set_camera_follow(cursor)
 	$UI/Battle/OnTurn.text = context.on_turn.leader.name
 	if context.on_turn.is_player_owned():
-		$UI/AnimationPlayer.play("turn_banner.player")
+		$AnimationPlayer.play("turn_banner.player")
 		cursor.visible = true
 	else:
-		$UI/AnimationPlayer.play("turn_banner.enemy")
+		$AnimationPlayer.play("turn_banner.enemy")
 		cursor.visible = false
-	await $UI/AnimationPlayer.animation_finished
+	await $AnimationPlayer.animation_finished
 	set_process_input(true)
 
 
