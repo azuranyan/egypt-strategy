@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=73 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -18,6 +18,112 @@
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="15_41khm"]
 [ext_resource type="Texture2D" uid="uid://c0hgaxsb44gfb" path="res://Screens/Battle/hp_full.png" id="16_yc0nr"]
 [ext_resource type="Texture2D" uid="uid://cc4r8g2175acd" path="res://Screens/Battle/hp_empty.png" id="17_iu53r"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pu3je"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_scqe4"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w78rl"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ct87q"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yx4vd"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ov5f7"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i564b"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftog0"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(384, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qbwm4"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mlqwc"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(768, 192, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0qgvj"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(0, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d7hp"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(192, 384, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnuru"]
+atlas = ExtResource("7_0u6tm")
+region = Rect2(576, 384, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ofkxj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxo64")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pu3je")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_scqe4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w78rl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ct87q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yx4vd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ov5f7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i564b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftog0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qbwm4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mlqwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0qgvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d7hp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnuru")
+}],
+"loop": false,
+"name": &"default",
+"speed": 30.0
+}]
 
 [sub_resource type="GDScript" id="GDScript_nspcd"]
 script/source = "extends StateMachine
@@ -118,59 +224,59 @@ func exit():
 	state_machine.release_focus()
 "
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_yxo64"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_h2iav"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(384, 384, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_pu3je"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_go6rb"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(0, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_scqe4"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhcdm"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(192, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_w78rl"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_fvfw5"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(384, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ct87q"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ijcck"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(576, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_yx4vd"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_k42gu"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(768, 0, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ov5f7"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_b4ajq"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(0, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_i564b"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_vopn3"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(192, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ftog0"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_utd0s"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(384, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qbwm4"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_l3i2s"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(576, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_mlqwc"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_obxao"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(768, 192, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0qgvj"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_eg0a8"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(0, 384, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_7d7hp"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_63y0k"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(192, 384, 192, 192)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_tnuru"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_47ll4"]
 atlas = ExtResource("7_0u6tm")
 region = Rect2(576, 384, 192, 192)
 
@@ -178,103 +284,51 @@ region = Rect2(576, 384, 192, 192)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_yxo64")
+"texture": SubResource("AtlasTexture_h2iav")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_pu3je")
+"texture": SubResource("AtlasTexture_go6rb")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_scqe4")
+"texture": SubResource("AtlasTexture_bhcdm")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_w78rl")
+"texture": SubResource("AtlasTexture_fvfw5")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ct87q")
+"texture": SubResource("AtlasTexture_ijcck")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_yx4vd")
+"texture": SubResource("AtlasTexture_k42gu")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ov5f7")
+"texture": SubResource("AtlasTexture_b4ajq")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_i564b")
+"texture": SubResource("AtlasTexture_vopn3")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ftog0")
+"texture": SubResource("AtlasTexture_utd0s")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_qbwm4")
+"texture": SubResource("AtlasTexture_l3i2s")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_mlqwc")
+"texture": SubResource("AtlasTexture_obxao")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0qgvj")
+"texture": SubResource("AtlasTexture_eg0a8")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_7d7hp")
+"texture": SubResource("AtlasTexture_63y0k")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_tnuru")
+"texture": SubResource("AtlasTexture_47ll4")
 }],
 "loop": false,
 "name": &"default",
 "speed": 30.0
 }]
-
-[sub_resource type="Animation" id="Animation_4yntm"]
-resource_name = "turn_banner.player"
-length = 1.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Battle/TurnBanner:visible")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [true, false]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Battle/TurnBanner/Player:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Battle/TurnBanner/Enemy:visible")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Battle/TurnBanner:scale")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.3, 1.1, 1.4),
-"transitions": PackedFloat32Array(0.33, 1, 0.33, 1),
-"update": 0,
-"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
-}
 
 [sub_resource type="Animation" id="Animation_un60y"]
 resource_name = "turn_banner.enemy"
@@ -282,7 +336,7 @@ length = 1.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Battle/TurnBanner:visible")
+tracks/0/path = NodePath("TurnBanner:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -294,7 +348,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Battle/TurnBanner/Player:visible")
+tracks/1/path = NodePath("TurnBanner/Player:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -306,7 +360,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Battle/TurnBanner/Enemy:visible")
+tracks/2/path = NodePath("TurnBanner/Enemy:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -318,7 +372,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Battle/TurnBanner:scale")
+tracks/3/path = NodePath("TurnBanner:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -326,6 +380,58 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(0.33, 1, 0.33, 1),
 "update": 0,
 "values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1e-05)]
+}
+
+[sub_resource type="Animation" id="Animation_4yntm"]
+resource_name = "turn_banner.player"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TurnBanner:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TurnBanner/Player:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TurnBanner/Enemy:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TurnBanner:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3, 1.1, 1.4),
+"transitions": PackedFloat32Array(0.33, 1, 0.33, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hw3jg"]
@@ -355,15 +461,15 @@ font_color = Color(1, 0.458824, 0.537255, 1)
 shadow_size = 8
 shadow_color = Color(0, 0, 0, 0.690196)
 
-[sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
-font_size = 30
-
 [sub_resource type="LabelSettings" id="LabelSettings_65bf7"]
 font = ExtResource("9_j1ncc")
 font_size = 46
 font_color = Color(0.545098, 0.631373, 1, 1)
 shadow_size = 8
 shadow_color = Color(0, 0, 0, 0.690196)
+
+[sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
+font_size = 30
 
 [sub_resource type="LabelSettings" id="LabelSettings_v2v4r"]
 font = ExtResource("14_ca16r")
@@ -411,6 +517,9 @@ script = ExtResource("2_bgyoj")
 
 [node name="PlayerActionController" type="Node" parent="."]
 script = ExtResource("3_brpnv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="PlayerActionController"]
+sprite_frames = SubResource("SpriteFrames_ofkxj")
 
 [node name="States" type="Control" parent="."]
 process_priority = -1
@@ -618,6 +727,65 @@ grow_horizontal = 2
 text = "Error"
 label_settings = SubResource("LabelSettings_vxtxp")
 
+[node name="TurnBanner" type="Control" parent="UI"]
+custom_minimum_size = Vector2(500, 70)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = 34.9993
+offset_right = 250.0
+offset_bottom = 104.999
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 1e-05)
+pivot_offset = Vector2(250, 35)
+
+[node name="ColorRect" type="ColorRect" parent="UI/TurnBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.859375, 0.828125, 0.773438, 1)
+
+[node name="Player" type="Label" parent="UI/TurnBanner"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -154.5
+offset_top = -19.0
+offset_right = 154.5
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "PLAYER TURN"
+label_settings = SubResource("LabelSettings_65bf7")
+
+[node name="Enemy" type="Label" parent="UI/TurnBanner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -154.5
+offset_top = -19.0
+offset_right = 141.5
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "ENEMY TURN"
+label_settings = SubResource("LabelSettings_vxtxp")
+
 [node name="Battle" type="CanvasLayer" parent="UI"]
 visible = false
 
@@ -635,66 +803,6 @@ offset_right = 154.0
 offset_bottom = 79.0
 text = "Turn %s"
 label_settings = SubResource("LabelSettings_6nd0a")
-
-[node name="TurnBanner" type="Control" parent="UI/Battle"]
-visible = false
-custom_minimum_size = Vector2(500, 70)
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -0.000366211
-offset_right = 250.0
-offset_bottom = 69.9996
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(1, 1e-05)
-pivot_offset = Vector2(250, 35)
-
-[node name="ColorRect" type="ColorRect" parent="UI/Battle/TurnBanner"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.859375, 0.828125, 0.773438, 1)
-
-[node name="Player" type="Label" parent="UI/Battle/TurnBanner"]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -154.5
-offset_top = -19.0
-offset_right = 154.5
-offset_bottom = 31.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "PLAYER TURN"
-label_settings = SubResource("LabelSettings_65bf7")
-
-[node name="Enemy" type="Label" parent="UI/Battle/TurnBanner"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -154.5
-offset_top = -19.0
-offset_right = 141.5
-offset_bottom = 31.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "ENEMY TURN"
-label_settings = SubResource("LabelSettings_vxtxp")
 
 [node name="Name" type="Control" parent="UI/Battle"]
 layout_mode = 3
@@ -900,3 +1008,7 @@ text = "End Turn
 [connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]
 [connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]
 [connection signal="pressed" from="UI/CancelPrep" to="." method="_on_undo_button_pressed"]
+[connection signal="pressed" from="UI/Battle/AttackButton" to="PlayerActionController" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="UI/Battle/SpecialButton" to="PlayerActionController" method="_on_special_button_pressed"]
+[connection signal="pressed" from="UI/Battle/UndoButton" to="PlayerActionController" method="_on_undo_button_pressed"]
+[connection signal="pressed" from="UI/Battle/EndTurnButton" to="PlayerActionController" method="_on_end_turn_button_pressed"]

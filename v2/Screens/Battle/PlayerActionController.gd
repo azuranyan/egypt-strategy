@@ -1,6 +1,9 @@
 extends BattleActionController
 
 
+signal _action_completed
+
+
 const MAP_MARGIN := 3
 
 
@@ -31,15 +34,20 @@ var move_stack: Array[UnitMoveAction]
 func initialize(battle: Battle, _empire: Empire) -> void:
 	self.battle = battle
 	
+
+## Called when action has to be executed.
+func do_action() -> void:
+	await _action_completed
+	
 	
 ## Called when turn starts.
 func turn_start() -> void:
-	pass
+	$"../UI/Battle".visible = true
 	
 
 ## Called when turn ends.
 func turn_end() -> void:
-	pass
+	$"../UI/Battle".visible = false
 
 	
 ## Called when action is started.
@@ -350,7 +358,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					clear_active_unit()
 					
 					# This is a move (MOVE), so check for end turn
-					#check_for_auto_end_turn()
+					check_for_auto_end_turn()
 				else:
 					# if same unit, swap
 					set_active_unit(unit)
@@ -375,7 +383,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 						set_active_unit(u)
 						
 					# This is a move (MOVE), so check for end turn
-					#check_for_auto_end_turn()
+					check_for_auto_end_turn()
 				else:
 					battle.play_error(true)
 			else:
@@ -410,7 +418,8 @@ func cancel():
 	
 
 func end_turn():
-	pass
+	battle.end_turn()
+	_action_completed.emit()
 	
 	
 func use_attack():
@@ -452,12 +461,27 @@ func use_attack():
 	battle.set_can_move(active_unit, false)
 	battle.set_can_attack(active_unit, false)
 	clear_active_unit()
+
+
+func check_for_auto_end_turn():
+	_action_completed.emit()
+	
+#	if Globals.prefs.auto_end_turn:
+#		var units := battle.map.get_units().filter(func(o): return is_owned(o))
+#		var should_end := true
+#
+#		for u in units:
+#			if can_move(u) or can_attack(u):
+#				should_end = false
+#
+#		if should_end:
+#			end_turn.call_deferred()
 	
 	
 func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
 	print("%s%s used %s" % [unit.name, battle.map.cell(unit.map_pos), attack.name], ": ", target, " ", targets)
-	$UI/AttackName/Label.text = attack.name
-	$UI/AttackName.visible = true
+	$"../UI/Battle/AttackName/Label".text = attack.name
+	$"../UI/Battle/AttackName".visible = true
 	battle.set_ui_visible(false, false, false)
 	
 	# play animations
@@ -493,10 +517,10 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 	unit.model.play_animation("idle")
 	unit.model.stop_animation()
 
-	$UI/AttackName.visible = false
+	$"../UI/Battle/AttackName".visible = false
 	
 	# This is a move (ATTACK), so check for end turn
-	#check_for_auto_end_turn()
+	check_for_auto_end_turn()
 
 
 func _use_attack_on_target(caster: Unit, target: Unit, attack: Attack):
@@ -523,3 +547,21 @@ class UnitMoveAction:
 	var can_move: bool
 	var can_attack: bool
 	
+
+
+func _on_attack_button_pressed():
+	assert(active_unit)
+	set_active_attack(active_unit.unit_type.basic_attack)
+
+
+func _on_special_button_pressed():
+	assert(active_unit)
+	set_active_attack(active_unit.unit_type.special_attack)
+
+
+func _on_undo_button_pressed():
+	cancel()
+
+
+func _on_end_turn_button_pressed():
+	end_turn()

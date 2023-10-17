@@ -325,6 +325,12 @@ signal turn_started
 signal turn_ended
 signal action_started
 signal action_ended
+#
+#signal attack_button_pressed
+#signal special_button_pressed
+#signal undo_button_pressed
+#signal end_turn_button_pressed
+
 
 @onready var ai_action_controller := $AIActionController as BattleActionController
 @onready var player_action_controller := $PlayerActionController as BattleActionController
