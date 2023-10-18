@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://0gn3h525f2d5"]
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://0gn3h525f2d5"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="1_krcam"]
-[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="2_wyw7p"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="2_wyw7p"]
 
 [sub_resource type="Resource" id="Resource_bx1g8"]
 script = ExtResource("1_krcam")
 min_heal = 3
 max_heal = 3
-target = 4
+target = 2
 custom_description = ""
 custom_animation = ""
 

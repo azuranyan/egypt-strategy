@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://5yd3n0qpk1bx"]
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://5yd3n0qpk1bx"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_fv0lw"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_fv0lw"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="1_sl4dd"]
 
 [sub_resource type="Resource" id="Resource_ne1ev"]

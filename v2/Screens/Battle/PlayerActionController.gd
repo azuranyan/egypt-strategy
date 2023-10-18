@@ -101,7 +101,7 @@ func _unhandled_input(event):
 			cancel()
 			return
 		
-		if active_attack.target_melee:
+		if active_attack.melee:
 			if event is InputEventMouseMotion:
 				if active_unit.map_pos.distance_to(cell) > 0.6:
 					battle.select_attack_target(active_unit, active_attack, cell)
@@ -257,7 +257,7 @@ func set_active_attack(attack: Attack):
 	active_attack = attack
 	refresh_active()
 	
-	if attack.target_melee:
+	if attack.melee:
 		battle.select_attack_target(active_unit, active_attack, null)
 		
 	battle.set_ui_visible(true, false, null)
@@ -459,28 +459,21 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 	# play animations
 	for t in targets:
 		t.model.play_animation(attack.target_animation)
-	unit.model.play_animation(attack.cast_animation)
+	unit.model.play_animation(attack.user_animation)
 	
-	# play attack sequence
-	match attack.cast_animation:
-		"attack", "buff", "heal":
-			# add animation TODO custom scripted animation
-			var pos := battle.map.world.uniform_to_screen(target)
-			#pos = get_viewport_transform() * pos
-			$AnimatedSprite2D.position = pos
-			$AnimatedSprite2D.position.y -= 50
-			$AnimatedSprite2D.play("default")
-			
-			#await $AnimatedSprite2D.animation_finished
-			#$AnimatedSprite2D.stop()
-			
-	match attack.target_animation:
-		"hurt", "buff", "heal":
-			pass
-			
 	# apply attack effect
 	for t in targets:
-		_use_attack_on_target(unit, t, attack)
+		for eff in attack.effects:
+			# all targets are in the array so so we must check first
+			if not _is_effect_target(unit, t, eff):
+				continue
+				
+			# play animation TODO spawn one each
+			$AnimatedSprite2D.position = battle.map.world.uniform_to_screen(t.map_pos)
+			$AnimatedSprite2D.position.y -= 50
+			$AnimatedSprite2D.play(eff.get_animation())
+			
+			eff._apply(battle, unit, attack, target, t)
 	
 	# stop animations
 	for t in targets:
@@ -492,24 +485,18 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 	$"../UI/Battle/AttackName".visible = false
 	
 	battle.notify_attack_sequence_finished()
-
-
-func _use_attack_on_target(caster: Unit, target: Unit, attack: Attack):
-	match attack.type_tag:
-		"attack":
-			battle.damage_unit(target, caster, caster.dmg)
-		"heal":
-			battle.damage_unit(target, caster, -caster.dmg)
-		"other":
-			pass
-			
-	if attack.status_effect != "None":
-		var duration_table := {"PSN": 2, "STN": 1, "VUL": 2}
-		var eff = Globals.status_effect[attack.status_effect]
-		var dur = duration_table[attack.status_effect]
 		
-		target.add_status_effect(eff, dur)
-		
+
+func _is_effect_target(unit: Unit, target: Unit, effect: AttackEffect) -> bool:
+	match effect.target:
+		0: # Enemy
+			return unit.is_enemy(target)
+		1: # Ally
+			return unit.is_ally(target)
+		2: # Self
+			return unit == target
+	return false
+
 
 class UnitMoveAction:
 	var unit: Unit

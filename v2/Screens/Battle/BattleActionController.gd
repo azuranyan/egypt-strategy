@@ -9,8 +9,7 @@ func initialize(_battle: Battle, _empire: Empire) -> void:
 
 ## Called when action has to be executed.
 func do_action() -> void:
-	print('do nothing ', self)
-	await get_tree().create_timer(1.0).timeout
+	push_error('no action implemented!')
 	
 	
 ## Called when turn starts.

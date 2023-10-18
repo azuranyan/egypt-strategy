@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://10qxptxtqfxf"]
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://10qxptxtqfxf"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_i6k4h"]
-[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_ti8el"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_ti8el"]
 
 [sub_resource type="Resource" id="Resource_vkggo"]
 script = ExtResource("1_i6k4h")
@@ -17,7 +17,7 @@ name = "Wave"
 description = ""
 user_animation = "attack"
 target_animation = "hurt"
-target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1), Vector2i(0, 2)])
+target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)])
 allow_rotation = false
 range = 1
 min_range = 0

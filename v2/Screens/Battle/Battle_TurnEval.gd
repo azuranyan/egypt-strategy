@@ -86,7 +86,7 @@ func handle_input(event: InputEvent) -> void:
 			cancel()
 			return
 		
-		if active_attack.target_melee:
+		if active_attack.melee:
 			if event is InputEventMouseMotion:
 				if active_unit.map_pos.distance_to(cell) > 0.6:
 					select_attack_target(active_unit, active_attack, cell)
@@ -508,7 +508,7 @@ func set_active_attack(attack: Attack):
 	active_attack = attack
 	refresh_active()
 	
-	if attack.target_melee:
+	if attack.melee:
 		select_attack_target(active_unit, active_attack, null)
 		
 	set_ui_visible(true, false, null)
@@ -649,7 +649,7 @@ func is_placeable(unit: Unit, cell: Vector2i) -> bool:
 
 ## Selects cell for attack target.
 func select_attack_target(unit: Unit, attack: Attack, target: Variant):
-	if attack.target_melee:
+	if attack.melee:
 		match typeof(target):
 			TYPE_VECTOR2, TYPE_VECTOR2I:
 				active_unit.face_towards(target)
@@ -678,7 +678,7 @@ func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
 	
 ## Returns a list of targeted cells.
 func get_attack_target_cells(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0) -> PackedVector2Array:
-	if attack.target_melee:
+	if attack.melee:
 		target_rotation = unit.get_heading() * PI/2
 		
 	var re := PackedVector2Array()
@@ -697,7 +697,7 @@ func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_ro
 	
 	var cells := Globals.flood_fill(battle.map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
 	
-	if not attack.target_melee:
+	if not attack.melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)
 	
 	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)

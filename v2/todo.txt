@@ -34,3 +34,11 @@ feature affect_caster (effect is used on the caster instead of target)
 before every effect, check if target is still alive
  - once unit dies, put in dead_queue
  - after turn cycle ends, clear all dead units
+
+implement stun and blk and other tick status effects
+
+undoing attack is still active unit and terrain is removed, but does not remove unit_path
+
+prep drag and drop broken
+
+auto end turn does not clear active unit

@@ -1,22 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://cyr3rqlljbdvd"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://cyr3rqlljbdvd"]
 
+[ext_resource type="Resource" uid="uid://djn7qxgy84x1d" path="res://Screens/Battle/data/attack/00default.tres" id="1_3xch5"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_d6gwo"]
-[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_mjx86"]
 [ext_resource type="Resource" uid="uid://d0230ikbham6e" path="res://Screens/Battle/data/Chara_Sitri.tres" id="2_hs11p"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_jvpv7"]
-
-[sub_resource type="Resource" id="Resource_h4fym"]
-script = ExtResource("1_mjx86")
-name = ""
-description = ""
-range = 1
-type_tag = "attack"
-status_effect = "PSN"
-cast_animation = "attack"
-target_animation = "hurt"
-target_melee = true
-target_unit = 1
-target_shape = Array[Vector2i]([Vector2i(0, 0)])
 
 [resource]
 script = ExtResource("1_d6gwo")
@@ -40,4 +27,5 @@ stat_growth_2 = {
 "hp": 0,
 "mov": 0
 }
-basic_attack = SubResource("Resource_h4fym")
+basic_attack = ExtResource("1_3xch5")
+special_attack = ExtResource("1_3xch5")

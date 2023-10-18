@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://cbf8a5u71ukev"]
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://cbf8a5u71ukev"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_dhme1"]
-[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_ftlrh"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_ftlrh"]
 
 [sub_resource type="Resource" id="Resource_381yd"]
 script = ExtResource("1_dhme1")

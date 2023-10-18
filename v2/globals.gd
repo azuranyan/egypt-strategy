@@ -10,20 +10,6 @@ var hp_multiplier: float = 1.0
 
 var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
 
-const charas := {
-	"Lysandra" = preload("res://Screens/Battle/data/Chara_Lysandra.tres"),
-	"Maia" = preload("res://Screens/Battle/data/Chara_Maia.tres"),
-	"Zahra" = preload("res://Screens/Battle/data/Chara_Zahra.tres"),
-	"Ishtar" = preload("res://Screens/Battle/data/Chara_Ishtar.tres"),
-	"Alara" = preload("res://Screens/Battle/data/Chara_Alara.tres"),
-	"Eirene" = preload("res://Screens/Battle/data/Chara_Eirene.tres"),
-	"Sutekh" = preload("res://Screens/Battle/data/Chara_Sutekh.tres"),
-	"Nyaraka" = preload("res://Screens/Battle/data/Chara_Nyaraka.tres"),
-	"Tali" = preload("res://Screens/Battle/data/Chara_Tali.tres"),
-	"Sitri" = preload("res://Screens/Battle/data/Chara_Sitri.tres"),
-	"Hesra" = preload("res://Screens/Battle/data/Chara_Hesra.tres"),
-	"Nebet" = preload("res://Screens/Battle/data/Chara_Nebet.tres"),
-}
 
 var territories := {
 	# This will be auto populated in Overworld._ready
@@ -45,11 +31,29 @@ var prefs := {
 	'auto_end_turn': false,
 }
 
-var chara := {}
-var doodad_type := {}
-var status_effect := {}
-var unit_type := {}
-var world := {}
+var attack := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+var chara := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+var doodad_type := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+var status_effect := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+var unit_type := {
+	# This will be auto populated in Entrypoint._ready
+}
+
+var world := {
+	# This will be auto populated in Entrypoint._ready
+}
 
 var scene_queue: Array[String] = []
 

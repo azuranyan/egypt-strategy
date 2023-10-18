@@ -7,6 +7,12 @@ func initialize(_battle: Battle, _empire: Empire) -> void:
 	battle = _battle
 	
 	
+## Called when action has to be executed.
+func do_action() -> void:
+	await get_tree().create_timer(1).timeout
+	battle.end_turn()
+	
+	
 ## Called when turn starts.
 func turn_start() -> void:
 	battle.cursor.visible = false

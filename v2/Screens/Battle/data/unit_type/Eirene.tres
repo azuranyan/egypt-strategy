@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://oqya0dcflxe7"]
+
+[ext_resource type="Resource" uid="uid://3q5kwqe2uiyo" path="res://Screens/Battle/data/attack/eirene_basic.tres" id="1_257sj"]
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_yblp2"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_5p1gf"]
+[ext_resource type="Resource" uid="uid://dny2mp22w4kt6" path="res://Screens/Battle/data/Chara_Eirene.tres" id="2_wi2nd"]
+[ext_resource type="Resource" uid="uid://dqf8kd4ksbwi5" path="res://Screens/Battle/data/attack/eirene_special.tres" id="4_agbmu"]
+
+[resource]
+script = ExtResource("1_yblp2")
+chara = ExtResource("2_wi2nd")
+sprite_frames = ExtResource("2_5p1gf")
+name = "Eirene"
+behavior = 1
+avatar = "Avatar of Hathor"
+title = "Caring Cow Goddess"
+map_color = Color(0.886275, 0.313726, 0.596078, 1)
+stat_hp = 4
+stat_mov = 2
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 0,
+"mov": 1
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+basic_attack = ExtResource("1_257sj")
+special_attack = ExtResource("4_agbmu")

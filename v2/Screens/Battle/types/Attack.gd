@@ -1,57 +1,66 @@
 extends Resource
 class_name Attack
 
-enum {
-	Ground = 1 << 0,
-	Enemy = 1 << 1,
-	Ally = 1 << 2,
-	Self = 1 << 3,
+
+enum Target {
+	ENEMY = 1 << 0,
+	ALLY = 1 << 1,
+	SELF = 1 << 2,
 }
 
-# The damage attack inflicts == chara.dmg.
-# fixed_damage, multiplier_damage, heal_amount are all metadata
-# icon, animation_tag, etc
 
-## The name of this attack.
+## Display name of the attack.
 @export var name: String
 
-## A short description for this attack.
+## Flavor text description.
 @export var description: String
 
-## The max range of this attack.
-@warning_ignore("shadowed_global_identifier")
-@export var range: int
+@export_subgroup('Animation')
 
-## The max range of this attack.
-@export var min_range: int
+## Unit animation played for the user.
+@export var user_animation: String
 
-## Attack type.
-@export_enum("attack", "heal", "other") var type_tag: String = "attack"
+## Unit animation played for the target.
+@export var target_animation: String
 
-## Status effect this attack may inflict.
-@export_enum("None", "PSN", "STN", "VUL") var status_effect: String = "None"
+@export_subgroup('Targeting')
 
-## Cast animation string.
-@export var cast_animation: String = "attack"
-
-## Target animation string.
-@export var target_animation: String = "hurt"
-
-## If true, attack can only change direction and not freely repositioned.
-@export var target_melee: bool = false:
-	set(value):
-		target_melee = (target_unit == Self) or value
-	get:
-		return target_melee
-
-## Selecting valid targets.
-@export_flags("Enemy", "Ally", "Self") var target_unit: int = 1:
-	set(value):
-		target_unit = value
-		target_melee = target_melee
-	get:
-		return target_unit
-	
-## the shape of the targeting area.
+## Shape of the targeting cursor.
 @export var target_shape: Array[Vector2i] = [Vector2i(0, 0)]
 
+## Whether rotation is allowed.
+@export var allow_rotation: bool
+
+## Range of the attack.
+@export var range: int = 1
+
+## Minimum range of the attack.
+@export var min_range: int
+
+## Allows the attack to be queued more than once.
+@export var multicast: int
+	
+## Melee targeting mode.
+@export var melee: bool
+
+@export_subgroup('Effect')
+
+## List of attack effects.
+@export var effects: Array[AttackEffect] = []
+
+
+## Returns the effect description.
+func get_effect_description() -> String:
+	var arr := PackedStringArray()
+	for eff in effects:
+		arr.append(eff.get_description())
+	return '\n'.join(arr)
+	
+
+## Returns the target flags.
+func get_target_flags() -> int:
+	var flags := 0
+	for eff in effects:
+		flags |= 1 << eff.target
+	return flags
+	

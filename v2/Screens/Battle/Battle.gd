@@ -326,9 +326,10 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	# check for valid targets
 	var has_valid_target := false
 	for t in targets:
-		if  (attack.target_unit & 1 != 0 and unit.is_enemy(t)) or \
-			(attack.target_unit & 2 != 0 and not unit.is_enemy(t)) or \
-			(attack.target_unit & 4 != 0 and unit == t):
+		var target_flags := attack.get_target_flags()
+		if  (target_flags & 1 != 0 and unit.is_enemy(t)) or \
+			(target_flags & 2 != 0 and not unit.is_enemy(t)) or \
+			(target_flags & 4 != 0 and unit == t):
 			has_valid_target = true
 			break
 	if not has_valid_target: 			# causes the attack to release as long
@@ -407,7 +408,6 @@ func _do_battle():
 	
 
 func _do_turn():
-	var num_actions := 0
 	while not _should_end_turn:
 		# things can happen before doing any actions so make sure to check first
 		if _evaluate_win_loss_condition():
@@ -420,12 +420,6 @@ func _do_turn():
 		action_ended.emit()
 		context.controller[context.on_turn].action_end()
 		
-		# action limit just in case
-		num_actions += 1
-		if num_actions >= action_limit:
-			push_warning("too many actions taken, maybe no end_turn()? force ending turn")
-			end_turn()
-			
 		# auto end turn
 		if Globals.prefs.auto_end_turn:
 			var units := map.get_units().filter(func(x): return x.empire == context.on_turn)
@@ -540,7 +534,7 @@ func is_placeable(unit: Unit, cell: Vector2i) -> bool:
 
 ## Selects cell for attack target.
 func select_attack_target(unit: Unit, attack: Attack, target: Variant):
-	if attack.target_melee:
+	if attack.melee:
 		match typeof(target):
 			TYPE_VECTOR2, TYPE_VECTOR2I:
 				unit.face_towards(target)
@@ -587,7 +581,7 @@ func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_ro
 	
 	var cells := get_targetable_cells(unit, attack)
 	
-	if not attack.target_melee:
+	if not attack.melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)
 	
 	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
@@ -749,7 +743,7 @@ func get_attack_target_units(user: Unit, attack: Attack, target: Vector2i, targe
 
 ## Returns a list of targeted cells.
 func get_attack_target_cells(user: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0) -> PackedVector2Array:
-	if attack.target_melee:
+	if attack.melee:
 		target_rotation = user.get_heading() * PI/2
 		
 	var re := PackedVector2Array()

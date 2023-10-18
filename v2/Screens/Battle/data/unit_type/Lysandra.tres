@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://cpbfkmumc5lef"]
+
+[ext_resource type="Resource" uid="uid://dm37wpgx22flt" path="res://Screens/Battle/data/chara/Lysandra.tres" id="1_86ubo"]
+[ext_resource type="Resource" uid="uid://dhgc8m3jtq1j" path="res://Screens/Battle/data/attack/lysandra_basic.tres" id="1_h7lj5"]
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_lcic4"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_1n4b3"]
+[ext_resource type="Resource" uid="uid://0gn3h525f2d5" path="res://Screens/Battle/data/attack/lysandra_special.tres" id="4_4o68y"]
+
+[resource]
+script = ExtResource("1_lcic4")
+chara = ExtResource("1_86ubo")
+sprite_frames = ExtResource("4_1n4b3")
+name = "Lysandra"
+behavior = 0
+avatar = "Priestess of Ra"
+title = "Supreme Sun God"
+map_color = Color(0.666667, 0.352941, 0.2, 1)
+stat_hp = 5
+stat_mov = 2
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 0,
+"mov": 1
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+basic_attack = ExtResource("1_h7lj5")
+special_attack = ExtResource("4_4o68y")

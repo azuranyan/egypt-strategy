@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=6 format=3 uid="uid://dtvjtgjbsugl1"]
+[gd_resource type="Resource" script_class="Attack" load_steps=6 format=3 uid="uid://dtvjtgjbsugl1"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_6qaot"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_6qaot"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_j236p"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/ZChargeEffect.gd" id="2_6w8g1"]
 

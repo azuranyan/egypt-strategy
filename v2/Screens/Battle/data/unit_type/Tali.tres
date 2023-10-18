@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://dkcjussxvqer"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_8xdc1"]
+[ext_resource type="Resource" uid="uid://cm3g3kwc45ib" path="res://Screens/Battle/data/attack/tali_basic.tres" id="1_oxorg"]
+[ext_resource type="Resource" uid="uid://t3800uynfq65" path="res://Screens/Battle/data/Chara_Tali.tres" id="2_cipkv"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_ou715"]
+[ext_resource type="Resource" uid="uid://5cduxd66lgfw" path="res://Screens/Battle/data/attack/tali_special.tres" id="4_4jlly"]
+
+[resource]
+script = ExtResource("1_8xdc1")
+chara = ExtResource("2_cipkv")
+sprite_frames = ExtResource("2_ou715")
+name = "Tali"
+behavior = 0
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+stat_hp = 3
+stat_mov = 2
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 1
+}
+basic_attack = ExtResource("1_oxorg")
+special_attack = ExtResource("4_4jlly")

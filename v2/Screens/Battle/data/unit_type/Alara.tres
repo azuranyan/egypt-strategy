@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://bv210kr682ybi"]
+
+[ext_resource type="Resource" uid="uid://b6obi67xggbvi" path="res://Screens/Battle/data/attack/alara_basic.tres" id="1_f0ym2"]
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_yr37c"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_cu6ax"]
+[ext_resource type="Resource" uid="uid://d4b7hg8644pc7" path="res://Screens/Battle/data/Chara_Alara.tres" id="2_f150o"]
+[ext_resource type="Resource" uid="uid://cu1m22jwus54c" path="res://Screens/Battle/data/attack/alara_special.tres" id="4_44fri"]
+
+[resource]
+script = ExtResource("1_yr37c")
+chara = ExtResource("2_f150o")
+sprite_frames = ExtResource("2_cu6ax")
+name = "Alara"
+behavior = 4
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+stat_hp = 3
+stat_mov = 3
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0
+}
+basic_attack = ExtResource("1_f0ym2")
+special_attack = ExtResource("4_44fri")

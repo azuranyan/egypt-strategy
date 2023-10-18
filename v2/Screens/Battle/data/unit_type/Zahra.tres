@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://db07m7y1a3tmi"]
+
+[ext_resource type="Resource" uid="uid://baqii06rv0kxo" path="res://Screens/Battle/data/attack/zahra_basic.tres" id="1_6u7w3"]
+[ext_resource type="Resource" uid="uid://c77i5p06r7021" path="res://Screens/Battle/data/Chara_Zahra.tres" id="2_ftxe1"]
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_sp700"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_io3ex"]
+[ext_resource type="Resource" uid="uid://k8kxbusw61gw" path="res://Screens/Battle/data/attack/zahra_special.tres" id="4_nsl5x"]
+
+[resource]
+script = ExtResource("3_sp700")
+chara = ExtResource("2_ftxe1")
+sprite_frames = ExtResource("4_io3ex")
+name = "Zahra"
+behavior = 1
+avatar = "Avatar of Sobek"
+title = "Cruel Crocodile God"
+map_color = Color(0, 0.501961, 0.501961, 1)
+stat_hp = 4
+stat_mov = 2
+stat_dmg = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 1,
+"hp": 0,
+"mov": 0
+}
+basic_attack = ExtResource("1_6u7w3")
+special_attack = ExtResource("4_nsl5x")

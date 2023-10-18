@@ -40,29 +40,26 @@ func register_maps():
 	
 	
 func register_objects():
-	var dir := DirAccess.open("res://Screens/Battle/data/")
+	register_data('attack', func(res: Attack): return res.resource_path.get_file())
+	register_data('chara', func(res: Chara): return res.name)
+	register_data('doodad_type', func(res: DoodadType): return res.resource_name)
+	register_data('status_effect', func(res: StatusEffect): return res.short_name)
+	register_data('unit_type', func(res: UnitType): return res.name)
+	register_data('world', func(res: World): return res.resource_path.get_file())
+	
+
+func register_data(subdir: String, get_id: Callable):
+	var path := "res://Screens/Battle/data/" + subdir + '/'
+	var dir := DirAccess.open(path)
 	dir.list_dir_begin()
 	var filename := dir.get_next()
 	while filename != "":
 		if !dir.current_is_dir() and filename.ends_with(".tres"):
-			var res = load("res://Screens/Battle/data/" + filename)
-			if res is Chara:
-				#Globals.chara[res.name] = res
-				pass 
-			elif res is DoodadType:
-				Globals.doodad_type[res.resource_name] = res
-			elif res is StatusEffect:
-				Globals.status_effect[res.short_name] = res
-			elif res is UnitType:
-				Globals.unit_type[res.chara.name] = res
-			elif res is World:
-				Globals.world[res.resource_name] = res
-			else:
-				print("unrecognized resource file %s" % filename)
+			var res = load(path + filename)
+			Globals.get(subdir)[get_id.call(res)] = res
 		filename = dir.get_next()
-	
-	Globals.chara = Globals.charas.duplicate()
-	
+
+
 
 func _on_button_pressed():
 	add_child(Globals.battle)

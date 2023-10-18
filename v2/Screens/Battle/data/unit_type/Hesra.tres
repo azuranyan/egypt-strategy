@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://6tklx7lxk55m"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_ga4uc"]
+[ext_resource type="Resource" uid="uid://diwyndwsjwymh" path="res://Screens/Battle/data/attack/hesra_basic.tres" id="1_ojd1l"]
+[ext_resource type="Resource" uid="uid://dw0ii0h0jo7eg" path="res://Screens/Battle/data/Chara_Hesra.tres" id="2_g0b5q"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_qxt8y"]
+[ext_resource type="Resource" uid="uid://5yd3n0qpk1bx" path="res://Screens/Battle/data/attack/hesra_special.tres" id="4_7nhhs"]
+
+[resource]
+script = ExtResource("1_ga4uc")
+chara = ExtResource("2_g0b5q")
+sprite_frames = ExtResource("2_qxt8y")
+name = "Hesra"
+behavior = 0
+avatar = "Priestess of Ra"
+title = ""
+map_color = Color(0.376471, 0.721569, 0.815686, 1)
+stat_hp = 4
+stat_mov = 3
+stat_dmg = 1
+stat_growth_1 = {
+"dmg": 0,
+"hp": 1,
+"mov": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0
+}
+basic_attack = ExtResource("1_ojd1l")
+special_attack = ExtResource("4_7nhhs")

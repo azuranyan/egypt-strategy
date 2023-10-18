@@ -171,7 +171,7 @@ func _battle_result(empire: Empire, territory: Territory, result: BattleManager.
 
 func update_boss_spawn_condition():
 	for t in Globals.territories.values():
-		if t.get_leader() != Globals.charas["Sitri"] and !t.is_player_owned():
+		if t.get_leader() != Globals.chara["Sitri"] and !t.is_player_owned():
 			return
 	
 	OverworldEvents.emit_signal("all_territories_taken")
@@ -205,11 +205,11 @@ func register_territories_to_globals():
 func register_empires_to_globals():
 	Globals.empires.clear()
 	
-	_register_new_empire(Globals.charas["Lysandra"], Globals.territories["Zetennu"])
-	_register_new_empire(Globals.charas["Sitri"], Globals.territories["Cursed Stronghold"])
+	_register_new_empire(Globals.chara["Lysandra"], Globals.territories["Zetennu"])
+	_register_new_empire(Globals.chara["Sitri"], Globals.territories["Cursed Stronghold"])
 	
 	var selection: Array[Chara] = []
-	for c in Globals.charas.values():
+	for c in Globals.chara.values():
 		if c.get_meta("territory_selection", false):
 			selection.append(c)
 			

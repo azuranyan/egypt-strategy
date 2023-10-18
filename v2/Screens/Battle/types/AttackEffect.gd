@@ -12,7 +12,7 @@ static func stat_to_str(stat: String) -> String:
 			return stat.capitalize()
 
 
-@export var target: NeoAttack.Target
+@export_enum('Enemy', 'Ally', 'Self') var target: int
 
 @export var custom_description: String
 
