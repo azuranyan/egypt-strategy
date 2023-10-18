@@ -1,12 +1,19 @@
-[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://cm3g3kwc45ib"]
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=6 format=3 uid="uid://cm3g3kwc45ib"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_axea4"]
 [ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_q3yfy"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/ZBackstabEffect.gd" id="2_0bsx6"]
 
 [sub_resource type="Resource" id="Resource_13e87"]
 script = ExtResource("1_axea4")
 min_damage = 2
 max_damage = 2
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[sub_resource type="Resource" id="Resource_cweup"]
+script = ExtResource("2_0bsx6")
 target = 0
 custom_description = ""
 custom_animation = ""
@@ -23,4 +30,4 @@ range = 2
 min_range = 0
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_13e87")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_13e87"), SubResource("Resource_cweup")])

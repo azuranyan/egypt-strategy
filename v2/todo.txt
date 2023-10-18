@@ -28,23 +28,9 @@ $$$$$$$$$$$$$$$
 feature to select however many targets have been selected
  - if it's already selected, deselect
 
-component system for attack
-- damage
-- status effect
-damage value
-heal value
-psn damage + psn damage value
-maia - attack 2 tiles simultaneously
-ishtar - heal allies and cure psn, STN enemies
-alara - min range, retreat
-sutekh - charge 2 tiles
-tali - "moves adjacent to opponents to attack"
-tali - applies block to self
-csv loader
-turn end
-enemy ai controls
-prep keyboard controls
-rotate target hotkey
+feature affect_caster (effect is used on the caster instead of target)
+ - modify z series of effects (effects that affect caster)
 
-signalize ui
-implement attack
+before every effect, check if target is still alive
+ - once unit dies, put in dead_queue
+ - after turn cycle ends, clear all dead units
