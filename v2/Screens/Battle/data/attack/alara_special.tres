@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://cu1m22jwus54c"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_3g7hv"]
+[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_4f8m3"]
+
+[sub_resource type="Resource" id="Resource_ml7ih"]
+script = ExtResource("1_3g7hv")
+min_damage = 1
+max_damage = 1
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[resource]
+script = ExtResource("1_4f8m3")
+name = "Fadeaway Shot"
+description = ""
+user_animation = "attack"
+target_animation = "hurt"
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = 1
+min_range = 0
+multicast = 0
+melee = true
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_ml7ih")])

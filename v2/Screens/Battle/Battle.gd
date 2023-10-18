@@ -36,7 +36,6 @@ signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, tar
 ## Emitted when an attack sequence has ended.
 signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
 
-
 signal _attack_sequence_finished()
 
 signal _end_attack_sequence_requested()
@@ -474,7 +473,6 @@ func update_portrait(unit: Unit):
 	for heart in container.get_children():
 		heart.visible = i < unit.hp
 		i += 1
-	
 	
 	
 func play_floating_number(unit: Unit, number: int, color: Color):

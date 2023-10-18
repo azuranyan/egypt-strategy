@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=6 format=3 uid="uid://7xoo4tjn6qea"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_34vom"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_lsryr"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="2_dn180"]
+
+[sub_resource type="Resource" id="Resource_xs4hr"]
+script = ExtResource("1_lsryr")
+min_damage = 2
+max_damage = 2
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[sub_resource type="Resource" id="Resource_wqysv"]
+script = ExtResource("2_dn180")
+effect = "VUL"
+duration = 1
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[resource]
+script = ExtResource("1_34vom")
+name = "Vulnerability"
+description = ""
+user_animation = "attack"
+target_animation = "hurt"
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = 1
+min_range = 0
+multicast = 0
+melee = true
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_xs4hr"), SubResource("Resource_wqysv")])

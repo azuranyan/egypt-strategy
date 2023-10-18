@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=2 format=3 uid="uid://djn7qxgy84x1d"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_ros3h"]
+
+[resource]
+script = ExtResource("1_ros3h")
+name = ""
+description = ""
+user_animation = ""
+target_animation = ""
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = 1
+min_range = 0
+melee = false
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([])

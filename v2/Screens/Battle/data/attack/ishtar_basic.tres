@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=10 format=3 uid="uid://cu1r2bai288i2"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_a84vy"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_qri6i"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="2_302i8"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="3_7exx3"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/RemoveStatusEffect.gd" id="4_em2po"]
+
+[sub_resource type="Resource" id="Resource_jdgr2"]
+script = ExtResource("1_qri6i")
+min_damage = 1
+max_damage = 1
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[sub_resource type="Resource" id="Resource_63lfh"]
+script = ExtResource("2_302i8")
+effect = "STN"
+duration = 1
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[sub_resource type="Resource" id="Resource_ijjlw"]
+script = ExtResource("3_7exx3")
+min_heal = 2
+max_heal = 2
+target = 2
+custom_description = ""
+custom_animation = ""
+
+[sub_resource type="Resource" id="Resource_l2pm7"]
+script = ExtResource("4_em2po")
+effect = "PSN"
+target = 2
+custom_description = ""
+custom_animation = ""
+
+[resource]
+script = ExtResource("1_a84vy")
+name = "Magic"
+description = ""
+user_animation = "attack"
+target_animation = "idle"
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = 1
+min_range = 0
+multicast = 0
+melee = true
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_jdgr2"), SubResource("Resource_63lfh"), SubResource("Resource_ijjlw"), SubResource("Resource_l2pm7")])

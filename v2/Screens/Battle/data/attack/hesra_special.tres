@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="NeoAttack" load_steps=4 format=3 uid="uid://5yd3n0qpk1bx"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/NeoAttack.gd" id="1_fv0lw"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="1_sl4dd"]
+
+[sub_resource type="Resource" id="Resource_ne1ev"]
+script = ExtResource("1_sl4dd")
+effect = "PSN"
+duration = 2
+target = 0
+custom_description = ""
+custom_animation = ""
+
+[resource]
+script = ExtResource("1_fv0lw")
+name = "Poison"
+description = ""
+user_animation = "attack"
+target_animation = "hurt"
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = 1
+min_range = 0
+multicast = 0
+melee = false
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_ne1ev")])
