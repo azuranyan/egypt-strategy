@@ -23,9 +23,9 @@ signal button_up(button: int)
 
 # Data signals
 signal stat_changed(stat: String)
-signal status_effect_added(effect: AppliedStatusEffect)
-signal status_effect_changed(effect: AppliedStatusEffect)
-signal status_effect_removed(effect: AppliedStatusEffect)
+signal status_effect_added(effect: StatusEffect)
+signal status_effect_changed(effect: StatusEffect)
+signal status_effect_removed(effect: StatusEffect)
 
 
 ## The general direction.
@@ -142,7 +142,8 @@ var empire: Empire:
 		bond = value
 		stat_changed.emit("bond")
 
-var status_effects: Array[AppliedStatusEffect] = []
+var status_effects: Array[StatusEffect] = []
+var status_effects_duration: Array[int] = []
 
 
 # Private properties
@@ -245,35 +246,36 @@ func reset(flags := RESET_ALL):
 		
 		
 ## Adds a status effect.
-func add_status_effect(status_effect: StatusEffect, duration: int) -> AppliedStatusEffect:
-	var effect := AppliedStatusEffect.new()
-	effect.status_effect = status_effect
-	effect.duration = duration
-	
-	status_effects.append(effect)
-	status_effect_added.emit(effect)
-	return effect
+func add_status_effect(effect: StatusEffect, duration: int):
+	var idx := status_effects.find(effect)
+	if idx == -1:
+		status_effects.append(effect)
+		status_effects_duration.append(duration)
+		status_effect_added.emit(effect)
+	else:
+		status_effects_duration[idx] = duration
+		status_effect_changed.emit(effect)
 	
 
 ## Removes a status effect.
-func remove_status_effect(effect: AppliedStatusEffect):
-	status_effects.erase(effect)
-	status_effect_removed.emit(effect)
+func remove_status_effect(effect: StatusEffect):
+	var idx := status_effects.find(effect)
+	if idx != -1:
+		status_effects.remove_at(idx)
+		status_effects_duration.remove_at(idx)
+		status_effect_removed.emit(effect)
 
 
 ## Ticks down the duration of status effects.
 func tick_status_effects():
-	var copy := status_effects.duplicate()
-	for eff in copy:
-		tick_status_effect(eff)
-
-
-## Ticks down the duration of a status effect.
-func tick_status_effect(effect: AppliedStatusEffect):
-	effect.duration -= 1
-	status_effect_changed.emit(effect)
-	if effect.duration <= 0:
-		remove_status_effect(effect)
+	var rm := []
+	for i in status_effects.size():
+		status_effects_duration[i] -= 1
+		status_effect_changed.emit(status_effects[i])
+		if status_effects_duration[i] <= 0:
+			rm.append(status_effects[i])
+	for eff in rm:
+		remove_status_effect(eff)
 
 
 ## Returns true if player owned.
@@ -438,13 +440,15 @@ func _on_stat_changed(stat):
 func _on_status_effect_added(effect):
 	var icon = preload("res://Screens/Battle/StatusEffectIcon.tscn").instantiate()
 	_hud_status_effects.add_child(icon)
-	icon.texture = effect.status_effect.icon
+	icon.texture = effect.icon
 	effect.set_meta("hud_icon", icon)
 
 
 func _on_status_effect_changed(effect):
-	if effect.duration <= 1:
+	if status_effects_duration[status_effects.find(effect)] <= 1:
 		effect.get_meta("hud_icon").get_node("AnimationPlayer").play("blink")
+	else:
+		effect.get_meta("hud_icon").get_node("AnimationPlayer").stop()
 
 
 func _on_status_effect_removed(effect: Object):
@@ -469,14 +473,5 @@ func _on_facing_changed():
 ################################################################################
 # Classes
 ################################################################################
-
-
-## Simple class for holding status effect instance information.
-class AppliedStatusEffect:
-	var status_effect: StatusEffect
-	var duration: int
-	var stacks: int
-	
-
 
 

@@ -9,7 +9,7 @@ func initialize(_battle: Battle, _empire: Empire) -> void:
 	
 ## Called when action has to be executed.
 func do_action() -> void:
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(1.5).timeout
 	battle.end_turn()
 	
 	

@@ -377,13 +377,20 @@ func _do_battle():
 	while true:
 		# reset move and attack flags
 		for u in map.get_units():
-			set_can_move(u, true)
-			set_can_attack(u, true)
+			var stunned: bool = Globals.status_effect['STN'] in u.status_effects
+			set_can_move(u, not stunned)
+			set_can_attack(u, not stunned)
 			
 		turn_cycle_started.emit()
 				
 		# allow both empires to take their turns
 		for empire in [context.attacker, context.defender]:
+			# tick poison at the very start of turn, should be here so we can 
+			# properly evaluate w/l conditions before the turn actually starts
+			for u in map.get_units():
+				if u.empire == empire and Globals.status_effect['PSN'] in u.status_effects:
+					damage_unit(u, Globals.status_effect['PSN'], 1)
+			
 			# things can happen before doing any actions so make sure to check first
 			if _evaluate_win_loss_condition():
 				break
@@ -398,7 +405,12 @@ func _do_battle():
 			await _do_turn()
 			turn_ended.emit()
 			context.controller[context.on_turn].turn_end()
-		
+			
+			# tick duration of status effects
+			for u in map.get_units():
+				if u.empire == empire:
+					u.tick_status_effects()
+			
 		turn_cycle_ended.emit()
 		
 		# increment number of turns
@@ -474,10 +486,17 @@ func play_floating_number(unit: Unit, number: int, color: Color):
 	var anim := node.get_node('AnimationPlayer') as AnimationPlayer
 	var label := node.get_node('Label') as Label
 	unit.add_child(node)
+	
+	# add some offset randomness
+	node.position.x = randf_range(node.position.x - 24, node.position.x + 24)
+	node.position.y = randf_range(node.position.x - 12, node.position.x + 12)
+	
 	label.text = str(number)
 	node.modulate = color
+	
 	anim.play('start')
 	await anim.animation_finished
+	
 	node.queue_free()
 	
 	
@@ -657,13 +676,32 @@ func kill_unit(unit: Unit):
 	
 
 ## Inflict damage upon a unit.
-func damage_unit(unit: Unit, _source: Variant, amount: int):
+func damage_unit(unit: Unit, source: Variant, amount: int):
+	# if unit has block, remove block and set damage to 0
+	if Globals.status_effect['BLK'] in unit.status_effects:
+		unit.remove_status_effect(Globals.status_effect['BLK'])
+		amount = 0
+	
+	# if unit has vul, increase damage taken by 1 
+	if Globals.status_effect['VUL'] in unit.status_effects and amount >= 0:
+		# this also increases poison damage which effectively 
+		# doubles the damage making it a potent combo
+		#amount += 1
+		if source != Globals.status_effect['VUL']:
+			damage_unit(unit, Globals.status_effect['VUL'], 1)
+		
 	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
 	
 	var color := Color.WHITE
 	if amount > 0:
-		camera.get_node("AnimationPlayer").play('shake')
-		color = Color(0.949, 0.29, 0.392)
+		if source == Globals.status_effect['PSN']:
+			color = Color(0.949, 0.29, 0.949)
+		elif source == Globals.status_effect['VUL']:
+			color = Color(0.949, 0.949, 0.29)
+		else:
+			camera.get_node("AnimationPlayer").play('shake')
+			color = Color(0.949, 0.29, 0.392)
+		
 	await play_floating_number(unit, abs(amount), color)
 	
 	if unit.hp == 0:

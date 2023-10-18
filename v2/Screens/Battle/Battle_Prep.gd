@@ -167,7 +167,9 @@ func _remove_unit(unit_name: String, pos := Map.OUT_OF_BOUNDS):
 	unit.map_pos = pos
 
 	# remove callbacks
-	var cb = unit.get_meta("prep_phase_callbacks")
+	# TODO this sometimes complains about not having callbacks, meaning a unit
+	# is removed without being added. check that root problem.
+	var cb = unit.get_meta("prep_phase_callbacks", null)
 	if cb:
 		unit.button_down.disconnect(cb[0])
 		unit.button_up.disconnect(cb[1])

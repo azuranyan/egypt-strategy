@@ -42,3 +42,13 @@ undoing attack is still active unit and terrain is removed, but does not remove 
 prep drag and drop broken
 
 auto end turn does not clear active unit
+
+unit -> unitid, so it doesn't rely on unique unit names and multiple unit types can be spawned
+
+Globals empires, territories -> empire, territory
+
+passing recovers 1 hp
+
+allow scrolling on character list
+
+damage counter for consecutive attacks
