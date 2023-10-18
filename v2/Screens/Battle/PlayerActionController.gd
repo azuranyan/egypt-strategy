@@ -29,6 +29,15 @@ var change_facing: Unit
 var move_stack: Array[UnitMoveAction]
 
 
+var _allow_input: bool:
+	set(value):
+		if not is_node_ready():
+			await get_parent().ready
+		#print(value)
+		_allow_input = value
+		$"../UI/Battle".visible = value
+		set_process_unhandled_input(value)
+
 
 ## Initializes the controller. Called once every battle start.
 func initialize(_battle: Battle, _empire: Empire) -> void:
@@ -42,26 +51,31 @@ func do_action() -> void:
 	
 ## Called when turn starts.
 func turn_start() -> void:
-	$"../UI/Battle".visible = true
+	_allow_input = true
+	#$"../UI/Battle".visible = true
 	
 
 ## Called when turn ends.
 func turn_end() -> void:
-	$"../UI/Battle".visible = false
+	_allow_input = false
+	#$"../UI/Battle".visible = false
 
 	
 ## Called when action is started.
 func action_start() -> void:
-	set_process_unhandled_input(true)
+	_allow_input = true
+	#set_process_unhandled_input(true)
 	
 
 ## Called when action is ended.
 func action_end() -> void:
-	set_process_unhandled_input(false)
+	_allow_input = false
+	#set_process_unhandled_input(false)
 
 
 func _ready():
-	set_process_unhandled_input(false)
+	_allow_input = false
+	#set_process_unhandled_input(false)
 
 
 func _unhandled_input(event):
@@ -289,8 +303,8 @@ func refresh_active():
 		
 	if active_attack:
 		assert(active_unit)
-		active_targetable = Globals.flood_fill(battle.map.cell(active_unit.map_pos), active_attack.range, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
-	
+		active_targetable = battle.get_targetable_cells(active_unit, active_attack)
+		
 	
 ################################################################################
 ## Main functions
@@ -359,7 +373,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					clear_active_unit()
 					
 					# This is a move (MOVE) action
-					action_completed.call_deferred()
+					#action_completed.call_deferred()
 					return
 				else:
 					# if same unit, swap
@@ -376,6 +390,8 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 			if battle.can_move(active_unit):
 				# check if target cell is valid
 				if Vector2(cell) in active_walkable and battle.is_pathable(active_unit, cell) and battle.is_placeable(active_unit, cell): 
+					# await, because not doing so immediately completes 
+					# the action and messes up the flow
 					battle.walk_unit(active_unit, cell)
 					push_move_action()
 					battle.set_can_move(active_unit, false)
@@ -384,8 +400,8 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					if battle.can_attack(u):
 						set_active_unit(u)
 						
-					# This is a move (MOVE) action
-					action_completed.call_deferred()
+					## This is a move (MOVE) action
+					#action_completed.call_deferred()
 					return
 				else:
 					battle.play_error(true)
@@ -533,11 +549,16 @@ func _on_battle_attack_sequence_ended(_unit, _attack, _target, _targets):
 
 
 func _on_battle_walking_started(_unit):
-	set_process_unhandled_input(false)
+	_allow_input = false
+	#$"../UI".visible = false
+	#set_process_unhandled_input(false)
 
 
 func _on_battle_walking_finished(_unit):
-	set_process_unhandled_input(true)
+	_allow_input = true
+	#$"../UI".visible = true
+	#set_process_unhandled_input(true)
+	action_completed.call_deferred()
 
 
 func _on_battle_cell_selected(cell):

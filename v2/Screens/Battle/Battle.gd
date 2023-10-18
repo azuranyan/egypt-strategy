@@ -81,6 +81,8 @@ enum {
 
 var context: Context
 
+var _camera_target: MapObject = null
+
 @onready var state_machine: StateMachine = $States
 @onready var character_list: CharacterList = $UI/CharacterList
 
@@ -328,8 +330,8 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 		if  (attack.target_unit & 1 != 0 and unit.is_enemy(t)) or \
 			(attack.target_unit & 2 != 0 and not unit.is_enemy(t)) or \
 			(attack.target_unit & 4 != 0 and unit == t):
-				has_valid_target = true
-				break
+			has_valid_target = true
+			break
 	if not has_valid_target: 			# causes the attack to release as long
 		play_error("Invalid target")	# as there's at least one valid target,
 		return							# even if there are invalid targets
@@ -564,20 +566,33 @@ func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 
 ## Returns a list of targetable cells.
 func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
-	return Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	var re := Globals.flood_fill(
+			map.cell(unit.map_pos),
+			attack.range,
+			Rect2i(Vector2i.ZERO, map.world.map_size),
+			)
+	if attack.min_range > 0:
+		var min_area := Globals.flood_fill(
+			map.cell(unit.map_pos),
+			attack.min_range,
+			Rect2i(Vector2i.ZERO, map.world.map_size),
+			)
+		for p in min_area:
+			var idx := re.find(p)
+			re.remove_at(idx)
+	return re
 	
 	
 ## Draws target overlay. target_rotation is ignored if melee.
 func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
 	terrain_overlay.clear()
 	
-	var cells := Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	var cells := get_targetable_cells(unit, attack)
 	
 	if not attack.target_melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)
 	
 	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
-	print(target_cells, " ", target)
 	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
 
 
@@ -752,20 +767,33 @@ func get_attack_target_cells(user: Unit, attack: Attack, target: Vector2i, targe
 
 ## Makes the camera follow a MapObject.
 func set_camera_follow(obj: MapObject):
-	if camera.has_meta("battle_target"):
-		camera.get_meta("battle_target").map_pos_changed.disconnect(camera.get_meta("battle_follow_func"))
-		camera.set_meta("battle_follow_func", null)
-		camera.set_meta("battle_target", null)
+	# TODO some bug concerning this:
+	# the wrong lambda is being called leading to error
+#	if camera.has_meta("battle_target"):
+#		camera.get_meta("battle_target").map_pos_changed.disconnect(camera.get_meta("battle_follow_func"))
+#		camera.set_meta("battle_follow_func", null)
+#		camera.set_meta("battle_target", null)
+#
+#	if obj:
+#		var follow_func := func():
+#			camera.position = map.world.uniform_to_screen(obj.map_pos)
+#
+#		camera.set_meta("battle_follow_func", follow_func)
+#		camera.set_meta("battle_target", obj)
+#
+#		obj.map_pos_changed.connect(follow_func)
+	if _camera_target:
+		_camera_target.map_pos_changed.disconnect(_on_target_map_pos_changed)
+	
+	_camera_target = obj
+	if _camera_target:
+		_camera_target.map_pos_changed.connect(_on_target_map_pos_changed)
 		
-	if obj:
-		var follow_func := func():
-			camera.position = map.world.uniform_to_screen(obj.map_pos)
-		obj.map_pos_changed.connect(follow_func)
-		
-		camera.set_meta("battle_follow_func", follow_func)
-		camera.set_meta("battle_target", obj)
 
-
+func _on_target_map_pos_changed():
+	assert(_camera_target)
+	camera.position = map.world.uniform_to_screen(_camera_target.map_pos)
+	
 
 # TODO maybe this should be on UI code?
 func _on_battle_started(attacker, defender, _territory):
