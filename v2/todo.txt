@@ -47,15 +47,16 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
-if a battle is initiated with one of the participants == player, do real battle otherwise quick battle
- - put fight logic and quick battle logic to battle
- - quick or not the overworld only need to listen to the result
-
 auto end turn not working
+
+knockback allows knocking enemies out of bounds LMAO
+ - check other movement based skills too
 
 battle win loss conditions
  - evaluate win loss
  - add custom win loss conditions
+ - battle prep conditions
+ - attacker/defender victory/withdraw
 
 display targeting info
  - list of units that will be hit by the attack

@@ -185,12 +185,12 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
 	$UI/CancelPrep.visible = false
 	
 	if rv != 0:
-		_unload_map()
+		_unload_map() # we emit the signal ourselves to end battle
 		_end_battle_requested.emit(Result.Cancelled)
 	else:
 		_battle_phase.call_deferred()
 		
-		await _end_battle_requested
+		await _end_battle_requested # wait for the gameplay to call end_battle()
 		_unload_map()
 	
 	
@@ -376,7 +376,7 @@ func _do_battle():
 	context.controller[context.defender].initialize(self, context.defender)
 	
 	# loop until battle finishes
-	while true:
+	while not context.should_end:
 		# reset move and attack flags
 		for u in map.get_units():
 			var stunned: bool = Globals.status_effect['STN'] in u.status_effects
@@ -423,6 +423,8 @@ func _do_battle():
 		# increment number of turns
 		context.turns += 1
 	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
+	
+	end_battle(context.result)
 		
 	
 
@@ -463,6 +465,18 @@ func _evaluate_win_loss_condition() -> bool:
 	if not context.should_end:
 		context.result = Result.None
 		context.should_end = false
+		
+		# TODO instead of polling checks, maybe add signals to units dying?
+		var attacker_units := map.get_units().filter(func(x): return x.empire == context.attacker)
+		if attacker_units.is_empty():
+			context.result = Result.DefenderVictory
+			context.should_end = true
+			
+		var defender_units := map.get_units().filter(func(x): return x.empire == context.defender)
+		if defender_units.is_empty(): # mutual obliteration is attacker victory
+			context.result = Result.AttackerVictory
+			context.should_end = true
+		
 	return context.should_end
 		
 		

@@ -23,5 +23,5 @@ allow_rotation = false
 range = -1
 min_range = 1
 multicast = 0
-melee = true
+melee = false
 effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_0bf4v")])
