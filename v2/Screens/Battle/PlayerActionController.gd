@@ -57,6 +57,9 @@ func turn_start() -> void:
 
 ## Called when turn ends.
 func turn_end() -> void:
+	clear_active_unit()
+	move_stack.clear()
+	
 	_allow_input = false
 	#$"../UI/Battle".visible = false
 
@@ -429,6 +432,8 @@ func cancel():
 		
 		# redraw stuff TODO select_active_unit?
 		#battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
+		if battle.can_move(active_unit):
+			battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
 		battle.set_ui_visible(null, true, null)
 	elif active_unit:
 		clear_active_unit()
@@ -437,9 +442,8 @@ func cancel():
 	
 
 func end_turn():
-	clear_active_unit()
 	battle.end_turn()
-	_action_completed.emit()
+	action_completed()
 	
 	
 func use_attack():

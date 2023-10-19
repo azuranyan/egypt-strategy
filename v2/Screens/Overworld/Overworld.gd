@@ -213,7 +213,6 @@ func register_empires_to_globals():
 		if c.get_meta("territory_selection", false):
 			selection.append(c)
 			
-		
 	selection.shuffle()
 	# var i := 0
 	for t in Globals.territories.values():

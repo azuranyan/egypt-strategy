@@ -406,11 +406,16 @@ func _do_battle():
 			turn_ended.emit()
 			context.controller[context.on_turn].turn_end()
 			
-			# tick duration of status effects
+			# do end-turn tick mechanics
 			for u in map.get_units():
 				if u.empire == empire:
+					# recover 1 hp for units that didn't do anything
+					if can_move(u) and can_attack(u):
+						damage_unit(u, self, -1) 
+					
+					# tick duration of status effects
 					u.tick_status_effects()
-			
+					
 		turn_cycle_ended.emit()
 		
 		# increment number of turns
