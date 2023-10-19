@@ -311,7 +311,7 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 			return
 	
 	# check for out of range
-	var target_range := Globals.flood_fill(map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, map.world.map_size))
+	var target_range := Globals.flood_fill(map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, map.world.map_size))
 	if cellf not in target_range:
 		play_error("Target is out of range.")
 		return
@@ -564,8 +564,8 @@ func select_attack_target(unit: Unit, attack: Attack, target: Variant):
 				unit.face_towards(target)
 			TYPE_FLOAT, TYPE_INT:
 				unit.facing = target
-		if attack.range > 0:
-			select_cell(unit.map_pos + Unit.Directions[unit.get_heading()] * attack.range)
+		if unit.get_attack_range(attack) > 0:
+			select_cell(unit.map_pos + Unit.Directions[unit.get_heading()] * unit.get_attack_range(attack))
 		else:
 			select_cell(unit.map_pos)
 	else:
@@ -584,7 +584,7 @@ func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
 	var re := Globals.flood_fill(
 			map.cell(unit.map_pos),
-			attack.range,
+			unit.get_attack_range(attack),
 			Rect2i(Vector2i.ZERO, map.world.map_size),
 			)
 	if attack.min_range > 0:
@@ -883,10 +883,6 @@ func _on_attack_sequence_started(_unit, attack, _target, _targets):
 
 func _on_attack_sequence_ended(_unit, _attack, _target, _targets):
 	$UI/Attack.visible = false
-
-
-func _on_attack_visibility_changed():
-	print('stop')
 
 
 func _on_walking_started(unit):

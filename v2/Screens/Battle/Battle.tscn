@@ -824,7 +824,6 @@ text = "End Turn
 [connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]
 [connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]
 [connection signal="pressed" from="UI/CancelPrep" to="." method="_on_undo_button_pressed"]
-[connection signal="visibility_changed" from="UI/Attack" to="." method="_on_attack_visibility_changed"]
 [connection signal="pressed" from="UI/Battle/AttackButton" to="PlayerActionController" method="_on_attack_button_pressed"]
 [connection signal="pressed" from="UI/Battle/SpecialButton" to="PlayerActionController" method="_on_special_button_pressed"]
 [connection signal="pressed" from="UI/Battle/UndoButton" to="PlayerActionController" method="_on_undo_button_pressed"]

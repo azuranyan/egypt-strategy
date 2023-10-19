@@ -2,6 +2,7 @@ extends Resource
 class_name AttackEffect
 
 
+## Convenience function to convert stat property name to standardized strings.
 static func stat_to_str(stat: String) -> String:
 	match stat:
 		'maxhp':
@@ -12,18 +13,17 @@ static func stat_to_str(stat: String) -> String:
 			return stat.capitalize()
 
 
+## The target of this effect.
 @export_enum('Enemy', 'Ally', 'Self') var target: int
 
+## A custom description for this effect.
 @export var custom_description: String
 
+## A custom animation for this effect.
 @export var custom_animation: String
 
-		
-func execute(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_units: Array[Unit]) -> void:
-	for u in target_units:
-		_apply(battle, user, attack, target_cell, u)
-	
-	
+
+## Returns a detailed description of the effect.
 func get_description() -> String:
 	if custom_description == '':
 		return _default_description()
@@ -31,6 +31,7 @@ func get_description() -> String:
 		return custom_description
 	
 	
+## Returns the effect that will be spawned on target.
 func get_animation() -> String:
 	if custom_animation == '':
 		return _default_animation()
@@ -38,13 +39,16 @@ func get_animation() -> String:
 		return custom_animation
 		
 
-func _apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_unit: Unit) -> void:
+## Applies the attack effect.
+func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_unit: Unit) -> void:
 	pass
 	
 	
+## Returns a default description if custom description is not provided.
 func _default_description() -> String:
 	return ''
 
 
+## Returns a default effect string if no custom effect string is given.
 func _default_animation() -> String:
 	return ''

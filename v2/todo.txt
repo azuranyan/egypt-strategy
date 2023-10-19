@@ -81,12 +81,12 @@ unit states [standby, alive, action_taken, dead, ghost]
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
-attack name is not showing bug
- - attack name is being shown and modified twice from _activate attack and battle signal
- - ui or battle is hidden so it doesn't show up anyway
- - maybe make ui centralized
-
 do other units
  - units without chara does not work because chara is accessed directly from the unit for details
 
 make use of groups
+
+ui being shown in battle signal is wrong
+ - some parts of the ui are player specific but will be shown even for ai
+
+AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings

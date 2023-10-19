@@ -32,7 +32,7 @@ enum Target {
 @export var allow_rotation: bool
 
 ## Range of the attack.
-@export var range: int = 1
+@export var range: int = -1
 
 ## Minimum range of the attack.
 @export var min_range: int
@@ -63,4 +63,3 @@ func get_target_flags() -> int:
 	for eff in effects:
 		flags |= 1 << eff.target
 	return flags
-	

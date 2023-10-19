@@ -6,7 +6,7 @@ class_name FlatDamageEffect
 @export var max_damage: int
 
 
-func _apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	battle.damage_unit(target_unit, user, randi_range(min_damage, max_damage))
 	
 	

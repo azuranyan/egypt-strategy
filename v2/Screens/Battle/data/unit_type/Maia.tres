@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://bjboq0txrh33r"]
 
 [ext_resource type="Resource" uid="uid://cbf8a5u71ukev" path="res://Screens/Battle/data/attack/maia_basic.tres" id="1_geu82"]
-[ext_resource type="Resource" uid="uid://dveq80t2bfh4s" path="res://Screens/Battle/data/Chara_Maia.tres" id="2_3vqr0"]
+[ext_resource type="Resource" uid="uid://dveq80t2bfh4s" path="res://Screens/Battle/data/chara/Maia.tres" id="2_3vqr0"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_do15t"]
 [ext_resource type="Resource" uid="uid://dejncw3dyrskx" path="res://Screens/Battle/data/attack/maia_special.tres" id="4_mougb"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_u8ad4"]
@@ -18,15 +18,18 @@ map_color = Color(0.313726, 0.784314, 0.470588, 1)
 stat_hp = 4
 stat_mov = 2
 stat_dmg = 1
+stat_rng = 1
 stat_growth_1 = {
 "dmg": 0,
 "hp": 1,
-"mov": 0
+"mov": 0,
+"rng": 0
 }
 stat_growth_2 = {
 "dmg": 1,
 "hp": 0,
-"mov": 0
+"mov": 0,
+"rng": 0
 }
 basic_attack = ExtResource("1_geu82")
 special_attack = ExtResource("4_mougb")

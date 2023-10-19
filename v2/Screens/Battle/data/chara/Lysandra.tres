@@ -7,7 +7,7 @@
 script = ExtResource("2_vo47a")
 name = "Lysandra"
 gender = "F"
-avatar = "Priestess of Ra"
+avatar = "Avatar of Ra"
 title = "Supreme Sun God"
 map_color = Color(0.666667, 0.352941, 0.2, 1)
 portrait = ExtResource("1_83k4p")

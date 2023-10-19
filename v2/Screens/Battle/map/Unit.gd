@@ -228,7 +228,7 @@ func reset(flags := RESET_ALL):
 		maxhp = unit_type.stat_hp
 		mov = unit_type.stat_mov
 		dmg = unit_type.stat_dmg
-		rng = unit_type.basic_attack.range
+		rng = unit_type.stat_rng
 	
 	if flags & RESET_HP != 0:
 		hp = maxhp
@@ -294,33 +294,12 @@ func face_towards(target: Vector2):
 	facing = atan2(v.y, v.x)
 
 
-### Walks along a path.
-#func walk_along(path: PackedVector2Array):
-#	if path.is_empty():
-#		return
-#
-#	# create the path
-#	for point in path:
-#		curve.add_point(world.uniform_to_screen(point) - position)
-#
-#	# start walk cycle
-#	walking = true
-#	walking_started.emit()
-#
-#	# await until walking is done
-#	await self.walking_finished
-#
-#	# cleanup code
-#	walking = false
-#	map_pos = path[-1]
-#	path_follow.progress = 0
-#	curve.clear_points()
-	
-
-## Stops walking
-#func stop_walking():
-#	if walking:
-#		walking_finished.emit()
+## Returns the attack range.
+func get_attack_range(attack: Attack) -> int:
+	if attack.range < 0:
+		return rng
+	else:
+		return attack.range
 
 
 ## Sets the general direction of this object.

@@ -7,7 +7,7 @@ class_name GiveStatusEffectEffect
 @export var duration: int
 
 
-func _apply(_battle: Battle, _user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(_battle: Battle, _user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	target_unit.add_status_effect(Globals.status_effect[effect], duration)
 	
 	

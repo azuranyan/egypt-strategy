@@ -10,7 +10,7 @@ const DIRECTIONS := [
 ]
 
 
-func _apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	var new_pos := Vector2i(target_unit.map_pos - DIRECTIONS[target_unit.get_heading()])
 	
 	if battle.is_placeable(user, new_pos):

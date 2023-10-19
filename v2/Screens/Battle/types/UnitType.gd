@@ -94,11 +94,14 @@ enum Behavior {
 ## Base DMG stat.
 @export var stat_dmg: int
 
+## Base RNG stat.
+@export var stat_rng: int
+
 ## Stat growth for +1 bond (or story powerup 1).
-@export var stat_growth_1: Dictionary = {"hp" = 0, "mov" = 0, "dmg" = 0}
+@export var stat_growth_1: Dictionary = {"hp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
 
 ## Stat growth for max bond (or story powerup 2).
-@export var stat_growth_2: Dictionary ={"hp" = 0, "mov" = 0, "dmg" = 0}
+@export var stat_growth_2: Dictionary ={"hp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
 
 ## Basic attack.
 @export var basic_attack: Attack

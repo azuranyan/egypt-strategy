@@ -22,5 +22,5 @@ allow_rotation = false
 range = 0
 min_range = 0
 multicast = 0
-melee = false
+melee = true
 effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_q38pl")])

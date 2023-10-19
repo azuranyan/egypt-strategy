@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="1_krcam"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="2_wyw7p"]
 
-[sub_resource type="Resource" id="Resource_bx1g8"]
+[sub_resource type="Resource" id="Resource_ipguo"]
 script = ExtResource("1_krcam")
 min_heal = 3
 max_heal = 3
@@ -23,4 +23,4 @@ range = 0
 min_range = 0
 multicast = 0
 melee = true
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_bx1g8")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_ipguo")])

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://cg530r0b7skp8"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_73xo5"]
+[ext_resource type="Resource" uid="uid://h35b1pr68bwa" path="res://Screens/Battle/data/attack/cultist_mace_basic.tres" id="1_usglr"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_4hwr6"]
+
+[resource]
+script = ExtResource("1_73xo5")
+sprite_frames = ExtResource("2_4hwr6")
+name = "Cultist - Mace"
+behavior = 0
+avatar = ""
+title = ""
+map_color = Color(1, 1, 1, 1)
+stat_hp = 3
+stat_mov = 2
+stat_dmg = 1
+stat_rng = 1
+stat_growth_1 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_usglr")

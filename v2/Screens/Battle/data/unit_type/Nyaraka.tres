@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_4nxtp"]
 [ext_resource type="Resource" uid="uid://7xoo4tjn6qea" path="res://Screens/Battle/data/attack/nyaraka_basic.tres" id="1_pr7kg"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_5rrdj"]
-[ext_resource type="Resource" uid="uid://bkdmg4n5eme2g" path="res://Screens/Battle/data/Chara_Nyaraka.tres" id="2_bwiei"]
+[ext_resource type="Resource" uid="uid://bkdmg4n5eme2g" path="res://Screens/Battle/data/chara/Nyaraka.tres" id="2_bwiei"]
 [ext_resource type="Resource" uid="uid://10qxptxtqfxf" path="res://Screens/Battle/data/attack/nyaraka_special.tres" id="4_mi6vs"]
 
 [resource]
@@ -18,15 +18,18 @@ map_color = Color(0.352941, 0.352941, 0.352941, 1)
 stat_hp = 4
 stat_mov = 2
 stat_dmg = 2
+stat_rng = 1
 stat_growth_1 = {
 "dmg": 0,
 "hp": 0,
-"mov": 1
+"mov": 1,
+"rng": 0
 }
 stat_growth_2 = {
 "dmg": 0,
 "hp": 1,
-"mov": 0
+"mov": 0,
+"rng": 0
 }
 basic_attack = ExtResource("1_pr7kg")
 special_attack = ExtResource("4_mi6vs")

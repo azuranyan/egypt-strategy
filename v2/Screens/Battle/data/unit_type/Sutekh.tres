@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_3ok56"]
 [ext_resource type="Resource" uid="uid://q6mshefdoa8y" path="res://Screens/Battle/data/attack/sutekh_basic.tres" id="1_tg7ye"]
-[ext_resource type="Resource" uid="uid://boa41b7k70yhw" path="res://Screens/Battle/data/Chara_Sutekh.tres" id="2_5u68u"]
+[ext_resource type="Resource" uid="uid://boa41b7k70yhw" path="res://Screens/Battle/data/chara/Sutekh.tres" id="2_5u68u"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_542ek"]
 [ext_resource type="Resource" uid="uid://dtvjtgjbsugl1" path="res://Screens/Battle/data/attack/sutekh_special.tres" id="4_dwuw2"]
 
@@ -15,18 +15,21 @@ behavior = 5
 avatar = "Avatar of Seth"
 title = "Ferocious Fox God"
 map_color = Color(0.545098, 0, 0, 1)
-stat_hp = 5
+stat_hp = 4
 stat_mov = 2
-stat_dmg = 3
+stat_dmg = 2
+stat_rng = 1
 stat_growth_1 = {
 "dmg": 0,
 "hp": 0,
-"mov": 1
+"mov": 1,
+"rng": 0
 }
 stat_growth_2 = {
 "dmg": 1,
 "hp": 0,
-"mov": 0
+"mov": 0,
+"rng": 0
 }
 basic_attack = ExtResource("1_tg7ye")
 special_attack = ExtResource("4_dwuw2")

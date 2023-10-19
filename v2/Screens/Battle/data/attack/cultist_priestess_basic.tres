@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://rsvyfxxcv72i"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_bxvk3"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="1_x8cdv"]
+
+[sub_resource type="Resource" id="Resource_v034i"]
+script = ExtResource("1_x8cdv")
+min_heal = 1
+max_heal = 1
+target = 1
+custom_description = ""
+custom_animation = ""
+
+[resource]
+script = ExtResource("1_bxvk3")
+name = "Heal"
+description = ""
+user_animation = "attack"
+target_animation = "heal"
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+allow_rotation = false
+range = -1
+min_range = 0
+multicast = 0
+melee = false
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_v034i")])

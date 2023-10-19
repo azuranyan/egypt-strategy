@@ -72,6 +72,13 @@ func _ready():
 	pass
 
 
+func attack_range(unit: Unit, attack: Attack) -> int:
+	if attack.range < 0:
+		return unit.stat_rng
+	else:
+		return attack.range
+
+
 ## Simple suboptimal flood fill algorithm.
 func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var re := PackedVector2Array()

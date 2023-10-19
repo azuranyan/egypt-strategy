@@ -554,7 +554,7 @@ func refresh_active():
 		
 	if active_attack:
 		assert(active_unit)
-		active_targetable = Globals.flood_fill(battle.map.cell(active_unit.map_pos), active_attack.range, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
+		active_targetable = Globals.flood_fill(battle.map.cell(active_unit.map_pos), active_unit.get_attack_range(active_attack), Rect2i(Vector2i.ZERO, battle.map.world.map_size))
 	
 	
 ################################################################################
@@ -655,8 +655,8 @@ func select_attack_target(unit: Unit, attack: Attack, target: Variant):
 				active_unit.face_towards(target)
 			TYPE_FLOAT, TYPE_INT:
 				active_unit.facing = target
-		if attack.range > 0:
-			select_cell(unit.map_pos + Unit.Directions[unit.get_heading()] * attack.range)
+		if unit.get_attack_range(attack) > 0:
+			select_cell(unit.map_pos + Unit.Directions[unit.get_heading()] * unit.get_attack_range(attack))
 		else:
 			select_cell(unit.map_pos)
 	else:
@@ -673,7 +673,7 @@ func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 
 ## Returns a list of targetable cells.
 func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
-	return Globals.flood_fill(battle.map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
+	return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, battle.map.world.map_size))
 	
 	
 ## Returns a list of targeted cells.
@@ -695,7 +695,7 @@ func get_attack_target_cells(unit: Unit, attack: Attack, target: Vector2i, targe
 func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
 	battle.terrain_overlay.clear()
 	
-	var cells := Globals.flood_fill(battle.map.cell(unit.map_pos), attack.range, Rect2i(Vector2i.ZERO, battle.map.world.map_size))
+	var cells := Globals.flood_fill(battle.map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, battle.map.world.map_size))
 	
 	if not attack.melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)

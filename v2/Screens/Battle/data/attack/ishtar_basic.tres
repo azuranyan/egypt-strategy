@@ -1,15 +1,16 @@
 [gd_resource type="Resource" script_class="Attack" load_steps=10 format=3 uid="uid://cu1r2bai288i2"]
 
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_1qq6v"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_a84vy"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_qri6i"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="2_302i8"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="3_7exx3"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/RemoveStatusEffect.gd" id="4_em2po"]
 
-[sub_resource type="Resource" id="Resource_jdgr2"]
-script = ExtResource("1_qri6i")
-min_damage = 1
-max_damage = 1
+[sub_resource type="Resource" id="Resource_t0so8"]
+script = ExtResource("1_1qq6v")
+flat_damage = 0
+stat = "dmg"
+multiplier = 1.0
 target = 0
 custom_description = ""
 custom_animation = ""
@@ -30,7 +31,7 @@ target = 1
 custom_description = ""
 custom_animation = ""
 
-[sub_resource type="Resource" id="Resource_l2pm7"]
+[sub_resource type="Resource" id="Resource_e7r6e"]
 script = ExtResource("4_em2po")
 effect = "PSN"
 target = 1
@@ -45,8 +46,8 @@ user_animation = "attack"
 target_animation = "idle"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 allow_rotation = false
-range = 1
+range = -1
 min_range = 0
 multicast = 0
 melee = true
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_jdgr2"), SubResource("Resource_63lfh"), SubResource("Resource_ijjlw"), SubResource("Resource_l2pm7")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_t0so8"), SubResource("Resource_63lfh"), SubResource("Resource_ijjlw"), SubResource("Resource_e7r6e")])

@@ -4,12 +4,12 @@ class_name StatDamageEffect
 
 @export var flat_damage: int
 
-@export_enum('maxhp', 'hp', 'mov', 'dmg', 'rng', 'bond') var stat: String
+@export_enum('maxhp', 'hp', 'mov', 'dmg', 'rng', 'bond') var stat: String = "dmg"
 
 @export var multiplier: float = 1
 
 
-func _apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	battle.damage_unit(target_unit, user, roundi(user.get(stat)*multiplier + flat_damage))
 	
 	

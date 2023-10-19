@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://qpdrrn4yu0p4"]
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://dx45c1bavorjy"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_56x5e"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_umf1a"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_qalwt"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="2_uxn3d"]
 
 [sub_resource type="Resource" id="Resource_0bf4v"]
-script = ExtResource("1_umf1a")
+script = ExtResource("1_qalwt")
 flat_damage = 0
 stat = "dmg"
 multiplier = 1.0
@@ -13,15 +13,15 @@ custom_description = ""
 custom_animation = ""
 
 [resource]
-script = ExtResource("1_56x5e")
+script = ExtResource("2_uxn3d")
 name = "Attack"
 description = ""
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 allow_rotation = false
-range = -1
-min_range = 1
+range = 1
+min_range = 0
 multicast = 0
 melee = true
 effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_0bf4v")])

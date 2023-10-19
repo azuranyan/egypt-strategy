@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://dvo3mwjbhre76"]
+
+[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_4wr26"]
+[ext_resource type="Resource" uid="uid://rsvyfxxcv72i" path="res://Screens/Battle/data/attack/cultist_priestess_basic.tres" id="1_r28iq"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_p2g6e"]
+
+[resource]
+script = ExtResource("1_4wr26")
+sprite_frames = ExtResource("2_p2g6e")
+name = "Cultist - Priestess"
+behavior = 0
+avatar = ""
+title = ""
+map_color = Color(1, 1, 1, 1)
+stat_hp = 3
+stat_mov = 2
+stat_dmg = 0
+stat_rng = 2
+stat_growth_1 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"hp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_r28iq")

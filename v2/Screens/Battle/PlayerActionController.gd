@@ -494,7 +494,7 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 			anim.animation_finished.connect(decrement_animated_counter)
 			animated_counter += 1
 			
-			eff._apply(battle, unit, attack, target, t)
+			eff.apply(battle, unit, attack, target, t)
 	
 	get_tree().call_group('cast_animation', 'play')
 	await cast_animation_finished
