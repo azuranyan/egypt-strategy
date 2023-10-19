@@ -181,7 +181,6 @@ world = ExtResource("2_5pj4c")
 map_pos = Vector2(5, 1)
 no_show = true
 metadata/spawn_point = "ai"
-metadata/spawn_unit = "Ishtar"
 
 [node name="AI_Spawn_02" parent="." index="21" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512

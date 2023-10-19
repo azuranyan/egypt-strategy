@@ -102,7 +102,7 @@ func _do_ai_turn(empire: Empire):
 				empire.aggression = empire.base_aggression
 			else:
 				# degenerate case of not having neighbors
-				print("warning: possible logic error: %s has no neighbors" % empire.leader.name)
+				push_error("possible logic error: %s has no neighbors" % empire.leader.name)
 			
 
 func empire_rest(empire: Empire):
@@ -117,8 +117,33 @@ func empire_rest(empire: Empire):
 # TODO put into battle manager or something
 func _empire_attack(empire: Empire, territory: Territory):
 	print("%s attacks %s (%s)!" % [empire.leader.name, territory.name, territory.empire.leader.name])
-	battle_manager.initiate_attack(empire, territory)
-
+	
+	# TODO show transition/loading screen
+	# TODO show objectives
+	
+	self.visible = false
+	get_parent().add_child(Globals.battle)
+	Globals.battle.start_battle(empire, territory.empire, territory)
+	var result = await Globals.battle.battle_ended
+	get_parent().remove_child(Globals.battle)
+	self.visible = true
+	
+	match result:
+		Battle.Result.Cancelled:
+			print("Attacker cancelled.")
+		Battle.Result.AttackerRequirementsError:
+			print("Attacker does not meet requirements")
+		Battle.Result.None:
+			push_error("Invalid battle result: None")
+		Battle.Result.AttackerVictory:
+			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.AttackerVictory)
+		Battle.Result.DefenderVictory:
+			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.DefenderVictory)
+		Battle.Result.AttackerWithdraw:
+			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.AttackerWithdraw)
+		Battle.Result.DefenderWithdraw:
+			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.DefenderWithdraw)
+	
 
 func _attacker_victory(empire: Empire, territory: Territory):
 	print("territory taken!")

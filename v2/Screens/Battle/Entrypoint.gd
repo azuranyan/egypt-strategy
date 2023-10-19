@@ -15,7 +15,7 @@ func _ready():
 	# Overworld starts before us and registers the empires and territories
 	register_objects()
 	register_maps()
-	
+
 	var post_ready := func():
 		for empire in Globals.empires.values():
 			if empire.is_player_owned():
@@ -60,14 +60,16 @@ func register_data(subdir: String, get_id: Callable):
 		filename = dir.get_next()
 
 
-
 func _on_button_pressed():
-	add_child(Globals.battle)
-	
 	# TODO when starting battle, close all overworld interactions
 	var attacker: Empire = Globals.empires[label_attacker.get_item_text(label_attacker.get_selectable_item())]
 	var defender: Empire = Globals.empires[label_defender.get_item_text(label_defender.get_selectable_item())]
 	var territory: Territory = Globals.territories[label_territory.get_item_text(label_territory.get_selectable_item())]
 	print(attacker, defender, territory)
+	
+	$Overworld.visible = false
 	Globals.battle.start_battle(attacker, defender, territory)
+	await Globals.battle.battle_ended
+	$Overworld.visible = true
+	
 #	Globals.battle.start_battle(Globals.empires["Lysandra"], Globals.empires["Lysandra"], Globals.territories["Neru-Khisi"])

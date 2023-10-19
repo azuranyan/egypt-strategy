@@ -329,10 +329,6 @@ func select_cell(cell: Vector2i):
 	
 	if show_portrait:
 		battle.update_portrait(unit if unit else active_unit)
-		#var punit := unit if unit else active_unit
-		# TODO select cell? set portrait whatever? update portrait? include hearts?
-		#$"../UI/Battle/Name/Label".text = punit.unit_type.name
-		#$"../UI/Battle/Portrait/Control/TextureRect".texture = punit.unit_type.chara.portrait
 	battle.set_ui_visible(show_portrait, show_actions, show_undo_end)
 		
 	# if there's an active attack, interaction is select target

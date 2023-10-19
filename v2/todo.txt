@@ -19,6 +19,8 @@ saving game
 
 main menu and battle flow
 
+
+
 ## minor
 prep uses global coords to bypass camera problems
 prep keyboard control
@@ -27,6 +29,7 @@ should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
 more robust cast animation system
 disgaea style enum targetable units in attack range
+disgaea style target and caster placement 
 
 
 ## would be nice
@@ -36,12 +39,19 @@ Globals empires, territories -> empire, territory
 feature affect_caster (effect is used on the caster instead of target)
  - modify z series of effects (i.e. effects that affect caster)
 ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
+AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
 
 
 
 ##########################################################################################################
 ## hot list
 ##########################################################################################################
+
+if a battle is initiated with one of the participants == player, do real battle otherwise quick battle
+ - put fight logic and quick battle logic to battle
+ - quick or not the overworld only need to listen to the result
+
+auto end turn not working
 
 battle win loss conditions
  - evaluate win loss
@@ -58,8 +68,6 @@ before every effect, check if target is still alive
  - once unit dies, put in dead_queue
  - after turn cycle ends, clear all dead units
  - maybe status effect bug is related to unit dying and getting cleared
-
-disgaea style target and caster placement 
 
 undoing attack is still active unit and terrain is removed, but does not remove unit_path
 
@@ -89,4 +97,4 @@ make use of groups
 ui being shown in battle signal is wrong
  - some parts of the ui are player specific but will be shown even for ai
 
-AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
+

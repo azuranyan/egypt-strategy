@@ -342,7 +342,9 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	
 	# attack signal
 	attack_sequence_started.emit(unit, attack, target_cell, targets)
+	await get_tree().create_timer(0.2).timeout # added artificial timeouts
 	await _attack_sequence_finished
+	await get_tree().create_timer(0.4).timeout
 	attack_sequence_ended.emit(unit, attack, target_cell, targets)
 	
 	

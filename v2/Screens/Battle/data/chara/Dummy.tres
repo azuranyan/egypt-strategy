@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://bll72uo4o01wg"]
+
+[ext_resource type="Texture2D" uid="uid://dbmh6m16yd65m" path="res://Screens/Overworld/Portraits/placeholder.webp" id="1_beku7"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_w71c3"]
+
+[resource]
+script = ExtResource("2_w71c3")
+name = "Dummy"
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(1, 1, 1, 1)
+portrait = ExtResource("1_beku7")

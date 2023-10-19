@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://c1cqleqcgjia6"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://c1cqleqcgjia6"]
 
 [ext_resource type="Resource" uid="uid://cwmgcdncen3ey" path="res://Screens/Battle/data/attack/basic_ranged.tres" id="1_t6f52"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_ykpc6"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_1h4rk"]
+[ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_1mckh"]
 
 [resource]
 script = ExtResource("1_ykpc6")
+chara = ExtResource("2_1mckh")
 sprite_frames = ExtResource("2_1h4rk")
 name = "Cultist - Bow"
 behavior = 0

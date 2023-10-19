@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://cs2uti1h2rk6u"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://cs2uti1h2rk6u"]
 
 [ext_resource type="Resource" uid="uid://dx45c1bavorjy" path="res://Screens/Battle/data/attack/basic_melee.tres" id="1_ck4vp"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_gus6v"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_3kt6v"]
+[ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_sfbo8"]
 
 [resource]
 script = ExtResource("1_gus6v")
+chara = ExtResource("2_sfbo8")
 sprite_frames = ExtResource("2_3kt6v")
 name = "Cultist - Spear"
 behavior = 0

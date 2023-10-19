@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://bd2a5wgt1kh8w"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://bd2a5wgt1kh8w"]
 
 [ext_resource type="Resource" uid="uid://bt0888vwkaq2i" path="res://Screens/Battle/data/attack/cultist_witch_basic.tres" id="1_38ylq"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_bppn6"]
+[ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_0eegm"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_6r6e4"]
 
 [resource]
 script = ExtResource("1_bppn6")
+chara = ExtResource("2_0eegm")
 sprite_frames = ExtResource("2_6r6e4")
 name = "Cultist - Witch"
 behavior = 0

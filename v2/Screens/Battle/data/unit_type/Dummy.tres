@@ -1,23 +1,13 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=7 format=3 uid="uid://blc6hirmqo4k"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://blc6hirmqo4k"]
 
 [ext_resource type="Resource" uid="uid://djn7qxgy84x1d" path="res://Screens/Battle/data/attack/00default.tres" id="1_cwl7l"]
-[ext_resource type="Texture2D" uid="uid://dbmh6m16yd65m" path="res://Screens/Overworld/Portraits/placeholder.webp" id="2_3i337"]
-[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="3_7eauh"]
+[ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_ayc8x"]
 [ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="4_ah3v8"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="5_y2jx2"]
 
-[sub_resource type="Resource" id="Resource_0tpnn"]
-script = ExtResource("3_7eauh")
-name = "Dummy"
-gender = "F"
-avatar = ""
-title = ""
-map_color = Color(1, 1, 1, 1)
-portrait = ExtResource("2_3i337")
-
 [resource]
 script = ExtResource("4_ah3v8")
-chara = SubResource("Resource_0tpnn")
+chara = ExtResource("2_ayc8x")
 sprite_frames = ExtResource("5_y2jx2")
 name = "Dummy"
 behavior = 0
@@ -27,6 +17,7 @@ map_color = Color(1, 1, 1, 1)
 stat_hp = 999
 stat_mov = 0
 stat_dmg = 0
+stat_rng = null
 stat_growth_1 = {
 "dmg": 0,
 "hp": 0,
