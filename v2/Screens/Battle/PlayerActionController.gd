@@ -453,13 +453,22 @@ func use_attack():
 func action_completed():
 	_action_completed.emit()
 	
+
+signal cast_animation_finished
+var animated_counter := 0
+func decrement_animated_counter():
+	animated_counter -= 1
+	if animated_counter <= 0:
+		var nodes := get_tree().get_nodes_in_group('cast_animation')
+		for node in nodes:
+			battle.remove_child(node)
+			node.queue_free()
+		cast_animation_finished.emit()
+			
 	
 func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
 	print("%s%s used %s" % [unit.name, battle.map.cell(unit.map_pos), attack.name], ": ", target, " ", targets)
-	$"../UI/Battle/AttackName/Label".text = attack.name
-	$"../UI/Battle/AttackName".visible = true
-	battle.set_ui_visible(false, false, false)
-	
+
 	# play animations
 	for t in targets:
 		t.model.play_animation(attack.target_animation)
@@ -471,13 +480,24 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 			# all targets are in the array so so we must check first
 			if not _is_effect_target(unit, t, eff):
 				continue
-				
-			# play animation TODO spawn one each
-			$AnimatedSprite2D.position = battle.map.world.uniform_to_screen(t.map_pos)
-			$AnimatedSprite2D.position.y -= 50
-			$AnimatedSprite2D.play(eff.get_animation())
+			
+			var anim := AnimatedSprite2D.new()
+			anim.sprite_frames = preload("res://Screens/Battle/data/default_effects.tres")
+			
+			battle.add_child(anim)
+			anim.position = battle.map.world.uniform_to_screen(t.map_pos)
+			anim.position.y -= 50
+			anim.scale = Vector2(0.5, 0.5)
+			anim.play(eff.get_animation())
+			anim.pause()
+			anim.add_to_group('cast_animation')
+			anim.animation_finished.connect(decrement_animated_counter)
+			animated_counter += 1
 			
 			eff._apply(battle, unit, attack, target, t)
+	
+	get_tree().call_group('cast_animation', 'play')
+	await cast_animation_finished
 	
 	# stop animations
 	for t in targets:
@@ -485,8 +505,6 @@ func _activate_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Arr
 		t.model.stop_animation() # TODO wouldn't have to do this if there's a reset
 	unit.model.play_animation("idle")
 	unit.model.stop_animation()
-
-	$"../UI/Battle/AttackName".visible = false
 	
 	battle.notify_attack_sequence_finished()
 		

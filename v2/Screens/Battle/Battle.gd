@@ -876,12 +876,17 @@ func _on_turn_cycle_started():
 	
 
 func _on_attack_sequence_started(_unit, attack, _target, _targets):
-	$UI/Battle/AttackName/Label.text = attack.name
-	$UI/Battle/AttackName.visible = true
+	set_ui_visible(false, false, false)
+	$UI/Attack/Label.text = attack.name
+	$UI/Attack.visible = true
 
 
 func _on_attack_sequence_ended(_unit, _attack, _target, _targets):
-	$UI/Battle/AttackName.visible = false
+	$UI/Attack.visible = false
+
+
+func _on_attack_visibility_changed():
+	print('stop')
 
 
 func _on_walking_started(unit):

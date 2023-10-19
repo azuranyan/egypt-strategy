@@ -7,12 +7,27 @@ bond levelling
 
 "All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
 
+dialogue hooks
+
+scriptable events
+ - unified battle api where all the functions are there instead of fiddling the classes themselves
+
+battle world state
+ - this should clean up the mess that you currently have to do with units and map and stuff
+
+saving game
+
+main menu and battle flow
+
 ## minor
 prep uses global coords to bypass camera problems
 prep keyboard control
 ui elements need to be canvaslayer to bypass camera and viewport transforms
 should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
+more robust cast animation system
+disgaea style enum targetable units in attack range
+
 
 ## would be nice
 damage counter for consecutive attacks
@@ -24,10 +39,17 @@ ugly cell() casting because of round: don't apply 0.5 to world and let map objec
 
 
 
-
 ##########################################################################################################
 ## hot list
 ##########################################################################################################
+
+battle win loss conditions
+ - evaluate win loss
+ - add custom win loss conditions
+
+display targeting info
+ - list of units that will be hit by the attack
+ - attack being used
 
 implement multicast
  - if it's already selected, deselect
@@ -36,6 +58,8 @@ before every effect, check if target is still alive
  - once unit dies, put in dead_queue
  - after turn cycle ends, clear all dead units
  - maybe status effect bug is related to unit dying and getting cleared
+
+disgaea style target and caster placement 
 
 undoing attack is still active unit and terrain is removed, but does not remove unit_path
 
@@ -57,10 +81,12 @@ unit states [standby, alive, action_taken, dead, ghost]
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
-dialogue hooks
+attack name is not showing bug
+ - attack name is being shown and modified twice from _activate attack and battle signal
+ - ui or battle is hidden so it doesn't show up anyway
+ - maybe make ui centralized
 
-scriptable events
- - unified battle api where all the functions are there instead of fiddling the classes themselves
+do other units
+ - units without chara does not work because chara is accessed directly from the unit for details
 
-battle world state
- - this should clean up the mess that you currently have to do with units and map and stuff
+make use of groups

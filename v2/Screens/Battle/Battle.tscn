@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=44 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -13,7 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="6_itebx"]
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="8_b0ewm"]
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="9_j1ncc"]
-[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="10_g7k58"]
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="14_ca16r"]
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="15_41khm"]
 
@@ -294,13 +293,13 @@ font_color = Color(0.545098, 0.631373, 1, 1)
 shadow_size = 8
 shadow_color = Color(0, 0, 0, 0.690196)
 
-[sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
-font_size = 30
-
 [sub_resource type="LabelSettings" id="LabelSettings_v2v4r"]
 font = ExtResource("14_ca16r")
 font_size = 20
 font_color = Color(0.00784314, 0.00784314, 0.00784314, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_6nd0a"]
+font_size = 30
 
 [sub_resource type="InputEventKey" id="InputEventKey_dqmi4"]
 device = -1
@@ -343,11 +342,6 @@ script = ExtResource("2_bgyoj")
 
 [node name="PlayerActionController" type="Node" parent="."]
 script = ExtResource("3_brpnv")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="PlayerActionController"]
-scale = Vector2(0.5, 0.5)
-sprite_frames = ExtResource("10_g7k58")
-animation = &"none"
 
 [node name="States" type="Control" parent="."]
 process_priority = -1
@@ -618,6 +612,47 @@ grow_vertical = 2
 text = "ENEMY TURN"
 label_settings = SubResource("LabelSettings_vxtxp")
 
+[node name="Attack" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = 52.0
+offset_right = 140.0
+offset_bottom = 78.0
+grow_horizontal = 2
+
+[node name="ColorRect2" type="ColorRect" parent="UI/Attack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.870588, 0.839216, 0.784314, 1)
+
+[node name="Label" type="Label" parent="UI/Attack"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.5
+offset_top = -12.0
+offset_right = 52.5
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "LYSANDRA"
+label_settings = SubResource("LabelSettings_v2v4r")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Battle" type="CanvasLayer" parent="UI"]
 visible = false
 
@@ -656,47 +691,6 @@ grow_vertical = 2
 color = Color(0.870588, 0.839216, 0.784314, 1)
 
 [node name="Label" type="Label" parent="UI/Battle/Name"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -52.5
-offset_top = -12.0
-offset_right = 52.5
-offset_bottom = 19.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "LYSANDRA"
-label_settings = SubResource("LabelSettings_v2v4r")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AttackName" type="Control" parent="UI/Battle"]
-visible = false
-layout_mode = 3
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -140.0
-offset_top = 52.0
-offset_right = 140.0
-offset_bottom = 78.0
-grow_horizontal = 2
-
-[node name="ColorRect2" type="ColorRect" parent="UI/Battle/AttackName"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -4.0
-offset_bottom = 4.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.870588, 0.839216, 0.784314, 1)
-
-[node name="Label" type="Label" parent="UI/Battle/AttackName"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -830,6 +824,7 @@ text = "End Turn
 [connection signal="unit_selected" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_selected"]
 [connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]
 [connection signal="pressed" from="UI/CancelPrep" to="." method="_on_undo_button_pressed"]
+[connection signal="visibility_changed" from="UI/Attack" to="." method="_on_attack_visibility_changed"]
 [connection signal="pressed" from="UI/Battle/AttackButton" to="PlayerActionController" method="_on_attack_button_pressed"]
 [connection signal="pressed" from="UI/Battle/SpecialButton" to="PlayerActionController" method="_on_special_button_pressed"]
 [connection signal="pressed" from="UI/Battle/UndoButton" to="PlayerActionController" method="_on_undo_button_pressed"]
