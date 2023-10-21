@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://dcd0kq31m2hxk"]
+
+[ext_resource type="Script" path="res://Game.gd" id="1_lioyt"]
+[ext_resource type="Script" path="res://Initializer.gd" id="2_u5wy3"]
+[ext_resource type="PackedScene" uid="uid://c11gexecl1hvb" path="res://Screens/Overworld/Overworld.tscn" id="2_v5lwm"]
+[ext_resource type="PackedScene" uid="uid://dy2jg0e1iws2m" path="res://Screens/Battle/Battle.tscn" id="3_mbriv"]
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_lioyt")
+
+[node name="Initializer" type="Node" parent="."]
+script = ExtResource("2_u5wy3")
+
+[node name="Overworld" parent="." instance=ExtResource("2_v5lwm")]
+layout_mode = 1
+
+[node name="Battle" parent="." instance=ExtResource("3_mbriv")]
+visible = false

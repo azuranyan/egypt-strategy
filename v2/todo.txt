@@ -39,13 +39,6 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 
 add check for bond level up after turn ends
 
-knockback allows knocking enemies out of bounds LMAO
- - check other movement based skills too
-
-await for overworld battle to end
- - everyone takes their turn while you are fighting
- - breaks the turn order code
-
 battle win loss conditions
  - evaluate win loss
  - add custom win loss conditions
@@ -64,7 +57,6 @@ before every effect, check if target is still alive
  - after turn cycle ends, clear all dead units
  - maybe status effect bug is related to unit dying and getting cleared
 
-prep drag and drop broken
 
 unit states [standby, alive, action_taken, dead, ghost]
  - standby units are spawned in but placed out of bounds and can't be interacted with
@@ -82,3 +74,9 @@ ui being shown in battle signal is wrong
 for manager classes, context/state are variables needed to resume a saved game
  - the rest of the variables are assumed to be transient and runtime only
 
+prep drag and drop broken
+
+prep error when exiting battle (keeping state and holding onto stale variable that's already freed)
+
+screen transitions
+ - possible redundant wait on quick battle and ai take turn

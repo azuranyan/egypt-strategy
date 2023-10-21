@@ -164,8 +164,10 @@ func _quick_battle(attacker: Empire, defender: Empire, territory: Territory):
 
 ## Real battle. 
 func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
+	# TODO we shouldnt need to do this ourselves and should be handled by
+	# the screen transitions function instead
+	self.visible = true
 	_load_map(territory.maps[0])
-
 	# if defender is ai, allow them to set first so player can see the map
 	# with enemies already in place.
 	var prep_queue := []
@@ -192,6 +194,10 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
 		
 		await _end_battle_requested # wait for the gameplay to call end_battle()
 		_unload_map()
+		
+	# TODO we shouldnt need to do this ourselves and should be handled by
+	# the screen transitions function instead
+	self.visible = false
 	
 	
 func _load_map(scene: PackedScene):
@@ -320,13 +326,13 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	
 	# check for minimum range
 	if attack.min_range > 0:
-		var min_range := Globals.flood_fill(map.cell(unit.map_pos), attack.min_range, Rect2i(Vector2i.ZERO, map.world.map_size))
+		var min_range := Util.flood_fill(map.cell(unit.map_pos), attack.min_range, Rect2i(Vector2i.ZERO, map.world.map_size))
 		if cellf in min_range:
 			play_error("Target is inside minimum range.")
 			return
 	
 	# check for out of range
-	var target_range := Globals.flood_fill(map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, map.world.map_size))
+	var target_range := Util.flood_fill(map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, map.world.map_size))
 	if cellf not in target_range:
 		play_error("Target is out of range.")
 		return
@@ -607,19 +613,19 @@ func select_attack_target(unit: Unit, attack: Attack, target: Variant):
 func get_walkable_cells(unit: Unit) -> PackedVector2Array:
 	var cond := func(p): return is_pathable(unit, p)
 	var bounds := Rect2i(Vector2i.ZERO, map.world.map_size)
-	return Globals.flood_fill(map.cell(unit.map_pos), unit.mov, bounds, cond)
+	return Util.flood_fill(map.cell(unit.map_pos), unit.mov, bounds, cond)
 	#return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size),  func(p): return is_pathable(unit, p))
 	
 
 ## Returns a list of targetable cells.
 func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
-	var re := Globals.flood_fill(
+	var re := Util.flood_fill(
 			map.cell(unit.map_pos),
 			unit.get_attack_range(attack),
 			Rect2i(Vector2i.ZERO, map.world.map_size),
 			)
 	if attack.min_range > 0:
-		var min_area := Globals.flood_fill(
+		var min_area := Util.flood_fill(
 			map.cell(unit.map_pos),
 			attack.min_range,
 			Rect2i(Vector2i.ZERO, map.world.map_size),
@@ -681,6 +687,9 @@ func spawn_unit(tag: String, empire: Empire, _name := "", pos := Map.OUT_OF_BOUN
 		heading = heading,
 	})
 	add_unit(unit, pos)
+	# TODO this piece of code shouldnt be here but im too lazy to create
+	# an appropriate function so just deal with this for now
+	unit.hp = unit.empire.hp_multiplier * unit.maxhp
 	return unit
 	
 
@@ -864,11 +873,15 @@ func _on_target_map_pos_changed():
 # TODO maybe this should be on UI code?
 func _on_battle_started(attacker, defender, _territory):
 	$UI.visible = true
-	$UI/Label.text = "%s vs %s" % [attacker.leader.name, defender.leader.name]
+	#$UI/Label.text = "%s vs %s" % [attacker.leader.name, defender.leader.name]
 
 
 func _on_battle_ended(_result):
 	$UI.visible = false
+
+	camera.drag_horizontal_enabled = false
+	camera.drag_vertical_enabled = false
+	camera.position = Vector2(960, 540)
 
 
 func _on_done_prep_pressed():

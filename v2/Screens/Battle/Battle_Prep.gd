@@ -77,10 +77,7 @@ func enter(kwargs := {}) -> void:
 		
 
 func done() -> void:
-	if prep_queue.is_empty():
-		state_machine.transition_to("TurnEval", {battle=battle})
-	else:
-		state_machine.transition_to("Prep", {battle=battle, prep_queue=prep_queue})
+	state_machine.transition_to("Idle", {battle=battle})
 
 
 func exit() -> void:
@@ -93,8 +90,17 @@ func exit() -> void:
 			o.no_show = true
 			
 	$UI.visible = false
+	
 	prep = null
 	battle.character_list.visible = false
+	
+	# todo context and delete
+	dragging = false
+	selected = null
+	selected_moved = false
+	selected_original_pos = Vector2.ZERO
+	selected_offset = Vector2.ZERO
+	heading_adjusted = null
 	
 
 func can_spawn(unit: Unit, pos: Vector2) -> bool:
@@ -169,8 +175,8 @@ func _remove_unit(unit_name: String, pos := Map.OUT_OF_BOUNDS):
 	# remove callbacks
 	# TODO this sometimes complains about not having callbacks, meaning a unit
 	# is removed without being added. check that root problem.
-	var cb = unit.get_meta("prep_phase_callbacks", null)
-	if cb:
+	if unit.has_meta("prep_phase_callbacks"):
+		var cb = unit.get_meta("prep_phase_callbacks", null)
 		unit.button_down.disconnect(cb[0])
 		unit.button_up.disconnect(cb[1])
 		unit.remove_meta("prep_phase_callbacks")

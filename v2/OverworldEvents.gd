@@ -49,12 +49,6 @@ signal train()
 ### Gameplay triggers
 ################################################################################
 
-## Emit to trigger an attack event to the engine
-signal empire_attack(empire: Empire, target: Territory)
-
-## Emitted by the battle manager
-signal battle_result(empire: Empire, target: Territory, result: BattleManager.Result)
-
 #const click_on_territory := 'overworld.click_on_territory'
 #const click_on_map := 'overworld.click_on_map'
 #const right_click := 'overworld.right_click'

@@ -110,8 +110,10 @@ func _on_attack_button_pressed():
 	
 	# this button should appear only for player and therefore is
 	# always the player empire triggering this
-	OverworldEvents.emit_signal("empire_attack", Globals.empires["Lysandra"], territory)
-	OverworldEvents.emit_signal("cycle_turn_end", Globals.empires["Lysandra"])
+	#OverworldEvents.emit_signal("empire_attack", Globals.empires["Lysandra"], territory)
+	#OverworldEvents.emit_signal("cycle_turn_end", Globals.empires["Lysandra"])
+	
+	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_attack_action(territory))
 
 
 func _on_inspect_button_pressed():

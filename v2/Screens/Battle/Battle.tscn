@@ -472,16 +472,6 @@ offset_top = 112.0
 offset_right = 1877.0
 offset_bottom = 687.0
 
-[node name="Label" type="Label" parent="UI"]
-offset_left = 146.0
-offset_top = 738.0
-offset_right = 186.0
-offset_bottom = 761.0
-text = "Tile: Tree1
-x = %s
-y = %s"
-metadata/_edit_use_anchors_ = true
-
 [node name="DonePrep" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(0, 48)

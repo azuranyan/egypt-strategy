@@ -695,7 +695,7 @@ func get_attack_target_cells(unit: Unit, attack: Attack, target: Vector2i, targe
 func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
 	battle.terrain_overlay.clear()
 	
-	var cells := Globals.flood_fill(battle.map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, battle.map.world.map_size))
+	var cells := Util.flood_fill(battle.map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, battle.map.world.map_size))
 	
 	if not attack.melee:
 		draw_terrain_overlay(cells, TERRAIN_RED, true)

@@ -1,86 +1,8 @@
-extends Node
-
-
-const DIRECTIONS = [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]
-#var territories: Array[Territory] = []
-
-#var gods: Array[God] = []
-var units: Array[Unit] = []
-var hp_multiplier: float = 1.0
-
-var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
-
-
-var territories := {
-	# This will be auto populated in Overworld._ready
-}
-
-var empires := {
-	# This will be auto populated in Overworld._ready
-}
-
-var maps := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-
-var prefs := {
-	'defeat_if_home_territory_captured': true,
-	'camera_follow_unit_move': true,
-	'mouse_edge_scrolling': true, # TODO
-	'auto_end_turn': true,
-}
-
-var attack := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var chara := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var doodad_type := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var status_effect := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var unit_type := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var world := {
-	# This will be auto populated in Entrypoint._ready
-}
-
-var scene_queue: Array[String] = []
-
-func _ready():
-#	var dir := DirAccess.open("res://Screens/Battle/data/")
-#	dir.list_dir_begin()
-#	var filename := dir.get_next()
-#	while filename != "":
-#		if !dir.current_is_dir() and filename.begins_with("Chara_"):
-#			var chara: Chara = load(filename)
-#
-#		filename = dir.get_next()
-
-	#get_tree().root.add_child.call_deferred(battle)
-	#print("battle added")
-	pass
-
-
-func attack_range(unit: Unit, attack: Attack) -> int:
-	if attack.range < 0:
-		return unit.stat_rng
-	else:
-		return attack.range
+class_name Util
 
 
 ## Simple suboptimal flood fill algorithm.
-func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
+static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var re := PackedVector2Array()
 	var stack := [cell]
 	
@@ -102,7 +24,7 @@ func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Cal
 		if condition.call(current):
 			re.append(current)
 		
-		for direction in DIRECTIONS:
+		for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
 			var coords: Vector2 = current + direction
 			
 			if not bounds.has_point(coords) or coords in re:
