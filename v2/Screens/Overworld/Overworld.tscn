@@ -106,6 +106,7 @@ adjacent = [NodePath("../../TerritoryButton6/Fort Zaka")]
 maps = Array[PackedScene]([ExtResource("5_xwig8")])
 
 [node name="TerritoryButton10" parent="." instance=ExtResource("3_aby1e")]
+visible = false
 position = Vector2(230, 139)
 scale = Vector2(0.05, 0.05)
 

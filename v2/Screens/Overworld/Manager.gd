@@ -10,96 +10,78 @@ enum Battle {
 # counts the number of turn cycles that have passed
 var turn_cycles: int = 0
 
-# empire turn order
-var turn_order: Array[Empire]
+# initial turn order
+var initial_turn_order: Array[Empire]
 
-# ugly implementation details
-var current_turn: int = 0
+# the turn queue
+var turn_queue: Array[Empire]
+
+# the empire currently taking their turn
+var on_turn: Empire
+
+# flag to indicate end
+var should_end := false
+
 
 # we need to have a global autoload but will also be initialized late
 func _init():
 	print('manager created')
 	
-	refresh_turn_order()
 
-
-func refresh_turn_order():
-	var ot := turn_order
-	
-	turn_order = []
-	
-	if Globals.empires["Sitri"] in ot:
-		turn_order.append(Globals.empires["Sitri"])
-		
-	turn_order.append(Globals.empires["Lysandra"])
-	
-	for ename in Globals.empires:
-		if ename != "Lysandra" and ename != "Sitri":
-			turn_order.append(Globals.empires[ename])
-	
-	
+## Removes the empire from the turn order.
 func remove_from_turn_order(empire: Empire):
-	var idx := get_empire_turn_order(empire)
-	print("removing %s from turn order" % empire.leader.name)
-	
-	assert(idx != -1, "logic error; defeated territory not in turn order")
-	assert(idx != current_turn, "logic error; trying to remove empire on current turn")
-	
-	turn_order.remove_at(idx)
-	
-	# current_turn will be invalid removed item index < current turn, so fix it
-	if idx < current_turn:
-		current_turn -= 1
+	empire.set_meta('Overworld.manager.eliminated', true)
 	
 	
-func get_empire_turn_order(empire: Empire) -> int:
-	return turn_order.find(empire)
+## Starts the overworld main loop.
+func do_cycle():
+	while not should_end:
+		OverworldEvents.cycle_start.emit()
+		
+		# create turn order if not yet
+		if initial_turn_order.is_empty():
+			# player takes turn first
+			initial_turn_order.append(Globals.empires['Lysandra'])
+			
+			# add the rest of them
+			for ename in Globals.empires:
+				if ename != 'Lysandra' and ename != 'Sitri':
+					initial_turn_order.append(Globals.empires[ename])
+					
+		# start the turns
+		turn_queue = initial_turn_order.duplicate()
+		while not turn_queue.is_empty():
+			# should_end is checked before the start of a new turn
+			if should_end:
+				break
+				
+			on_turn = turn_queue.pop_front()
+			
+			# skip eliminated empires - we do it this way because 
+			# empires can be defeated while the queue is on going
+			if on_turn.get_meta('Overworld.manager.eliminated', false):
+				continue
+				
+			# allow scene to play before the start of a turn
+			await _play_scene_insert()
+			
+			OverworldEvents.emit_signal("cycle_turn_start", on_turn)
+			await OverworldEvents.cycle_turn_end
+			
+			# allow scene to play after the end of a turn
+			await _play_scene_insert()
+			
+		OverworldEvents.cycle_end.emit()
+		turn_cycles += 1
 	
 
-func do_cycle():
-	var new_cycle = true
-	while true:
-		if new_cycle:
-			OverworldEvents.emit_signal("cycle_start")
+func _play_scene_insert():
+	# do the scene queue
+	while !Globals.scene_queue.is_empty():
+		var scn: String = Globals.scene_queue.pop_front()
 		
-		# do the scene queue
-		while !Globals.scene_queue.is_empty():
-			var scene: String = Globals.scene_queue.pop_front()
-			
-			# emit signal to start scene
-			OverworldEvents.emit_signal("cycle_scene_start", scene)
-			
-			# wait for the signal to end scene
-			await OverworldEvents.cycle_scene_end
+		# emit signal to start scene
+		OverworldEvents.cycle_scene_start.emit(scn)
 		
-		# refresh turn order, just in case something changed?
-		# refresh_turn_order()
-		print("TURN ORDER ", turn_cycles)
-		for e in turn_order:
-			if e == turn_order[current_turn]:
-				print("  * ", e.leader.name)
-			else:
-				print("    ", e.leader.name)
-			
-		# do the turn
-		var empire := turn_order[current_turn]
-		OverworldEvents.emit_signal("cycle_turn_start", empire)
-			
-		# wait for the signal to end turn
-		await OverworldEvents.cycle_turn_end
-		
-		# do next turn
-		current_turn += 1
-		print("TURN ORDER END")
-			
-		# turn over cycle if needed
-		if current_turn >= turn_order.size():
-			OverworldEvents.emit_signal("cycle_end")
-			current_turn = 0
-			turn_cycles += 1
-			new_cycle = true
-		else:
-			new_cycle = false
-		
-		
-		
+		# wait for the signal to end scene
+		await OverworldEvents.cycle_scene_end

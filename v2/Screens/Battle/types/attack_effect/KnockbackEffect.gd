@@ -16,7 +16,7 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 	var new_pos := Vector2i(target_unit.map_pos + DIRECTIONS[direction])
 	
 	# TODO check if new_pos has unit, if there is then damage both by 1
-	if battle.is_placeable(target_unit, new_pos):
+	if battle.is_placeable(target_unit, new_pos) and battle.map.is_inside_bounds(new_pos):
 		# TODO animate
 		target_unit.map_pos = new_pos
 	else:

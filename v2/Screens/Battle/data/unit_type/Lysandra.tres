@@ -15,19 +15,19 @@ behavior = 0
 avatar = "Avatar of Ra"
 title = "Supreme Sun God"
 map_color = Color(0.666667, 0.352941, 0.2, 1)
-stat_hp = 5
+stat_maxhp = 0
 stat_mov = 2
 stat_dmg = 2
 stat_rng = 2
 stat_growth_1 = {
 "dmg": 0,
-"hp": 0,
+"maxhp": 0,
 "mov": 1,
 "rng": 0
 }
 stat_growth_2 = {
 "dmg": 0,
-"hp": 1,
+"maxhp": 1,
 "mov": 0,
 "rng": 0
 }

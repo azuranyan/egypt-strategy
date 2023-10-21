@@ -300,8 +300,23 @@ func play_error(message):
 		display_message(message)
 	
 	
+func set_bond_level(unit: Unit, level: int):
+	unit.bond = clampi(level, 0, 2)
+	if unit.bond >= 1:
+		for stat in unit.unit_type.stat_growth_1:
+			unit.set(stat, unit.unit_type.stat_growth_1[stat])
+	if unit.bond >= 2:
+		for stat in unit.unit_type.stat_growth_2:
+			unit.set(stat, unit.unit_type.stat_growth_2[stat])
+	
+	
 func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
 	var cellf := Vector2(target_cell)
+	
+	# check for bond level
+	if attack == unit.unit_type.special_attack and unit.bond < 2:
+		play_error("Unit has not unlocked this skill yet.")
+		return
 	
 	# check for minimum range
 	if attack.min_range > 0:

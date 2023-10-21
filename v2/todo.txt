@@ -1,38 +1,28 @@
 ##########################################################################################################
 ## to implement
 ##########################################################################################################
-special should only be available at bond 3
-
-bond levelling
-
 "All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
 
 dialogue hooks
+ - print statement for dialogue
 
-scriptable events
+scriptable events/battle world state
  - unified battle api where all the functions are there instead of fiddling the classes themselves
-
-battle world state
  - this should clean up the mess that you currently have to do with units and map and stuff
-
-saving game
-
-main menu and battle flow
-
 
 
 ## minor
+ui elements need to be canvaslayer to bypass camera and viewport transforms
 prep uses global coords to bypass camera problems
 prep keyboard control
-ui elements need to be canvaslayer to bypass camera and viewport transforms
 should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
 more robust cast animation system
-disgaea style enum targetable units in attack range
-disgaea style target and caster placement 
 
 
 ## would be nice
+disgaea style enum targetable units in attack range
+disgaea style target and caster placement 
 damage counter for consecutive attacks
 allow scrolling on character list
 Globals empires, territories -> empire, territory
@@ -47,10 +37,14 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
-auto end turn not working
+add check for bond level up after turn ends
 
 knockback allows knocking enemies out of bounds LMAO
  - check other movement based skills too
+
+await for overworld battle to end
+ - everyone takes their turn while you are fighting
+ - breaks the turn order code
 
 battle win loss conditions
  - evaluate win loss
@@ -70,17 +64,7 @@ before every effect, check if target is still alive
  - after turn cycle ends, clear all dead units
  - maybe status effect bug is related to unit dying and getting cleared
 
-undoing attack is still active unit and terrain is removed, but does not remove unit_path
-
 prep drag and drop broken
-
-status_effect_changed null error bug
-
-overworld ui elements not hidden when going to battle
-
-main action should be on battle (walk, attack) and battle does the marking logic
- - use attack
- - execute attack
 
 unit states [standby, alive, action_taken, dead, ghost]
  - standby units are spawned in but placed out of bounds and can't be interacted with
@@ -90,12 +74,11 @@ unit states [standby, alive, action_taken, dead, ghost]
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
-do other units
- - units without chara does not work because chara is accessed directly from the unit for details
-
 make use of groups
 
 ui being shown in battle signal is wrong
  - some parts of the ui are player specific but will be shown even for ai
 
+for manager classes, context/state are variables needed to resume a saved game
+ - the rest of the variables are assumed to be transient and runtime only
 

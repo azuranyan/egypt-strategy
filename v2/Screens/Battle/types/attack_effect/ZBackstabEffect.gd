@@ -13,7 +13,7 @@ const DIRECTIONS := [
 func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	var new_pos := Vector2i(target_unit.map_pos - DIRECTIONS[target_unit.get_heading()])
 	
-	if battle.is_placeable(user, new_pos):
+	if battle.is_placeable(user, new_pos) and battle.map.is_inside_bounds(new_pos):
 		# TODO animate
 		user.map_pos = new_pos
 		user.face_towards(target_unit.map_pos)

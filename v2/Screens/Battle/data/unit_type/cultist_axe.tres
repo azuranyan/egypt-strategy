@@ -13,19 +13,19 @@ behavior = 0
 avatar = ""
 title = ""
 map_color = Color(1, 1, 1, 1)
-stat_hp = 3
+stat_maxhp = 0
 stat_mov = 2
 stat_dmg = 2
 stat_rng = 1
 stat_growth_1 = {
 "dmg": 0,
-"hp": 0,
+"maxhp": 0,
 "mov": 0,
 "rng": 0
 }
 stat_growth_2 = {
 "dmg": 0,
-"hp": 0,
+"maxhp": 0,
 "mov": 0,
 "rng": 0
 }

@@ -79,7 +79,7 @@ func _turn_start(empire: Empire):
 		
 
 func _end_turn():
-	OverworldEvents.emit_signal("cycle_turn_end", manager.turn_order[manager.current_turn])
+	OverworldEvents.emit_signal("cycle_turn_end", manager.on_turn)
 
 	
 func _do_ai_turn(empire: Empire):
@@ -123,7 +123,7 @@ func _empire_attack(empire: Empire, territory: Territory):
 	
 	self.visible = false
 	get_parent().add_child(Globals.battle)
-	Globals.battle.start_battle(empire, territory.empire, territory)
+	await Globals.battle.start_battle(empire, territory.empire, territory)
 	var result = await Globals.battle.battle_ended
 	get_parent().remove_child(Globals.battle)
 	self.visible = true
@@ -136,12 +136,16 @@ func _empire_attack(empire: Empire, territory: Territory):
 		Battle.Result.None:
 			push_error("Invalid battle result: None")
 		Battle.Result.AttackerVictory:
+			print("Attacker Victory!")
 			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.AttackerVictory)
 		Battle.Result.DefenderVictory:
+			print("Defender Victory")
 			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.DefenderVictory)
 		Battle.Result.AttackerWithdraw:
+			print("Attacker Withdraw.")
 			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.AttackerWithdraw)
 		Battle.Result.DefenderWithdraw:
+			print("Defender Withdraw.")
 			OverworldEvents.battle_result.emit(empire, territory, BattleManager.Result.DefenderWithdraw)
 	
 
@@ -203,11 +207,12 @@ func update_boss_spawn_condition():
 	
 		
 func spawn_boss():
-	# await boss spawn animation
+	# TODO await boss spawn animation
+	$TerritoryButton10.visible = true
 	
 	connect_territories(Globals.territories["Cursed Stronghold"], Globals.territories["Ruins of Atesh"])
 	
-	manager.turn_order.append(Globals.empires["Sitri"])
+	manager.initial_turn_order.append(Globals.empires["Sitri"])
 	
 
 ## Connects two territories together

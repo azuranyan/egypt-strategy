@@ -225,7 +225,7 @@ func _set_if_has(prop: String, kwargs: Dictionary):
 ## Resets the unit.
 func reset(flags := RESET_ALL):
 	if flags & RESET_STATS != 0:
-		maxhp = unit_type.stat_hp
+		maxhp = unit_type.stat_maxhp
 		mov = unit_type.stat_mov
 		dmg = unit_type.stat_dmg
 		rng = unit_type.stat_rng

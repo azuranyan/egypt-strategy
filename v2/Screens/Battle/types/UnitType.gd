@@ -86,7 +86,7 @@ enum Behavior {
 @export_group("Stats")
 
 ## Base HP stat.
-@export var stat_hp: int
+@export var stat_maxhp: int
 
 ## Base MOV stat.
 @export var stat_mov: int
@@ -98,10 +98,10 @@ enum Behavior {
 @export var stat_rng: int
 
 ## Stat growth for +1 bond (or story powerup 1).
-@export var stat_growth_1: Dictionary = {"hp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
+@export var stat_growth_1: Dictionary = {"maxhp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
 
 ## Stat growth for max bond (or story powerup 2).
-@export var stat_growth_2: Dictionary ={"hp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
+@export var stat_growth_2: Dictionary ={"maxhp" = 0, "mov" = 0, "dmg" = 0, "rng" = 0}
 
 ## Basic attack.
 @export var basic_attack: Attack

@@ -14,19 +14,19 @@ behavior = 0
 avatar = "Dark Serpent"
 title = "Vainglorious Viper Goddess"
 map_color = Color(0.470588, 0.317647, 0.662745, 1)
-stat_hp = 9
+stat_maxhp = 0
 stat_mov = 3
 stat_dmg = 2
 stat_rng = 1
 stat_growth_1 = {
 "dmg": 0,
-"hp": 0,
+"maxhp": 0,
 "mov": 0,
 "rng": 0
 }
 stat_growth_2 = {
 "dmg": 0,
-"hp": 0,
+"maxhp": 0,
 "mov": 0,
 "rng": 0
 }
