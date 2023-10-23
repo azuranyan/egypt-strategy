@@ -10,6 +10,8 @@ scriptable events/battle world state
  - unified battle api where all the functions are there instead of fiddling the classes themselves
  - this should clean up the mess that you currently have to do with units and map and stuff
 
+possible problem with await-style flow
+ - signals like quit game and other exceptions may cause leaks and issues
 
 ## minor
 ui elements need to be canvaslayer to bypass camera and viewport transforms
@@ -37,26 +39,16 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
-add check for bond level up after turn ends
-
-battle win loss conditions
- - evaluate win loss
- - add custom win loss conditions
- - battle prep conditions
- - attacker/defender victory/withdraw
+battle
+ - unit pass/do nothing
 
 display targeting info
  - list of units that will be hit by the attack
  - attack being used
 
-implement multicast
- - if it's already selected, deselect
+add check for bond level up after turn ends
 
-before every effect, check if target is still alive
- - once unit dies, put in dead_queue
- - after turn cycle ends, clear all dead units
- - maybe status effect bug is related to unit dying and getting cleared
-
+make use of groups
 
 unit states [standby, alive, action_taken, dead, ghost]
  - standby units are spawned in but placed out of bounds and can't be interacted with
@@ -66,7 +58,13 @@ unit states [standby, alive, action_taken, dead, ghost]
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
-make use of groups
+implement multicast
+ - if it's already selected, deselect
+
+before every effect, check if target is still alive
+ - once unit dies, put in dead_queue
+ - after turn cycle ends, clear all dead units
+ - maybe status effect bug is related to unit dying and getting cleared
 
 ui being shown in battle signal is wrong
  - some parts of the ui are player specific but will be shown even for ai
@@ -74,9 +72,8 @@ ui being shown in battle signal is wrong
 for manager classes, context/state are variables needed to resume a saved game
  - the rest of the variables are assumed to be transient and runtime only
 
-prep drag and drop broken
-
-prep error when exiting battle (keeping state and holding onto stale variable that's already freed)
-
-screen transitions
- - possible redundant wait on quick battle and ai take turn
+prep
+ - drag and drop broken
+prep
+ - error when exiting battle (keeping state and holding onto stale variable that's already freed) @handle_input @selected
+ - above error does not exist when battle is removed from the tree to stop input from propagating

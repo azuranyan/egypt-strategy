@@ -9,14 +9,10 @@ static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, conditi
 	while not stack.is_empty():
 		var current = stack.pop_back()
 		
-		# diagonal distance check (not circle or square)
-		var diff: Vector2 = (current - cell).abs()
-		var dist := int(diff.x + diff.y)
-		
 		# various checks
 		var out_of_bounds: bool = not bounds.has_point(current)
 		var dupe: bool = current in re
-		var out_of_range: bool = dist > max_distance
+		var out_of_range: bool = cell_distance(current, cell) > max_distance
 		
 		if out_of_bounds or dupe or out_of_range:
 			continue
@@ -34,6 +30,12 @@ static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, conditi
 				stack.append(coords) # not ideal
 	return re
 	
+
+## Returns the cell distance between two cells.
+static func cell_distance(a: Vector2, b: Vector2) -> int:
+	var diff := (a - b).abs()
+	return int(diff.x + diff.y)
+
 
 ## Appends object to array if it doesn't exist.
 static func append_unique(arr, what):

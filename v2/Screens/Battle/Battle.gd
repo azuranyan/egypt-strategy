@@ -98,12 +98,14 @@ func _ready():
 	
 	print("battle ready")
 	
-	# TODO not ideal
-	Globals.battle = self
 	
-
 ## Starts a battle between two empires over a territory.
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick := false):
+func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick: Variant = null):
+	# force ourselves to be ready by doing this hack
+	if not self.is_node_ready():
+		Globals.push_screen(Globals.battle)
+		Globals.pop_screen()
+		
 	# initialize context
 	context = Battle.Context.new()
 	context.attacker = attacker
@@ -115,25 +117,28 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 	context.controller[attacker] = player_action_controller if attacker.is_player_owned() else ai_action_controller
 	context.controller[defender] = player_action_controller if defender.is_player_owned() else ai_action_controller
 	context.should_end = false
+	context.victory_conditions = [VictoryCondition.new()] # TODO
 	
 	if fulfills_battle_requirements(attacker, territory):
 		# do battle
 		battle_started.emit(attacker, defender, territory)
 		
-		if do_quick or !(attacker.is_player_owned() or defender.is_player_owned()):
-			_quick_battle(attacker, defender, territory)
+		var should_do_quick := not (attacker.is_player_owned() or defender.is_player_owned())
+		if do_quick != null:
+			should_do_quick = do_quick
+			
+		if should_do_quick:
+			context.result = await _quick_battle(attacker, defender, territory)
 		else:
-			_real_battle(attacker, defender, territory)
+			Globals.push_screen(self)
+			context.result = await _real_battle(attacker, defender, territory)
+			Globals.pop_screen()
 		
-		# wait until done
-		var result = await _end_battle_requested
-		battle_ended.emit(result)
+		battle_ended.emit(context.result)
 	else:
+		# error
 		display_message(context.warnings)
 		battle_ended.emit(Result.AttackerRequirementsError)
-	
-	# cleanup
-	context = null
 
 
 ## Returns true if the attacker fulfills battle requirements over territory.
@@ -157,17 +162,15 @@ func end_battle(result: Result):
 	
 
 ## Outcome is an implementation detail.
-func _quick_battle(attacker: Empire, defender: Empire, territory: Territory):
-	await get_tree().create_timer(1.0).timeout
-	end_battle(Result.AttackerVictory)
+func _quick_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
+	return Result.AttackerVictory
 
 
 ## Real battle. 
-func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
-	# TODO we shouldnt need to do this ourselves and should be handled by
-	# the screen transitions function instead
-	self.visible = true
+func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
+	# load the map
 	_load_map(territory.maps[0])
+	
 	# if defender is ai, allow them to set first so player can see the map
 	# with enemies already in place.
 	var prep_queue := []
@@ -177,29 +180,81 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
 	else:
 		prep_queue.append(context.attacker)
 		prep_queue.append(context.defender)
-	
+		
+	# prep phase
 	$UI/DonePrep.visible = true
 	$UI/CancelPrep.visible = true
-	
-	var rv = await _prep_phase(prep_queue)
-	
+	var prep_result := await _prep_phase(prep_queue)
 	$UI/DonePrep.visible = false
 	$UI/CancelPrep.visible = false
 	
-	if rv != 0:
-		_unload_map() # we emit the signal ourselves to end battle
-		_end_battle_requested.emit(Result.Cancelled)
-	else:
-		_battle_phase.call_deferred()
-		
-		await _end_battle_requested # wait for the gameplay to call end_battle()
-		_unload_map()
-		
-	# TODO we shouldnt need to do this ourselves and should be handled by
-	# the screen transitions function instead
-	self.visible = false
+	# battle phase
+	var battle_result := Result.Cancelled
+	if prep_result == 0:
+		# PRUNE allow do_battle to be cut in line by end_battle call
+		_do_battle.call_deferred()	
+		battle_result = await _end_battle_requested
+	_unload_map()
+	return battle_result
 	
 	
+func _do_battle():
+	$UI/Battle.visible = true # TODO signalize all ui changes
+	context.controller[context.attacker].initialize(self, context.attacker)
+	context.controller[context.defender].initialize(self, context.defender)
+	
+	# loop until battle finishes
+	while not context.should_end:
+		# reset move and attack flags
+		for u in map.get_units():
+			var stunned: bool = Globals.status_effect['STN'] in u.status_effects
+			set_can_move(u, not stunned)
+			set_can_attack(u, not stunned)
+			
+		turn_cycle_started.emit()
+				
+		# allow both empires to take their turns
+		for empire in [context.attacker, context.defender]:
+			# tick poison at the very start of turn, should be here so we can 
+			# properly evaluate w/l conditions before the turn actually starts
+			for u in map.get_units():
+				if u.empire == empire and Globals.status_effect['PSN'] in u.status_effects:
+					damage_unit(u, Globals.status_effect['PSN'], 1)
+			
+			# things can happen before/after doing any actions so make sure to check first
+			if _evaluate_victory_conditions():
+				break
+			
+			# set the empire as the one to take their turn
+			context.on_turn = empire
+			_should_end_turn = false
+			
+			# do turn (note that the attacker always attacks first)
+			context.controller[context.on_turn].turn_start()
+			turn_started.emit()
+			await _do_turn()
+			turn_ended.emit()
+			context.controller[context.on_turn].turn_end()
+			
+			# do end-turn tick mechanics
+			for u in map.get_units():
+				if u.empire == empire:
+					# recover 1 hp for units that didn't do anything
+					if can_move(u) and can_attack(u):
+						damage_unit(u, self, -1) 
+					
+					# tick duration of status effects
+					u.tick_status_effects()
+					
+		turn_cycle_ended.emit()
+		
+		# increment number of turns
+		context.turns += 1
+	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
+	
+	end_battle(context.result)
+		
+		
 func _load_map(scene: PackedScene):
 	print("loading map '%s'" % scene.resource_path)
 	map = scene.instantiate() as Map
@@ -278,11 +333,6 @@ func _prep_phase(prep_queue: Array) -> int:
 func _check_prep_start() -> bool:
 	return true
 
-
-func _battle_phase():
-	#state_machine.transition_to("TurnEval", {battle=self})
-	_do_battle()
-		
 	
 func get_viewport_size() -> Vector2i:
 	return viewport.size
@@ -368,6 +418,12 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	await get_tree().create_timer(0.4).timeout
 	attack_sequence_ended.emit(unit, attack, target_cell, targets)
 	
+
+
+func do_nothing(unit: Unit):
+	set_can_move(unit, false)
+	set_can_attack(unit, false)
+	
 	
 ################################################################################
 
@@ -389,70 +445,12 @@ signal action_ended
 
 @onready var ai_action_controller := $AIActionController as BattleActionController
 @onready var player_action_controller := $PlayerActionController as BattleActionController
-
-
-func _do_battle():
-	$UI/Battle.visible = true # TODO signalize all ui changes
-	context.controller[context.attacker].initialize(self, context.attacker)
-	context.controller[context.defender].initialize(self, context.defender)
-	
-	# loop until battle finishes
-	while not context.should_end:
-		# reset move and attack flags
-		for u in map.get_units():
-			var stunned: bool = Globals.status_effect['STN'] in u.status_effects
-			set_can_move(u, not stunned)
-			set_can_attack(u, not stunned)
-			
-		turn_cycle_started.emit()
-				
-		# allow both empires to take their turns
-		for empire in [context.attacker, context.defender]:
-			# tick poison at the very start of turn, should be here so we can 
-			# properly evaluate w/l conditions before the turn actually starts
-			for u in map.get_units():
-				if u.empire == empire and Globals.status_effect['PSN'] in u.status_effects:
-					damage_unit(u, Globals.status_effect['PSN'], 1)
-			
-			# things can happen before doing any actions so make sure to check first
-			if _evaluate_win_loss_condition():
-				break
-			
-			# set the empire as the one to take their turn
-			context.on_turn = empire
-			_should_end_turn = false
-			
-			# do turn (note that the attacker always attacks first)
-			context.controller[context.on_turn].turn_start()
-			turn_started.emit()
-			await _do_turn()
-			turn_ended.emit()
-			context.controller[context.on_turn].turn_end()
-			
-			# do end-turn tick mechanics
-			for u in map.get_units():
-				if u.empire == empire:
-					# recover 1 hp for units that didn't do anything
-					if can_move(u) and can_attack(u):
-						damage_unit(u, self, -1) 
-					
-					# tick duration of status effects
-					u.tick_status_effects()
-					
-		turn_cycle_ended.emit()
-		
-		# increment number of turns
-		context.turns += 1
-	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
-	
-	end_battle(context.result)
-		
 	
 
 func _do_turn():
 	while not _should_end_turn:
-		# things can happen before doing any actions so make sure to check first
-		if _evaluate_win_loss_condition():
+		# things can happen before/after doing any actions so make sure to check first
+		if _evaluate_victory_conditions():
 			return
 		
 		# do action
@@ -481,24 +479,13 @@ func end_turn():
 	_should_end_turn = true
 	
 
-func _evaluate_win_loss_condition() -> bool:
-	# once this evaluates to true, we won't reevaluate again on subsequent calls
-	if not context.should_end:
-		context.result = Result.None
-		context.should_end = false
-		
-		# TODO instead of polling checks, maybe add signals to units dying?
-		var attacker_units := map.get_units().filter(func(x): return x.empire == context.attacker)
-		if attacker_units.is_empty():
-			context.result = Result.DefenderVictory
+func _evaluate_victory_conditions() -> bool:
+	for c in context.victory_conditions:
+		context.result = c.evaluate(self)
+		if context.result != Result.None:
 			context.should_end = true
-			
-		var defender_units := map.get_units().filter(func(x): return x.empire == context.defender)
-		if defender_units.is_empty(): # mutual obliteration is attacker victory
-			context.result = Result.AttackerVictory
-			context.should_end = true
-		
-	return context.should_end
+			return true
+	return false
 		
 		
 ################################################################################
@@ -886,9 +873,11 @@ func _on_battle_ended(_result):
 
 func _on_done_prep_pressed():
 	if fulfills_prep_requirements(context.on_turn, context.territory):
+		print("FUCKING TRANSITION")
 		state_machine.transition_to("Idle")
 		_end_prep_requested.emit(0)
 	else:
+		print("FUCKING ERROR")
 		display_message(context.warnings)
 
 
@@ -960,5 +949,7 @@ class Context:
 
 	var spawned_units: Array[Unit]
 	var warnings: PackedStringArray
+	
+	var victory_conditions: Array[VictoryCondition]
 	
 	

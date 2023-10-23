@@ -55,10 +55,14 @@ var world := {
 var scene_queue: Array[String] = []
 
 
-@onready var overworld := $Overworld as Overworld
-@onready var battle := $Battle as Battle
+#var overworld_scene := preload("res://Screens/Overworld/Overworld.tscn").instantiate()
+#var battle_scene := preload("res://Screens/Battle/Battle.tscn").instantiate()
 
-	
+
+var overworld: Overworld = preload("res://Screens/Overworld/Overworld.tscn").instantiate()
+var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
+
+var screen_stack: Array[Node] = []
 
 
 ## Registers data from /battle.
@@ -80,3 +84,41 @@ static func attack_range(unit: Unit, attack: Attack) -> int:
 	else:
 		return attack.range
 
+
+func _ready():
+	push_screen.call_deferred(overworld, '')
+	
+
+## Replaces the top screen with another.
+func transition_screen(new: Node, transition: String = ''):
+	if screen_stack.size() == 0:
+		push_screen(new, transition)
+	else:
+		var old := screen_stack[-1]
+		screen_stack[-1] = new
+		_transition(old, new, transition)
+
+
+## Pushes a new screen on top.
+func push_screen(new: Node, transition: String = ''):
+	# this check is not necessary but back() spits an error if null is empty
+	# which is undesirable instead of just being fucking quiet about it 
+	var old: Node = null if screen_stack.is_empty() else screen_stack.back()
+	screen_stack.push_back(new)
+	_transition(old, new, transition)
+
+
+## Pops the top screen and restores the previous screen.
+func pop_screen(transition: String = ''):
+	var old: Node = screen_stack.pop_back()
+	var new: Node = screen_stack.back()
+	_transition(old, new, transition)
+	
+
+func _transition(old: Node, new: Node, transition: String):
+	print("transitioning from '%s' to '%s' with '%s'" % [old, new, transition])
+	if old:
+		get_tree().root.remove_child(old)
+	get_tree().root.add_child(new)
+	
+	

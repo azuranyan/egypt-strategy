@@ -87,7 +87,6 @@ func _on_cycle_turn_start(empire: Empire):
 	
 	
 func _on_cycle_turn_end(_empire: Empire):
-	# hides all panels
 	hide_extended_panel()
 	
 	
@@ -117,15 +116,16 @@ func _on_attack_button_pressed():
 
 
 func _on_inspect_button_pressed():
-	OverworldEvents.emit_signal("inspect")
+	#OverworldEvents.emit_signal("inspect")
+	pass
 
 
 func _on_rest_button_pressed():
-	OverworldEvents.emit_signal("rest")
+	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_rest_action())
 
 
 func _on_train_button_pressed():
-	OverworldEvents.emit_signal("train")
+	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_train_action(territory))
 	
 
 func _on_child_entered_tree(node: Node):

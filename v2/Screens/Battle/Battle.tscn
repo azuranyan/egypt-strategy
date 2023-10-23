@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=38 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://diu2xhfofh1m1" path="res://Screens/Battle/camera_2d.tscn" id="2_rnoma"]
 [ext_resource type="Script" path="res://Screens/Battle/Battle_Prep.gd" id="2_t55sd"]
 [ext_resource type="Script" path="res://Screens/Battle/PlayerActionController.gd" id="3_brpnv"]
-[ext_resource type="PackedScene" uid="uid://b7wt1gpod4rjo" path="res://Screens/Battle/Battle_TurnEval.tscn" id="3_uathk"]
 [ext_resource type="TileSet" uid="uid://bim62kb8y75qx" path="res://Screens/Battle/terrainfyuckingsavethisshit.tres" id="3_vfrdl"]
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="4_4ux0f"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="5_773tr"]
@@ -35,84 +34,6 @@ func enter(kwargs:={}):
 
 func exit():
 	state_machine.grab_focus()
-"
-
-[sub_resource type="GDScript" id="GDScript_52mns"]
-script/source = "extends State
-
-# Init state
-
-var battle: Battle
-
-
-func enter(kwargs := {}) -> void:
-	print(\"enter init\")
-	battle = kwargs.battle
-	
-	# initialize context
-	var context = Battle.Context.new()
-	context.attacker = kwargs.attacker
-	context.defender = kwargs.defender
-	context.territory = kwargs.territory
-	context.result = Battle.Result.Cancelled
-	context.turns = 0
-	context.current_turn = context.attacker
-	
-	battle.context = context
-	
-	# load territory map
-	battle.load_map(\"res://Screens/Battle/maps/StartingZone.tscn\")
-	
-	# emit signal
-	battle.battle_started.emit(context.attacker, context.defender, context.territory)
-	
-	# if defender is ai, allow them to set first
-	var prep_queue := []
-	if !context.defender.is_player_owned() and context.attacker.is_player_owned():
-		prep_queue.append(context.defender)
-		prep_queue.append(context.attacker)
-	else:
-		prep_queue.append(context.attacker)
-		prep_queue.append(context.defender)
-	
-	#$Node2D.visible = true
-	$Node2D/Label.text = \"%s vs %s\" % [context.attacker.leader.name, context.defender.leader.name]
-	
-	# start prep phase
-	state_machine.transition_to(\"Prep\", {battle=battle, prep_queue=prep_queue})
-"
-
-[sub_resource type="LabelSettings" id="LabelSettings_c22gi"]
-font_size = 30
-
-[sub_resource type="GDScript" id="GDScript_t4niq"]
-script/source = "extends State
-
-# PlayerAction state
-
-func enter(kwargs:={}):
-	print(\"enter player action\")
-"
-
-[sub_resource type="GDScript" id="GDScript_nu43r"]
-script/source = "extends State
-
-# AIAction state
-
-func enter(kwargs:={}):
-	print(\"enter ai action\")
-"
-
-[sub_resource type="GDScript" id="GDScript_gihxl"]
-script/source = "extends State
-
-# End state
-
-func enter(kwargs:={}):
-	print(\"enter end\")
-
-func exit():
-	state_machine.release_focus()
 "
 
 [sub_resource type="Animation" id="Animation_inphs"]
@@ -345,7 +266,6 @@ script = ExtResource("3_brpnv")
 
 [node name="States" type="Control" parent="."]
 process_priority = -1
-visible = false
 z_index = 1
 layout_mode = 3
 anchors_preset = 0
@@ -364,21 +284,6 @@ text = "State: %s"
 [node name="Idle" type="Node2D" parent="States"]
 script = SubResource("GDScript_wxbqf")
 
-[node name="Init" type="Node2D" parent="States"]
-script = SubResource("GDScript_52mns")
-
-[node name="Node2D" type="Node2D" parent="States/Init"]
-visible = false
-
-[node name="Label" type="Label" parent="States/Init/Node2D"]
-offset_left = 58.0
-offset_top = 34.0
-offset_right = 187.0
-offset_bottom = 79.0
-size_flags_horizontal = 4
-text = "%s vs %s"
-label_settings = SubResource("LabelSettings_c22gi")
-
 [node name="Prep" type="Node2D" parent="States"]
 script = ExtResource("2_t55sd")
 
@@ -390,17 +295,6 @@ offset_top = 79.0
 offset_right = 158.0
 offset_bottom = 105.0
 text = "Prep: %s"
-
-[node name="TurnEval" parent="States" instance=ExtResource("3_uathk")]
-
-[node name="PlayerAction" type="Node2D" parent="States"]
-script = SubResource("GDScript_t4niq")
-
-[node name="AIAction" type="Node2D" parent="States"]
-script = SubResource("GDScript_nu43r")
-
-[node name="End" type="Node2D" parent="States"]
-script = SubResource("GDScript_gihxl")
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 0
@@ -806,7 +700,6 @@ text = "End Turn
 [connection signal="walking_finished" from="." to="PlayerActionController" method="_on_battle_walking_finished"]
 [connection signal="walking_started" from="." to="." method="_on_walking_started"]
 [connection signal="walking_started" from="." to="PlayerActionController" method="_on_battle_walking_started"]
-[connection signal="attack_used" from="States/TurnEval" to="." method="_on_turn_eval_attack_used"]
 [connection signal="unit_cancelled" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_cancelled"]
 [connection signal="unit_dragged" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_dragged"]
 [connection signal="unit_highlight_changed" from="UI/CharacterList" to="States/Prep" method="_on_character_list_unit_highlight_changed"]

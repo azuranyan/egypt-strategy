@@ -101,6 +101,8 @@ func do_cycle():
 			var action := await _get_turn_action(context.on_turn)
 			await _execute_action(context.on_turn, action)
 			
+			OverworldEvents.cycle_turn_end.emit(context.on_turn)
+			
 			# allow scene to play after the end of a turn
 			await _play_scene_insert()
 			
@@ -177,11 +179,9 @@ func _execute_action(empire: Empire, action: Array):
 			# TODO show transition/loading screen
 			# TODO show objectives
 			
-			self.visible = false
-			# call deferred because we're awaiting for signal
+			# PRUNE call stack
 			Globals.battle.start_battle.call_deferred(attacker, defender, territory)
 			var result = await Globals.battle.battle_ended
-			self.visible = true
 			
 			match result:
 				Battle.Result.Cancelled:

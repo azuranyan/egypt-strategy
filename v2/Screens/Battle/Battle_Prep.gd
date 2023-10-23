@@ -74,6 +74,14 @@ func enter(kwargs := {}) -> void:
 	for o in battle.map.get_objects():
 		if o.get_meta("spawn_point", "") == "player":
 			o.no_show = false
+			
+	# todo context and delete
+	dragging = false
+	selected = null
+	selected_moved = false
+	selected_original_pos = Vector2.ZERO
+	selected_offset = Vector2.ZERO
+	heading_adjusted = null
 		
 
 func done() -> void:
@@ -101,6 +109,7 @@ func exit() -> void:
 	selected_original_pos = Vector2.ZERO
 	selected_offset = Vector2.ZERO
 	heading_adjusted = null
+	print("EXIT PREP")
 	
 
 func can_spawn(unit: Unit, pos: Vector2) -> bool:
