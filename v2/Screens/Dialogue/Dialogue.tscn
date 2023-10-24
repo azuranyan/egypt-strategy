@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjf4rts52td14"]
+
+[ext_resource type="Script" path="res://Screens/Dialogue/Dialogue.gd" id="1_b8sjv"]
+
+[node name="Node2D" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_b8sjv")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -752.0
+offset_top = -251.0
+offset_right = 753.0
+offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 0.396078)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ColorRect"]
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 57.0
+offset_top = 27.0
+offset_right = -57.0
+offset_bottom = -27.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/bold_italics_font_size = 24
+theme_override_font_sizes/mono_font_size = 24
+text = "This is a text"

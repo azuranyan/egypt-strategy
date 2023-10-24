@@ -77,7 +77,9 @@ func do_cycle():
 			
 	# do the cycle
 	while not context.should_end:
+		# allow scene to play after cycle start
 		OverworldEvents.cycle_start.emit()
+		await Globals.play_queued_scenes()
 		
 		# start the turns
 		context.turn_queue = context.initial_turn_order.duplicate()
@@ -94,19 +96,20 @@ func do_cycle():
 				continue
 				
 			# allow scene to play before the start of a turn
-			await _play_scene_insert()
-			
 			OverworldEvents.cycle_turn_start.emit(context.on_turn)
+			await Globals.play_queued_scenes()
 		
 			var action := await _get_turn_action(context.on_turn)
 			await _execute_action(context.on_turn, action)
 			
-			OverworldEvents.cycle_turn_end.emit(context.on_turn)
-			
 			# allow scene to play after the end of a turn
-			await _play_scene_insert()
+			OverworldEvents.cycle_turn_end.emit(context.on_turn)
+			await Globals.play_queued_scenes()
 			
+		# allow scene to play after cycle end
 		OverworldEvents.cycle_end.emit()
+		await Globals.play_queued_scenes()
+		
 		context.turn_cycles += 1
 	
 
@@ -114,19 +117,6 @@ func do_cycle():
 func remove_from_turn_order(empire: Empire):
 	empire.set_meta('Overworld_manager_eliminated', true)
 	
-		
-## Plays queued insert scenes.
-func _play_scene_insert():
-	# do the scene queue
-	while !Globals.scene_queue.is_empty():
-		var scn: String = Globals.scene_queue.pop_front()
-		
-		# emit signal to start scene
-		OverworldEvents.cycle_scene_start.emit(scn)
-		
-		# wait for the signal to end scene
-		await OverworldEvents.cycle_scene_end
-		
 
 ## Returns the action taken by the empire.
 func _get_turn_action(empire: Empire) -> Array:

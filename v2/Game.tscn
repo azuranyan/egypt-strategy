@@ -15,3 +15,5 @@ script = ExtResource("1_lioyt")
 
 [node name="Initializer" type="Node" parent="."]
 script = ExtResource("2_u5wy3")
+
+[connection signal="_notify_end_scene" from="." to="." method="_dequeue_scene" flags=3]

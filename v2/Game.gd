@@ -1,13 +1,26 @@
 extends Node
 
 
+## Emitted when scene is started.
+signal scene_started(scene)
+
+## Emitted when scene is ended.
+signal scene_ended
+
+## Emitted when scene queue is finished.
+signal scene_queue_finished
+
+
+
+signal _notify_end_scene
+
+
 const DIRECTIONS = [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]
 #var territories: Array[Territory] = []
 
 #var gods: Array[God] = []
 var units: Array[Unit] = []
 var hp_multiplier: float = 1.0
-
 
 var territories := {
 	# This will be auto populated in Overworld._ready
@@ -78,17 +91,6 @@ static func register_data(subdir: String, get_id: Callable):
 		filename = dir.get_next()
 		
 		
-static func attack_range(unit: Unit, attack: Attack) -> int:
-	if attack.range < 0:
-		return unit.stat_rng
-	else:
-		return attack.range
-
-
-func _ready():
-	push_screen.call_deferred(overworld, '')
-	
-
 ## Replaces the top screen with another.
 func transition_screen(new: Node, transition: String = ''):
 	if screen_stack.size() == 0:
@@ -121,3 +123,20 @@ func _transition(old: Node, new: Node, transition: String):
 	get_tree().root.add_child(new)
 	
 	
+## Plays queued insert scenes.
+func play_queued_scenes():
+	_dequeue_scene.call_deferred()
+	await scene_queue_finished
+		
+
+## Notifies the game that scene has ended.
+func notify_end_scene():
+	_notify_end_scene.emit()
+	
+	
+func _dequeue_scene():
+	if not Globals.scene_queue.is_empty():
+		var scn: String = Globals.scene_queue.pop_front()
+		scene_started.emit(scn)
+	else:
+		scene_queue_finished.emit()
