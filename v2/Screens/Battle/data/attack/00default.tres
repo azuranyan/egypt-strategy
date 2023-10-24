@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_c5krg"]
 script = ExtResource("1_c1xgg")
-min_damage = 1
-max_damage = 3
+amount = 1
 target = 0
 custom_description = ""
 custom_animation = ""
@@ -20,7 +19,7 @@ target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 allow_rotation = false
 range = 6
-min_range = 1
+min_range = 0
 multicast = 0
 melee = false
 effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_c5krg")])

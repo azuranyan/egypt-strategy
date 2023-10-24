@@ -203,31 +203,34 @@ func _do_battle():
 	context.controller[context.attacker].initialize(self, context.attacker)
 	context.controller[context.defender].initialize(self, context.defender)
 	
+	for u in map.get_units(): # TODO not here
+		u.hp = maxi(1, u.empire.hp_multiplier * u.maxhp)
+		
 	# loop until battle finishes
 	while not context.should_end:
-		# reset move and attack flags
-		for u in map.get_units():
-			var stunned: bool = Globals.status_effect['STN'] in u.status_effects
-			set_can_move(u, not stunned)
-			set_can_attack(u, not stunned)
-			
 		turn_cycle_started.emit()
-				
+		
 		# allow both empires to take their turns
 		for empire in [context.attacker, context.defender]:
-			# tick poison at the very start of turn, should be here so we can 
-			# properly evaluate w/l conditions before the turn actually starts
-			for u in map.get_units():
-				if u.empire == empire and Globals.status_effect['PSN'] in u.status_effects:
+			# set the empire as the one to take their turn
+			context.on_turn = empire
+			_should_end_turn = false
+			
+			for u in get_owned_units():
+				# reset move and attack flags
+				var stunned: bool = Globals.status_effect['STN'] in u.status_effects
+				set_can_move(u, not stunned)
+				set_can_attack(u, not stunned)
+				set_did_nothing(u, not stunned)
+					
+				# tick poison at the very start of turn, should be here so we can 
+				# properly evaluate w/l conditions before the turn actually starts
+				if Globals.status_effect['PSN'] in u.status_effects:
 					damage_unit(u, Globals.status_effect['PSN'], 1)
 			
 			# things can happen before/after doing any actions so make sure to check first
 			if _evaluate_victory_conditions():
 				break
-			
-			# set the empire as the one to take their turn
-			context.on_turn = empire
-			_should_end_turn = false
 			
 			# do turn (note that the attacker always attacks first)
 			context.controller[context.on_turn].turn_start()
@@ -237,14 +240,13 @@ func _do_battle():
 			context.controller[context.on_turn].turn_end()
 			
 			# do end-turn tick mechanics
-			for u in map.get_units():
-				if u.empire == empire:
-					# recover 1 hp for units that didn't do anything
-					if can_move(u) and can_attack(u):
-						damage_unit(u, self, -1) 
-					
-					# tick duration of status effects
-					u.tick_status_effects()
+			for u in get_owned_units():
+				# recover 1 hp for units that didn't do anything
+				if did_nothing(u):
+					damage_unit(u, self, -1) 
+				
+				# tick duration of status effects
+				u.tick_status_effects()
 					
 		turn_cycle_ended.emit()
 		
@@ -284,7 +286,8 @@ func _prep_phase(prep_queue: Array) -> int:
 		if prep.is_player_owned():
 			state_machine.transition_to("Prep", {prep_queue=[prep], battle=self})
 		else:
-			var spawnable := prep.units.duplicate()
+			var spawnable: Array[String] = []
+			spawnable.assign(prep.units)
 			
 			# fill spawn points
 			for spawn_point in map.get_spawn_points("ai"):
@@ -402,7 +405,7 @@ func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_ro
 		
 	# check for any targets
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
-	var targets := map.get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
+	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	if targets.is_empty():
 		return ATTACK_NO_TARGETS
 		
@@ -433,7 +436,7 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	
 	# attack signal (not ideal cos we're re-evaluating targets)
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
-	var targets := map.get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
+	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	attack_sequence_started.emit(unit, attack, target_cell, targets)
 	await get_tree().create_timer(0.2).timeout # added artificial timeouts
 	await _attack_sequence_finished
@@ -444,6 +447,7 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 func do_nothing(unit: Unit):
 	set_can_move(unit, false)
 	set_can_attack(unit, false)
+	set_did_nothing(unit, true)
 	
 	
 ################################################################################
@@ -483,7 +487,7 @@ func _do_turn():
 		
 		# auto end turn
 		if Globals.prefs.auto_end_turn:
-			var units := map.get_units().filter(func(x): return x.empire == context.on_turn)
+			var units := get_owned_units()
 			var should_end := true
 			
 			for u in units:
@@ -569,6 +573,10 @@ func can_move(unit: Unit) -> bool:
 
 func can_attack(unit: Unit) -> bool:
 	return unit.get_meta("Battle_can_attack", false)
+	
+	
+func did_nothing(unit: Unit) -> bool:
+	return unit.get_meta("Battle_did_nothing", false)
 
 
 func set_can_move(unit: Unit, value: bool):
@@ -577,6 +585,10 @@ func set_can_move(unit: Unit, value: bool):
 	
 func set_can_attack(unit: Unit, value: bool):
 	unit.set_meta("Battle_can_attack", value)
+	
+
+func set_did_nothing(unit: Unit, value: bool):
+	unit.set_meta("Battle_did_nothing", value)
 	
 	
 func is_owned(unit: Unit) -> bool:
@@ -694,38 +706,85 @@ func spawn_unit(tag: String, empire: Empire, _name := "", pos := Map.OUT_OF_BOUN
 		name = _name if _name != "" else tag,
 		heading = heading,
 	})
-	add_unit(unit, pos)
-	# TODO this piece of code shouldnt be here but im too lazy to create
-	# an appropriate function so just deal with this for now
-	unit.hp = unit.empire.hp_multiplier * unit.maxhp
+	if pos == Map.OUT_OF_BOUNDS:
+		set_unit_group(unit, 'units_standby')
+	else:
+		set_unit_group(unit, 'units_alive')
+	for u in map.get_units(): # TODO not here
+		u.hp = maxi(1, u.empire.hp_multiplier * u.maxhp)
 	return unit
 	
 
-## Adds an already created unit to the map.
-func add_unit(unit: Unit, pos := Map.OUT_OF_BOUNDS):
-	var old_parent := unit.get_parent()
-	if old_parent:
-		if old_parent is Map:
-			old_parent.remove_object(unit)
+### Adds an already created unit to the map.
+#func add_unit(unit: Unit, pos := Map.OUT_OF_BOUNDS):
+#	var old_parent := unit.get_parent()
+#	if old_parent:
+#		if old_parent is Map:
+#			old_parent.remove_object(unit)
+#		else:
+#			old_parent.remove_child(unit)
+#	map.add_object(unit)
+#	unit.map_pos = pos
+#
+#
+### Removes a unit from the map.
+#func remove_unit(unit: Unit):
+#	if unit not in map.get_objects():
+#		return
+#	# TODO if removed unit is on turn, forfeit first
+#
+#	map.remove_object(unit)
+
+
+const unit_group := [
+	'units_standby',
+	'units_alive',
+	'units_dead',
+	'units_ghost',
+]
+
+func set_unit_group(unit: Unit, group: String):
+	for g in unit_group:
+		if g == group:
+			unit.add_to_group(g)
+			unit.set_meta('Battle_group', g)
 		else:
-			old_parent.remove_child(unit)
-	map.add_object(unit)
-	unit.map_pos = pos
-	
-	
-## Removes a unit from the map.
-func remove_unit(unit: Unit):
-	if unit not in map.get_objects():
-		return
-	# TODO if removed unit is on turn, forfeit first
-	
-	map.remove_object(unit)
+			unit.remove_from_group(g)
+	match group:
+		'units_standby':
+			unit.map_pos = Map.OUT_OF_BOUNDS
+		'units_alive':
+			pass
+		'units_dead':
+			pass
+		'units_ghost':
+			pass
+			
+func get_unit(cell: Vector2i) -> Unit:
+	for u in get_units():
+		if map.cell(u.map_pos) == cell:
+			return u
+	return null
+
+
+func get_units(group: String = 'units_alive') -> Array[Unit]:
+	var re: Array[Unit] = []
+	re.assign(get_tree().get_nodes_in_group(group))
+	return re
+
+
+func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Array[Unit]:
+	if empire:
+		return get_units(group).filter(func(x): return x.empire == empire)
+	else:
+		return get_units(group).filter(func(x): return x.empire == context.on_turn)
 
 
 ## Kills a unit.
 func kill_unit(unit: Unit):
 	# TODO play death animation
-	remove_unit(unit)
+	#remove_unit(unit)
+	set_unit_group(unit, 'units_dead')
 	
 
 ## Inflict damage upon a unit.
@@ -826,7 +885,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 func get_attack_target_units(user: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0) -> Array[Unit]:
 	var targets: Array[Unit] = []
 	for p in get_attack_target_cells(user, attack, target, target_rotation):
-		var u := map.get_object(p, Map.Pathing.UNIT)
+		var u := get_unit(p)
 		if u:
 			targets.append(u)
 	return targets

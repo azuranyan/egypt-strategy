@@ -11,6 +11,10 @@ func apply(_battle: Battle, _user: Unit, attack: Attack, target_cell: Vector2i, 
 		target_unit.face_towards(target_cell)
 	
 	
+func get_effect_hint() -> String:
+	return 'cc'
+	
+	
 func _default_description() -> String:
 	return "Instantly moves unit towards target."
 

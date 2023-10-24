@@ -25,6 +25,7 @@ overworld
  - action log
 battle
  - end banner
+attack shape rotation is rotated 90 degrees
 
 ## would be nice
 disgaea style enum targetable units in attack range

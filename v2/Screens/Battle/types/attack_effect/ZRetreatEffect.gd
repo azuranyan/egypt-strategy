@@ -18,6 +18,10 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 		user.map_pos = new_pos
 	
 	
+func get_effect_hint() -> String:
+	return 'attack'
+	
+	
 func _default_description() -> String:
 	return 'Retreats 1 tile.'
 

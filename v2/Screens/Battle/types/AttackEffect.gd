@@ -44,6 +44,11 @@ func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, ta
 	pass
 	
 	
+## Type of effect hint for the engine.
+func get_effect_hint() -> String:
+	return 'attack'
+	
+	
 ## Returns a default description if custom description is not provided.
 func _default_description() -> String:
 	return ''

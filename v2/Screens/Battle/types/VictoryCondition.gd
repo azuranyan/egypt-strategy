@@ -3,12 +3,12 @@ class_name VictoryCondition
 
 
 func evaluate(battle: Battle) -> Battle.Result:
-	if battle.map.get_units().filter(func(x): return x.empire == battle.context.attacker).is_empty():
+	if battle.get_owned_units(battle.context.defender).is_empty():
+		return Battle.Result.AttackerVictory
+		
+	if battle.get_owned_units(battle.context.attacker).is_empty():
 		return Battle.Result.DefenderVictory
 		
-	if battle.map.get_units().filter(func(x): return x.empire == battle.context.defender).is_empty():
-		return Battle.Result.AttackerVictory
-	
 	return Battle.Result.None
 	
 

@@ -196,19 +196,19 @@ func _execute_action(empire: Empire, action: Array):
 					push_error("Invalid battle result: None")
 					
 				Battle.Result.AttackerVictory:
-					print("Attacker Withdraw. Battle lost!")
+					print("Attacker Victory!")
 					_attacker_victory(empire, territory)
 					defender.hp_multiplier = 0.1
 					
 				Battle.Result.DefenderVictory:
-					print("Attacker Withdraw. Battle lost!")
+					print("Defender Victory!")
 					attacker.hp_multiplier = 0.1
 					
 				Battle.Result.AttackerWithdraw:
-					print("Attacker Withdraw. Battle lost!")
+					print("Attacker Withdraw.")
 					
 				Battle.Result.DefenderWithdraw:
-					print("Attacker Withdraw. Battle lost!")
+					print("Defender Withdraw.")
 					_attacker_victory(empire, territory)
 					
 		TRAIN_ACTION:

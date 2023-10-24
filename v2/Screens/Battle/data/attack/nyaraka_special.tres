@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_vkggo"]
 script = ExtResource("1_i6k4h")
-min_damage = 2
-max_damage = 2
+amount = 2
 target = 0
 custom_description = ""
 custom_animation = ""

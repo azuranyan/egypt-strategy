@@ -13,6 +13,10 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 	battle.damage_unit(target_unit, user, roundi(user.get(stat)*multiplier + flat_heal))
 	
 	
+func get_effect_hint() -> String:
+	return 'heal'
+	
+	
 func _default_description() -> String:
 	if flat_heal > 0:
 		return "Heals %sx of %s plus %s hp." % [multiplier, stat_to_str(stat), flat_heal]

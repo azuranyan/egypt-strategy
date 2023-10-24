@@ -216,6 +216,8 @@ func load_vars(kwargs: Dictionary):
 	debug.visible = kwargs.get("debug", debug.visible)
 	
 	
+	
+	
 func _set_if_has(prop: String, kwargs: Dictionary):
 	if kwargs.has(prop):
 		assert(kwargs.get(prop) != null)
@@ -275,7 +277,7 @@ func tick_status_effects():
 		if status_effects_duration[i] <= 0:
 			rm.append(status_effects[i])
 	for eff in rm:
-		remove_status_effect(eff)
+		remove_status_effect.call_deferred(eff)
 
 
 ## Returns true if player owned.

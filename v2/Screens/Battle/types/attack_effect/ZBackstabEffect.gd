@@ -19,6 +19,10 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 		user.face_towards(target_unit.map_pos)
 	
 	
+func get_effect_hint() -> String:
+	return 'attack'
+	
+	
 func _default_description() -> String:
 	return 'Teleports user behind target.'
 

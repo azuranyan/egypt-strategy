@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ipguo"]
 script = ExtResource("1_krcam")
-min_heal = 3
-max_heal = 3
+amount = 3
 target = 2
 custom_description = ""
 custom_animation = ""

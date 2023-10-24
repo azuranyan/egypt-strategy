@@ -158,7 +158,7 @@ func _unhandled_input(event):
 				2:
 					cancel()
 				3:
-					change_facing = battle.map.get_object(cell, Map.Pathing.UNIT)
+					change_facing = battle.get_unit(cell)
 		else:
 			match event.button_index:
 				3:
@@ -168,7 +168,7 @@ func _unhandled_input(event):
 	elif event is InputEventKey:
 		if event.keycode == KEY_KP_2:
 			if event.pressed:
-				change_facing = battle.map.get_object(cur, Map.Pathing.UNIT)
+				change_facing = battle.get_unit(cur)
 			else:
 				change_facing = null
 			return
@@ -226,7 +226,8 @@ func undo_move_action():
 		action.unit.map_pos = action.cell
 		action.unit.facing = action.facing
 		battle.set_can_move(action.unit, action.can_move)
-		battle.set_can_attack(action.unit, action.can_attack)
+		battle.set_can_attack(action.unit, action.can_attack) #TODO do nothing
+		battle.set_did_nothing(action.unit, action.can_move and action.can_attack)
 		
 		set_active_unit(action.unit)
 		
@@ -317,7 +318,7 @@ func refresh_active():
 func select_cell(cell: Vector2i):
 	cell.x = clampi(cell.x, -MAP_MARGIN, battle.map.world.map_size.x + MAP_MARGIN - 1)
 	cell.y = clampi(cell.y, -MAP_MARGIN, battle.map.world.map_size.y + MAP_MARGIN - 1)
-	var unit := battle.map.get_unit(cell)
+	var unit := battle.get_unit(cell)
 	
 	# set cursor position
 	battle.cursor.map_pos = cell
@@ -353,7 +354,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 		
 	cell.x = clampi(cell.x, -MAP_MARGIN, battle.map.world.map_size.x + MAP_MARGIN - 1)
 	cell.y = clampi(cell.y, -MAP_MARGIN, battle.map.world.map_size.y + MAP_MARGIN - 1)
-	var unit := battle.map.get_unit(cell)
+	var unit := battle.get_unit(cell)
 	
 	# if there's an active attack, interaction is (to try) to use attack
 	if active_attack:
@@ -369,6 +370,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					# active unit, just "move" it in place
 					push_move_action()
 					battle.set_can_move(active_unit, false)
+					battle.set_did_nothing(active_unit, false)
 					clear_active_unit()
 					
 					# This is a move (MOVE) action
@@ -394,6 +396,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					battle.walk_unit(active_unit, cell)
 					push_move_action()
 					battle.set_can_move(active_unit, false)
+					battle.set_did_nothing(active_unit, false)
 					var u := active_unit
 					clear_active_unit()
 					if battle.can_attack(u):

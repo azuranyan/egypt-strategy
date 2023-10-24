@@ -21,6 +21,10 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 		user.facing = angle
 	
 	
+func get_effect_hint() -> String:
+	return 'attack'
+	
+	
 func _default_description() -> String:
 	return 'Charges towards target.'
 

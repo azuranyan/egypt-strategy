@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_vshpf"]
 script = ExtResource("1_gamcp")
-min_damage = 1
-max_damage = 1
+amount = 1
 target = 0
 custom_description = ""
 custom_animation = ""

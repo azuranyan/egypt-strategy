@@ -173,6 +173,7 @@ func _add_unit(unit_name: String, pos := Map.OUT_OF_BOUNDS):
 	unit.set_meta("prep_phase_callbacks", cb)
 	
 	unit.map_pos = pos
+	battle.set_unit_group(unit, 'units_standby' if pos == Map.OUT_OF_BOUNDS else 'units_alive')
 	
 
 ## Removes unit. Should be used within interactions.
@@ -180,6 +181,7 @@ func _remove_unit(unit_name: String, pos := Map.OUT_OF_BOUNDS):
 	var unit := _get_unit(unit_name)
 	
 	unit.map_pos = pos
+	battle.set_unit_group(unit, 'units_standby' if pos == Map.OUT_OF_BOUNDS else 'units_alive')
 
 	# remove callbacks
 	# TODO this sometimes complains about not having callbacks, meaning a unit
@@ -220,7 +222,7 @@ func _on_character_list_unit_released(unit: String, pos: Vector2):
 		print("can spawn ", unit, " at ", o_pos)
 		#var unit2 := battle.map.get_object_at(_get_unit(unit).map_pos, false) as Unit
 		var unit2: Unit = null
-		for u in battle.map.get_units():
+		for u in battle.get_units():
 			if u != _get_unit(unit) and u.map_pos == o_pos:
 				unit2 = u
 				break

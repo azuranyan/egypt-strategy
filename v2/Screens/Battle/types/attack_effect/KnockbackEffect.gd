@@ -23,6 +23,10 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 		battle.damage_unit(target_unit, self, 1)
 	
 	
+func get_effect_hint() -> String:
+	return 'cc'
+	
+	
 func _default_description() -> String:
 	return 'Knocks unit back.'
 

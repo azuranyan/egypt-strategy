@@ -11,6 +11,10 @@ func apply(_battle: Battle, _user: Unit, _attack: Attack, _target_cell: Vector2i
 		break
 	
 	
+func get_effect_hint() -> String:
+	return 'cleanse'
+	
+	
 func _default_description() -> String:
 	return 'Removes %s.' % effect
 

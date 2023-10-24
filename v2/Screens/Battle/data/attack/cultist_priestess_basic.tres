@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_v034i"]
 script = ExtResource("1_x8cdv")
-min_heal = 1
-max_heal = 1
+amount = 1
 target = 1
 custom_description = ""
 custom_animation = ""

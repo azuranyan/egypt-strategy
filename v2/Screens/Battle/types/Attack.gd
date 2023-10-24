@@ -63,3 +63,12 @@ func get_target_flags() -> int:
 	for eff in effects:
 		flags |= 1 << eff.target
 	return flags
+
+
+## Returns the target flags.
+func get_effect_hints() -> PackedStringArray:
+	var re := PackedStringArray()
+	for eff in effects:
+		if eff.get_effect_hint() not in re:
+			re.append(eff.get_effect_hint())
+	return re
