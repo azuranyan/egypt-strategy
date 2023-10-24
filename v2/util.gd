@@ -41,7 +41,19 @@ static func cell_distance(a: Vector2, b: Vector2) -> int:
 static func append_unique(arr, what):
 	if what not in arr:
 		arr.append(what)
+		
+		
+static func bounds(size: Vector2) -> Rect2:
+	return Rect2(0, 0, size.x, size.y)
+	
+	
+static func boundsi(size: Vector2i) -> Rect2i:
+	return Rect2i(0, 0, size.x, size.y)
 
+
+static func world_bounds() -> Rect2i:
+	return boundsi(Globals.battle.map.world.map_size)
+	
 
 ## Returns a square path from a given path.
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:

@@ -116,7 +116,6 @@ func pop_screen(transition: String = ''):
 	
 
 func _transition(old: Node, new: Node, transition: String):
-	print("transitioning from '%s' to '%s' with '%s'" % [old, new, transition])
 	if old:
 		get_tree().root.remove_child(old)
 	get_tree().root.add_child(new)

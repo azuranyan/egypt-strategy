@@ -365,35 +365,47 @@ func set_bond_level(unit: Unit, level: int):
 		for stat in unit.unit_type.stat_growth_2:
 			unit.set(stat, unit.unit_type.stat_growth_2[stat])
 	
-	
-func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
+
+enum {
+	ATTACK_OK = 0,
+	ATTACK_NOT_UNLOCKED,
+	ATTACK_TARGET_INSIDE_MIN_RANGE,
+	ATTACK_TARGET_OUT_OF_RANGE,
+	ATTACK_NO_TARGETS,
+	ATTACK_INVALID_TARGET,
+}
+
+const ATTACK_ERROR_MESSAGE := [
+	'Use attack.',
+	'Unit has not unlocked this skill yet.',
+	'Target is inside minimum range.',
+	'Target is out of range.',
+	'No targets found.',
+	'Invalid target.',
+]
+
+func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float) -> int:
 	var cellf := Vector2(target_cell)
 	
 	# check for bond level
 	if attack == unit.unit_type.special_attack and unit.bond < 2:
-		play_error("Unit has not unlocked this skill yet.")
-		return
-	
+		return ATTACK_NOT_UNLOCKED
+		
 	# check for minimum range
 	if attack.min_range > 0:
-		var min_range := Util.flood_fill(map.cell(unit.map_pos), attack.min_range, Rect2i(Vector2i.ZERO, map.world.map_size))
-		if cellf in min_range:
-			play_error("Target is inside minimum range.")
-			return
-	
-	# check for out of range
-	var target_range := Util.flood_fill(map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, map.world.map_size))
-	if cellf not in target_range:
-		play_error("Target is out of range.")
-		return
-	
+		if cellf in Util.flood_fill(map.cell(unit.map_pos), attack.min_range, Rect2i(Vector2i.ZERO, map.world.map_size)):
+			return ATTACK_TARGET_INSIDE_MIN_RANGE
+		
+	# check for range
+	if cellf not in Util.flood_fill(map.cell(unit.map_pos), unit.get_attack_range(attack), Rect2i(Vector2i.ZERO, map.world.map_size)):
+		return ATTACK_TARGET_OUT_OF_RANGE
+		
 	# check for any targets
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
 	var targets := map.get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	if targets.is_empty():
-		play_error("No targets found.")
-		return
-	
+		return ATTACK_NO_TARGETS
+		
 	# check for valid targets
 	var has_valid_target := false
 	for t in targets:
@@ -404,21 +416,30 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 			has_valid_target = true
 			break
 	if not has_valid_target: 			# causes the attack to release as long
-		play_error("Invalid target")	# as there's at least one valid target,
-		return							# even if there are invalid targets
+		return ATTACK_INVALID_TARGET	# even if there are invalid targets
+	
+	return ATTACK_OK
+	
+	
+func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
+	var re := can_use_attack(unit, attack, target_cell, target_rotation)
+	if re != ATTACK_OK:
+		play_error(ATTACK_ERROR_MESSAGE[re])
+		return
 	
 	# commit actions
 	set_can_move(unit, false)
 	set_can_attack(unit, false)
 	
-	# attack signal
+	# attack signal (not ideal cos we're re-evaluating targets)
+	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
+	var targets := map.get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	attack_sequence_started.emit(unit, attack, target_cell, targets)
 	await get_tree().create_timer(0.2).timeout # added artificial timeouts
 	await _attack_sequence_finished
 	await get_tree().create_timer(0.4).timeout
 	attack_sequence_ended.emit(unit, attack, target_cell, targets)
 	
-
 
 func do_nothing(unit: Unit):
 	set_can_move(unit, false)
@@ -745,7 +766,7 @@ func walk_unit(unit: Unit, cell: Vector2i):
 	walking_started.emit(unit)
 	
 	var start := map.cell(unit.map_pos)
-	var end := cell
+	var end := cell # TODO unit_path is initialized by player and can't be used by ai
 	var path := unit_path._pathfinder.calculate_point_path(start, end)
 	await _walk_along(unit, path)
 		

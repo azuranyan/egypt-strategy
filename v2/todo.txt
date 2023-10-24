@@ -20,7 +20,11 @@ prep keyboard control
 should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
 more robust cast animation system
-
+overworld
+ - banner player turn
+ - action log
+battle
+ - end banner
 
 ## would be nice
 disgaea style enum targetable units in attack range
@@ -38,6 +42,13 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ##########################################################################################################
 ## hot list
 ##########################################################################################################
+
+winner is you popup when game ends
+ - 
+
+can_move, can_attack is different from pass
+ - unit can pass and not do anything but will get pass bonuses
+ - doing nothing will prevent units from getting pass bonus because they're marked as moved
 
 battle
  - unit pass/do nothing
