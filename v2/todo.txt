@@ -3,9 +3,6 @@
 ##########################################################################################################
 "All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
 
-dialogue hooks
- - print statement for dialogue
-
 scriptable events/battle world state
  - unified battle api where all the functions are there instead of fiddling the classes themselves
  - this should clean up the mess that you currently have to do with units and map and stuff
@@ -44,29 +41,21 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
+end battle confirmation screen
+ - end battle confirmation don't show again screen
+
+add play_queued_scenes on all appropriate spots
 winner is you popup when game ends
  - 
-
-can_move, can_attack is different from pass
- - unit can pass and not do anything but will get pass bonuses
- - doing nothing will prevent units from getting pass bonus because they're marked as moved
-
 battle
  - unit pass/do nothing
-
 display targeting info
  - list of units that will be hit by the attack
  - attack being used
 
+
+
 add check for bond level up after turn ends
-
-make use of groups
-
-unit states [standby, alive, action_taken, dead, ghost]
- - standby units are spawned in but placed out of bounds and can't be interacted with
- - alive units and dead units are self explanatory
- - action_taken is a special substate of alive where it's alive but cannot take any more actions
- - ghost units are not interactible and is not bound to the same rules and exists for ui and stuf
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
@@ -74,7 +63,6 @@ implement multicast
  - if it's already selected, deselect
 
 before every effect, check if target is still alive
- - once unit dies, put in dead_queue
  - after turn cycle ends, clear all dead units
  - maybe status effect bug is related to unit dying and getting cleared
 

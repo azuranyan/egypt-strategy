@@ -226,8 +226,8 @@ func undo_move_action():
 		action.unit.map_pos = action.cell
 		action.unit.facing = action.facing
 		battle.set_can_move(action.unit, action.can_move)
-		battle.set_can_attack(action.unit, action.can_attack) #TODO do nothing
-		battle.set_did_nothing(action.unit, action.can_move and action.can_attack)
+		battle.set_can_attack(action.unit, action.can_attack)
+		battle.set_action_taken(action.unit, false)
 		
 		set_active_unit(action.unit)
 		
@@ -343,7 +343,6 @@ func select_cell(cell: Vector2i):
 			battle.unit_path.draw(battle.map.cell(active_unit.map_pos), cell)
 		else:
 			battle.unit_path.clear()
-			
 	
 	
 func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
@@ -370,7 +369,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					# active unit, just "move" it in place
 					push_move_action()
 					battle.set_can_move(active_unit, false)
-					battle.set_did_nothing(active_unit, false)
+					battle.set_action_taken(active_unit, true)
 					clear_active_unit()
 					
 					# This is a move (MOVE) action
@@ -396,7 +395,7 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 					battle.walk_unit(active_unit, cell)
 					push_move_action()
 					battle.set_can_move(active_unit, false)
-					battle.set_did_nothing(active_unit, false)
+					battle.set_action_taken(active_unit, true)
 					var u := active_unit
 					clear_active_unit()
 					if battle.can_attack(u):

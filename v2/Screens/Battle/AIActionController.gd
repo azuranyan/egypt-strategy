@@ -104,21 +104,25 @@ func make_move(unit: Unit):
 	
 	assert(move)
 	print('  ', battle.map.cell(unit.map_pos), ' Choosing ', move)
-	if battle.map.cell(unit.map_pos) == move.cell:
-		battle.set_can_move(unit, false)
-		battle.set_did_nothing(unit, true)
-	else:
-		battle.unit_path.initialize(battle.get_walkable_cells(unit))
-		battle.unit_path.draw(battle.map.cell(unit.map_pos), move.cell)
-		await battle._walk_along(unit, pathfind_cell(unit, move.cell))
-		battle.unit_path.stop()
-		battle.set_can_move(unit, false)
-		battle.set_did_nothing(unit, false)
 	
+	# do nothing
+	if battle.map.cell(unit.map_pos) == move.cell and not move.attack:
+		battle.do_nothing(unit)
+		return
+		
+	# move
+	battle.unit_path.initialize(battle.get_walkable_cells(unit))
+	battle.unit_path.draw(battle.map.cell(unit.map_pos), move.cell)
+	await battle._walk_along(unit, pathfind_cell(unit, move.cell))
+	battle.unit_path.stop()
+	battle.set_can_move(unit, false)
+	
+	# attack
 	if move.attack:
 		await battle.use_attack(unit, move.attack, move.target, 0)
 		battle.set_can_attack(unit, false)
-		battle.set_did_nothing(unit, false)
+		
+	battle.set_action_taken(unit, true)
 
 	
 

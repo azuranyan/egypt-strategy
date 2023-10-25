@@ -2,6 +2,7 @@
 extends Control
 class_name Battle
 
+################################################################################
 
 ## Emitted when battle is started.
 signal battle_started(attacker, defender, territory)
@@ -9,6 +10,23 @@ signal battle_started(attacker, defender, territory)
 ## Emitted when battle ended.
 signal battle_ended(result)
 
+## Emitted when turn cycle starts.
+signal turn_cycle_started
+
+## Emitted when turn cycle ends.
+signal turn_cycle_ended
+
+## Emitted when an empire's turn starts.
+signal turn_started
+
+## Emitted when an empire's turn ends.
+signal turn_ended
+
+## Emitted during an empire's turn before it starts an action.
+signal action_started
+
+## Emitted during an empire's turn after the action is taken.
+signal action_ended
 
 ################################################################################
 
@@ -35,6 +53,8 @@ signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, tar
 
 ## Emitted when an attack sequence has ended.
 signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+
+################################################################################
 
 signal _attack_sequence_finished()
 
@@ -78,9 +98,38 @@ enum {
 }
 
 
+enum {
+	ATTACK_OK = 0,
+	ATTACK_NOT_UNLOCKED,
+	ATTACK_TARGET_INSIDE_MIN_RANGE,
+	ATTACK_TARGET_OUT_OF_RANGE,
+	ATTACK_NO_TARGETS,
+	ATTACK_INVALID_TARGET,
+}
+
+
+const ATTACK_ERROR_MESSAGE := [
+	'Use attack.',
+	'Unit has not unlocked this skill yet.',
+	'Target is inside minimum range.',
+	'Target is out of range.',
+	'No targets found.',
+	'Invalid target.',
+]
+
+
+const unit_group := [
+	'units_standby',
+	'units_alive',
+	'units_dead',
+	'units_ghost',
+]
+
+
 var context: Context
 
 var _camera_target: MapObject = null
+var _should_end_turn: bool
 
 @onready var state_machine: StateMachine = $States
 @onready var character_list: CharacterList = $UI/CharacterList
@@ -92,6 +141,9 @@ var _camera_target: MapObject = null
 @onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
 @onready var cursor: SpriteObject = $UI/Cursor
 
+@onready var ai_action_controller := $AIActionController as BattleActionController
+@onready var player_action_controller := $PlayerActionController as BattleActionController
+	
 
 func _ready():
 	set_debug_tile_visible(false)
@@ -122,6 +174,7 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 	if fulfills_battle_requirements(attacker, territory):
 		# do battle
 		battle_started.emit(attacker, defender, territory)
+		await Globals.play_queued_scenes()
 		
 		var should_do_quick := not (attacker.is_player_owned() or defender.is_player_owned())
 		if do_quick != null:
@@ -139,9 +192,10 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 		# error
 		display_message(context.warnings)
 		battle_ended.emit(Result.AttackerRequirementsError)
+	await Globals.play_queued_scenes()
 
 
-## Returns true if the attacker fulfills battle requirements over territory.
+## Returns true if the attacker can initiate the attack to territory.
 func fulfills_battle_requirements(empire: Empire, territory: Territory) -> bool:
 	context.warnings = []
 	return true
@@ -191,7 +245,7 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	# battle phase
 	var battle_result := Result.Cancelled
 	if prep_result == 0:
-		# PRUNE allow do_battle to be cut in line by end_battle call
+		# _do_battle can be cut 
 		_do_battle.call_deferred()	
 		battle_result = await _end_battle_requested
 	_unload_map()
@@ -209,6 +263,7 @@ func _do_battle():
 	# loop until battle finishes
 	while not context.should_end:
 		turn_cycle_started.emit()
+		await Globals.play_queued_scenes()
 		
 		# allow both empires to take their turns
 		for empire in [context.attacker, context.defender]:
@@ -221,7 +276,7 @@ func _do_battle():
 				var stunned: bool = Globals.status_effect['STN'] in u.status_effects
 				set_can_move(u, not stunned)
 				set_can_attack(u, not stunned)
-				set_did_nothing(u, not stunned)
+				set_action_taken(u, stunned)
 					
 				# tick poison at the very start of turn, should be here so we can 
 				# properly evaluate w/l conditions before the turn actually starts
@@ -233,28 +288,60 @@ func _do_battle():
 				break
 			
 			# do turn (note that the attacker always attacks first)
-			context.controller[context.on_turn].turn_start()
 			turn_started.emit()
+			await Globals.play_queued_scenes()
+			context.controller[context.on_turn].turn_start()
+			
 			await _do_turn()
+			
 			turn_ended.emit()
+			await Globals.play_queued_scenes()
 			context.controller[context.on_turn].turn_end()
 			
 			# do end-turn tick mechanics
 			for u in get_owned_units():
 				# recover 1 hp for units that didn't do anything
-				if did_nothing(u):
+				if not action_taken(u):
 					damage_unit(u, self, -1) 
 				
 				# tick duration of status effects
 				u.tick_status_effects()
 					
 		turn_cycle_ended.emit()
+		await Globals.play_queued_scenes()
 		
 		# increment number of turns
 		context.turns += 1
 	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
 	
 	end_battle(context.result)
+		
+		
+func _do_turn():
+	while not _should_end_turn:
+		# things can happen before/after doing any actions so make sure to check first
+		if _evaluate_victory_conditions():
+			return
+		
+		# do action
+		context.controller[context.on_turn].action_start()
+		action_started.emit()
+		await context.controller[context.on_turn].do_action()
+		action_ended.emit()
+		context.controller[context.on_turn].action_end()
+		
+		# auto end turn
+		if Globals.prefs.auto_end_turn:
+			var units := get_owned_units()
+			var should_end := true
+			
+			for u in units:
+				if can_move(u) or can_attack(u):
+					should_end = false
+					break
+					
+			if should_end:
+				end_turn()
 		
 		
 func _load_map(scene: PackedScene):
@@ -277,6 +364,15 @@ func _unload_map():
 	map.queue_free()
 	map = null
 	
+
+func _evaluate_victory_conditions() -> bool:
+	for c in context.victory_conditions:
+		context.result = c.evaluate(self)
+		if context.result != Result.None:
+			context.should_end = true
+			return true
+	return false
+		
 	
 func _prep_phase(prep_queue: Array) -> int:
 	while not prep_queue.is_empty():
@@ -332,61 +428,43 @@ func _prep_phase(prep_queue: Array) -> int:
 					
 	return await _end_prep_requested
 	
+
+## Walks a unit (action).
+func walk_unit(unit: Unit, cell: Vector2i):
+	walking_started.emit(unit)
 	
-func _check_prep_start() -> bool:
-	return true
-
-	
-func get_viewport_size() -> Vector2i:
-	return viewport.size
-
-
-func set_debug_tile_visible(debug_tile_visible: bool):
-	# inspector starts with 1 but this is 0-based
-	viewport.set_canvas_cull_mask_bit(9, debug_tile_visible)
-
-
-func display_message(message):
-	print(message)
-	message_displayed.emit(message)
-	
-
-func play_error(message):
-	if not $AudioStreamPlayer2D.is_playing():
-		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
-		$AudioStreamPlayer2D.play()
-	if message:
-		display_message(message)
+	var start := map.cell(unit.map_pos)
+	var end := cell # TODO unit_path is initialized by player and can't be used by ai
+	var path := unit_path._pathfinder.calculate_point_path(start, end)
+	await _walk_along(unit, path)
+		
+	walking_finished.emit(unit)
 	
 	
-func set_bond_level(unit: Unit, level: int):
-	unit.bond = clampi(level, 0, 2)
-	if unit.bond >= 1:
-		for stat in unit.unit_type.stat_growth_1:
-			unit.set(stat, unit.unit_type.stat_growth_1[stat])
-	if unit.bond >= 2:
-		for stat in unit.unit_type.stat_growth_2:
-			unit.set(stat, unit.unit_type.stat_growth_2[stat])
-	
-
-enum {
-	ATTACK_OK = 0,
-	ATTACK_NOT_UNLOCKED,
-	ATTACK_TARGET_INSIDE_MIN_RANGE,
-	ATTACK_TARGET_OUT_OF_RANGE,
-	ATTACK_NO_TARGETS,
-	ATTACK_INVALID_TARGET,
-}
-
-const ATTACK_ERROR_MESSAGE := [
-	'Use attack.',
-	'Unit has not unlocked this skill yet.',
-	'Target is inside minimum range.',
-	'Target is out of range.',
-	'No targets found.',
-	'Invalid target.',
-]
-
+## Makes a unit walk along a path (action).
+func _walk_along(unit: Unit, path: PackedVector2Array):
+	if is_walking(unit):
+		stop_walking(unit)
+		
+	match path.size():
+		0, 1:
+			pass
+		_:
+			# initialize driver
+			var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
+			driver.unit = unit
+			unit.set_meta("Battle_driver", driver)
+			$Drivers.add_child(driver)
+			
+			# run and wait for driver
+			await driver.walk_along(path)
+			
+			# cleanup
+			$Drivers.remove_child(driver)
+			unit.remove_meta("Battle_driver")
+			driver.queue_free()
+			
+			
 func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float) -> int:
 	var cellf := Vector2(target_cell)
 	
@@ -424,6 +502,7 @@ func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_ro
 	return ATTACK_OK
 	
 	
+## Unit use attack (action).
 func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
 	var re := can_use_attack(unit, attack, target_cell, target_rotation)
 	if re != ATTACK_OK:
@@ -444,78 +523,245 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	attack_sequence_ended.emit(unit, attack, target_cell, targets)
 	
 
+## Do nothing (action). Unit cannot move or attack and is considered as not having any action taken.
 func do_nothing(unit: Unit):
 	set_can_move(unit, false)
 	set_can_attack(unit, false)
-	set_did_nothing(unit, true)
+	set_action_taken(unit, false)
 	
 	
-################################################################################
-
-const action_limit := 10
-var _should_end_turn: bool
-
-signal turn_cycle_started
-signal turn_cycle_ended
-signal turn_started
-signal turn_ended
-signal action_started
-signal action_ended
-#
-#signal attack_button_pressed
-#signal special_button_pressed
-#signal undo_button_pressed
-#signal end_turn_button_pressed
-
-
-@onready var ai_action_controller := $AIActionController as BattleActionController
-@onready var player_action_controller := $PlayerActionController as BattleActionController
-	
-
-func _do_turn():
-	while not _should_end_turn:
-		# things can happen before/after doing any actions so make sure to check first
-		if _evaluate_victory_conditions():
-			return
-		
-		# do action
-		context.controller[context.on_turn].action_start()
-		action_started.emit()
-		await context.controller[context.on_turn].do_action()
-		action_ended.emit()
-		context.controller[context.on_turn].action_end()
-		
-		# auto end turn
-		if Globals.prefs.auto_end_turn:
-			var units := get_owned_units()
-			var should_end := true
-			
-			for u in units:
-				if can_move(u) or can_attack(u):
-					should_end = false
-					break
-					
-			if should_end:
-				end_turn()
-		
-		
-## Sends the signal to end the current turn.
+## End the current turn.
 func end_turn():
 	_should_end_turn = true
 	
+		
+## Notify the game that attack sequence is done.
+func notify_attack_sequence_finished():
+	# this is done so the methods called from the attack_sequence_started
+	# signal can call this function and trigger the notify on the next frame.
+	# not doing so will cause us to be stuck because we're still in the same
+	# context as the attack_sequence call and have not moved on to the next
+	# statement yet aka await for finish.
+	_notify_attack_sequence_finished.call_deferred()
 
-func _evaluate_victory_conditions() -> bool:
-	for c in context.victory_conditions:
-		context.result = c.evaluate(self)
-		if context.result != Result.None:
-			context.should_end = true
-			return true
-	return false
+
+func _notify_attack_sequence_finished():
+	_attack_sequence_finished.emit()
+	
+	
+################################################################################
+# Unit and turn utility functions
+################################################################################
+	
+## Spawns a unit.
+func spawn_unit(tag: String, empire: Empire, _name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.West) -> Unit:
+	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
+	var unit := Unit.create(map, {
+		world = map.world,
+		unit_type = Globals.unit_type[tag],
+		empire = empire,
+		map_pos = pos,
+#		facing = 0,
+#		hud = true,
+#		color = Color.WHITE,
+#		shadow = true,
+#		debug = false,
+		name = _name if _name != "" else tag,
+		heading = heading,
+	})
+	if pos == Map.OUT_OF_BOUNDS:
+		set_unit_group(unit, 'units_standby')
+	else:
+		set_unit_group(unit, 'units_alive')
+	for u in map.get_units(): # TODO not here
+		u.hp = maxi(1, u.empire.hp_multiplier * u.maxhp)
+	return unit
+	
+
+## Returns the unit on cell.
+func get_unit(cell: Vector2i) -> Unit:
+	for u in get_units():
+		if map.cell(u.map_pos) == cell:
+			return u
+	return null
+	
+	
+## Sets the unit group.
+func set_unit_group(unit: Unit, group: String):
+	for g in unit_group:
+		if g == group:
+			unit.add_to_group(g)
+			unit.set_meta('Battle_group', g)
+		else:
+			unit.remove_from_group(g)
+	match group:
+		'units_standby':
+			unit.map_pos = Map.OUT_OF_BOUNDS
+		'units_alive':
+			pass
+		'units_dead':
+			pass
+		'units_ghost':
+			pass
+			
+			
+
+## Returns units in a given group. Returns all alive units by default.
+func get_units(group: String = 'units_alive') -> Array[Unit]:
+	var re: Array[Unit] = []
+	re.assign(get_tree().get_nodes_in_group(group))
+	return re
+
+
+## Returns units owned by empire.
+func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Array[Unit]:
+	if empire:
+		return get_units(group).filter(func(x): return x.empire == empire)
+	else:
+		return get_units(group).filter(func(x): return x.empire == context.on_turn)
+
+
+## Kills a unit.
+func kill_unit(unit: Unit):
+	# TODO play death animation
+	#remove_unit(unit)
+	set_unit_group(unit, 'units_dead')
+	
+
+## Inflict damage upon a unit.
+func damage_unit(unit: Unit, source: Variant, amount: int):
+	# if unit has block, remove block and set damage to 0
+	if Globals.status_effect['BLK'] in unit.status_effects:
+		unit.remove_status_effect(Globals.status_effect['BLK'])
+		amount = 0
+	
+	# if unit has vul, increase damage taken by 1 
+	if Globals.status_effect['VUL'] in unit.status_effects and amount >= 0:
+		# this also increases poison damage which effectively 
+		# doubles the damage making it a potent combo
+		#amount += 1
+		if source != Globals.status_effect['VUL']:
+			damage_unit(unit, Globals.status_effect['VUL'], 1)
 		
+	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
+	
+	var color := Color.WHITE
+	if amount > 0:
+		if source == Globals.status_effect['PSN']:
+			color = Color(0.949, 0.29, 0.949)
+		elif source == Globals.status_effect['VUL']:
+			color = Color(0.949, 0.949, 0.29)
+		else:
+			camera.get_node("AnimationPlayer").play('shake')
+			color = Color(0.949, 0.29, 0.392)
 		
+	await play_floating_number(unit, abs(amount), color)
+	
+	if unit.hp == 0:
+		kill_unit(unit)
+	
+	
+## Makes the unit stop walking.
+func stop_walking(unit: Unit):
+	unit.get_meta("Battle_driver").stop_walking()
+	
+
+## Returns true if the unit is walking.
+func is_walking(unit: Unit):
+	return unit.has_meta("Battle_driver")
+	
+	
+## Sets unit bond level.
+func set_bond_level(unit: Unit, level: int):
+	unit.bond = clampi(level, 0, 2)
+	if unit.bond >= 1:
+		for stat in unit.unit_type.stat_growth_1:
+			unit.set(stat, unit.unit_type.stat_growth_1[stat])
+	if unit.bond >= 2:
+		for stat in unit.unit_type.stat_growth_2:
+			unit.set(stat, unit.unit_type.stat_growth_2[stat])
+	
+	
+## Returns true if the unit do a move action.
+func can_move(unit: Unit) -> bool:
+	return unit.get_meta("Battle_can_move", false)
+
+
+## Returns true if the unit can do an attack action.
+func can_attack(unit: Unit) -> bool:
+	return unit.get_meta("Battle_can_attack", false)
+	
+	
+## Returns true if the unit has taken any actions.
+func action_taken(unit: Unit) -> bool:
+	return unit.get_meta("Battle_action_taken", false)
+
+
+## Sets the unit can_move flag.
+func set_can_move(unit: Unit, value: bool):
+	unit.set_meta("Battle_can_move", value)
+	
+	
+## Sets the unit can_attack flag.
+func set_can_attack(unit: Unit, value: bool):
+	unit.set_meta("Battle_can_attack", value)
+	
+	
+## Sets the unit action_taken flag.
+func set_action_taken(unit: Unit, value: bool):
+	unit.set_meta("Battle_action_taken", value)
+	
+
+## Returns true if the unit is owned by the current empire on turn.
+func is_owned(unit: Unit) -> bool:
+	return unit.empire == context.on_turn
+	
+	
+## Returns true if pos is pathable for unit.
+func is_pathable(unit: Unit, cell: Vector2i) -> bool:
+	for obj in map.get_objects_at(cell):
+		if not unit.can_path(obj):
+			return false
+	return true
+	
+
+## Returns true if this unit can be placed on pos.
+func is_placeable(unit: Unit, cell: Vector2i) -> bool:
+	if map.cell(unit.map_pos) == cell:
+		return true
+	for obj in map.get_objects_at(cell):
+		if not unit.can_place(obj):
+			return false
+	return true
+
+
+################################################################################
+# Misc Battle functions
 ################################################################################
 	
 
+func get_viewport_size() -> Vector2i:
+	return viewport.size
+
+
+func set_debug_tile_visible(debug_tile_visible: bool):
+	# inspector starts with 1 but this is 0-based
+	viewport.set_canvas_cull_mask_bit(9, debug_tile_visible)
+
+
+func display_message(message):
+	print(message)
+	message_displayed.emit(message)
+	
+
+func play_error(message):
+	if not $AudioStreamPlayer2D.is_playing():
+		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
+		$AudioStreamPlayer2D.play()
+	if message:
+		display_message(message)
+	
+	
 func update_portrait(unit: Unit):
 	# TODO unit parameters should be accessible in a uniform manner instead of
 	# having picking from unit_type and chara
@@ -554,65 +800,16 @@ func play_floating_number(unit: Unit, number: int, color: Color):
 	node.queue_free()
 	
 	
-func notify_attack_sequence_finished():
-	# this is done so the methods called from the attack_sequence_started
-	# signal can call this function and trigger the notify on the next frame.
-	# not doing so will cause us to be stuck because we're still in the same
-	# context as the attack_sequence call and have not moved on to the next
-	# statement yet aka await for finish.
-	_notify_attack_sequence_finished.call_deferred()
-
-
-func _notify_attack_sequence_finished():
-	_attack_sequence_finished.emit()
+## Makes the camera follow a MapObject.
+func set_camera_follow(obj: MapObject):
+	if _camera_target:
+		_camera_target.map_pos_changed.disconnect(_on_target_map_pos_changed)
 	
-	
-func can_move(unit: Unit) -> bool:
-	return unit.get_meta("Battle_can_move", false)
-
-
-func can_attack(unit: Unit) -> bool:
-	return unit.get_meta("Battle_can_attack", false)
-	
-	
-func did_nothing(unit: Unit) -> bool:
-	return unit.get_meta("Battle_did_nothing", false)
-
-
-func set_can_move(unit: Unit, value: bool):
-	unit.set_meta("Battle_can_move", value)
-	
-	
-func set_can_attack(unit: Unit, value: bool):
-	unit.set_meta("Battle_can_attack", value)
-	
-
-func set_did_nothing(unit: Unit, value: bool):
-	unit.set_meta("Battle_did_nothing", value)
-	
-	
-func is_owned(unit: Unit) -> bool:
-	return unit.empire == context.on_turn
-	
-	
-## Returns true if pos is pathable.
-func is_pathable(unit: Unit, cell: Vector2i) -> bool:
-	for obj in map.get_objects_at(cell):
-		if not unit.can_path(obj):
-			return false
-	return true
-	
-
-## Returns true if this unit can be placed on pos.
-func is_placeable(unit: Unit, cell: Vector2i) -> bool:
-	if map.cell(unit.map_pos) == cell:
-		return true
-	for obj in map.get_objects_at(cell):
-		if not unit.can_place(obj):
-			return false
-	return true
-
-
+	_camera_target = obj
+	if _camera_target:
+		_camera_target.map_pos_changed.connect(_on_target_map_pos_changed)
+		
+		
 ## Selects cell for attack target.
 func select_attack_target(unit: Unit, attack: Attack, target: Variant):
 	if attack.melee:
@@ -689,181 +886,6 @@ func set_ui_visible(chara_info: Variant, attacks: Variant, undo_end: Variant):
 		$UI/Battle/UndoButton.visible = undo_end
 		$UI/Battle/EndTurnButton.visible = undo_end
 	
-		
-## Spawns a unit of type tag with name at pos, facing x.
-func spawn_unit(tag: String, empire: Empire, _name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.West) -> Unit:
-	assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
-	var unit := Unit.create(map, {
-		world = map.world,
-		unit_type = Globals.unit_type[tag],
-		empire = empire,
-		map_pos = pos,
-#		facing = 0,
-#		hud = true,
-#		color = Color.WHITE,
-#		shadow = true,
-#		debug = false,
-		name = _name if _name != "" else tag,
-		heading = heading,
-	})
-	if pos == Map.OUT_OF_BOUNDS:
-		set_unit_group(unit, 'units_standby')
-	else:
-		set_unit_group(unit, 'units_alive')
-	for u in map.get_units(): # TODO not here
-		u.hp = maxi(1, u.empire.hp_multiplier * u.maxhp)
-	return unit
-	
-
-### Adds an already created unit to the map.
-#func add_unit(unit: Unit, pos := Map.OUT_OF_BOUNDS):
-#	var old_parent := unit.get_parent()
-#	if old_parent:
-#		if old_parent is Map:
-#			old_parent.remove_object(unit)
-#		else:
-#			old_parent.remove_child(unit)
-#	map.add_object(unit)
-#	unit.map_pos = pos
-#
-#
-### Removes a unit from the map.
-#func remove_unit(unit: Unit):
-#	if unit not in map.get_objects():
-#		return
-#	# TODO if removed unit is on turn, forfeit first
-#
-#	map.remove_object(unit)
-
-
-const unit_group := [
-	'units_standby',
-	'units_alive',
-	'units_dead',
-	'units_ghost',
-]
-
-func set_unit_group(unit: Unit, group: String):
-	for g in unit_group:
-		if g == group:
-			unit.add_to_group(g)
-			unit.set_meta('Battle_group', g)
-		else:
-			unit.remove_from_group(g)
-	match group:
-		'units_standby':
-			unit.map_pos = Map.OUT_OF_BOUNDS
-		'units_alive':
-			pass
-		'units_dead':
-			pass
-		'units_ghost':
-			pass
-			
-func get_unit(cell: Vector2i) -> Unit:
-	for u in get_units():
-		if map.cell(u.map_pos) == cell:
-			return u
-	return null
-
-
-func get_units(group: String = 'units_alive') -> Array[Unit]:
-	var re: Array[Unit] = []
-	re.assign(get_tree().get_nodes_in_group(group))
-	return re
-
-
-func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Array[Unit]:
-	if empire:
-		return get_units(group).filter(func(x): return x.empire == empire)
-	else:
-		return get_units(group).filter(func(x): return x.empire == context.on_turn)
-
-
-## Kills a unit.
-func kill_unit(unit: Unit):
-	# TODO play death animation
-	#remove_unit(unit)
-	set_unit_group(unit, 'units_dead')
-	
-
-## Inflict damage upon a unit.
-func damage_unit(unit: Unit, source: Variant, amount: int):
-	# if unit has block, remove block and set damage to 0
-	if Globals.status_effect['BLK'] in unit.status_effects:
-		unit.remove_status_effect(Globals.status_effect['BLK'])
-		amount = 0
-	
-	# if unit has vul, increase damage taken by 1 
-	if Globals.status_effect['VUL'] in unit.status_effects and amount >= 0:
-		# this also increases poison damage which effectively 
-		# doubles the damage making it a potent combo
-		#amount += 1
-		if source != Globals.status_effect['VUL']:
-			damage_unit(unit, Globals.status_effect['VUL'], 1)
-		
-	unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
-	
-	var color := Color.WHITE
-	if amount > 0:
-		if source == Globals.status_effect['PSN']:
-			color = Color(0.949, 0.29, 0.949)
-		elif source == Globals.status_effect['VUL']:
-			color = Color(0.949, 0.949, 0.29)
-		else:
-			camera.get_node("AnimationPlayer").play('shake')
-			color = Color(0.949, 0.29, 0.392)
-		
-	await play_floating_number(unit, abs(amount), color)
-	
-	if unit.hp == 0:
-		kill_unit(unit)
-
-	
-## Walks the unit.
-func walk_unit(unit: Unit, cell: Vector2i):
-	walking_started.emit(unit)
-	
-	var start := map.cell(unit.map_pos)
-	var end := cell # TODO unit_path is initialized by player and can't be used by ai
-	var path := unit_path._pathfinder.calculate_point_path(start, end)
-	await _walk_along(unit, path)
-		
-	walking_finished.emit(unit)
-	
-## Makes the unit stop walking.
-func stop_walking(unit: Unit):
-	unit.get_meta("Battle_driver").stop_walking()
-	
-
-## Returns true if the unit is walking.
-func is_walking(unit: Unit):
-	return unit.has_meta("Battle_driver")
-	
-	
-## Makes the unit walk along a path.
-func _walk_along(unit: Unit, path: PackedVector2Array):
-	if is_walking(unit):
-		stop_walking(unit)
-		
-	match path.size():
-		0, 1:
-			pass
-		_:
-			# initialize driver
-			var driver: UnitDriver = preload("res://Screens/Battle/map/UnitDriver.tscn").instantiate()
-			driver.unit = unit
-			unit.set_meta("Battle_driver", driver)
-			$Drivers.add_child(driver)
-			
-			# run and wait for driver
-			await driver.walk_along(path)
-			
-			# cleanup
-			$Drivers.remove_child(driver)
-			unit.remove_meta("Battle_driver")
-			driver.queue_free()
-			
 			
 ## Selects the cell.
 func select_cell(cell: Vector2i):
@@ -907,45 +929,22 @@ func get_attack_target_cells(user: Unit, attack: Attack, target: Vector2i, targe
 	return re
 
 
-## Makes the camera follow a MapObject.
-func set_camera_follow(obj: MapObject):
-	# TODO some bug concerning this:
-	# the wrong lambda is being called leading to error
-#	if camera.has_meta("battle_target"):
-#		camera.get_meta("battle_target").map_pos_changed.disconnect(camera.get_meta("battle_follow_func"))
-#		camera.set_meta("battle_follow_func", null)
-#		camera.set_meta("battle_target", null)
-#
-#	if obj:
-#		var follow_func := func():
-#			camera.position = map.world.uniform_to_screen(obj.map_pos)
-#
-#		camera.set_meta("battle_follow_func", follow_func)
-#		camera.set_meta("battle_target", obj)
-#
-#		obj.map_pos_changed.connect(follow_func)
-	if _camera_target:
-		_camera_target.map_pos_changed.disconnect(_on_target_map_pos_changed)
-	
-	_camera_target = obj
-	if _camera_target:
-		_camera_target.map_pos_changed.connect(_on_target_map_pos_changed)
-		
+################################################################################
+# Signals
+################################################################################
+
 
 func _on_target_map_pos_changed():
 	assert(_camera_target)
 	camera.position = map.world.uniform_to_screen(_camera_target.map_pos)
 	
 
-# TODO maybe this should be on UI code?
 func _on_battle_started(attacker, defender, _territory):
 	$UI.visible = true
-	#$UI/Label.text = "%s vs %s" % [attacker.leader.name, defender.leader.name]
 
 
 func _on_battle_ended(_result):
 	$UI.visible = false
-
 	camera.drag_horizontal_enabled = false
 	camera.drag_vertical_enabled = false
 	camera.position = Vector2(960, 540)
@@ -953,11 +952,9 @@ func _on_battle_ended(_result):
 
 func _on_done_prep_pressed():
 	if fulfills_prep_requirements(context.on_turn, context.territory):
-		print("FUCKING TRANSITION")
 		state_machine.transition_to("Idle")
 		_end_prep_requested.emit(0)
 	else:
-		print("FUCKING ERROR")
 		display_message(context.warnings)
 
 
