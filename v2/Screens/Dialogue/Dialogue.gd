@@ -14,8 +14,6 @@ func play_scene(scene: String):
 			await cps_text('This is a test')
 			await cps_text('Just wait')
 			await cps_text('Only 2s per message')
-			await cps_text('Not too bad yeah?')
-			await cps_text('No, there is no fast forward..')
 	self.visible = false
 	Globals.notify_end_scene()
 	

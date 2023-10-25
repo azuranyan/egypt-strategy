@@ -140,16 +140,24 @@ var _should_end_turn: bool
 @onready var terrain_overlay: TileMap = $SubViewportContainer/Viewport/TerrainOverlay
 @onready var unit_path: UnitPath = $SubViewportContainer/Viewport/UnitPath
 @onready var cursor: SpriteObject = $UI/Cursor
+@onready var pause_overlay: PauseOverlay = $UI/PauseOverlay
 
 @onready var ai_action_controller := $AIActionController as BattleActionController
 @onready var player_action_controller := $PlayerActionController as BattleActionController
-	
+
 
 func _ready():
 	set_debug_tile_visible(false)
 	
 	print("battle ready")
 	
+
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_ESCAPE and context:
+			accept_event()
+			quit_battle.call_deferred()
+
 	
 ## Starts a battle between two empires over a territory.
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick: Variant = null):
@@ -213,8 +221,23 @@ func end_battle(result: Result):
 		_end_battle_requested.emit(result)
 	else:
 		push_warning("end_battle: battle not started!")
-	
+		
 
+## Quits the battle.
+func quit_battle():
+	if not context:
+		return
+		
+	if not context.battle_phase and context.attacker.is_player_owned():
+		var should_end := await pause_overlay.show_pause('Cancel Attack?')
+		if should_end:
+			_on_undo_button_pressed() # FIX misnomer
+	else:
+		var should_end := await pause_overlay.show_pause('Withdraw?')
+		if should_end:
+			end_battle(Result.AttackerWithdraw if context.attacker.is_player_owned() else Result.DefenderWithdraw)
+	
+	
 ## Outcome is an implementation detail.
 func _quick_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
 	return Result.AttackerVictory
@@ -253,6 +276,7 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	
 	
 func _do_battle():
+	context.battle_phase = true
 	$UI/Battle.visible = true # TODO signalize all ui changes
 	context.controller[context.attacker].initialize(self, context.attacker)
 	context.controller[context.defender].initialize(self, context.defender)
@@ -958,7 +982,7 @@ func _on_done_prep_pressed():
 		display_message(context.warnings)
 
 
-func _on_undo_button_pressed():
+func _on_undo_button_pressed(): # FIX misnomer
 	state_machine.transition_to("Idle")
 	_end_prep_requested.emit(1)
 
@@ -1014,6 +1038,8 @@ func _on_walking_finished(unit):
 	
 ## The state of the battle.
 class Context:
+	var battle_phase := false
+	
 	var attacker: Empire
 	var defender: Empire
 	var territory: Territory

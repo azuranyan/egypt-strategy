@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=37 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
@@ -13,6 +13,7 @@
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="8_b0ewm"]
 [ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="9_j1ncc"]
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="14_ca16r"]
+[ext_resource type="Script" path="res://Screens/Battle/PauseOverlay.gd" id="15_32orc"]
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="15_41khm"]
 
 [sub_resource type="GDScript" id="GDScript_nspcd"]
@@ -186,20 +187,6 @@ _data = {
 "turn_banner.player": SubResource("Animation_4yntm")
 }
 
-[sub_resource type="InputEventKey" id="InputEventKey_4apw1"]
-device = -1
-keycode = 4194305
-
-[sub_resource type="InputEventMouseButton" id="InputEventMouseButton_p1kbt"]
-button_mask = 2
-position = Vector2(308, 19)
-global_position = Vector2(312, 62)
-button_index = 2
-pressed = true
-
-[sub_resource type="Shortcut" id="Shortcut_8j76h"]
-events = [SubResource("InputEventKey_4apw1"), SubResource("InputEventMouseButton_p1kbt")]
-
 [sub_resource type="LabelSettings" id="LabelSettings_vxtxp"]
 font = ExtResource("9_j1ncc")
 font_size = 46
@@ -236,10 +223,6 @@ keycode = 69
 [sub_resource type="Shortcut" id="Shortcut_m56qi"]
 events = [SubResource("InputEventKey_4ao6f")]
 
-[sub_resource type="InputEventKey" id="InputEventKey_tovbx"]
-device = -1
-keycode = 4194305
-
 [sub_resource type="InputEventMouseButton" id="InputEventMouseButton_sfvxc"]
 button_mask = 2
 position = Vector2(308, 19)
@@ -248,7 +231,15 @@ button_index = 2
 pressed = true
 
 [sub_resource type="Shortcut" id="Shortcut_8fg1i"]
-events = [SubResource("InputEventKey_tovbx"), SubResource("InputEventMouseButton_sfvxc")]
+events = [SubResource("InputEventMouseButton_sfvxc")]
+
+[sub_resource type="LabelSettings" id="LabelSettings_b2gdf"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_622fl"]
+font = ExtResource("14_ca16r")
+font_size = 24
+font_color = Color(0, 0, 0, 1)
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -386,7 +377,6 @@ offset_right = 1844.0
 offset_bottom = 865.0
 focus_mode = 0
 theme = ExtResource("8_b0ewm")
-shortcut = SubResource("Shortcut_8j76h")
 text = "Cancel Battle"
 
 [node name="WarningUI" type="Control" parent="UI"]
@@ -685,6 +675,92 @@ theme = ExtResource("8_b0ewm")
 text = "End Turn
 "
 
+[node name="PauseOverlay" type="ColorRect" parent="UI"]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.270588)
+script = ExtResource("15_32orc")
+
+[node name="ColorRect" type="ColorRect" parent="UI/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -201.0
+offset_top = -59.0
+offset_right = 201.0
+offset_bottom = 59.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.862745, 0.831373, 0.776471, 1)
+
+[node name="Label" type="Label" parent="UI/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -107.0
+offset_right = 42.5
+offset_bottom = -70.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Paused"
+label_settings = SubResource("LabelSettings_b2gdf")
+
+[node name="Label2" type="Label" parent="UI/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -184.0
+offset_top = -42.0
+offset_right = 184.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "End battle?"
+label_settings = SubResource("LabelSettings_622fl")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -193.0
+offset_top = 12.0
+offset_right = 193.0
+offset_bottom = 52.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="YesButton" type="Button" parent="UI/PauseOverlay/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="UI/PauseOverlay/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No
+"
+
 [connection signal="attack_sequence_ended" from="." to="." method="_on_attack_sequence_ended"]
 [connection signal="attack_sequence_ended" from="." to="PlayerActionController" method="_on_battle_attack_sequence_ended"]
 [connection signal="attack_sequence_started" from="." to="." method="_on_attack_sequence_started"]
@@ -711,3 +787,5 @@ text = "End Turn
 [connection signal="pressed" from="UI/Battle/SpecialButton" to="PlayerActionController" method="_on_special_button_pressed"]
 [connection signal="pressed" from="UI/Battle/UndoButton" to="PlayerActionController" method="_on_undo_button_pressed"]
 [connection signal="pressed" from="UI/Battle/EndTurnButton" to="PlayerActionController" method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/YesButton" to="UI/PauseOverlay" method="_on_yes_button_pressed"]
+[connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/NoButton" to="UI/PauseOverlay" method="_on_no_button_pressed"]

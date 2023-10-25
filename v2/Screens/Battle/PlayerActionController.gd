@@ -95,12 +95,12 @@ func _unhandled_input(event):
 		battle.camera.drag_vertical_enabled = true
 		
 		# accept
-		if (event is InputEventMouseButton and event.button_index == 1 or event is InputEventKey and (event.keycode == KEY_KP_1 or event.keycode == KEY_ENTER)) and event.pressed:
+		if (event is InputEventMouseButton and event.button_index == 1 or event is InputEventKey and event.keycode == KEY_KP_1) and event.pressed:
 			battle.accept_cell()
 			return
 		
 		# cancel
-		if (event is InputEventMouseButton and event.button_index == 2 or event is InputEventKey and (event.keycode == KEY_KP_3 or event.keycode == KEY_ESCAPE)) and event.pressed:
+		if (event is InputEventMouseButton and event.button_index == 2 or event is InputEventKey and event.keycode == KEY_KP_3) and event.pressed:
 			cancel()
 			return
 		
@@ -196,10 +196,10 @@ func _unhandled_input(event):
 						battle.select_cell(cur + Vector2i(-1, 0))
 					KEY_D:
 						battle.select_cell(cur + Vector2i(+1, 0))
-					KEY_KP_1, KEY_ENTER:
+					KEY_KP_1:
 						battle.select_cell(cur)
 						battle.accept_cell()
-					KEY_KP_3, KEY_ESCAPE:
+					KEY_KP_3:
 						cancel()
 
 ################################################################################
