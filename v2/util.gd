@@ -2,7 +2,7 @@ class_name Util
 
 
 ## Simple suboptimal flood fill algorithm.
-static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
+static func flood_fill(cell: Vector2, max_distance: int, _bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var re := PackedVector2Array()
 	var stack := [cell]
 	
@@ -10,7 +10,7 @@ static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, conditi
 		var current = stack.pop_back()
 		
 		# various checks
-		var out_of_bounds: bool = not bounds.has_point(current)
+		var out_of_bounds: bool = not _bounds.has_point(current)
 		var dupe: bool = current in re
 		var out_of_range: bool = cell_distance(current, cell) > max_distance
 		
@@ -23,7 +23,7 @@ static func flood_fill(cell: Vector2, max_distance: int, bounds: Rect2i, conditi
 		for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
 			var coords: Vector2 = current + direction
 			
-			if not bounds.has_point(coords) or coords in re:
+			if not _bounds.has_point(coords) or coords in re:
 				continue
 			
 			if condition.call(current):

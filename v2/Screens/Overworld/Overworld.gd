@@ -11,7 +11,9 @@ enum {
 	REST_ACTION,
 	ATTACK_ACTION,
 	TRAIN_ACTION,
+	INSPECT_ACTION,
 }
+
 
 ## Returns a special null action.
 static func empire_null_action() -> Array:
@@ -33,24 +35,15 @@ static func empire_train_action(territory: Territory) -> Array:
 	return [TRAIN_ACTION, territory]
 	
 	
-class Context:
-	# counts the number of turn cycles that have passed
-	var turn_cycles: int
-
-	# initial turn order
-	var initial_turn_order: Array[Empire]
-
-	# the turn queue
-	var turn_queue: Array[Empire]
-
-	# the empire currently taking their turn
-	var on_turn: Empire
-
-	# flag to indicate end
-	var should_end := false
-
+## Returns a inspect action.
+static func empire_inspect_action() -> Array:
+	return [INSPECT_ACTION]
+	
 
 var context: Context
+
+
+@onready var action_log := $ActionLog
 
 	
 # Called when the node enters the scene tree for the first time.
@@ -60,9 +53,9 @@ func _ready():
 	register_empires_to_globals()
 		
 	# connect overworld events TODO remove and stick spawn to where it should be
-	OverworldEvents.connect("all_territories_taken", spawn_boss)
-	
-	do_cycle.call_deferred()
+	OverworldEvents.all_territories_taken.connect(spawn_boss)
+	OverworldEvents.cycle_turn_start.connect(func(x): if x.is_player_owned(): $TurnBanner/AnimationPlayer.play("show"))
+	OverworldEvents.cycle_end.connect(func(): display('TURN %s DONE' % context.turn_cycles))
 	
 
 ## Starts the overworld main loop.
@@ -111,7 +104,7 @@ func do_cycle():
 		await Globals.play_queued_scenes()
 		
 		context.turn_cycles += 1
-	
+
 
 ## Removes the empire from the turn order.
 func remove_from_turn_order(empire: Empire):
@@ -154,9 +147,9 @@ func _execute_action(empire: Empire, action: Array):
 	match action[0]:
 		REST_ACTION:
 			if empire.is_player_owned():
-				print("%s rests. HP recovered." % empire.leader.name)
+				display("%s rests. HP recovered." % empire.leader.name)
 			else:
-				print("%s rests. HP recovered (aggression: %s)" % [empire.leader.name, empire.aggression])
+				display("%s rests. HP recovered. Aggression %.2f" % [empire.leader.name, empire.aggression])
 				
 			empire.hp_multiplier = 1.0
 			
@@ -164,10 +157,7 @@ func _execute_action(empire: Empire, action: Array):
 			var territory: Territory = action[1]
 			var attacker: Empire = empire
 			var defender: Empire = territory.empire
-			print("%s attacks %s (%s)!" % [attacker.leader.name, territory.name, defender.leader.name])
-			
-			# TODO show transition/loading screen
-			# TODO show objectives
+			display("%s attacks %s (%s)!" % [attacker.leader.name, territory.name, defender.leader.name])
 			
 			# PRUNE call stack
 			Globals.battle.start_battle.call_deferred(attacker, defender, territory)
@@ -175,34 +165,39 @@ func _execute_action(empire: Empire, action: Array):
 			
 			match result:
 				Battle.Result.Cancelled:
-					print("Attacker cancelled.")
+					display("Attacker cancelled.")
 					context.turn_queue.push_front(empire)
 					
 				Battle.Result.AttackerRequirementsError:
-					print("Attacker does not meet requirements")
+					display("Attacker does not meet requirements")
 					context.turn_queue.push_front(empire)
 					
 				Battle.Result.None:
 					push_error("Invalid battle result: None")
 					
 				Battle.Result.AttackerVictory:
-					print("Attacker Victory!")
+					display("Attacker Victory!")
 					_attacker_victory(empire, territory)
 					defender.hp_multiplier = 0.1
 					
 				Battle.Result.DefenderVictory:
-					print("Defender Victory!")
+					display("Defender Victory!")
 					attacker.hp_multiplier = 0.1
 					
 				Battle.Result.AttackerWithdraw:
-					print("Attacker Withdraw.")
+					display("Attacker Withdraw.")
 					
 				Battle.Result.DefenderWithdraw:
-					print("Defender Withdraw.")
+					display("Defender Withdraw.")
 					_attacker_victory(empire, territory)
 					
 		TRAIN_ACTION:
-			print('%s trains units (TODO does nothing)')
+			display('%s trains units (TODO does nothing)' % empire.leader)
+			context.turn_queue.push_front(empire)
+			
+		INSPECT_ACTION:
+			display('%s inspects units (TODO does nothing)' % empire.leader)
+			context.turn_queue.push_front(empire)
 	
 
 func _attacker_victory(empire: Empire, territory: Territory):
@@ -225,15 +220,13 @@ func _attacker_victory(empire: Empire, territory: Territory):
 		print("%s is defeated!" % old_owner.leader.name)
 		
 		if old_owner.is_player_owned():
-			print("player defeated, game uber")
+			context.should_end = true
+			OverworldEvents.player_defeated.emit()
+		elif old_owner.leader.get_meta("final_boss", false):
+			context.should_end = true
+			OverworldEvents.boss_defeated.emit()
 		else:
-			if old_owner.leader.get_meta("final_boss", false):
-				# boss
-				print("boss defeated, congerets")
-				OverworldEvents.emit_signal("boss_defeated")
-			else:
-				# normal enemy
-				update_boss_spawn_condition()
+			update_boss_spawn_condition()
 			remove_from_turn_order(old_owner)
 		
 
@@ -242,7 +235,7 @@ func update_boss_spawn_condition():
 		if t.get_leader() != Globals.chara["Sitri"] and !t.is_player_owned():
 			return
 	
-	OverworldEvents.emit_signal("all_territories_taken")
+	OverworldEvents.all_territories_taken.emit()
 	
 		
 func spawn_boss():
@@ -254,6 +247,12 @@ func spawn_boss():
 	
 	context.initial_turn_order.append(Globals.empires["Sitri"])
 	
+
+## Displays message and prints to console.
+func display(message: String):
+	print(message)
+	action_log.display(message)
+
 
 ## Connects two territories together
 func connect_territories(a: Territory, b: Territory):
@@ -331,3 +330,19 @@ func empire_give_territory(from_empire: Empire, to_empire: Empire, territory: Te
 	# broadcast
 	OverworldEvents.territory_owner_changed.emit(from_empire, to_empire, territory)
 	
+
+class Context:
+	# counts the number of turn cycles that have passed
+	var turn_cycles: int
+
+	# initial turn order
+	var initial_turn_order: Array[Empire]
+
+	# the turn queue
+	var turn_queue: Array[Empire]
+
+	# the empire currently taking their turn
+	var on_turn: Empire
+
+	# flag to indicate end
+	var should_end := false

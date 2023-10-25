@@ -106,18 +106,11 @@ func _on_texture_button_toggled(button_pressed):
 		
 func _on_attack_button_pressed():
 	$TextureButton.button_pressed = false
-	
-	# this button should appear only for player and therefore is
-	# always the player empire triggering this
-	#OverworldEvents.emit_signal("empire_attack", Globals.empires["Lysandra"], territory)
-	#OverworldEvents.emit_signal("cycle_turn_end", Globals.empires["Lysandra"])
-	
 	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_attack_action(territory))
 
 
 func _on_inspect_button_pressed():
-	#OverworldEvents.emit_signal("inspect")
-	pass
+	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_inspect_action())
 
 
 func _on_rest_button_pressed():

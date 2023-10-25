@@ -228,14 +228,18 @@ func quit_battle():
 	if not context:
 		return
 		
+	var should_end := false
 	if not context.battle_phase and context.attacker.is_player_owned():
-		var should_end := await pause_overlay.show_pause('Cancel Attack?')
-		if should_end:
-			_on_undo_button_pressed() # FIX misnomer
+		should_end = await pause_overlay.show_pause('Cancel Attack?')
 	else:
-		var should_end := await pause_overlay.show_pause('Withdraw?')
-		if should_end:
+		should_end = await pause_overlay.show_pause('Withdraw?')
+	
+	if should_end:
+		if context.battle_phase:
 			end_battle(Result.AttackerWithdraw if context.attacker.is_player_owned() else Result.DefenderWithdraw)
+		else:
+			state_machine.transition_to("Idle")
+			_end_prep_requested.emit(1)
 	
 	
 ## Outcome is an implementation detail.
@@ -489,7 +493,7 @@ func _walk_along(unit: Unit, path: PackedVector2Array):
 			driver.queue_free()
 			
 			
-func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float) -> int:
+func check_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float) -> int:
 	var cellf := Vector2(target_cell)
 	
 	# check for bond level
@@ -528,16 +532,6 @@ func can_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_ro
 	
 ## Unit use attack (action).
 func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
-	var re := can_use_attack(unit, attack, target_cell, target_rotation)
-	if re != ATTACK_OK:
-		play_error(ATTACK_ERROR_MESSAGE[re])
-		return
-	
-	# commit actions
-	set_can_move(unit, false)
-	set_can_attack(unit, false)
-	
-	# attack signal (not ideal cos we're re-evaluating targets)
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
 	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	attack_sequence_started.emit(unit, attack, target_cell, targets)
@@ -879,17 +873,30 @@ func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
 	
 ## Draws target overlay. target_rotation is ignored if melee.
 func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
+	draw_attack_overlay_multicast(unit, attack, [target], target_rotation)
+#	terrain_overlay.clear()
+#	var cells := get_targetable_cells(unit, attack)
+#	if not attack.melee:
+#		draw_terrain_overlay(cells, TERRAIN_RED, true)
+#	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
+#	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
+#
+
+## Draws target overlay. Supports multicast.
+func draw_attack_overlay_multicast(unit: Unit, attack: Attack, targets: Array[Vector2i], target_rotation: float = 0):
 	terrain_overlay.clear()
 	
+	# draw range
 	var cells := get_targetable_cells(unit, attack)
-	
 	if not attack.melee:
-		draw_terrain_overlay(cells, TERRAIN_RED, true)
+		draw_terrain_overlay(cells, TERRAIN_RED)
+		
+	# draw targeted cells
+	for target in targets:
+		var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
+		draw_terrain_overlay(target_cells, TERRAIN_BLUE)
 	
-	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
-	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
-
-
+	
 ## Draws terrain overlay.
 func draw_terrain_overlay(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear := false):
 	if clear:
@@ -899,13 +906,14 @@ func draw_terrain_overlay(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear
 		
 		
 ## Sets the visibility of ui elements.
-func set_ui_visible(chara_info: Variant, attacks: Variant, undo_end: Variant):
+func set_ui_visible(chara_info: Variant, attack: Variant, special: Variant, undo_end: Variant):
 	if chara_info != null:
 		$UI/Battle/Name.visible = chara_info
 		$UI/Battle/Portrait.visible = chara_info
-	if attacks != null:
-		$UI/Battle/AttackButton.visible = attacks
-		$UI/Battle/SpecialButton.visible = attacks
+	if attack != null:
+		$UI/Battle/AttackButton.visible = attack
+	if special != null:
+		$UI/Battle/SpecialButton.visible = special
 	if undo_end != null:
 		$UI/Battle/UndoButton.visible = undo_end
 		$UI/Battle/EndTurnButton.visible = undo_end
@@ -982,9 +990,8 @@ func _on_done_prep_pressed():
 		display_message(context.warnings)
 
 
-func _on_undo_button_pressed(): # FIX misnomer
-	state_machine.transition_to("Idle")
-	_end_prep_requested.emit(1)
+func _on_cancel_prep_pressed():
+	quit_battle()
 
 
 func _on_turn_started():
@@ -1010,7 +1017,7 @@ func _on_turn_cycle_started():
 	
 
 func _on_attack_sequence_started(_unit, attack, _target, _targets):
-	set_ui_visible(false, false, false)
+	set_ui_visible(false, false, false, false)
 	$UI/Attack/Label.text = attack.name
 	$UI/Attack.visible = true
 

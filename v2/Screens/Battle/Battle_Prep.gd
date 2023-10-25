@@ -60,8 +60,6 @@ func enter(kwargs := {}) -> void:
 	
 	prep = prep_queue.pop_front()
 	
-	$UI/Prep.text = "Prep: %s" % prep.leader.name
-	
 	# add the units to character list
 	for u in prep.units:
 		# TODO we're creating all units instead of just the necessary ones
@@ -97,8 +95,6 @@ func exit() -> void:
 		if o.get_meta("spawn_point", "") == "player":
 			o.no_show = true
 			
-	$UI.visible = false
-	
 	prep = null
 	battle.character_list.visible = false
 	

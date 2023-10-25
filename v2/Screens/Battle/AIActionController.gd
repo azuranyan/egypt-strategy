@@ -291,7 +291,7 @@ static func generate_attack_move(unit: Unit, cell: Vector2i, attack: Attack) -> 
 		
 		# add all possible attack locations
 		for target in Globals.battle.get_targetable_cells(unit, attack):
-			if Globals.battle.can_use_attack(unit, attack, target, 0) == Battle.ATTACK_OK:
+			if Globals.battle.check_use_attack(unit, attack, target, 0) == Battle.ATTACK_OK:
 				re.append(Move.move_attack(cell, attack, target))
 		
 		# hack: restore unit position

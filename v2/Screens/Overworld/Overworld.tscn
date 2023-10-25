@@ -1,11 +1,80 @@
-[gd_scene load_steps=7 format=3 uid="uid://c11gexecl1hvb"]
+[gd_scene load_steps=12 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
 [ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://d2jpf34a0pcc2" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
-[ext_resource type="PackedScene" uid="uid://deoum6p0ur60e" path="res://Screens/Overworld/CombinedPlayerMenu.tscn" id="4_j3r5l"]
 [ext_resource type="Script" path="res://Screens/Overworld/Territory.gd" id="4_xerix"]
 [ext_resource type="PackedScene" uid="uid://btf3bu5kpnvls" path="res://Screens/Battle/maps/StartingZone.tscn" id="5_xwig8"]
+[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="6_xkwu1"]
+[ext_resource type="PackedScene" uid="uid://cd5xmi7eirbjn" path="res://Screens/Overworld/ActionLog.tscn" id="7_6hcg0"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_2puew"]
+font = ExtResource("6_xkwu1")
+font_size = 46
+font_color = Color(0.545098, 0.631373, 1, 1)
+shadow_size = 8
+shadow_color = Color(0, 0, 0, 0.690196)
+
+[sub_resource type="Animation" id="Animation_qbev4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_7r1ee"]
+resource_name = "show"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 1.1, 1.4),
+"transitions": PackedFloat32Array(0.33, 1, 0.33, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_klyja"]
+_data = {
+"RESET": SubResource("Animation_qbev4"),
+"show": SubResource("Animation_7r1ee")
+}
 
 [node name="Overworld" type="Control"]
 layout_mode = 3
@@ -114,9 +183,6 @@ scale = Vector2(0.05, 0.05)
 script = ExtResource("4_xerix")
 maps = Array[PackedScene]([ExtResource("5_xwig8")])
 
-[node name="CombinedPlayerMenu" parent="." instance=ExtResource("4_j3r5l")]
-z_index = 2
-
 [node name="MouseEventBlocker" type="Control" parent="."]
 visible = false
 anchors_preset = 0
@@ -124,3 +190,53 @@ offset_left = -2.0
 offset_top = -2.0
 offset_right = 1922.0
 offset_bottom = 1082.0
+
+[node name="TurnBanner" type="Control" parent="."]
+visible = false
+custom_minimum_size = Vector2(500, 70)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = 34.9993
+offset_right = 250.0
+offset_bottom = 104.999
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(250, 35)
+
+[node name="ColorRect" type="ColorRect" parent="TurnBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.859375, 0.828125, 0.773438, 1)
+
+[node name="Player" type="Label" parent="TurnBanner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -154.5
+offset_top = -19.0
+offset_right = 154.5
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "PLAYER TURN"
+label_settings = SubResource("LabelSettings_2puew")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TurnBanner"]
+libraries = {
+"": SubResource("AnimationLibrary_klyja")
+}
+
+[node name="ActionLog" parent="." instance=ExtResource("7_6hcg0")]
+display_duration = 8.0

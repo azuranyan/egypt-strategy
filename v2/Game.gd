@@ -11,16 +11,11 @@ signal scene_ended
 signal scene_queue_finished
 
 
-
 signal _notify_end_scene
 
 
 const DIRECTIONS = [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]
-#var territories: Array[Territory] = []
 
-#var gods: Array[God] = []
-var units: Array[Unit] = []
-var hp_multiplier: float = 1.0
 
 var territories := {
 	# This will be auto populated in Overworld._ready
@@ -38,7 +33,7 @@ var prefs := {
 	'defeat_if_home_territory_captured': true,
 	'camera_follow_unit_move': true,
 	'mouse_edge_scrolling': true, # TODO
-	'auto_end_turn': true,
+	'auto_end_turn': false,
 }
 
 var attack := {
@@ -66,12 +61,6 @@ var world := {
 }
 
 var scene_queue: Array[String] = []
-
-
-#var overworld_scene := preload("res://Screens/Overworld/Overworld.tscn").instantiate()
-#var battle_scene := preload("res://Screens/Battle/Battle.tscn").instantiate()
-
-
 var overworld: Overworld = preload("res://Screens/Overworld/Overworld.tscn").instantiate()
 var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
 
@@ -117,10 +106,17 @@ func pop_screen(transition: String = ''):
 	_transition(old, new, transition)
 	
 
-func _transition(old: Node, new: Node, transition: String):
+func _transition(old: Node, new: Node, _transition: String): # TODO different transitions
+	# load the image of the old screen
+	var img := get_viewport().get_texture().get_image()
+	var tex := ImageTexture.create_from_image(img)
+	$TextureRect.set_texture(tex)
+	
+	$AnimationPlayer.play("fade_out")
 	if old:
 		get_tree().root.remove_child(old)
 	get_tree().root.add_child(new)
+	#await $AnimationPlayer.animation_finished
 	
 	
 ## Plays queued insert scenes.

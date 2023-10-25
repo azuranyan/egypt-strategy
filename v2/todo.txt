@@ -3,12 +3,7 @@
 ##########################################################################################################
 "All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
 
-scriptable events/battle world state
- - unified battle api where all the functions are there instead of fiddling the classes themselves
- - this should clean up the mess that you currently have to do with units and map and stuff
 
-possible problem with await-style flow
- - signals like quit game and other exceptions may cause leaks and issues
 
 ## minor
 ui elements need to be canvaslayer to bypass camera and viewport transforms
@@ -17,14 +12,13 @@ prep keyboard control
 should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
 more robust cast animation system
-overworld
- - banner player turn
- - action log
-battle
- - end banner
 attack shape rotation is rotated 90 degrees
+clearly determine program flow of signal connections
+ - to connect_defer or to defer the signal emit, etc
+overworld buttons need to be double clicked when clicked
 
 ## would be nice
+add pause while showing player banner
 disgaea style enum targetable units in attack range
 disgaea style target and caster placement 
 damage counter for consecutive attacks
@@ -41,26 +35,11 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
-end battle confirmation screen
- - end battle confirmation don't show again screen
-
-add play_queued_scenes on all appropriate spots
-winner is you popup when game ends
- - 
-battle
- - unit pass/do nothing
-display targeting info
- - list of units that will be hit by the attack
- - attack being used
-
-
+choppy fadeout transition after going out from battle
 
 add check for bond level up after turn ends
 
 unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
-
-implement multicast
- - if it's already selected, deselect
 
 before every effect, check if target is still alive
  - after turn cycle ends, clear all dead units

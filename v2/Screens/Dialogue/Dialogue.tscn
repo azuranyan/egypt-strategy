@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Screens/Dialogue/Dialogue.gd" id="1_b8sjv"]
 
 [node name="Node2D" type="Control"]
+z_index = 100
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +28,6 @@ grow_vertical = 0
 color = Color(0, 0, 0, 0.396078)
 
 [node name="RichTextLabel" type="RichTextLabel" parent="ColorRect"]
-z_index = 100
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -44,3 +44,5 @@ theme_override_font_sizes/italics_font_size = 24
 theme_override_font_sizes/bold_italics_font_size = 24
 theme_override_font_sizes/mono_font_size = 24
 text = "This is a text"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

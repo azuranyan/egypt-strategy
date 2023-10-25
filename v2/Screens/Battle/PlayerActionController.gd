@@ -19,6 +19,9 @@ var active_walkable: PackedVector2Array
 ## The active attack. Set when an attack is engaged. Active attack implies active unit.
 var active_attack: Attack
 
+## The active attack multicast counter.
+var active_multicast: Array[Vector2i]
+
 ## Cached targetable cells of the active attack.
 var active_targetable: PackedVector2Array
 
@@ -234,7 +237,7 @@ func undo_move_action():
 
 ## Sets the active unit.
 func set_active_unit(unit: Unit):
-	battle.set_ui_visible(true, battle.can_attack(unit), battle.is_owned(unit))
+	battle.set_ui_visible(true, battle.can_attack(unit), unit.bond>=2, battle.is_owned(unit))
 	
 	if active_unit:
 		clear_active_unit()
@@ -264,9 +267,9 @@ func set_active_attack(attack: Attack):
 	if attack.melee:
 		battle.select_attack_target(active_unit, active_attack, null)
 		
-	battle.set_ui_visible(true, false, null)
+	battle.set_ui_visible(true, false, false, null)
 	
-	battle.draw_attack_overlay(active_unit, attack, battle.cursor.map_pos)
+	battle.draw_attack_overlay(active_unit, attack, battle.map.cell(battle.cursor.map_pos))
 	
 
 ## Clears the active unit.
@@ -281,7 +284,7 @@ func clear_active_unit():
 		# clear ui
 		battle.terrain_overlay.clear()
 		battle.unit_path.clear()
-		battle.set_ui_visible(false, false, false)
+		battle.set_ui_visible(false, false, false, false)
 		
 		# clear attack
 		clear_active_attack()
@@ -292,11 +295,12 @@ func clear_active_attack():
 	if active_attack:
 		# clear stuff
 		active_attack = null
+		active_multicast.clear()
 		active_targetable.clear()
 		
 		# clear ui
 		battle.terrain_overlay.clear()
-		battle.set_ui_visible(null, false, null)
+		battle.set_ui_visible(null, false, false, null)
 	
 	
 ## Refreshes cached data from active unit and attack.
@@ -330,11 +334,13 @@ func select_cell(cell: Vector2i):
 	
 	if show_portrait:
 		battle.update_portrait(unit if unit else active_unit)
-	battle.set_ui_visible(show_portrait, show_actions, show_undo_end)
+	battle.set_ui_visible(show_portrait, show_actions, show_actions and active_unit.bond>=2, show_undo_end)
 		
 	# if there's an active attack, interaction is select target
 	if active_attack:
-		battle.draw_attack_overlay(active_unit, active_attack, cell)
+		var arr := active_multicast.duplicate()
+		arr.append(cell)
+		battle.draw_attack_overlay_multicast(active_unit, active_attack, arr)
 		return
 	
 	# if there's an active unit, interaction is select position
@@ -357,7 +363,14 @@ func accept_cell(cell: Vector2i = Map.OUT_OF_BOUNDS):
 	
 	# if there's an active attack, interaction is (to try) to use attack
 	if active_attack:
-		use_attack()
+		var err := battle.check_use_attack(active_unit, active_attack, cell, 0)
+		if err != Battle.ATTACK_OK:
+			battle.play_error(Battle.ATTACK_ERROR_MESSAGE[err])
+			return
+		
+		active_multicast.append(cell)
+		if active_multicast.size() > active_attack.multicast:
+			use_attack()
 		return
 		
 	# if a unit is selected, interaction is select unit
@@ -432,7 +445,7 @@ func cancel():
 		#battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
 		if battle.can_move(active_unit):
 			battle.draw_terrain_overlay(active_walkable, Battle.TERRAIN_GREEN, true)
-		battle.set_ui_visible(null, true, null)
+		battle.set_ui_visible(null, true, active_unit.bond>=2, null)
 	elif active_unit:
 		clear_active_unit()
 	else:
@@ -445,11 +458,21 @@ func end_turn():
 	
 	
 func use_attack():
-	battle.use_attack(active_unit, active_attack, battle.map.cell(battle.cursor.map_pos), 0)
+	var unit := active_unit
+	var attack := active_attack
+	var targets := active_multicast.duplicate()
+	move_stack.clear()
+	clear_active_unit()
+	battle.set_can_move(unit, false)
+	battle.set_can_attack(unit, false)
+	battle.set_action_taken(unit, true)
+	for cell in targets:
+		battle.use_attack(unit, attack, cell, 0)
 
 
 func action_completed():
-	_action_completed.emit()
+	#_action_completed.emit()
+	emit_signal.call_deferred('_action_completed')
 	
 
 signal cast_animation_finished
@@ -546,8 +569,7 @@ func _on_end_turn_button_pressed():
 
 
 func _on_battle_attack_sequence_started(unit, attack, target, targets):
-	move_stack.clear()
-	clear_active_unit()
+	# FIX this func shouldn't be implemented here lmao
 	_activate_attack(unit, attack, target, targets)
 
 
