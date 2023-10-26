@@ -270,6 +270,12 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	
 	var battle_result := await _manual_prep_and_do_battle(manual_queue)
 	
+	# show battle results
+	var battle_results_screen := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate() as BattleResultsScreen
+	battle_results_screen.show_result_for(context.attacker if context.attacker.is_player_owned() else context.defender, battle_result)
+	get_tree().root.add_child.call_deferred(battle_results_screen)
+	await battle_results_screen.done
+	
 	# pop self from the stack
 	Globals.pop_screen()
 	await Globals.transition_finished
@@ -403,8 +409,8 @@ func _do_battle():
 	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
 	
 	end_battle(context.result)
-		
-		
+	
+	
 func _do_turn():
 	while not _should_end_turn:
 		# things can happen before/after doing any actions so make sure to check first

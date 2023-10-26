@@ -139,11 +139,14 @@ func _transition(old: Node, new: Node, _transition: String): # TODO different tr
 	var loading_screen := loading_screen_scene.instantiate() as LoadingScreen
 	get_tree().root.add_child(loading_screen)
 	
+	# add new scene, deferred so the lag is hidden behind the transition
+	get_tree().root.add_child.call_deferred(new)
+	
 	# wait for the loading screen to fade in
 	await loading_screen.safe_to_load
 	
 	# replace dummy with new scene (child first so it's already there)
-	get_tree().root.add_child(new)
+	#get_tree().root.add_child(new)
 	screen_ready.emit()
 	get_tree().root.remove_child(dummy)
 	
@@ -170,7 +173,7 @@ func _dequeue_scene():
 	else:
 		scene_queue_finished.emit()
 		
-#
+		
 #func load_scene(old_scene: String, new_scene: String, transition: String):
 #	var loading_screen_inst := SCENES.loading_screen.instantiate() as LoadingScreen
 #	get_tree().root.add_child.call_deferred(loading_screen_inst)
