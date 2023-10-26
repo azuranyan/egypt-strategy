@@ -10,11 +10,32 @@ signal scene_ended
 ## Emitted when scene queue is finished.
 signal scene_queue_finished
 
+## Emitted when screen is ready.
+signal screen_ready
+
+## Emitted when the transition is finished.
+signal transition_finished
+
 
 signal _notify_end_scene
 
 
-const DIRECTIONS = [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]
+## The general direction.
+enum Heading { East, South, West, North }
+
+## List of direction vectors. Order is important!
+const DIRECTIONS := [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, Vector2.UP]
+
+## Record of game scenes.
+#const SCENES := {
+#	'overworld': preload("res://Screens/Overworld/Overworld.tscn"),
+#	'battle': preload("res://Screens/Battle/Battle.tscn"),
+#	'dialogue': preload("res://Screens/Dialogue/Dialogue.tscn"),
+#	'main_menu': preload("res://Screens/MainMenu/MainMenu.tscn"),
+#	'loading_screen': preload("res://Screens/LoadingScreen/LoadingScreen.tscn"),
+#}
+const loading_screen_scene := preload("res://Screens/LoadingScreen/LoadingScreen.tscn")
+const dummy_scene := preload("res://Screens/LoadingScreen/DummyScene.tscn")
 
 
 var territories := {
@@ -87,7 +108,7 @@ func transition_screen(new: Node, transition: String = ''):
 	else:
 		var old := screen_stack[-1]
 		screen_stack[-1] = new
-		_transition(old, new, transition)
+		_transition.call_deferred(old, new, transition)
 
 
 ## Pushes a new screen on top.
@@ -96,27 +117,39 @@ func push_screen(new: Node, transition: String = ''):
 	# which is undesirable instead of just being fucking quiet about it 
 	var old: Node = null if screen_stack.is_empty() else screen_stack.back()
 	screen_stack.push_back(new)
-	_transition(old, new, transition)
+	_transition.call_deferred(old, new, transition)
 
 
 ## Pops the top screen and restores the previous screen.
 func pop_screen(transition: String = ''):
 	var old: Node = screen_stack.pop_back()
 	var new: Node = screen_stack.back()
-	_transition(old, new, transition)
+	_transition.call_deferred(old, new, transition)
 	
 
 func _transition(old: Node, new: Node, _transition: String): # TODO different transitions
-	# load the image of the old screen
-	var img := get_viewport().get_texture().get_image()
-	var tex := ImageTexture.create_from_image(img)
-	$TextureRect.set_texture(tex)
-	
-	$AnimationPlayer.play("fade_out")
+	print('transitioning from ', old, ' to ', new)
+	# replace old screen with a dummy (dummy first to hide the remove)
+	var dummy := dummy_scene.instantiate()
+	get_tree().root.add_child(dummy)
 	if old:
 		get_tree().root.remove_child(old)
+		
+	# add loading screen
+	var loading_screen := loading_screen_scene.instantiate() as LoadingScreen
+	get_tree().root.add_child(loading_screen)
+	
+	# wait for the loading screen to fade in
+	await loading_screen.safe_to_load
+	
+	# replace dummy with new scene (child first so it's already there)
 	get_tree().root.add_child(new)
-	#await $AnimationPlayer.animation_finished
+	screen_ready.emit()
+	get_tree().root.remove_child(dummy)
+	
+	# wait for the loading screen to fade out
+	await loading_screen.fade_out()
+	transition_finished.emit()
 	
 	
 ## Plays queued insert scenes.
@@ -136,3 +169,36 @@ func _dequeue_scene():
 		scene_started.emit(scn)
 	else:
 		scene_queue_finished.emit()
+		
+#
+#func load_scene(old_scene: String, new_scene: String, transition: String):
+#	var loading_screen_inst := SCENES.loading_screen.instantiate() as LoadingScreen
+#	get_tree().root.add_child.call_deferred(loading_screen_inst)
+#
+#	var load_path: String = SCENES.get(new_scene, new_scene)
+#	if not ResourceLoader.exists(load_path):
+#		push_error("scene '%s' does not exist." % load_path)
+#		return
+#	var loader_new_scene := ResourceLoader.load_threaded_request(load_path)
+#
+#	await loading_screen_inst.safe_to_load
+#	SCENES.get(old_scene, old_scene)
+#	# queue free old_scene_inst
+#
+#	while true:
+#		var load_progress := []
+#		var load_status = ResourceLoader.load_threaded_get_status(load_path, load_progress)
+#
+#		match load_status:
+#			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
+#				push_error("unable to load: invalid resource.")
+#				return null
+#			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+#				loading_screen_inst.update(load_progress[0])
+#			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
+#				push_error("unable to load: loading failed.")
+#				return null
+#			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+#				var new_scene_inst := (ResourceLoader.load_threaded_get(load_path) as PackedScene).instantiate()
+#				get_tree().root.add_child.call_deferred(new_scene_inst)
+#				loading_screen_inst.fade_out()

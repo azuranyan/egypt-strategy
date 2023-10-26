@@ -161,10 +161,9 @@ func _unhandled_input(event):
 	
 ## Starts a battle between two empires over a territory.
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick: Variant = null):
-	# force ourselves to be ready by doing this hack
+	# force ourselves to be ready (controllers are set init here, but we're loading in late)
 	if not self.is_node_ready():
-		Globals.push_screen(Globals.battle)
-		Globals.pop_screen()
+		self._ready()
 		
 	# initialize context
 	context = Battle.Context.new()
@@ -191,10 +190,7 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 		if should_do_quick:
 			context.result = await _quick_battle(attacker, defender, territory)
 		else:
-			Globals.push_screen(self)
 			context.result = await _real_battle(attacker, defender, territory)
-			Globals.pop_screen()
-		
 		battle_ended.emit(context.result)
 	else:
 		# error
@@ -249,34 +245,98 @@ func _quick_battle(attacker: Empire, defender: Empire, territory: Territory) -> 
 
 ## Real battle. 
 func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
-	# load the map
+	# push self into the screen stack
+	Globals.push_screen(self)
+	
+	# load the map so it's ready before we are revealed
+	await Globals.screen_ready
 	_load_map(territory.maps[0])
 	
-	# if defender is ai, allow them to set first so player can see the map
-	# with enemies already in place.
-	var prep_queue := []
-	if !context.defender.is_player_owned() and context.attacker.is_player_owned():
-		prep_queue.append(context.defender)
-		prep_queue.append(context.attacker)
-	else:
-		prep_queue.append(context.attacker)
-		prep_queue.append(context.defender)
-		
-	# prep phase
-	$UI/DonePrep.visible = true
-	$UI/CancelPrep.visible = true
-	var prep_result := await _prep_phase(prep_queue)
-	$UI/DonePrep.visible = false
-	$UI/CancelPrep.visible = false
+	var auto_queue: Array[Empire] = []
+	var manual_queue: Array[Empire] = []
+	for prep in [context.attacker, context.defender]:
+		if prep.is_player_owned():
+			manual_queue.append(prep)
+		else:
+			auto_queue.append(prep)
 	
-	# battle phase
-	var battle_result := Result.Cancelled
-	if prep_result == 0:
-		# _do_battle can be cut 
-		_do_battle.call_deferred()	
-		battle_result = await _end_battle_requested
+	# fill auto_prep
+	for prep in auto_queue:
+		context.on_turn = prep
+		_auto_prep(prep)
+	
+	# wait for the screen transition before proceeding
+	await Globals.transition_finished
+	
+	var battle_result := await _manual_prep_and_do_battle(manual_queue)
+	
+	# pop self from the stack
+	Globals.pop_screen()
+	await Globals.transition_finished
 	_unload_map()
 	return battle_result
+	
+	
+func _auto_prep(empire: Empire):
+	var spawnable: Array[String] = []
+	spawnable.assign(empire.units)
+	
+	# fill spawn points
+	for spawn_point in map.get_spawn_points("ai"):
+		print('  checking spawn point ', spawn_point)
+		if spawnable.is_empty():
+			print('  no more spawnables, stopping')
+			break
+			
+		var nem := ""
+			
+		# spawn or random
+		if map.get_object_at(spawn_point).has_meta("spawn_unit"):
+			var s = map.get_object_at(spawn_point).get_meta("spawn_unit")
+			if s not in spawnable:
+				push_error("spawn_unit '%s' not in spawnable" % s)
+				continue
+			else:
+				nem = s
+		else:
+			nem = spawnable.pick_random()
+		
+		# remove from spawnable list
+		spawnable.erase(nem)
+		
+		# spawn unit
+		var unit := spawn_unit(nem, empire, "", spawn_point)
+		print('  spawning %s at %s' % [nem, spawn_point])
+		
+		# make it face towards the closest spawn point
+		var p_spawn := map.get_spawn_points("player")
+		var closest := Map.OUT_OF_BOUNDS
+		var closest_dist := -1
+		while not p_spawn.is_empty():
+			var v := p_spawn[-1]
+			var v_dist := spawn_point.distance_squared_to(v)
+			if closest == Map.OUT_OF_BOUNDS or v_dist < closest_dist:
+				closest = v
+				closest_dist = int(v_dist)
+			p_spawn.remove_at(p_spawn.size() - 1)
+				
+		unit.face_towards(closest)
+	
+
+func _manual_prep_and_do_battle(queue: Array[Empire]) -> Result:
+	for prep in queue:
+		$UI/DonePrep.visible = true
+		$UI/CancelPrep.visible = (prep == context.attacker)
+		context.on_turn = prep
+		state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
+		var result: int = await _end_prep_requested
+		$UI/DonePrep.visible = false
+		$UI/CancelPrep.visible = false
+		if result != 0:
+			return Result.Cancelled
+			
+	_do_battle.call_deferred()
+	return await _end_battle_requested
 	
 	
 func _do_battle():
@@ -400,63 +460,8 @@ func _evaluate_victory_conditions() -> bool:
 			context.should_end = true
 			return true
 	return false
-		
 	
-func _prep_phase(prep_queue: Array) -> int:
-	while not prep_queue.is_empty():
-		var prep: Empire = prep_queue.pop_front()
-		context.on_turn = prep
-		print("%s %s is preparing units" % [prep.leader.name, prep])
-		if prep.is_player_owned():
-			state_machine.transition_to("Prep", {prep_queue=[prep], battle=self})
-		else:
-			var spawnable: Array[String] = []
-			spawnable.assign(prep.units)
-			
-			# fill spawn points
-			for spawn_point in map.get_spawn_points("ai"):
-				print('  checking spawn point ', spawn_point)
-				if spawnable.is_empty():
-					print('  no more spawnables, stopping')
-					break
-					
-				var nem := ""
-					
-				# spawn or random
-				if map.get_object_at(spawn_point).has_meta("spawn_unit"):
-					var s = map.get_object_at(spawn_point).get_meta("spawn_unit")
-					if s not in spawnable:
-						push_error("spawn_unit '%s' not in spawnable" % s)
-						continue
-					else:
-						nem = s
-				else:
-					nem = spawnable.pick_random()
-				
-				# remove from spawnable list
-				spawnable.erase(nem)
-				
-				# spawn unit
-				var unit := spawn_unit(nem, prep, "", spawn_point)
-				print('  spawning %s at %s' % [nem, spawn_point])
-				
-				# make it face towards the closest spawn point
-				var p_spawn := map.get_spawn_points("player")
-				var closest := Map.OUT_OF_BOUNDS
-				var closest_dist := -1
-				while not p_spawn.is_empty():
-					var v := p_spawn[-1]
-					var v_dist := spawn_point.distance_squared_to(v)
-					if closest == Map.OUT_OF_BOUNDS or v_dist < closest_dist:
-						closest = v
-						closest_dist = int(v_dist)
-					p_spawn.remove_at(p_spawn.size() - 1)
-						
-				unit.face_towards(closest)
-					
-	return await _end_prep_requested
 	
-
 ## Walks a unit (action).
 func walk_unit(unit: Unit, cell: Vector2i):
 	walking_started.emit(unit)
@@ -623,7 +628,6 @@ func set_unit_group(unit: Unit, group: String):
 			pass
 			
 			
-
 ## Returns units in a given group. Returns all alive units by default.
 func get_units(group: String = 'units_alive') -> Array[Unit]:
 	var re: Array[Unit] = []
@@ -645,6 +649,29 @@ func kill_unit(unit: Unit):
 	#remove_unit(unit)
 	set_unit_group(unit, 'units_dead')
 	
+
+## Revives a unit.
+func revive_unit(unit: Unit, hp: int):
+	unit.hp = mini(hp, unit.maxhp)
+	set_unit_group(unit, 'units_alive')
+
+
+## Standby unit.
+func standby_unit(unit: Unit):
+	set_unit_group(unit, 'units_standby')
+	
+
+## Sets unit position.
+func set_unit_position(unit: Unit, cell: Vector2i):
+	unit.map_pos = cell
+	if cell == Map.OUT_OF_BOUNDS:
+		standby_unit(unit)
+	else:
+		if unit.hp > 0:
+			set_unit_group(unit, 'units_alive')
+		else:
+			set_unit_group(unit, 'units_dead')
+
 
 ## Inflict damage upon a unit.
 func damage_unit(unit: Unit, source: Variant, amount: int):
@@ -874,13 +901,7 @@ func get_targetable_cells(unit: Unit, attack: Attack) -> PackedVector2Array:
 ## Draws target overlay. target_rotation is ignored if melee.
 func draw_attack_overlay(unit: Unit, attack: Attack, target: Vector2i, target_rotation: float = 0):
 	draw_attack_overlay_multicast(unit, attack, [target], target_rotation)
-#	terrain_overlay.clear()
-#	var cells := get_targetable_cells(unit, attack)
-#	if not attack.melee:
-#		draw_terrain_overlay(cells, TERRAIN_RED, true)
-#	var target_cells := get_attack_target_cells(unit, attack, target, target_rotation)
-#	draw_terrain_overlay(target_cells, TERRAIN_BLUE, false)
-#
+	
 
 ## Draws target overlay. Supports multicast.
 func draw_attack_overlay_multicast(unit: Unit, attack: Attack, targets: Array[Vector2i], target_rotation: float = 0):

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/Dialogue/Dialogue.gd" id="1_b8sjv"]
 
-[node name="Node2D" type="Control"]
+[node name="Dialogue" type="Control"]
 z_index = 100
 layout_mode = 3
 anchors_preset = 15

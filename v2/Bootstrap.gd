@@ -20,5 +20,4 @@ func run_game():
 	
 	# start overworld cycle
 	Globals.push_screen(Globals.overworld, '')
-	Globals.overworld.do_cycle()
-	
+	Globals.transition_finished.connect(Globals.overworld.do_cycle, CONNECT_ONE_SHOT)

@@ -2,7 +2,7 @@ extends Node
 
 
 func _ready():
-	Globals.scene_queue.append('start')
+	#Globals.scene_queue.append('start')
 	Globals.scene_started.connect(play_scene)
 	OverworldEvents.boss_defeated.connect(func(): Globals.scene_queue.append('gameover win'))
 	OverworldEvents.player_defeated.connect(func(): Globals.scene_queue.append('gameover loss'))

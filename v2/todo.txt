@@ -16,6 +16,11 @@ attack shape rotation is rotated 90 degrees
 clearly determine program flow of signal connections
  - to connect_defer or to defer the signal emit, etc
 overworld buttons need to be double clicked when clicked
+unit states in unit so we're not fiddling with stupid states and stuff
+ - this also allows us to set unit on ghost or standby but keep its original position, so we can un-standby
+ - can path and other stuff can also be implemented there, idgaf now
+ - allows pathing over dead bodies
+ - add x and y offset
 
 ## would be nice
 add pause while showing player banner
