@@ -268,19 +268,34 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	# wait for the screen transition before proceeding
 	await Globals.transition_finished
 	
+	# do the prep phase and battle phase
 	var battle_result := await _manual_prep_and_do_battle(manual_queue)
 	
-	# show battle results
-	var battle_results_screen := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate() as BattleResultsScreen
-	battle_results_screen.show_result_for(context.attacker if context.attacker.is_player_owned() else context.defender, battle_result)
-	get_tree().root.add_child.call_deferred(battle_results_screen)
-	await battle_results_screen.done
-	
+#	# show battle results
+#	var text := ''
+#	match context.result:
+#		Battle.Result.AttackerVictory:
+#			text = 'Battle Won!'		if context.attacker.is_player_owned() else 'Battle Lost.'
+#		Battle.Result.DefenderVictory:
+#			text = 'Battle Lost.'		if context.attacker.is_player_owned() else 'Battle Won!'
+#		Battle.Result.AttackerWithdraw:
+#			text = 'Battle Forfeited.'	if context.attacker.is_player_owned() else 'Enemy Withdraw!'
+#		Battle.Result.DefenderWithdraw:
+#			text = 'Enemy Withdraw!'	if context.attacker.is_player_owned() else 'Battle Forfeited.'
+#
+#	if text != '':
+#		var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()
+#		get_tree().root.add_child.call_deferred(node)
+#		node.get_node('Control/Label').text = text
+#		await node.done
+		
 	# pop self from the stack
 	Globals.pop_screen()
 	await Globals.transition_finished
 	_unload_map()
 	return battle_result
+	
+	
 	
 	
 func _auto_prep(empire: Empire):

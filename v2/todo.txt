@@ -1,9 +1,6 @@
 ##########################################################################################################
 ## to implement
 ##########################################################################################################
-"All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
-
-
 
 ## minor
 ui elements need to be canvaslayer to bypass camera and viewport transforms
@@ -40,24 +37,18 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
+"All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
+
 choppy fadeout transition after going out from battle
+ - 
+ - battle does not terminate cleanly when end_battle
+ - weird pause when withdrawing
 
 add check for bond level up after turn ends
 
-unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
-before every effect, check if target is still alive
- - after turn cycle ends, clear all dead units
- - maybe status effect bug is related to unit dying and getting cleared
+
+unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
 
 ui being shown in battle signal is wrong
  - some parts of the ui are player specific but will be shown even for ai
-
-for manager classes, context/state are variables needed to resume a saved game
- - the rest of the variables are assumed to be transient and runtime only
-
-prep
- - drag and drop broken
-prep
- - error when exiting battle (keeping state and holding onto stale variable that's already freed) @handle_input @selected
- - above error does not exist when battle is removed from the tree to stop input from propagating

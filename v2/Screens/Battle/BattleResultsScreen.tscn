@@ -76,6 +76,7 @@ script = ExtResource("1_bsbby")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 autoplay = "show"
+speed_scale = 5.0
 libraries = {
 "": SubResource("AnimationLibrary_okw71")
 }
