@@ -31,8 +31,8 @@ func turn_start() -> void:
 
 ## Called when turn ends.
 func turn_end() -> void:
-	battle.cursor.visible = true
-
+	battle.cursor.visible = true # PUT TO PLAYER YOU DISGUSTANG BASTARD
+ 
 	
 ## Called when action is started.
 func action_start() -> void:

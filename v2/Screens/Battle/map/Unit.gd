@@ -202,7 +202,7 @@ func load_vars(kwargs: Dictionary):
 	_set_if_has("empire", kwargs)
 	
 	_set_if_has("map_pos", kwargs)
-	_set_if_has("name", kwargs)
+	_set_if_has("unit_name", kwargs)
 	_set_if_has("facing", kwargs)
 	_set_if_has("selectable", kwargs)
 	

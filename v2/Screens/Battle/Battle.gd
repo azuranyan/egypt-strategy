@@ -362,6 +362,7 @@ func _manual_prep_and_do_battle(queue: Array[Empire]) -> Result:
 	
 func _do_battle():
 	context.battle_phase = true
+	
 	$UI/Battle.visible = true # TODO signalize all ui changes
 	context.controller[context.attacker].initialize(self, context.attacker)
 	context.controller[context.defender].initialize(self, context.defender)

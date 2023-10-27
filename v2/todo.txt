@@ -37,6 +37,18 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
+spawning 
+ - allow spawning of multiples of some units
+ - better spawning marker, also allow specifying chance tables
+ - allow adding units to the map and assigning them to player spawn
+
+remove dead untis from the map
+
+"simulating" battle results for quick battle
+
+map
+ - default_facing_hint - hint for default facing of player units
+
 "All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
 
 choppy fadeout transition after going out from battle

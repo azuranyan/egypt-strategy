@@ -133,7 +133,7 @@ func _transition(old: Node, new: Node, _transition: String): # TODO different tr
 	var dummy := dummy_scene.instantiate()
 	get_tree().root.add_child(dummy)
 	if old:
-		get_tree().root.remove_child(old)
+		get_tree().root.remove_child.call_deferred(old)
 		
 	# add loading screen
 	var loading_screen := loading_screen_scene.instantiate() as LoadingScreen
