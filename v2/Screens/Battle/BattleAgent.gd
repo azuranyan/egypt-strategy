@@ -17,9 +17,9 @@ func prepare_units():
 
 
 func do_turn():
-	pass
+	await do_action(Util.do_nothing)
 	
-
+	
 func do_action(action: Callable, args := []):
 	# things can happen before doing any actions so make sure to check
 	if battle._evaluate_victory_conditions():

@@ -1,12 +1,13 @@
-[gd_scene load_steps=34 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=35 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
 [ext_resource type="Script" path="res://Screens/Battle/AIActionController.gd" id="2_bgyoj"]
 [ext_resource type="PackedScene" uid="uid://diu2xhfofh1m1" path="res://Screens/Battle/camera_2d.tscn" id="2_rnoma"]
-[ext_resource type="Script" path="res://Screens/Battle/PlayerActionController.gd" id="3_brpnv"]
+[ext_resource type="PackedScene" uid="uid://buwb2f4fox8wj" path="res://player_action_controller.tscn" id="3_5prvk"]
 [ext_resource type="TileSet" uid="uid://bim62kb8y75qx" path="res://Screens/Battle/terrainfyuckingsavethisshit.tres" id="3_vfrdl"]
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="4_4ux0f"]
+[ext_resource type="Script" path="res://Screens/Battle/AttackSequencePlayer.gd" id="4_qmhs1"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="5_773tr"]
 [ext_resource type="Texture2D" uid="uid://bcnpp5ccwkck" path="res://Screens/Battle/cursor.png" id="6_itebx"]
 [ext_resource type="Theme" uid="uid://wlic4ks3f85i" path="res://Screens/Battle/theme.tres" id="8_b0ewm"]
@@ -230,8 +231,10 @@ script = ExtResource("1_nfufl")
 [node name="AIActionController" type="Node" parent="."]
 script = ExtResource("2_bgyoj")
 
-[node name="PlayerActionController" type="Node" parent="."]
-script = ExtResource("3_brpnv")
+[node name="PlayerActionController" parent="." instance=ExtResource("3_5prvk")]
+
+[node name="AttackSequencePlayer" type="Node" parent="."]
+script = ExtResource("4_qmhs1")
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 0
@@ -660,24 +663,16 @@ text = "No
 "
 
 [connection signal="attack_sequence_ended" from="." to="." method="_on_attack_sequence_ended"]
-[connection signal="attack_sequence_ended" from="." to="PlayerActionController" method="_on_battle_attack_sequence_ended"]
+[connection signal="attack_sequence_ended" from="." to="AttackSequencePlayer" method="_on_battle_attack_sequence_ended"]
 [connection signal="attack_sequence_started" from="." to="." method="_on_attack_sequence_started"]
-[connection signal="attack_sequence_started" from="." to="PlayerActionController" method="_on_battle_attack_sequence_started"]
+[connection signal="attack_sequence_started" from="." to="AttackSequencePlayer" method="_on_battle_attack_sequence_started"]
 [connection signal="battle_ended" from="." to="." method="_on_battle_ended"]
 [connection signal="battle_started" from="." to="." method="_on_battle_started"]
-[connection signal="cell_accepted" from="." to="PlayerActionController" method="_on_battle_cell_accepted"]
-[connection signal="cell_selected" from="." to="PlayerActionController" method="_on_battle_cell_selected"]
 [connection signal="turn_cycle_started" from="." to="." method="_on_turn_cycle_started"]
 [connection signal="turn_ended" from="." to="." method="_on_turn_ended"]
 [connection signal="turn_started" from="." to="." method="_on_turn_started"]
 [connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
-[connection signal="walking_finished" from="." to="PlayerActionController" method="_on_battle_walking_finished"]
 [connection signal="walking_started" from="." to="." method="_on_walking_started"]
-[connection signal="walking_started" from="." to="PlayerActionController" method="_on_battle_walking_started"]
 [connection signal="pressed" from="UI/CancelPrep" to="." method="_on_cancel_prep_pressed"]
-[connection signal="pressed" from="UI/Battle/AttackButton" to="PlayerActionController" method="_on_attack_button_pressed"]
-[connection signal="pressed" from="UI/Battle/SpecialButton" to="PlayerActionController" method="_on_special_button_pressed"]
-[connection signal="pressed" from="UI/Battle/UndoButton" to="PlayerActionController" method="_on_undo_button_pressed"]
-[connection signal="pressed" from="UI/Battle/EndTurnButton" to="PlayerActionController" method="_on_end_turn_button_pressed"]
 [connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/YesButton" to="UI/PauseOverlay" method="_on_yes_button_pressed"]
 [connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/NoButton" to="UI/PauseOverlay" method="_on_no_button_pressed"]

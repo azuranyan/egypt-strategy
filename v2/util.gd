@@ -1,6 +1,11 @@
 class_name Util
 
 
+## Simple do nothing function.
+static func do_nothing():
+	pass
+
+
 ## Simple suboptimal flood fill algorithm.
 static func flood_fill(cell: Vector2, max_distance: int, _bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var re := PackedVector2Array()

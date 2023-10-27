@@ -136,11 +136,11 @@ func do_turn():
 		assert(action)
 		print('  ', battle.map.cell(unit.map_pos), ' Choosing ', action)
 		
-		await do_action(make_action, [unit, action])
+		await do_action(do_unit_action, [unit, action])
 	
 	
 ## Actually performs the move.
-func make_action(unit: Unit, action: Action):
+func do_unit_action(unit: Unit, action: Action):
 	# do nothing
 	if battle.map.cell(unit.map_pos) == action.cell and not action.attack:
 		battle.do_nothing(unit)

@@ -37,8 +37,13 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ## hot list
 ##########################################################################################################
 
+battle
+ - change heading via key input doesn't work (heading can only be changed thru key input @hook)
+ - make player spawnable spots visible before transition
+ - mouse position still needs event local
+ - undo move action not working
+
 spawning 
- - allow spawning of multiples of some units
  - better spawning marker, also allow specifying chance tables
  - allow adding units to the map and assigning them to player spawn
 

@@ -56,6 +56,10 @@ signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targe
 
 ################################################################################
 
+signal prep_cancelled
+
+################################################################################
+
 signal _attack_sequence_finished()
 
 signal _end_attack_sequence_requested()
@@ -166,10 +170,16 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 		
 	# initialize context
 	context = Battle.Context.new()
+	if attacker.is_player_owned():
+		context.player = attacker
+		context.ai = defender
+	else:
+		context.player = defender
+		context.ai = attacker
 	context.attacker = attacker
 	context.defender = defender
 	context.territory = territory
-	context.result = Battle.Result.Cancelled
+	context.result = Battle.Result.None
 	context.turns = 0
 	context.on_turn = context.attacker
 	#context.controller[attacker] = player_action_controller if attacker.is_player_owned() else ai_action_controller
@@ -177,7 +187,7 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 	context.should_end = false
 	context.victory_conditions = [VictoryCondition.new()] # TODO
 	
-	if fulfills_battle_requirements(attacker, territory):
+	if fulfills_attack_requirements(attacker, territory):
 		# do battle
 		battle_started.emit(attacker, defender, territory)
 		await Globals.play_queued_scenes()
@@ -199,13 +209,15 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 
 
 ## Returns true if the attacker can initiate the attack to territory.
-func fulfills_battle_requirements(empire: Empire, territory: Territory) -> bool:
+func fulfills_attack_requirements(empire: Empire, territory: Territory) -> bool:
+	# TODO put battle requirements here
 	context.warnings = []
 	return true
 
 
 ## Returns true if the attacker fulfills prep requirements over territory.
 func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
+	# TODO put battle requirements here
 	context.warnings = []
 	return true
 
@@ -215,12 +227,13 @@ func end_battle(result: Result):
 	if context:
 		_end_battle_requested.emit(result)
 	else:
-		push_warning("end_battle: battle not started!")
+		push_error("end_battle(): battle not started!")
 		
 
 ## Quits the battle.
 func quit_battle():
 	if not context:
+		push_error("quit_battle(): battle not started!")
 		return
 		
 	var should_end := false
@@ -233,23 +246,19 @@ func quit_battle():
 		if context.battle_phase:
 			end_battle(Result.AttackerWithdraw if context.attacker.is_player_owned() else Result.DefenderWithdraw)
 		else:
-			# TODO FIX
-			pass
-			#state_machine.transition_to("Idle")
-			#_end_prep_requested.emit(1)
+			prep_cancelled.emit()
 	
 	
 ## Outcome is an implementation detail.
 func _quick_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
+	# TODO randomize or simulate the victor
 	return Result.AttackerVictory
 
 
 ## Real battle. 
 func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
-	# push self into the screen stack
+	# pre-battle setup
 	Globals.push_screen(self)
-	
-	# load the map so it's ready before we are revealed
 	await Globals.screen_ready
 	_load_map(territory.maps[0])
 	
@@ -258,137 +267,57 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 		context.defender: Globals.create_agent_for(context.defender), 
 	}
 	
-	var auto_queue: Array[Empire] = []
-	var manual_queue: Array[Empire] = []
-	for prep in [context.attacker, context.defender]:
-		if prep.is_player_owned():
-			manual_queue.append(prep)
-		else:
-			auto_queue.append(prep)
-	
-	# fill auto_prep
-	for prep in auto_queue:
-		context.on_turn = prep
-		await agent[prep].prepare_units()
-		#_auto_prep(prep)
-	
+	await agent[context.ai].prepare_units()
+		
 	# wait for the screen transition before proceeding
 	await Globals.transition_finished
 	
-	# do the prep phase and battle phase
-	#var battle_result := await _manual_prep_and_do_battle(manual_queue)
+	# allow the player to prep
+	$UI/DonePrep.visible = true
+	$UI/CancelPrep.visible = context.attacker.is_player_owned()
+	await agent[context.player].prepare_units()
+	$UI/DonePrep.visible = false
+	$UI/CancelPrep.visible = false
 	
-	for prep in manual_queue:
-		$UI/DonePrep.visible = true
-		$UI/CancelPrep.visible = (prep == context.attacker)
-		context.on_turn = prep
-		#state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
-		#var result: int = await _end_prep_requested
-		await agent[prep].prepare_units()
-		$UI/DonePrep.visible = false
-		$UI/CancelPrep.visible = false
-		#if result != 0:
-		#	return Result.Cancelled
-	
+	if context.result != Result.Cancelled:
+		$UI/Battle.visible = true # TODO signalize all ui changes
+		_do_battle.call_deferred(agent)
+		await _end_battle_requested
+		$UI/Battle.visible = false
+		
+		# show battle results
+		var text := ''
+		match context.result:
+			Result.AttackerVictory:
+				text = 'Battle Won!' if context.attacker.is_player_owned() else 'Battle Lost.'
+			Result.DefenderVictory:
+				text = 'Battle Lost.' if context.attacker.is_player_owned() else 'Battle Won!'
+			Result.AttackerWithdraw:
+				text = 'Battle Forfeited.' if context.attacker.is_player_owned() else 'Enemy Withdraw!'
+			Result.DefenderWithdraw:
+				text = 'Enemy Withdraw!' if context.attacker.is_player_owned() else 'Battle Forfeited.'
+				
+		if text != '':
+			var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()
+			get_tree().root.add_child.call_deferred(node)
+			node.get_node('Control/Label').text = text
+			await node.done
+			
+	# post-battle setup
 	for e in agent.values():
 		e.queue_free()
-#	# show battle results
-#	var text := ''
-#	match context.result:
-#		Battle.Result.AttackerVictory:
-#			text = 'Battle Won!'		if context.attacker.is_player_owned() else 'Battle Lost.'
-#		Battle.Result.DefenderVictory:
-#			text = 'Battle Lost.'		if context.attacker.is_player_owned() else 'Battle Won!'
-#		Battle.Result.AttackerWithdraw:
-#			text = 'Battle Forfeited.'	if context.attacker.is_player_owned() else 'Enemy Withdraw!'
-#		Battle.Result.DefenderWithdraw:
-#			text = 'Enemy Withdraw!'	if context.attacker.is_player_owned() else 'Battle Forfeited.'
-#
-#	if text != '':
-#		var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()
-#		get_tree().root.add_child.call_deferred(node)
-#		node.get_node('Control/Label').text = text
-#		await node.done
-		
-	# pop self from the stack
 	Globals.pop_screen()
 	await Globals.transition_finished
 	_unload_map()
-	#return battle_result
-	return Result.AttackerVictory
 	
-	
-	
-	
-func _auto_prep(empire: Empire):
-	var spawnable: Array[String] = []
-	spawnable.assign(empire.units)
-	
-	# fill spawn points
-	for spawn_point in map.get_spawn_points("ai"):
-		print('  checking spawn point ', spawn_point)
-		if spawnable.is_empty():
-			print('  no more spawnables, stopping')
-			break
-			
-		var nem := ""
-			
-		# spawn or random
-		if map.get_object_at(spawn_point).has_meta("spawn_unit"):
-			var s = map.get_object_at(spawn_point).get_meta("spawn_unit")
-			if s not in spawnable:
-				push_error("spawn_unit '%s' not in spawnable" % s)
-				continue
-			else:
-				nem = s
-		else:
-			nem = spawnable.pick_random()
-		
-		# remove from spawnable list
-		spawnable.erase(nem)
-		
-		# spawn unit
-		var unit := spawn_unit(nem, empire, "", spawn_point)
-		print('  spawning %s at %s' % [nem, spawn_point])
-		
-		# make it face towards the closest spawn point
-		var p_spawn := map.get_spawn_points("player")
-		var closest := Map.OUT_OF_BOUNDS
-		var closest_dist := -1
-		while not p_spawn.is_empty():
-			var v := p_spawn[-1]
-			var v_dist := spawn_point.distance_squared_to(v)
-			if closest == Map.OUT_OF_BOUNDS or v_dist < closest_dist:
-				closest = v
-				closest_dist = int(v_dist)
-			p_spawn.remove_at(p_spawn.size() - 1)
-				
-		unit.face_towards(closest)
-	
+	return context.result
 
-func _manual_prep_and_do_battle(queue: Array[Empire]) -> Result:
-	for prep in queue:
-		$UI/DonePrep.visible = true
-		$UI/CancelPrep.visible = (prep == context.attacker)
-		context.on_turn = prep
-		# TODO FIX
-		#state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
-		#var result: int = await _end_prep_requested
-		$UI/DonePrep.visible = false
-		$UI/CancelPrep.visible = false
-		#if result != 0:
-		#	return Result.Cancelled
-			
-	_do_battle.call_deferred()
-	return await _end_battle_requested
-	
-	
-func _do_battle():
+
+func _do_battle(agent: Dictionary):
 	context.battle_phase = true
 	
-	$UI/Battle.visible = true # TODO signalize all ui changes
-	context.controller[context.attacker].initialize(self, context.attacker)
-	context.controller[context.defender].initialize(self, context.defender)
+	#context.controller[context.attacker].initialize(self, context.attacker)
+	#context.controller[context.defender].initialize(self, context.defender)
 	
 	for u in map.get_units(): # TODO not here
 		u.hp = maxi(1, u.empire.hp_multiplier * u.maxhp)
@@ -423,13 +352,14 @@ func _do_battle():
 			# do turn (note that the attacker always attacks first)
 			turn_started.emit()
 			await Globals.play_queued_scenes()
-			context.controller[context.on_turn].turn_start()
+			#context.controller[context.on_turn].turn_start()
 			
-			await _do_turn()
-			
+			#await _do_turn()
+			await agent[empire].do_turn()
+						
 			turn_ended.emit()
 			await Globals.play_queued_scenes()
-			context.controller[context.on_turn].turn_end()
+			#context.controller[context.on_turn].turn_end()
 			
 			# do end-turn tick mechanics
 			for u in get_owned_units():
@@ -1115,6 +1045,8 @@ func _on_walking_finished(unit):
 class Context:
 	var battle_phase := false
 	
+	var player: Empire
+	var ai: Empire
 	var attacker: Empire
 	var defender: Empire
 	var territory: Territory
