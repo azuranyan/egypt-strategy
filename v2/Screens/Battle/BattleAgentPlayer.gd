@@ -1,4 +1,8 @@
 extends BattleAgent
+class_name BattleAgentPlayer
+
+
+signal prep_done
 
 
 ## The unit that's being rotated.
@@ -42,6 +46,10 @@ func initialize():
 	battle.character_list.unit_cancelled.connect(_on_character_list_unit_cancelled)
 	battle.character_list.unit_highlight_changed.connect(_on_character_list_unit_highlight_changed)
 	
+	# connect to battle
+	battle.get_node('UI/DonePrep').pressed.connect(func(): prep_done.emit())
+	#battle.get_node('UI/CancelPrep').pressed.connect(func(): prep_done.emit())
+	
 	# show the spawn points
 	for o in battle.map.get_objects():
 		if o.get_meta("spawn_point", "") == "player":
@@ -49,7 +57,7 @@ func initialize():
 
 
 func prepare_units():
-	pass
+	await prep_done
 
 
 func do_turn():
@@ -69,12 +77,14 @@ func add_unit_hooks(unit: Unit):
 			2:
 				# if selected unit is right clicked, deselect
 				if unit == selected:
+					battle.set_unit_group(unit, 'units_standby')
 					selected = null
+					print('rmb')
 			3:
 				# if mmb is pressed on the unit, adjust heading
 				heading_adjusted = unit
 		
-	var on_button_up := func(button):
+	var on_button_up := func(_button):
 		pass
 		
 	unit.button_down.connect(on_button_down)
@@ -100,14 +110,16 @@ func _unhandled_input(event):
 				
 		# mark input as handled
 		get_viewport().set_input_as_handled()
+				
 			
 	if selected:
 		if event is InputEventMouseMotion:
 			# drag selected unit to position
 			var drag_pos: Vector2 = battle.map.world.screen_to_uniform(event.position) + selected_offset
+			var drag_cell := battle.map.cell(drag_pos)
 			selected.map_pos = drag_pos
 			
-			if Vector2(battle.map.cell(drag_pos)) in battle.map.get_spawn_points('player'):
+			if Vector2(drag_cell) in battle.map.get_spawn_points('player'):
 				selected.animation.play("RESET")
 			else:
 				selected.animation.play("highlight_red")
@@ -116,10 +128,12 @@ func _unhandled_input(event):
 			# releasing lmb releases the currently selected unit
 			if event.button_index == 1 and not event.pressed:
 				battle.character_list.get_button(selected.unit_name).release()
+				
+		# mark input as handled
+		get_viewport().set_input_as_handled()
 
 
 func _on_character_list_unit_selected(uname: String, pos: Vector2):
-	#pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	var unit: Unit = unit_map[uname]
 	
 	selected = unit
@@ -135,8 +149,7 @@ func _on_character_list_unit_selected(uname: String, pos: Vector2):
 	unit.modulate = Color(1, 1, 1, 0.5)
 	
 
-func _on_character_list_unit_released(uname: String, pos: Vector2):
-	#pos = battle.viewport.canvas_transform.affine_inverse() * pos
+func _on_character_list_unit_released(uname: String, _pos: Vector2):
 	var unit: Unit = unit_map[uname]
 	
 	unit.snap_to_grid()
@@ -144,7 +157,7 @@ func _on_character_list_unit_released(uname: String, pos: Vector2):
 		
 	# temporarily put away the unit it doesn't get included in get_unit()
 	# we'll add it again if the unit can be spawned in the chosen spot
-	battle.set_unit_group(unit, 'units_standby')
+	battle.set_unit_position(unit, Map.OUT_OF_BOUNDS)
 	
 	if spawn_pos in battle.map.get_spawn_points('player'):
 		var occupant := battle.get_unit(spawn_pos)
@@ -153,7 +166,7 @@ func _on_character_list_unit_released(uname: String, pos: Vector2):
 			if selected_moved:
 				occupant.map_pos = selected_original_pos
 			else:
-				battle.set_unit_group(occupant, 'units_standby')
+				battle.set_unit_position(unit, Map.OUT_OF_BOUNDS)
 		battle.set_unit_position(unit, spawn_pos)
 		
 	unit.animation.play("RESET")
@@ -164,7 +177,6 @@ func _on_character_list_unit_released(uname: String, pos: Vector2):
 
 
 func _on_character_list_unit_dragged(uname: String, pos: Vector2):
-	#pos = battle.viewport.canvas_transform.affine_inverse() * pos
 	var unit: Unit = unit_map[uname]
 	
 	var drag_pos := battle.map.world.screen_to_uniform(pos)
@@ -176,8 +188,13 @@ func _on_character_list_unit_dragged(uname: String, pos: Vector2):
 		unit.animation.play("highlight_red")
 
 
-func _on_character_list_unit_cancelled(_uname: String):
-	selected = null
+func _on_character_list_unit_cancelled(uname: String):
+	if unit_map[uname] == selected:
+		if selected_moved:
+			battle.set_unit_position(selected, selected_original_pos)
+		else:
+			battle.set_unit_position(selected, Map.OUT_OF_BOUNDS)
+		selected = null
 
 
 func _on_character_list_unit_highlight_changed(uname: String, value: bool):

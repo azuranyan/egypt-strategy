@@ -131,7 +131,6 @@ var context: Context
 var _camera_target: MapObject = null
 var _should_end_turn: bool
 
-@onready var state_machine: StateMachine = $States
 @onready var character_list: CharacterList = $UI/CharacterList
 
 @onready var viewport: Viewport = $SubViewportContainer/Viewport
@@ -142,8 +141,8 @@ var _should_end_turn: bool
 @onready var cursor: SpriteObject = $UI/Cursor
 @onready var pause_overlay: PauseOverlay = $UI/PauseOverlay
 
-@onready var ai_action_controller := $AIActionController as BattleActionController
-@onready var player_action_controller := $PlayerActionController as BattleActionController
+#@onready var ai_action_controller := $AIActionController as BattleActionController
+#@onready var player_action_controller := $PlayerActionController as BattleActionController
 
 
 func _ready():
@@ -173,8 +172,8 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_q
 	context.result = Battle.Result.Cancelled
 	context.turns = 0
 	context.on_turn = context.attacker
-	context.controller[attacker] = player_action_controller if attacker.is_player_owned() else ai_action_controller
-	context.controller[defender] = player_action_controller if defender.is_player_owned() else ai_action_controller
+	#context.controller[attacker] = player_action_controller if attacker.is_player_owned() else ai_action_controller
+	#context.controller[defender] = player_action_controller if defender.is_player_owned() else ai_action_controller
 	context.should_end = false
 	context.victory_conditions = [VictoryCondition.new()] # TODO
 	
@@ -234,8 +233,10 @@ func quit_battle():
 		if context.battle_phase:
 			end_battle(Result.AttackerWithdraw if context.attacker.is_player_owned() else Result.DefenderWithdraw)
 		else:
-			state_machine.transition_to("Idle")
-			_end_prep_requested.emit(1)
+			# TODO FIX
+			pass
+			#state_machine.transition_to("Idle")
+			#_end_prep_requested.emit(1)
 	
 	
 ## Outcome is an implementation detail.
@@ -252,6 +253,11 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	await Globals.screen_ready
 	_load_map(territory.maps[0])
 	
+	var agent := {
+		context.attacker: Globals.create_agent_for(context.attacker), 
+		context.defender: Globals.create_agent_for(context.defender), 
+	}
+	
 	var auto_queue: Array[Empire] = []
 	var manual_queue: Array[Empire] = []
 	for prep in [context.attacker, context.defender]:
@@ -263,14 +269,29 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	# fill auto_prep
 	for prep in auto_queue:
 		context.on_turn = prep
-		_auto_prep(prep)
+		await agent[prep].prepare_units()
+		#_auto_prep(prep)
 	
 	# wait for the screen transition before proceeding
 	await Globals.transition_finished
 	
 	# do the prep phase and battle phase
-	var battle_result := await _manual_prep_and_do_battle(manual_queue)
+	#var battle_result := await _manual_prep_and_do_battle(manual_queue)
 	
+	for prep in manual_queue:
+		$UI/DonePrep.visible = true
+		$UI/CancelPrep.visible = (prep == context.attacker)
+		context.on_turn = prep
+		#state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
+		#var result: int = await _end_prep_requested
+		await agent[prep].prepare_units()
+		$UI/DonePrep.visible = false
+		$UI/CancelPrep.visible = false
+		#if result != 0:
+		#	return Result.Cancelled
+	
+	for e in agent.values():
+		e.queue_free()
 #	# show battle results
 #	var text := ''
 #	match context.result:
@@ -293,7 +314,8 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	Globals.pop_screen()
 	await Globals.transition_finished
 	_unload_map()
-	return battle_result
+	#return battle_result
+	return Result.AttackerVictory
 	
 	
 	
@@ -349,12 +371,13 @@ func _manual_prep_and_do_battle(queue: Array[Empire]) -> Result:
 		$UI/DonePrep.visible = true
 		$UI/CancelPrep.visible = (prep == context.attacker)
 		context.on_turn = prep
-		state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
-		var result: int = await _end_prep_requested
+		# TODO FIX
+		#state_machine.transition_to.call_deferred("Prep", {prep_queue=[prep], battle=self})
+		#var result: int = await _end_prep_requested
 		$UI/DonePrep.visible = false
 		$UI/CancelPrep.visible = false
-		if result != 0:
-			return Result.Cancelled
+		#if result != 0:
+		#	return Result.Cancelled
 			
 	_do_battle.call_deferred()
 	return await _end_battle_requested
@@ -1027,8 +1050,10 @@ func _on_battle_ended(_result):
 
 func _on_done_prep_pressed():
 	if fulfills_prep_requirements(context.on_turn, context.territory):
-		state_machine.transition_to("Idle")
-		_end_prep_requested.emit(0)
+		# TODO FIX
+		pass
+		#state_machine.transition_to("Idle")
+		#_end_prep_requested.emit(0)
 	else:
 		display_message(context.warnings)
 
@@ -1097,7 +1122,7 @@ class Context:
 	
 	var turns: int
 	var on_turn: Empire
-	var controller := {}
+	#var controller := {}
 	var should_end: bool
 
 	var spawned_units: Array[Unit]

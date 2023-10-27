@@ -1,4 +1,5 @@
 extends BattleAgent
+class_name BattleAgentAI
 
 
 ## Returns a list of all possible moves.
