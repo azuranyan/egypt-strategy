@@ -77,8 +77,10 @@ func initialize():
 	battle.character_list.unit_highlight_changed.connect(_on_character_list_unit_highlight_changed)
 	
 	# connect to battle
-	battle.get_node('UI/DonePrep').pressed.connect(_on_battle_ui_done_prep_pressed)
-	battle.get_node('UI/CancelPrep').pressed.connect(_on_battle_prep_cancelled)
+	battle.prep_done.connect(_on_battle_prep_done)
+	battle.prep_cancelled.connect(_on_battle_prep_cancelled)
+	battle.battle_quit.connect(_on_battle_quit_battle)
+	
 	battle.cell_selected.connect(_on_battle_cell_selected)
 	battle.cell_accepted.connect(_on_battle_cell_accepted)
 	battle.get_node('UI/Battle/AttackButton').pressed.connect(_on_battle_ui_attack_button_pressed)
@@ -86,12 +88,14 @@ func initialize():
 	battle.get_node('UI/Battle/UndoButton').pressed.connect(cancel)
 	battle.get_node('UI/Battle/EndTurnButton').pressed.connect(end_turn)
 	
-
-func prepare_units():
+	# change ui before transition is shown
 	battle.character_list.visible = true
-	battle.cursor.visible = false
 	for o in battle.map.get_objects().filter(func(x): return x.get_meta('spawn_point', '') == 'player'):
 		o.no_show = false
+	battle.cursor.visible = false
+	
+
+func prepare_units():
 	input_handler = _unhandled_input_prep
 	
 	await prep_done
@@ -102,13 +106,20 @@ func prepare_units():
 	
 
 func do_turn():
+	# setup
+	should_end = false
 	battle.cursor.visible = true
 	input_handler = _unhandled_input_battle
+	
+	# do the action loop
 	while not should_end:
 		var action: Array = await action_ready
 		await do_action(action[0], action[1])
-	await do_action(func(): pass)
+		
+	# cleanup
 	battle.cursor.visible = false
+	clear_active_unit()
+	move_stack.clear()
 	
 
 func add_unit_hooks(unit: Unit):
@@ -155,14 +166,20 @@ func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
 		use_keyboard(true)
 	
+	if event is InputEventKey:
+		if event.keycode == KEY_KP_2:
+			var unit := battle.get_unit(battle.map.cell(battle.cursor.map_pos))
+			if event.pressed and battle.can_attack(unit):
+				heading_adjusted = unit
+			else:
+				heading_adjusted = null
+			# prevent inputs from propagating
+			get_viewport().set_input_as_handled()
+			return
+				
+	# heading adjustment
 	if heading_adjusted:
 		if event is InputEventKey:
-			if event.keycode == KEY_KP_2:
-				if event.pressed:
-					heading_adjusted = battle.get_unit(battle.map.cell(battle.cursor.map_pos))
-				else:
-					heading_adjusted = null
-			
 			if event.pressed:
 				match event.keycode:
 					KEY_W:
@@ -196,6 +213,24 @@ func _unhandled_input(event):
 	# phase specific controls
 	input_handler.call(event)
 	
+
+func _on_battle_prep_done():
+	prep_done.emit()
+	
+	
+func _on_battle_prep_cancelled():
+	battle.context.result = Battle.Result.Cancelled
+	prep_done.emit()
+	
+
+func _on_battle_quit_battle():
+	# TODO pressing quit battle shows it for the player, but the way the
+	# signals are handled this is very confusing.
+	if battle.context.attacker.is_player_owned():
+		battle.end_battle(Battle.Result.AttackerWithdraw)
+	else:
+		battle.end_battle(Battle.Result.DefenderWithdraw)
+
 
 ################################################################################
 ## Prep
@@ -251,12 +286,13 @@ func _on_character_list_unit_released(uname: String, _pos: Vector2):
 	
 	if spawn_pos in battle.map.get_spawn_points('player'):
 		var occupant := battle.get_unit(spawn_pos)
+		print('dropping unit to %s: has %s' % [spawn_pos, occupant])
 		if occupant:
 			# if the unit is being moved, swap positions, otherwise take over
 			if selected_moved:
 				occupant.map_pos = selected_original_pos
 			else:
-				battle.set_unit_position(unit, Map.OUT_OF_BOUNDS)
+				battle.set_unit_position(occupant, Map.OUT_OF_BOUNDS)
 		battle.set_unit_position(unit, spawn_pos)
 		
 	unit.animation.play("RESET")
@@ -290,14 +326,6 @@ func _on_character_list_unit_cancelled(uname: String):
 func _on_character_list_unit_highlight_changed(uname: String, value: bool):
 	unit_map[uname].animation.play("highlight" if value else "RESET")
 		
-
-func _on_battle_ui_done_prep_pressed():
-	prep_done.emit()
-	
-	
-func _on_battle_prep_cancelled():
-	battle.context.result = Battle.Result.Cancelled
-	prep_done.emit()
 
 ################################################################################
 ## Battle
@@ -338,24 +366,30 @@ func do_unit_action(action: Callable, args := []):
 	
 ## Walks the active unit.
 func move_action(cell: Vector2i):
+	# setup
 	battle.get_node('UI/Battle').visible = false
 	set_process_unhandled_input(false)
-	await battle.walk_unit(active_unit, cell)
-	battle.get_node('UI/Battle').visible = true
-	set_process_unhandled_input(true)
 	push_move_action()
-	battle.set_can_move(active_unit, false)
-	battle.set_action_taken(active_unit, true)
-	
-	# clear and set again if can_attack to refresh the ui
 	var unit := active_unit
 	clear_active_unit()
+	
+	# walk
+	await battle.walk_unit(unit, cell)
+	
+	# cleanup
+	battle.get_node('UI/Battle').visible = true
+	set_process_unhandled_input(true)
+	battle.set_can_move(unit, false)
+	battle.set_action_taken(unit, true)
+	
+	# clear and set again if can_attack to refresh the ui
 	if battle.can_attack(unit):
 		set_active_unit(unit)
 		
 
 ## Uses the active attack.
 func attack_action():
+	# setup
 	var unit := active_unit
 	var attack := active_attack
 	var targets := active_multicast.duplicate()
@@ -370,17 +404,21 @@ func attack_action():
 		add_child(p)
 		p.add_to_group('parallel_use_attack')
 		#battle.use_attack(unit, attack, cell, 0)
-		
+	
+	# attack
 	get_tree().call_group('parallel_use_attack', 'execute')
+	
+	# cleanup
 	get_tree().call_group('parallel_use_attack', 'queue_free')
 		
 		
 ## Does nothing.
 func do_nothing_action():
-	battle.do_nothing(active_unit)
-	push_move_action()
-	if not battle.can_attack(active_unit):
-		clear_active_unit()
+	if active_unit: # this can be called even without active_unit
+		push_move_action()
+		battle.do_nothing(active_unit)
+		if not battle.can_attack(active_unit):
+			clear_active_unit()
 	
 	
 ## Ends the turn.
@@ -423,6 +461,7 @@ func push_move_action():
 func undo_move_action():
 	if not move_stack.is_empty():
 		var action = move_stack.pop_back()
+		print('undoing move action ', action.unit.map_pos, ' ', action.cell)
 		
 		action.unit.map_pos = action.cell
 		action.unit.facing = action.facing
@@ -431,6 +470,8 @@ func undo_move_action():
 		battle.set_action_taken(action.unit, false)
 		
 		set_active_unit(action.unit)
+	else:
+		print('no moves to undo')
 	
 	
 ## Sets the active unit.
@@ -594,10 +635,10 @@ func _on_battle_cell_accepted(cell: Vector2i):
 					do_unit_action(move_action, [cell])
 					return
 				else:
-					battle.play_error(true)
+					battle.play_error('outside range')
 			else:
 				if battle.can_attack(active_unit):
-					battle.play_error(true)
+					battle.play_error('already moved')
 				else:
 					clear_active_unit()
 		# no active unit, not owned, or has already moved

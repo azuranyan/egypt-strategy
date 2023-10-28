@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dgtvgql28ujaa"]
+[gd_scene load_steps=9 format=3 uid="uid://dgtvgql28ujaa"]
 
 [ext_resource type="Script" path="res://Screens/Battle/BattleResultsScreen.gd" id="1_bsbby"]
 
@@ -7,10 +7,70 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Control:modulate")
+tracks/0/path = NodePath("Control2/Control:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control2/Banner:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(832.001, 539.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Control2/Banner:size")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(256, 4)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Control2/Control/Label:label_settings:outline_size")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Control2:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Control2:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -22,7 +82,7 @@ resource_name = "hide"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Control:modulate")
+tracks/0/path = NodePath("Control2/Control:modulate")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -34,31 +94,92 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_d7b4w"]
 resource_name = "show"
+length = 1.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Control:modulate")
-tracks/0/interp = 2
+tracks/0/path = NodePath("Control2/Control:modulate")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.9),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(0.33, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
-tracks/1/type = "method"
+tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("Control2/Banner:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 0.33, 1),
+"update": 0,
+"values": [Vector2(160, 538), Vector2(160, 510), Vector2(160, 510)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Control2/Banner:size")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 0.33, 1),
+"update": 0,
+"values": [Vector2(1600, 4), Vector2(1600, 60), Vector2(1600, 60)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Control2/Control/Label:label_settings:outline_size")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0, 5, 0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Control2:position")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.8),
+"transitions": PackedFloat32Array(0.732043, 1, 1),
+"update": 0,
+"values": [Vector2(5, 0), Vector2(-2, 0), Vector2(0, 0)]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(1.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [],
-"method": &"_on_done"
+"args": [&"animation_finished"],
+"method": &"emit_signal"
 }]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Control2:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.1, 1.2),
+"transitions": PackedFloat32Array(0.541688, 0.329877, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1.13, 1.13, 1.13, 1), Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_okw71"]
@@ -68,6 +189,14 @@ _data = {
 "show": SubResource("Animation_d7b4w")
 }
 
+[sub_resource type="Gradient" id="Gradient_3cg1j"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_a6x8b"]
+gradient = SubResource("Gradient_3cg1j")
+
 [sub_resource type="LabelSettings" id="LabelSettings_fmneq"]
 font_size = 32
 
@@ -76,35 +205,42 @@ script = ExtResource("1_bsbby")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 autoplay = "show"
-speed_scale = 5.0
+speed_scale = 0.6
 libraries = {
 "": SubResource("AnimationLibrary_okw71")
 }
 
-[node name="Control" type="Control" parent="."]
+[node name="Control2" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 0.00146484
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
 
-[node name="Panel" type="Panel" parent="Control"]
+[node name="Banner" type="TextureRect" parent="Control2"]
+modulate = Color(0.537255, 0.168627, 0.223529, 1)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -233.0
-offset_top = -98.0
-offset_right = 233.0
-offset_bottom = 98.0
+offset_left = -127.999
+offset_top = -0.5
+offset_right = 128.001
+offset_bottom = 3.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_a6x8b")
+
+[node name="Control" type="Control" parent="Control2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="Control"]
+[node name="Label" type="Label" parent="Control2/Control"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -112,9 +248,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -228.0
-offset_top = -11.0
+offset_top = -24.0
 offset_right = 228.0
-offset_bottom = 12.0
+offset_bottom = 24.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Victory!"
@@ -122,4 +258,5 @@ label_settings = SubResource("LabelSettings_fmneq")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="gui_input" from="Control" to="." method="_on_control_gui_input"]
+[connection signal="_battle_won_changed" from="." to="." method="_on__battle_won_changed"]
+[connection signal="_text_changed" from="." to="." method="_on__text_changed"]

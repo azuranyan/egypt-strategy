@@ -38,14 +38,18 @@ AttackEffect.get_animation() -> get_target_special_effect() or something else, a
 ##########################################################################################################
 
 battle
- - change heading via key input doesn't work (heading can only be changed thru key input @hook)
- - make player spawnable spots visible before transition
- - mouse position still needs event local
- - undo move action not working
+ - fix 0 second delay on banners sometimes resulting to bizzare it's your turn again situations
+ - end turn needs to be pressed to make battle realize battle has already been won
+ - battle result screen should fade with the
+ - recover animation is screen shake?
+ 
+prep
+ - putting enemy from chara list to location doesn;t seem to do swap
 
 spawning 
  - better spawning marker, also allow specifying chance tables
  - allow adding units to the map and assigning them to player spawn
+ - dead enemy ai can move on their turn after killed by player in their turn
 
 remove dead untis from the map
 

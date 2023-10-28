@@ -673,6 +673,7 @@ text = "No
 [connection signal="turn_started" from="." to="." method="_on_turn_started"]
 [connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
 [connection signal="walking_started" from="." to="." method="_on_walking_started"]
+[connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]
 [connection signal="pressed" from="UI/CancelPrep" to="." method="_on_cancel_prep_pressed"]
 [connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/YesButton" to="UI/PauseOverlay" method="_on_yes_button_pressed"]
 [connection signal="pressed" from="UI/PauseOverlay/HBoxContainer/NoButton" to="UI/PauseOverlay" method="_on_no_button_pressed"]

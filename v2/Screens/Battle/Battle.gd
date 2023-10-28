@@ -58,6 +58,10 @@ signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targe
 
 signal prep_cancelled
 
+signal prep_done
+
+signal battle_quit
+
 ################################################################################
 
 signal _attack_sequence_finished()
@@ -131,6 +135,8 @@ const unit_group := [
 
 
 var context: Context
+
+var _allow_quit := false
 
 var _camera_target: MapObject = null
 var _should_end_turn: bool
@@ -224,30 +230,44 @@ func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
 
 ## Request to end battle.
 func end_battle(result: Result):
+	# TODO this is iffy
 	if context:
+		context.result = result
 		_end_battle_requested.emit(result)
 	else:
 		push_error("end_battle(): battle not started!")
 		
 
 ## Quits the battle.
-func quit_battle():
+func show_quit_battle() -> bool:
+	if not _allow_quit:
+		return false
+		
 	if not context:
 		push_error("quit_battle(): battle not started!")
-		return
+		return false
 		
-	var should_end := false
+#	var should_end := false
 	if not context.battle_phase and context.attacker.is_player_owned():
-		should_end = await pause_overlay.show_pause('Cancel Attack?')
+		return await pause_overlay.show_pause('Return to Overworld?')
 	else:
-		should_end = await pause_overlay.show_pause('Withdraw?')
+		return await pause_overlay.show_pause('Withdraw?')
 	
+	
+## Quits the battle.
+func quit_battle(show_confirm_dialogue := true):
+	var should_end: bool
+	if show_confirm_dialogue:
+		should_end = await show_quit_battle()
+	else:
+		should_end = true
+
 	if should_end:
 		if context.battle_phase:
-			end_battle(Result.AttackerWithdraw if context.attacker.is_player_owned() else Result.DefenderWithdraw)
+			battle_quit.emit()
 		else:
 			prep_cancelled.emit()
-	
+
 	
 ## Outcome is an implementation detail.
 func _quick_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
@@ -275,7 +295,9 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	# allow the player to prep
 	$UI/DonePrep.visible = true
 	$UI/CancelPrep.visible = context.attacker.is_player_owned()
+	_allow_quit = true
 	await agent[context.player].prepare_units()
+	_allow_quit = false
 	$UI/DonePrep.visible = false
 	$UI/CancelPrep.visible = false
 	
@@ -287,21 +309,26 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 		
 		# show battle results
 		var text := ''
+		var battle_won := false
 		match context.result:
 			Result.AttackerVictory:
-				text = 'Battle Won!' if context.attacker.is_player_owned() else 'Battle Lost.'
+				text = 'Territory Taken!' if context.attacker.is_player_owned() else 'Territory Lost.'
+				battle_won = true
 			Result.DefenderVictory:
-				text = 'Battle Lost.' if context.attacker.is_player_owned() else 'Battle Won!'
+				text = 'Conquest Failed.' if context.attacker.is_player_owned() else 'Defense Success!'
 			Result.AttackerWithdraw:
 				text = 'Battle Forfeited.' if context.attacker.is_player_owned() else 'Enemy Withdraw!'
 			Result.DefenderWithdraw:
-				text = 'Enemy Withdraw!' if context.attacker.is_player_owned() else 'Battle Forfeited.'
+				text = 'Enemy Withdraw!' if context.attacker.is_player_owned() else 'Territory Surrendered.'
+				battle_won = true
 				
 		if text != '':
 			var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()
 			get_tree().root.add_child.call_deferred(node)
-			node.get_node('Control/Label').text = text
-			await node.done
+			node.text = text
+			node.battle_won = battle_won
+			await node.animation_finished
+			node.queue_free()
 			
 	# post-battle setup
 	for e in agent.values():
@@ -355,7 +382,9 @@ func _do_battle(agent: Dictionary):
 			#context.controller[context.on_turn].turn_start()
 			
 			#await _do_turn()
+			_allow_quit = true
 			await agent[empire].do_turn()
+			_allow_quit = false
 						
 			turn_ended.emit()
 			await Globals.play_queued_scenes()
@@ -779,7 +808,7 @@ func play_error(message):
 		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
 		$AudioStreamPlayer2D.play()
 	if message:
-		display_message(message)
+		display_message('error: ' + message)
 	
 	
 func update_portrait(unit: Unit):
@@ -980,16 +1009,13 @@ func _on_battle_ended(_result):
 
 func _on_done_prep_pressed():
 	if fulfills_prep_requirements(context.on_turn, context.territory):
-		# TODO FIX
-		pass
-		#state_machine.transition_to("Idle")
-		#_end_prep_requested.emit(0)
+		prep_done.emit()
 	else:
 		display_message(context.warnings)
 
 
 func _on_cancel_prep_pressed():
-	quit_battle()
+	quit_battle.call_deferred()
 
 
 func _on_turn_started():
