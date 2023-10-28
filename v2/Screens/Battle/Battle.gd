@@ -548,6 +548,18 @@ func check_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_
 		return ATTACK_INVALID_TARGET	# even if there are invalid targets
 	
 	return ATTACK_OK
+
+	
+## Unit use attack compatible with multicast.
+func use_attack_multicast(unit: Unit, attack: Attack, target_cells: Array[Vector2i], target_rotation: float):
+	if target_cells.size() == 1:
+		use_attack(unit, attack, target_cells[0], target_rotation)
+	else:
+		var multicaster := AttackMulticaster.new()
+		add_child(multicaster)
+		multicaster.use_attack_multicast(unit, attack, target_cells, target_rotation)
+		await multicaster.done
+		multicaster.queue_free()
 	
 	
 ## Unit use attack (action).
