@@ -409,7 +409,7 @@ func _do_battle(agent: Dictionary):
 				
 				# tick duration of status effects
 				u.tick_status_effects()
-					
+			
 		turn_cycle_ended.emit()
 		await Globals.play_queued_scenes()
 		
@@ -418,33 +418,6 @@ func _do_battle(agent: Dictionary):
 	$UI/Battle.visible = false # TODO doesn't belong here, signalize this
 	
 	end_battle(context.result)
-	
-	
-func _do_turn():
-	while not _should_end_turn:
-		# things can happen before/after doing any actions so make sure to check first
-		if _evaluate_victory_conditions():
-			return
-		
-		# do action
-		context.controller[context.on_turn].action_start()
-		action_started.emit()
-		await context.controller[context.on_turn].do_action()
-		action_ended.emit()
-		context.controller[context.on_turn].action_end()
-		
-		# auto end turn
-		if Globals.prefs.auto_end_turn:
-			var units := get_owned_units()
-			var should_end := true
-			
-			for u in units:
-				if can_move(u) or can_attack(u):
-					should_end = false
-					break
-					
-			if should_end:
-				end_turn()
 		
 		
 func _load_map(scene: PackedScene):
@@ -584,6 +557,24 @@ func do_nothing(unit: Unit):
 func end_turn():
 	_should_end_turn = true
 	
+	
+## Waits for death animations to play out.
+func wait_for_death_animations():
+	var should_wait := false
+	print('wait for death anim')
+	for u in get_tree().get_nodes_in_group('units_dead'):
+		print('connecting ', u)
+		u.animation_finished.connect(func():
+			print('anim done ', u)
+			set_unit_position(u, Map.OUT_OF_BOUNDS)
+			, CONNECT_ONE_SHOT)
+		print('playing anim ', u)
+		u.play_animation.call('death')
+		should_wait = true
+		
+	if should_wait: # just estimate
+		await get_tree().create_timer(1.4).timeout
+		
 		
 ## Notify the game that attack sequence is done.
 func notify_attack_sequence_finished():
@@ -672,8 +663,8 @@ func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Ar
 
 ## Kills a unit.
 func kill_unit(unit: Unit):
+	print('kill ', unit.unit_name)
 	# TODO play death animation
-	#remove_unit(unit)
 	set_unit_group(unit, 'units_dead')
 	
 
@@ -726,11 +717,13 @@ func damage_unit(unit: Unit, source: Variant, amount: int):
 		else:
 			camera.get_node("AnimationPlayer").play('shake')
 			color = Color(0.949, 0.29, 0.392)
-		
-	await play_floating_number(unit, abs(amount), color)
 	
-	if unit.hp == 0:
+	play_floating_number(unit, abs(amount), color)
+	
+	if unit.hp <= 0:
 		kill_unit(unit)
+		
+		
 	
 	
 ## Makes the unit stop walking.

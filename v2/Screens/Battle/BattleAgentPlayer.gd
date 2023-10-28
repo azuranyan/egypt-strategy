@@ -58,6 +58,7 @@ var input_handler: Callable
 
 
 func initialize():
+	set_process_unhandled_input(false)
 	# add the units to character list
 	for type_name in empire.units:
 		var unit := battle.spawn_unit(type_name, empire)
@@ -96,10 +97,12 @@ func initialize():
 	
 
 func prepare_units():
+	set_process_unhandled_input(true)
 	input_handler = _unhandled_input_prep
 	
 	await prep_done
 	
+	set_process_unhandled_input(false)
 	battle.character_list.visible = false
 	for o in battle.map.get_objects().filter(func(x): return x.get_meta('spawn_point', '') == 'player'):
 		o.no_show = true
@@ -109,6 +112,7 @@ func do_turn():
 	# setup
 	should_end = false
 	battle.cursor.visible = true
+	set_process_unhandled_input(true)
 	input_handler = _unhandled_input_battle
 	
 	# do the action loop
@@ -118,6 +122,7 @@ func do_turn():
 		
 	# cleanup
 	battle.cursor.visible = false
+	set_process_unhandled_input(false)
 	clear_active_unit()
 	move_stack.clear()
 	
@@ -412,6 +417,7 @@ func _unhandled_input_battle(event):
 				KEY_KP_3:
 					cancel()
 
+
 ## Uses callable passed as the action.
 func do_unit_action(action: Callable, args := []):
 	# call deferred so we don't have the massive stack tree and
@@ -451,22 +457,12 @@ func attack_action():
 	var targets := active_multicast.duplicate()
 	move_stack.clear()
 	clear_active_unit()
+	await battle.use_attack_multicast(unit, attack, targets, 0)
 	battle.set_can_move(unit, false)
 	battle.set_can_attack(unit, false)
 	battle.set_action_taken(unit, true)
+	print('use attack done')
 	
-	for cell in targets:
-		#var p := ParallelUseAttack.new(unit, attack, cell, 0)
-		#add_child(p)
-		#p.add_to_group('parallel_use_attack')
-		battle.use_attack(unit, attack, cell, 0)
-#
-#	# attack
-#	get_tree().call_group('parallel_use_attack', 'execute')
-#
-#	# cleanup
-#	get_tree().call_group('parallel_use_attack', 'queue_free')
-		
 		
 ## Does nothing.
 func do_nothing_action():
@@ -719,23 +715,3 @@ class UnitMoveAction:
 	var can_move: bool
 	var can_attack: bool
 	
-
-class ParallelUseAttack extends Node:
-	var unit: Unit
-	var attack: Attack
-	var cell: Vector2i
-	var rotation: float
-	
-	
-	func _init(unit: Unit, attack: Attack, cell: Vector2i, rotation: float):
-		self.unit = unit
-		self.attack = attack
-		self.cell = cell
-		self.rotation = rotation
-		
-		
-	func execute():
-		Globals.battle.use_attack(unit, attack, cell, rotation)
-		
-		
-		

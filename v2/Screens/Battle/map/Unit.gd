@@ -21,6 +21,8 @@ signal button_up(button: int)
 #signal walking_started
 #signal walking_finished
 
+signal animation_finished
+
 # Data signals
 signal stat_changed(stat: String)
 signal status_effect_added(effect: StatusEffect)
@@ -184,6 +186,10 @@ func _ready():
 	
 	stat_changed.connect(_on_stat_changed)
 	
+	model.get_node('Sprite').animation_finished.connect(func():
+		print('fucking done' , self)
+		animation_finished.emit()
+		)
 	# keeping a reference to curve resource makes it extremely buggy
 	# because curve is a resource that get saved with the scene. this
 	# is why we're creating a new curve every _ready.
@@ -216,12 +222,19 @@ func load_vars(kwargs: Dictionary):
 	debug.visible = kwargs.get("debug", debug.visible)
 	
 	
-	
-	
 func _set_if_has(prop: String, kwargs: Dictionary):
 	if kwargs.has(prop):
 		assert(kwargs.get(prop) != null)
 		set(prop, kwargs.get(prop))
+
+
+## Plays animation for model
+func play_animation(anim: String, loop: bool = false):
+	print('play anim UNIT ', anim)
+	if loop:
+		model.play_animation(anim + '_loop')
+	else:
+		model.play_animation(anim)
 
 
 ## Resets the unit.
@@ -361,6 +374,11 @@ func is_enemy(other: Unit) -> bool:
 	return other.empire != empire
 	
 
+## Puts the unit in the standby area.
+func to_standby():
+	Globals.battle.set_unit_position(self, Map.OUT_OF_BOUNDS)
+	
+	
 ################################################################################
 # Signals
 ################################################################################

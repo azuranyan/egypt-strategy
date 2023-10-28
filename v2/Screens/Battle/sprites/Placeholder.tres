@@ -13,8 +13,32 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("1_r86gb")
 }],
-"loop": true,
+"loop": false,
 "name": &"BackAttack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r86gb")
+}],
+"loop": true,
+"name": &"BackAttack_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 3.2,
+"texture": ExtResource("2_1jh81")
+}],
+"loop": false,
+"name": &"BackDeath",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 3.2,
+"texture": ExtResource("2_1jh81")
+}],
+"loop": false,
+"name": &"BackIdle",
 "speed": 5.0
 }, {
 "frames": [{
@@ -22,7 +46,18 @@ animations = [{
 "texture": ExtResource("2_1jh81")
 }],
 "loop": true,
-"name": &"BackIdle",
+"name": &"BackIdle_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_swcbg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_1jh81")
+}],
+"loop": false,
+"name": &"BackWalk",
 "speed": 5.0
 }, {
 "frames": [{
@@ -33,7 +68,15 @@ animations = [{
 "texture": ExtResource("2_1jh81")
 }],
 "loop": true,
-"name": &"BackWalk",
+"name": &"BackWalk_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_d2kfb")
+}],
+"loop": false,
+"name": &"FrontAttack",
 "speed": 5.0
 }, {
 "frames": [{
@@ -41,7 +84,23 @@ animations = [{
 "texture": ExtResource("4_d2kfb")
 }],
 "loop": true,
-"name": &"FrontAttack",
+"name": &"FrontAttack_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 3.2,
+"texture": ExtResource("5_dssaf")
+}],
+"loop": false,
+"name": &"FrontDeath",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_dssaf")
+}],
+"loop": false,
+"name": &"FrontIdle",
 "speed": 5.0
 }, {
 "frames": [{
@@ -49,7 +108,18 @@ animations = [{
 "texture": ExtResource("5_dssaf")
 }],
 "loop": true,
-"name": &"FrontIdle",
+"name": &"FrontIdle_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_7433e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_dssaf")
+}],
+"loop": false,
+"name": &"FrontWalk",
 "speed": 5.0
 }, {
 "frames": [{
@@ -60,6 +130,6 @@ animations = [{
 "texture": ExtResource("5_dssaf")
 }],
 "loop": true,
-"name": &"FrontWalk",
+"name": &"FrontWalk_loop",
 "speed": 5.0
 }]
