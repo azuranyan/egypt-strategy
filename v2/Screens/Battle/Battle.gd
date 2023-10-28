@@ -310,17 +310,28 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 		# show battle results
 		var text := ''
 		var battle_won := false
-		match context.result:
-			Result.AttackerVictory:
-				text = 'Territory Taken!' if context.attacker.is_player_owned() else 'Territory Lost.'
-				battle_won = true
-			Result.DefenderVictory:
-				text = 'Conquest Failed.' if context.attacker.is_player_owned() else 'Defense Success!'
-			Result.AttackerWithdraw:
-				text = 'Battle Forfeited.' if context.attacker.is_player_owned() else 'Enemy Withdraw!'
-			Result.DefenderWithdraw:
-				text = 'Enemy Withdraw!' if context.attacker.is_player_owned() else 'Territory Surrendered.'
-				battle_won = true
+		if context.attacker.is_player_owned():
+			battle_won = context.result == Result.AttackerVictory or context.result == Result.DefenderWithdraw
+			match context.result:
+				Result.AttackerVictory:
+					text = 'Territory Taken!'
+				Result.DefenderVictory:
+					text = 'Conquest Failed.'
+				Result.AttackerWithdraw:
+					text = 'Battle Forfeited.'
+				Result.DefenderWithdraw:
+					text = 'Enemy Withdraw!'
+		else:
+			battle_won = context.result == Result.DefenderVictory or context.result == Result.AttackerWithdraw
+			match context.result:
+				Result.AttackerVictory:
+					text = 'Territory Lost.'
+				Result.DefenderVictory:
+					text = 'Defense Success!'
+				Result.AttackerWithdraw:
+					text = 'Enemy Withdraw!'
+				Result.DefenderWithdraw:
+					text = 'Territory Surrendered.'
 				
 		if text != '':
 			var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()

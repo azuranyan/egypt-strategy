@@ -339,11 +339,49 @@ func _unhandled_input_battle(event):
 	else:
 		cell = cur
 	
-#	if active_attack:
-#		# prevent inputs from propagating
-#		get_viewport().set_input_as_handled()
-#		return
+	# active attack controls overrides unit controls
+	if active_attack:
+		if (event is InputEventMouseButton and event.button_index == 1 or event is InputEventKey and event.keycode == KEY_KP_1) and event.pressed:
+			battle.accept_cell()
+			return
 		
+		if (event is InputEventMouseButton and event.button_index == 2 or event is InputEventKey and event.keycode == KEY_KP_3) and event.pressed:
+			cancel()
+			return
+		
+		if active_attack.melee:
+			if event is InputEventMouseMotion:
+				if active_unit.map_pos.distance_to(cell) > 0.6:
+					battle.select_attack_target(active_unit, active_attack, cell)
+			elif event is InputEventKey and event.pressed:
+				match event.keycode:
+					KEY_W:
+						battle.select_attack_target(active_unit, active_attack, -PI/2)
+					KEY_S:
+						battle.select_attack_target(active_unit, active_attack, PI/2)
+					KEY_A:
+						battle.select_attack_target(active_unit, active_attack, PI)
+					KEY_D:
+						battle.select_attack_target(active_unit, active_attack, 0.0)
+		else:
+			if event is InputEventMouseMotion:
+				battle.select_cell(cell)
+			elif event is InputEventKey and event.pressed:
+				match event.keycode:
+					KEY_W:
+						battle.select_cell(cur + Vector2i(0, -1))
+					KEY_S:
+						battle.select_cell(cur + Vector2i(0, +1))
+					KEY_A:
+						battle.select_cell(cur + Vector2i(-1, 0))
+					KEY_D:
+						battle.select_cell(cur + Vector2i(+1, 0))
+						
+		# prevent inputs from propagating
+		get_viewport().set_input_as_handled()
+		return
+		
+	# basic unit controls
 	if event is InputEventMouseButton and event.pressed:
 		match event.button_index:
 			1:
@@ -353,8 +391,26 @@ func _unhandled_input_battle(event):
 				cancel()
 				
 	if event is InputEventMouseMotion:
+		use_keyboard(false)
 		battle.select_cell(cell)
 	
+	if event is InputEventKey:
+		if event.pressed:
+			use_keyboard(true)
+			match event.keycode:
+				KEY_W:
+					battle.select_cell(cur + Vector2i(0, -1))
+				KEY_S:
+					battle.select_cell(cur + Vector2i(0, +1))
+				KEY_A:
+					battle.select_cell(cur + Vector2i(-1, 0))
+				KEY_D:
+					battle.select_cell(cur + Vector2i(+1, 0))
+				KEY_KP_1:
+					battle.select_cell(cur)
+					battle.accept_cell()
+				KEY_KP_3:
+					cancel()
 
 ## Uses callable passed as the action.
 func do_unit_action(action: Callable, args := []):
@@ -400,16 +456,16 @@ func attack_action():
 	battle.set_action_taken(unit, true)
 	
 	for cell in targets:
-		var p := ParallelUseAttack.new(unit, attack, cell, 0)
-		add_child(p)
-		p.add_to_group('parallel_use_attack')
-		#battle.use_attack(unit, attack, cell, 0)
-	
-	# attack
-	get_tree().call_group('parallel_use_attack', 'execute')
-	
-	# cleanup
-	get_tree().call_group('parallel_use_attack', 'queue_free')
+		#var p := ParallelUseAttack.new(unit, attack, cell, 0)
+		#add_child(p)
+		#p.add_to_group('parallel_use_attack')
+		battle.use_attack(unit, attack, cell, 0)
+#
+#	# attack
+#	get_tree().call_group('parallel_use_attack', 'execute')
+#
+#	# cleanup
+#	get_tree().call_group('parallel_use_attack', 'queue_free')
 		
 		
 ## Does nothing.
