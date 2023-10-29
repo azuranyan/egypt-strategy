@@ -187,8 +187,9 @@ func _ready():
 	stat_changed.connect(_on_stat_changed)
 	
 	model.get_node('Sprite').animation_finished.connect(func():
-		print('fucking done' , self)
+		print('fucking EMITTING ', self, ' ', model.animation)
 		animation_finished.emit()
+		print('fucking DONE EMITTING ', self, ' ', model.animation)
 		)
 	# keeping a reference to curve resource makes it extremely buggy
 	# because curve is a resource that get saved with the scene. this

@@ -42,6 +42,8 @@ battle
  - end turn needs to be pressed to make battle realize battle has already been won
  - battle result screen should fade with the
  - recover animation is screen shake?
+ - ai cannot take advantage of multicast
+ - due to multicast, using attack executes on the next frame
  
 prep
  - putting enemy from chara list to location doesn;t seem to do swap

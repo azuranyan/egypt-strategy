@@ -49,10 +49,10 @@ signal walking_started(unit: Unit)
 signal walking_finished(unit: Unit)
 
 ## Emitted when an attack sequence has started.
-signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+#signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
 
 ## Emitted when an attack sequence has ended.
-signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
+#signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
 
 ################################################################################
 
@@ -410,6 +410,7 @@ func _do_battle(agent: Dictionary):
 				# tick duration of status effects
 				u.tick_status_effects()
 			
+			
 		turn_cycle_ended.emit()
 		await Globals.play_queued_scenes()
 		
@@ -419,6 +420,27 @@ func _do_battle(agent: Dictionary):
 	
 	end_battle(context.result)
 		
+		
+func wait_for_death_animations():
+	print('check for death animation')
+	# play death animations
+	var wait_for_death_animations := false
+	for u in get_tree().get_nodes_in_group('units_dead'):
+		print('ded ')
+		u.animation_finished.connect(func():
+			set_unit_position(u, Map.OUT_OF_BOUNDS)
+			print('FUCK OFF THE MAP')
+			,
+			CONNECT_ONE_SHOT)
+			#u.to_standby, CONNECT_ONE_SHOT)
+		u.play_animation.call_deferred('death')
+		wait_for_death_animations = true
+		
+	if wait_for_death_animations:
+		print('waiting for death animations')
+		await get_tree().create_timer(1.4).timeout
+	print('done wait')
+
 		
 func _load_map(scene: PackedScene):
 	print("loading map '%s'" % scene.resource_path)
@@ -533,17 +555,22 @@ func use_attack_multicast(unit: Unit, attack: Attack, target_cells: Array[Vector
 		multicaster.use_attack_multicast(unit, attack, target_cells, target_rotation)
 		await multicaster.done
 		multicaster.queue_free()
+		
+	
 	
 	
 ## Unit use attack (action).
 func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
 	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
-	attack_sequence_started.emit(unit, attack, target_cell, targets)
-	await get_tree().create_timer(0.2).timeout # added artificial timeouts
-	await _attack_sequence_finished
-	await get_tree().create_timer(0.4).timeout
-	attack_sequence_ended.emit(unit, attack, target_cell, targets)
+	
+	$AttackSequencePlayer.use_attack(unit, attack, target_cell, targets)
+	
+	#attack_sequence_started.emit(unit, attack, target_cell, targets)
+	#await get_tree().create_timer(0.2).timeout # added artificial timeouts
+	#await _attack_sequence_finished
+	#await get_tree().create_timer(0.4).timeout
+	#attack_sequence_ended.emit(unit, attack, target_cell, targets)
 	
 
 ## Do nothing (action). Unit cannot move or attack and is considered as not having any action taken.
@@ -557,24 +584,6 @@ func do_nothing(unit: Unit):
 func end_turn():
 	_should_end_turn = true
 	
-	
-## Waits for death animations to play out.
-func wait_for_death_animations():
-	var should_wait := false
-	print('wait for death anim')
-	for u in get_tree().get_nodes_in_group('units_dead'):
-		print('connecting ', u)
-		u.animation_finished.connect(func():
-			print('anim done ', u)
-			set_unit_position(u, Map.OUT_OF_BOUNDS)
-			, CONNECT_ONE_SHOT)
-		print('playing anim ', u)
-		u.play_animation.call('death')
-		should_wait = true
-		
-	if should_wait: # just estimate
-		await get_tree().create_timer(1.4).timeout
-		
 		
 ## Notify the game that attack sequence is done.
 func notify_attack_sequence_finished():
@@ -663,7 +672,7 @@ func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Ar
 
 ## Kills a unit.
 func kill_unit(unit: Unit):
-	print('kill ', unit.unit_name)
+	print('killed unit')
 	# TODO play death animation
 	set_unit_group(unit, 'units_dead')
 	
@@ -718,12 +727,10 @@ func damage_unit(unit: Unit, source: Variant, amount: int):
 			camera.get_node("AnimationPlayer").play('shake')
 			color = Color(0.949, 0.29, 0.392)
 	
-	play_floating_number(unit, abs(amount), color)
-	
 	if unit.hp <= 0:
 		kill_unit(unit)
 		
-		
+	play_floating_number(unit, abs(amount), color)
 	
 	
 ## Makes the unit stop walking.
