@@ -63,8 +63,7 @@ func play_animation(_animation: String):
 			
 	if _animation.ends_with('_loop') or _animation == 'walk':
 		anim = anim + '_loop'
-	print('play anim MODEL ', anim)
-			
+		
 	if _heading == Unit.Heading.North or _heading == Unit.Heading.West:
 		sprite.play("Back" + anim)
 	else:

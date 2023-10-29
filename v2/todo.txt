@@ -3,75 +3,38 @@
 ##########################################################################################################
 
 ## minor
-ui elements need to be canvaslayer to bypass camera and viewport transforms
-prep uses global coords to bypass camera problems
-prep keyboard control
-should behavior really need to be on unittype (ai behavior)
 mark units with something when they have taken turn (E) in disgaea
-more robust cast animation system
 attack shape rotation is rotated 90 degrees
-clearly determine program flow of signal connections
- - to connect_defer or to defer the signal emit, etc
 overworld buttons need to be double clicked when clicked
 unit states in unit so we're not fiddling with stupid states and stuff
  - this also allows us to set unit on ghost or standby but keep its original position, so we can un-standby
  - can path and other stuff can also be implemented there, idgaf now
  - allows pathing over dead bodies
  - add x and y offset
+AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
+ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
+
 
 ## would be nice
-add pause while showing player banner
 disgaea style enum targetable units in attack range
 disgaea style target and caster placement 
 damage counter for consecutive attacks
 allow scrolling on character list
 Globals empires, territories -> empire, territory
-feature affect_caster (effect is used on the caster instead of target)
- - modify z series of effects (i.e. effects that affect caster)
-ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
-AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
-
 
 
 ##########################################################################################################
 ## hot list
 ##########################################################################################################
 
-battle
- - fix 0 second delay on banners sometimes resulting to bizzare it's your turn again situations
- - end turn needs to be pressed to make battle realize battle has already been won
- - battle result screen should fade with the
- - recover animation is screen shake?
- - ai cannot take advantage of multicast
- - due to multicast, using attack executes on the next frame
- 
-prep
- - putting enemy from chara list to location doesn;t seem to do swap
+make more map samples
 
+battle
+ - ai cannot take advantage of multicast
+ 
 spawning 
  - better spawning marker, also allow specifying chance tables
  - allow adding units to the map and assigning them to player spawn
  - dead enemy ai can move on their turn after killed by player in their turn
 
-remove dead untis from the map
-
 "simulating" battle results for quick battle
-
-map
- - default_facing_hint - hint for default facing of player units
-
-"All Avatars except Lysandra have the exact same stats as their friendly versions. However; they gain stats equivalent to 1 level of Bond when they win a territory, not to exceed the max of 3. They do not get the 2nd Skill from this."
-
-choppy fadeout transition after going out from battle
- - 
- - battle does not terminate cleanly when end_battle
- - weird pause when withdrawing
-
-add check for bond level up after turn ends
-
-
-
-unit -> unitid, so it doesn't rely on unit names and multiple unit types can be spawned
-
-ui being shown in battle signal is wrong
- - some parts of the ui are player specific but will be shown even for ai

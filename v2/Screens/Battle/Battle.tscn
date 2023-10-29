@@ -1,10 +1,8 @@
-[gd_scene load_steps=35 format=3 uid="uid://dy2jg0e1iws2m"]
+[gd_scene load_steps=34 format=3 uid="uid://dy2jg0e1iws2m"]
 
 [ext_resource type="Script" path="res://Screens/Battle/Battle.gd" id="1_nfufl"]
 [ext_resource type="PackedScene" uid="uid://3m1eme6n2wed" path="res://Screens/Battle/CharacterList.tscn" id="2_6wey6"]
-[ext_resource type="Script" path="res://Screens/Battle/AIActionController.gd" id="2_bgyoj"]
 [ext_resource type="PackedScene" uid="uid://diu2xhfofh1m1" path="res://Screens/Battle/camera_2d.tscn" id="2_rnoma"]
-[ext_resource type="PackedScene" uid="uid://buwb2f4fox8wj" path="res://player_action_controller.tscn" id="3_5prvk"]
 [ext_resource type="TileSet" uid="uid://bim62kb8y75qx" path="res://Screens/Battle/terrainfyuckingsavethisshit.tres" id="3_vfrdl"]
 [ext_resource type="PackedScene" uid="uid://b2dwrqycqblmj" path="res://Screens/Battle/map/UnitPath.tscn" id="4_4ux0f"]
 [ext_resource type="Script" path="res://Screens/Battle/AttackSequencePlayer.gd" id="4_qmhs1"]
@@ -15,42 +13,6 @@
 [ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="14_ca16r"]
 [ext_resource type="Script" path="res://Screens/Battle/PauseOverlay.gd" id="15_32orc"]
 [ext_resource type="Texture2D" uid="uid://dbkeyxh50sked" path="res://Screens/Overworld/Portraits/Maia.png" id="15_41khm"]
-
-[sub_resource type="Animation" id="Animation_inphs"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:offset")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_073ue"]
-resource_name = "shake"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:offset")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.3, 0.5, 0.7, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(0, 10), Vector2(0, -15), Vector2(0, 5), Vector2(0, -2), Vector2(0, 0)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_vyaap"]
-_data = {
-"RESET": SubResource("Animation_inphs"),
-"shake": SubResource("Animation_073ue")
-}
 
 [sub_resource type="Animation" id="Animation_mypb8"]
 length = 0.001
@@ -166,6 +128,71 @@ _data = {
 "turn_banner.player": SubResource("Animation_4yntm")
 }
 
+[sub_resource type="Animation" id="Animation_inphs"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:zoom")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_073ue"]
+resource_name = "shake"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3, 0.5, 0.7, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 10), Vector2(0, -15), Vector2(0, 5), Vector2(0, -2), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_n4sjp"]
+resource_name = "zoom"
+length = 1.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:zoom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.2, 1.4),
+"transitions": PackedFloat32Array(0.33, 0.33),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.1, 1.1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vyaap"]
+_data = {
+"RESET": SubResource("Animation_inphs"),
+"shake": SubResource("Animation_073ue"),
+"zoom": SubResource("Animation_n4sjp")
+}
+
 [sub_resource type="LabelSettings" id="LabelSettings_65bf7"]
 font = ExtResource("9_j1ncc")
 font_size = 46
@@ -228,15 +255,16 @@ script = ExtResource("1_nfufl")
 
 [node name="Drivers" type="Node" parent="."]
 
-[node name="AIActionController" type="Node" parent="."]
-script = ExtResource("2_bgyoj")
-
-[node name="PlayerActionController" parent="." instance=ExtResource("3_5prvk")]
-
 [node name="AttackSequencePlayer" type="Node" parent="."]
 script = ExtResource("4_qmhs1")
 
-[node name="Dummy_4" type="Node" parent="AttackSequencePlayer"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../UI")
+libraries = {
+"": SubResource("AnimationLibrary_hw3jg")
+}
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 0
@@ -282,14 +310,6 @@ metadata/battle_follow_func = Callable()
 speed_scale = 4.0
 libraries = {
 "": SubResource("AnimationLibrary_vyaap")
-}
-
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-root_node = NodePath("../UI")
-libraries = {
-"": SubResource("AnimationLibrary_hw3jg")
 }
 
 [node name="UI" type="CanvasLayer" parent="."]
@@ -449,6 +469,7 @@ text = "Turn %s"
 label_settings = SubResource("LabelSettings_6nd0a")
 
 [node name="Name" type="Control" parent="UI/Battle"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 101.0
@@ -486,6 +507,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Portrait" type="Control" parent="UI/Battle"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 101.0
@@ -533,6 +555,7 @@ offset_right = 33.0
 offset_bottom = 141.0
 
 [node name="AttackButton" type="Button" parent="UI/Battle"]
+visible = false
 custom_minimum_size = Vector2(130, 130)
 offset_left = 290.0
 offset_top = 829.0
@@ -545,6 +568,7 @@ text = "Attack
 [q]"
 
 [node name="SpecialButton" type="Button" parent="UI/Battle"]
+visible = false
 custom_minimum_size = Vector2(130, 130)
 offset_left = 429.0
 offset_top = 829.0
@@ -557,6 +581,7 @@ text = "Special
 [e]"
 
 [node name="UndoButton" type="Button" parent="UI/Battle"]
+visible = false
 custom_minimum_size = Vector2(0, 48)
 offset_left = 1684.0
 offset_top = 815.0
@@ -568,6 +593,7 @@ shortcut = SubResource("Shortcut_8fg1i")
 text = "Undo Move"
 
 [node name="EndTurnButton" type="Button" parent="UI/Battle"]
+visible = false
 custom_minimum_size = Vector2(0, 48)
 offset_left = 1617.0
 offset_top = 881.0
@@ -667,8 +693,6 @@ text = "No
 [connection signal="battle_ended" from="." to="." method="_on_battle_ended"]
 [connection signal="battle_started" from="." to="." method="_on_battle_started"]
 [connection signal="turn_cycle_started" from="." to="." method="_on_turn_cycle_started"]
-[connection signal="turn_ended" from="." to="." method="_on_turn_ended"]
-[connection signal="turn_started" from="." to="." method="_on_turn_started"]
 [connection signal="walking_finished" from="." to="." method="_on_walking_finished"]
 [connection signal="walking_started" from="." to="." method="_on_walking_started"]
 [connection signal="pressed" from="UI/DonePrep" to="." method="_on_done_prep_pressed"]

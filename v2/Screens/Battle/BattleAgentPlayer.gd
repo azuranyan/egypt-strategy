@@ -155,9 +155,9 @@ func add_unit_hooks(unit: Unit):
 	
 	
 func use_keyboard(keyboard: bool):
-	battle.camera.drag_horizontal_enabled = keyboard
-	battle.camera.drag_vertical_enabled = keyboard
-	battle.set_camera_follow(battle.cursor if keyboard else null)
+	battle.camera.drag_horizontal_enabled = not keyboard
+	battle.camera.drag_vertical_enabled = not keyboard
+	#battle.set_camera_follow(battle.cursor if keyboard else null)
 	
 	
 func _unhandled_input(event):
@@ -423,7 +423,6 @@ func do_unit_action(action: Callable, args := []):
 	# call deferred so we don't have the massive stack tree and
 	# we start the whole action loop in a fresh new frame
 	emit_signal.call_deferred('action_ready', action, args)
-	print(action, args)
 	
 	
 ## Walks the active unit.
@@ -461,7 +460,6 @@ func attack_action():
 	battle.set_can_move(unit, false)
 	battle.set_can_attack(unit, false)
 	battle.set_action_taken(unit, true)
-	print('use attack done')
 	
 		
 ## Does nothing.
@@ -513,7 +511,6 @@ func push_move_action():
 func undo_move_action():
 	if not move_stack.is_empty():
 		var action = move_stack.pop_back()
-		print('undoing move action ', action.unit.map_pos, ' ', action.cell)
 		
 		action.unit.map_pos = action.cell
 		action.unit.facing = action.facing
@@ -522,8 +519,6 @@ func undo_move_action():
 		battle.set_action_taken(action.unit, false)
 		
 		set_active_unit(action.unit)
-	else:
-		print('no moves to undo')
 	
 	
 ## Sets the active unit.

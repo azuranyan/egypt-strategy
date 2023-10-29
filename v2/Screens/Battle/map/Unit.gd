@@ -21,8 +21,6 @@ signal button_up(button: int)
 #signal walking_started
 #signal walking_finished
 
-signal animation_finished
-
 # Data signals
 signal stat_changed(stat: String)
 signal status_effect_added(effect: StatusEffect)
@@ -186,11 +184,6 @@ func _ready():
 	
 	stat_changed.connect(_on_stat_changed)
 	
-	model.get_node('Sprite').animation_finished.connect(func():
-		print('fucking EMITTING ', self, ' ', model.animation)
-		animation_finished.emit()
-		print('fucking DONE EMITTING ', self, ' ', model.animation)
-		)
 	# keeping a reference to curve resource makes it extremely buggy
 	# because curve is a resource that get saved with the scene. this
 	# is why we're creating a new curve every _ready.
@@ -231,7 +224,6 @@ func _set_if_has(prop: String, kwargs: Dictionary):
 
 ## Plays animation for model
 func play_animation(anim: String, loop: bool = false):
-	print('play anim UNIT ', anim)
 	if loop:
 		model.play_animation(anim + '_loop')
 	else:

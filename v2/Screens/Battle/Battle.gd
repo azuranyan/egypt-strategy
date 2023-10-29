@@ -48,12 +48,6 @@ signal walking_started(unit: Unit)
 ## Emitted when a unit finishes walking.
 signal walking_finished(unit: Unit)
 
-## Emitted when an attack sequence has started.
-#signal attack_sequence_started(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
-
-## Emitted when an attack sequence has ended.
-#signal attack_sequence_ended(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit])
-
 ################################################################################
 
 signal prep_cancelled
@@ -63,10 +57,6 @@ signal prep_done
 signal battle_quit
 
 ################################################################################
-
-signal _attack_sequence_finished()
-
-signal _end_attack_sequence_requested()
 
 signal _end_battle_requested(result)
 
@@ -228,6 +218,19 @@ func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
 	return true
 
 
+## Plays death animation for dead units and removes them from the map.
+func wait_for_death_animations():
+	# play death animations
+	var wait_for_death_animations := false
+	for u in get_tree().get_nodes_in_group('units_dead'):
+		u.model.get_node('Sprite').animation_finished.connect(u.to_standby, CONNECT_ONE_SHOT)
+		u.play_animation.call_deferred('death')
+		wait_for_death_animations = true
+		
+	if wait_for_death_animations:
+		await get_tree().create_timer(1.4).timeout
+
+
 ## Request to end battle.
 func end_battle(result: Result):
 	# TODO this is iffy
@@ -252,6 +255,21 @@ func show_quit_battle() -> bool:
 		return await pause_overlay.show_pause('Return to Overworld?')
 	else:
 		return await pause_overlay.show_pause('Withdraw?')
+	
+	
+## Shows the turn banner.
+func show_turn_banner():
+	set_process_input(false)
+	set_camera_follow(cursor)
+	$UI/Battle/OnTurn.text = context.on_turn.leader.name
+	if context.on_turn.is_player_owned():
+		$AnimationPlayer.play("turn_banner.player")
+		cursor.visible = true
+	else:
+		$AnimationPlayer.play("turn_banner.enemy")
+		cursor.visible = false
+	await $AnimationPlayer.animation_finished
+	set_process_input(true)
 	
 	
 ## Quits the battle.
@@ -386,11 +404,13 @@ func _do_battle(agent: Dictionary):
 			# things can happen before/after doing any actions so make sure to check first
 			if _evaluate_victory_conditions():
 				break
+				
+			# show turn banner
+			await show_turn_banner()
 			
 			# do turn (note that the attacker always attacks first)
 			turn_started.emit()
 			await Globals.play_queued_scenes()
-			#context.controller[context.on_turn].turn_start()
 			
 			#await _do_turn()
 			_allow_quit = true
@@ -399,7 +419,6 @@ func _do_battle(agent: Dictionary):
 						
 			turn_ended.emit()
 			await Globals.play_queued_scenes()
-			#context.controller[context.on_turn].turn_end()
 			
 			# do end-turn tick mechanics
 			for u in get_owned_units():
@@ -409,7 +428,6 @@ func _do_battle(agent: Dictionary):
 				
 				# tick duration of status effects
 				u.tick_status_effects()
-			
 			
 		turn_cycle_ended.emit()
 		await Globals.play_queued_scenes()
@@ -421,26 +439,6 @@ func _do_battle(agent: Dictionary):
 	end_battle(context.result)
 		
 		
-func wait_for_death_animations():
-	print('check for death animation')
-	# play death animations
-	var wait_for_death_animations := false
-	for u in get_tree().get_nodes_in_group('units_dead'):
-		print('ded ')
-		u.animation_finished.connect(func():
-			set_unit_position(u, Map.OUT_OF_BOUNDS)
-			print('FUCK OFF THE MAP')
-			,
-			CONNECT_ONE_SHOT)
-			#u.to_standby, CONNECT_ONE_SHOT)
-		u.play_animation.call_deferred('death')
-		wait_for_death_animations = true
-		
-	if wait_for_death_animations:
-		print('waiting for death animations')
-		await get_tree().create_timer(1.4).timeout
-	print('done wait')
-
 		
 func _load_map(scene: PackedScene):
 	print("loading map '%s'" % scene.resource_path)
@@ -548,7 +546,7 @@ func check_use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_
 ## Unit use attack compatible with multicast.
 func use_attack_multicast(unit: Unit, attack: Attack, target_cells: Array[Vector2i], target_rotation: float):
 	if target_cells.size() == 1:
-		use_attack(unit, attack, target_cells[0], target_rotation)
+		await use_attack(unit, attack, target_cells[0], target_rotation)
 	else:
 		var multicaster := AttackMulticaster.new()
 		add_child(multicaster)
@@ -557,20 +555,23 @@ func use_attack_multicast(unit: Unit, attack: Attack, target_cells: Array[Vector
 		multicaster.queue_free()
 		
 	
-	
-	
 ## Unit use attack (action).
 func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotation: float):
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
 	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	
-	$AttackSequencePlayer.use_attack(unit, attack, target_cell, targets)
+	camera.drag_horizontal_enabled = false
+	camera.drag_vertical_enabled = false
+	set_camera_follow(unit)
+	unit.map_pos = unit.map_pos
+	$UI/Attack/Label.text = attack.name
+	$UI/Attack.visible = true
 	
-	#attack_sequence_started.emit(unit, attack, target_cell, targets)
-	#await get_tree().create_timer(0.2).timeout # added artificial timeouts
-	#await _attack_sequence_finished
-	#await get_tree().create_timer(0.4).timeout
-	#attack_sequence_ended.emit(unit, attack, target_cell, targets)
+	$AttackSequencePlayer.use_attack.call_deferred(unit, attack, target_cell, targets)
+	await $AttackSequencePlayer.done
+	
+	$UI/Attack.visible = false
+	set_camera_follow(null)
 	
 
 ## Do nothing (action). Unit cannot move or attack and is considered as not having any action taken.
@@ -583,20 +584,6 @@ func do_nothing(unit: Unit):
 ## End the current turn.
 func end_turn():
 	_should_end_turn = true
-	
-		
-## Notify the game that attack sequence is done.
-func notify_attack_sequence_finished():
-	# this is done so the methods called from the attack_sequence_started
-	# signal can call this function and trigger the notify on the next frame.
-	# not doing so will cause us to be stuck because we're still in the same
-	# context as the attack_sequence call and have not moved on to the next
-	# statement yet aka await for finish.
-	_notify_attack_sequence_finished.call_deferred()
-
-
-func _notify_attack_sequence_finished():
-	_attack_sequence_finished.emit()
 	
 	
 ################################################################################
@@ -672,8 +659,6 @@ func get_owned_units(empire: Empire = null, group: String = 'units_alive') -> Ar
 
 ## Kills a unit.
 func kill_unit(unit: Unit):
-	print('killed unit')
-	# TODO play death animation
 	set_unit_group(unit, 'units_dead')
 	
 
@@ -1041,36 +1026,8 @@ func _on_cancel_prep_pressed():
 	quit_battle.call_deferred()
 
 
-func _on_turn_started():
-	set_process_input(false)
-	set_camera_follow(cursor)
-	$UI/Battle/OnTurn.text = context.on_turn.leader.name
-	if context.on_turn.is_player_owned():
-		$AnimationPlayer.play("turn_banner.player")
-		cursor.visible = true
-	else:
-		$AnimationPlayer.play("turn_banner.enemy")
-		cursor.visible = false
-	await $AnimationPlayer.animation_finished
-	set_process_input(true)
-
-
-func _on_turn_ended():
-	pass # Replace with function body.
-
-
 func _on_turn_cycle_started():
 	$UI/Battle/TurnNumber.text = str(context.turns)
-	
-
-func _on_attack_sequence_started(_unit, attack, _target, _targets):
-	set_ui_visible(false, false, false, false)
-	$UI/Attack/Label.text = attack.name
-	$UI/Attack.visible = true
-
-
-func _on_attack_sequence_ended(_unit, _attack, _target, _targets):
-	$UI/Attack.visible = false
 
 
 func _on_walking_started(unit):

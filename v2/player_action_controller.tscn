@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://buwb2f4fox8wj"]
-
-[ext_resource type="Script" path="res://Screens/Battle/PlayerActionController.gd" id="1_xb6hh"]
-
-[node name="PlayerActionController" type="Node"]
-script = ExtResource("1_xb6hh")
