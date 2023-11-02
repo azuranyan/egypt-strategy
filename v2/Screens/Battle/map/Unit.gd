@@ -216,12 +216,18 @@ func load_vars(kwargs: Dictionary):
 	debug.visible = kwargs.get("debug", debug.visible)
 	
 	
-	
-	
 func _set_if_has(prop: String, kwargs: Dictionary):
 	if kwargs.has(prop):
 		assert(kwargs.get(prop) != null)
 		set(prop, kwargs.get(prop))
+
+
+## Plays animation for model
+func play_animation(anim: String, loop: bool = false):
+	if loop:
+		model.play_animation(anim + '_loop')
+	else:
+		model.play_animation(anim)
 
 
 ## Resets the unit.
@@ -361,6 +367,11 @@ func is_enemy(other: Unit) -> bool:
 	return other.empire != empire
 	
 
+## Puts the unit in the standby area.
+func to_standby():
+	Globals.battle.set_unit_position(self, Map.OUT_OF_BOUNDS)
+	
+	
 ################################################################################
 # Signals
 ################################################################################

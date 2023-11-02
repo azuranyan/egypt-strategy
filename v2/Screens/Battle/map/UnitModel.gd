@@ -56,9 +56,14 @@ func play_animation(_animation: String):
 			anim = "Walk"
 		"attack":
 			anim = "Attack"
+		"death":
+			anim = 'Death'
 		_:
 			anim = "Idle"
 			
+	if _animation.ends_with('_loop') or _animation == 'walk':
+		anim = anim + '_loop'
+		
 	if _heading == Unit.Heading.North or _heading == Unit.Heading.West:
 		sprite.play("Back" + anim)
 	else:

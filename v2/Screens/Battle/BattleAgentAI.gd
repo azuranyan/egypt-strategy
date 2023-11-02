@@ -98,6 +98,7 @@ func prepare_units():
 
 
 func do_turn():
+	should_end = false
 	unit_action_queue = []
 	for u in battle.get_owned_units():
 		if battle.can_move(u) or battle.can_attack(u):
@@ -105,6 +106,7 @@ func do_turn():
 			
 	while not (should_end or unit_action_queue.is_empty()):
 		var unit: Unit = unit_action_queue.pick_random()
+		unit_action_queue.erase(unit)
 		
 		var all_actions := generate_action_list(unit)
 		
@@ -136,11 +138,11 @@ func do_turn():
 		assert(action)
 		print('  ', battle.map.cell(unit.map_pos), ' Choosing ', action)
 		
-		await do_action(make_action, [unit, action])
+		await do_action(do_unit_action, [unit, action])
 	
 	
 ## Actually performs the move.
-func make_action(unit: Unit, action: Action):
+func do_unit_action(unit: Unit, action: Action):
 	# do nothing
 	if battle.map.cell(unit.map_pos) == action.cell and not action.attack:
 		battle.do_nothing(unit)
