@@ -27,6 +27,10 @@ Globals empires, territories -> empire, territory
 ## hot list
 ##########################################################################################################
 
+enemy units don't have their own heroes
+
+autoconnect when connecting territories
+
 make more map samples
 
 battle
