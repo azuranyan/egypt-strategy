@@ -39,6 +39,13 @@ battle
 spawning 
  - better spawning marker, also allow specifying chance tables
  - allow adding units to the map and assigning them to player spawn
+<<<<<<< Updated upstream
  - dead enemy ai can move on their turn after killed by player in their turn
+=======
+
+auto win without battle bug
+
+remove dead untis from the map
+>>>>>>> Stashed changes
 
 "simulating" battle results for quick battle
