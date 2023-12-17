@@ -1,29 +1,52 @@
-[gd_scene load_steps=9 format=3 uid="uid://d2jpf34a0pcc2"]
+[gd_scene load_steps=12 format=3 uid="uid://d2jpf34a0pcc2"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/TerritoryButton.gd" id="1_su0vc"]
-[ext_resource type="Texture2D" uid="uid://c1tjvvva43kas" path="res://Screens/Overworld/ExpandedButton/BGColor - Outline.png" id="2_gx50n"]
-[ext_resource type="Texture2D" uid="uid://b75cl1cl5ds5e" path="res://Screens/Overworld/ExpandedButton/BGColor.png" id="3_0la0k"]
-[ext_resource type="Texture2D" uid="uid://en77gxcfd3r0" path="res://Screens/Overworld/ExpandedButton/home.png" id="4_pgc5k"]
-[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="5_cex1x"]
-[ext_resource type="Texture2D" uid="uid://k1lgvb5f4f0l" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="6_bq4tg"]
-[ext_resource type="Texture2D" uid="uid://bnk231ahs1kmg" path="res://Screens/Overworld/ExpandedButton/spacing.png" id="7_47sq5"]
+[ext_resource type="Texture2D" uid="uid://qpqas52mdmhx" path="res://Screens/Overworld/ExpandedButton/BGColor - Outline.png" id="2_gx50n"]
+[ext_resource type="Texture2D" uid="uid://cjq5ofrfsx2vw" path="res://Screens/Overworld/ExpandedButton/BGColor.png" id="3_0la0k"]
+[ext_resource type="Texture2D" uid="uid://dcdadcmx8wbn6" path="res://Screens/Overworld/ExpandedButton/home.png" id="4_pgc5k"]
+[ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="5_cex1x"]
+[ext_resource type="Texture2D" uid="uid://50msr7gh4tex" path="res://Screens/Overworld/ExpandedButton/AttackButton.png" id="6_bq4tg"]
+[ext_resource type="Texture2D" uid="uid://cl2oh3cvf7hdl" path="res://Screens/Overworld/ExpandedButton/spacing.png" id="7_47sq5"]
 [ext_resource type="ButtonGroup" uid="uid://de7k1tuawexim" path="res://Screens/Overworld/TerritoryButtonGroup.tres" id="8_6t83g"]
+[ext_resource type="FontFile" uid="uid://b1mr3ff8qpetx" path="res://Rakkas-Regular.ttf" id="10_fnhgp"]
+[ext_resource type="PackedScene" uid="uid://caoyy1w780pww" path="res://tools/HeaderLabel.tscn" id="10_u6vdh"]
+
+[sub_resource type="GDScript" id="GDScript_uq4mc"]
+script/source = "extends Node2D
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	# a small hack because of the flawed design. FIX later
+	scale = Vector2.ONE/get_parent().scale
+	global_position = Vector2.ZERO
+"
 
 [node name="TerritoryButton" type="Node2D"]
 script = ExtResource("1_su0vc")
 
+[node name="Connections" type="Node2D" parent="."]
+visible = false
+z_index = -1
+z_as_relative = false
+script = SubResource("GDScript_uq4mc")
+
 [node name="ColorRect" type="ColorRect" parent="."]
 visible = false
-offset_left = -81.0
-offset_top = 153.0
-offset_right = 4394.0
-offset_bottom = 2562.0
+offset_left = -2157.0
+offset_top = -1177.0
+offset_right = 2318.0
+offset_bottom = 1232.0
 color = Color(0.803922, 1, 0.780392, 1)
 
 [node name="ExtendedEnemyPanel" type="Control" parent="."]
 visible = false
 layout_mode = 3
 anchors_preset = 0
+offset_left = -2076.0
+offset_top = -1330.0
+offset_right = -2076.0
+offset_bottom = -1330.0
 
 [node name="Background1" type="Control" parent="ExtendedEnemyPanel"]
 anchors_preset = 0
@@ -99,6 +122,10 @@ stretch_mode = 4
 visible = false
 layout_mode = 3
 anchors_preset = 0
+offset_left = -2076.0
+offset_top = -1330.0
+offset_right = -2076.0
+offset_bottom = -1330.0
 
 [node name="BgColor-Outline" type="Sprite2D" parent="ExtendedPlayerPanel"]
 position = Vector2(2167, 3476)
@@ -170,24 +197,35 @@ icon = ExtResource("7_47sq5")
 alignment = 0
 
 [node name="TextureButton" type="TextureButton" parent="."]
-offset_right = 4314.0
-offset_bottom = 2492.0
+offset_left = -2058.0
+offset_top = -1338.0
+offset_right = 2256.0
+offset_bottom = 1154.0
 toggle_mode = true
 button_group = ExtResource("8_6t83g")
-metadata/_edit_lock_ = true
 
 [node name="Label" type="Label" parent="."]
-offset_left = 39.0
-offset_top = 1945.0
-offset_right = 4276.0
-offset_bottom = 2479.0
+visible = false
+offset_left = -2037.0
+offset_top = 554.0
+offset_right = 2200.0
+offset_bottom = 1154.0
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.105882, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 13
-theme_override_fonts/font = ExtResource("5_cex1x")
+theme_override_fonts/font = ExtResource("10_fnhgp")
 theme_override_font_sizes/font_size = 400
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="HeaderLabel" parent="." instance=ExtResource("10_u6vdh")]
+offset_left = -2024.0
+offset_top = 542.0
+offset_right = 2222.0
+offset_bottom = 1151.0
+font_size = 260
+font_color = Color(0.168627, 0.145098, 0.027451, 1)
+caps_size = 380
 
 [connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]

@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7d724dyw8h73"]
+
+[ext_resource type="Script" path="res://Screens/Overworld/Connection.gd" id="1_ni0t2"]
+
+[node name="Connection" type="Node2D"]
+modulate = Color(1, 1, 1, 0.27451)
+script = ExtResource("1_ni0t2")
+width = 2.5

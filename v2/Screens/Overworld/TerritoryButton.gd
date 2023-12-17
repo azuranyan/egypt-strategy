@@ -43,6 +43,22 @@ func _ready():
 	OverworldEvents.connect("cycle_turn_end", _on_cycle_turn_end)
 
 
+func create_connections():
+	for node in $Connections.get_children():
+		$Connections.remove_child(node)
+		node.queue_free()
+		
+	for t in territory.adjacent:
+		var adj = t.get_parent()
+		var con = preload("res://Screens/Overworld/Connection.tscn").instantiate()
+		con.name = t.name
+		con.a = self.position
+		con.b = adj.position
+		# TODO because of the scaling, we have to do this
+		#con.width = 1/scale.x
+		$Connections.add_child(con)
+
+
 func show_extended_enemy_panel(show_attack: bool):
 	# no need to do hide the other panel, it's only there for formality
 	$ExtendedEnemyPanel.show()
@@ -91,6 +107,7 @@ func _on_cycle_turn_end(_empire: Empire):
 	
 	
 func _on_texture_button_toggled(button_pressed):
+	$Connections.visible = button_pressed
 	if button_pressed:
 		# raise z so it is over all other buttons
 		self.z_index += 1
@@ -143,8 +160,10 @@ func _on_territory_changed():
 func _update_territory_name():
 	if territory:
 		label.text = territory.name
+		$HeaderLabel.text = territory.name
 	else:
 		label.text = ""
+		$HeaderLabel.text = ""
 
 
 func _get_button_texture(chara: Chara) -> Texture2D:

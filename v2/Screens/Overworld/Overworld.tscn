@@ -1,11 +1,11 @@
 [gd_scene load_steps=12 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
-[ext_resource type="Texture2D" uid="uid://bbj045ctprn32" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
+[ext_resource type="Texture2D" uid="uid://bxjnkian270op" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://d2jpf34a0pcc2" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
 [ext_resource type="Script" path="res://Screens/Overworld/Territory.gd" id="4_xerix"]
 [ext_resource type="PackedScene" uid="uid://btf3bu5kpnvls" path="res://Screens/Battle/maps/StartingZone.tscn" id="5_xwig8"]
-[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="6_xkwu1"]
+[ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="6_xkwu1"]
 [ext_resource type="PackedScene" uid="uid://cd5xmi7eirbjn" path="res://Screens/Overworld/ActionLog.tscn" id="7_6hcg0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_2puew"]
@@ -87,6 +87,7 @@ mouse_filter = 2
 script = ExtResource("1_mrexs")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
+z_index = -1
 position = Vector2(-36, -21)
 texture = ExtResource("2_gnts6")
 centered = false

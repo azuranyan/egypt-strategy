@@ -57,6 +57,10 @@ func _ready():
 	OverworldEvents.cycle_turn_start.connect(func(x): if x.is_player_owned(): $TurnBanner/AnimationPlayer.play("show"))
 	OverworldEvents.cycle_end.connect(func(): display('TURN %s DONE' % context.turn_cycles))
 	
+	for node in get_children():
+		if node is TerritoryButton:
+			node.create_connections()
+	
 
 ## Starts the overworld main loop.
 func do_cycle():

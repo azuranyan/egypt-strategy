@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=5 format=3 uid="uid://wlic4ks3f85i"]
 
-[ext_resource type="FontFile" uid="uid://betryss44sx0q" path="res://Screens/sylfaen.ttf" id="1_iccm4"]
+[ext_resource type="FontFile" uid="uid://b7k7f4v4nf0ej" path="res://Screens/sylfaen.ttf" id="1_iccm4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lnkxh"]
 bg_color = Color(1, 0.976471, 0.941176, 1)
