@@ -16,6 +16,7 @@ ugly cell() casting because of round: don't apply 0.5 to world and let map objec
 
 
 ## would be nice
+sprite viewer 
 disgaea style enum targetable units in attack range
 disgaea style target and caster placement 
 damage counter for consecutive attacks
@@ -49,3 +50,21 @@ remove dead untis from the map
 >>>>>>> Stashed changes
 
 "simulating" battle results for quick battle
+
+
+
+##########################################################################################################
+## v2 demo+
+##########################################################################################################
+
+12x12 grid
+lysandra is requried to be in the battle otherwise it wouldnt start
+mission objectives
+ - always: lysandra must be there
+ - you can't quit when you are attacked
+camera follow stops working after casting skill
+ - hotfixed with cast skill camera target, might have to be perma fixed with better input mode control procedure
+overworld keyboard interactivity
+update the visuals to match the example
+main menu
+implement the AI behaviour system

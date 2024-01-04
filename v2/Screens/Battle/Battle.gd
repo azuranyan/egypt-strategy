@@ -560,6 +560,7 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	var target_cells := get_attack_target_cells(unit, attack, target_cell, target_rotation)
 	var targets := get_units().filter(func(u): return Vector2(map.cell(u.map_pos)) in target_cells)
 	
+	var old_target = _camera_target
 	camera.drag_horizontal_enabled = false
 	camera.drag_vertical_enabled = false
 	set_camera_follow(unit)
@@ -571,7 +572,7 @@ func use_attack(unit: Unit, attack: Attack, target_cell: Vector2i, target_rotati
 	await $AttackSequencePlayer.done
 	
 	$UI/Attack.visible = false
-	set_camera_follow(null)
+	set_camera_follow(old_target)
 	
 
 ## Do nothing (action). Unit cannot move or attack and is considered as not having any action taken.

@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3 uid="uid://bg3djjkbmlv2r"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_nlile"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_hffm8"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_c10ln"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="4_swiy5"]
+[ext_resource type="Texture2D" uid="uid://ddo1422kgkch8" path="res://icon.svg" id="5_o2vgy"]
+
+[node name="Map" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nlile")
+texture = ExtResource("3_hffm8")
+map_size = Vector2i(12, 12)
+tile_size = 67.862
+offset = Vector2(1012.17, 359.226)
+y_ratio = 0.58
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_hffm8")
+expand_mode = 3
+
+[node name="Grid" type="Node2D" parent="."]
+self_modulate = Color(0, 0, 0, 0.568627)
+position = Vector2(1012.17, 208.351)
+rotation = 0.525584
+scale = Vector2(0.817435, 0.817435)
+skew = 0.519629
+script = ExtResource("4_c10ln")
+tile_size = 67.862
+size = Vector2i(12, 12)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("3_hffm8")
+
+[node name="MapObject" type="Node2D" parent="." node_paths=PackedStringArray("map")]
+position = Vector2(1012.17, 208.351)
+script = ExtResource("4_swiy5")
+map = NodePath("..")
+
+[node name="Icon" type="Sprite2D" parent="MapObject"]
+position = Vector2(0.830017, 0.648926)
+texture = ExtResource("5_o2vgy")
+
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]

@@ -1,0 +1,63 @@
+[gd_scene load_steps=10 format=3 uid="uid://cu0uiberydpuk"]
+
+[ext_resource type="Script" path="res://tools/Map2.gd" id="1_ltwxt"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_sepkv"]
+[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="3_t4syd"]
+[ext_resource type="PackedScene" uid="uid://dutxj6eowln0g" path="res://Screens/Battle/map/PlayerSpawnLocation.tscn" id="4_3q4rv"]
+[ext_resource type="PackedScene" uid="uid://ddfgi2i65lecl" path="res://Screens/Battle/map/EnemySpawnLocation.tscn" id="5_ek7xr"]
+[ext_resource type="PackedScene" uid="uid://86byh8q1hmuu" path="res://Screens/Battle/map_types/Doodad.tscn" id="6_2virn"]
+[ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="7_qdrbk"]
+
+[sub_resource type="Resource" id="Resource_780wi"]
+script = ExtResource("3_t4syd")
+map_size = Vector2i(0, 0)
+tile_size = 0
+offset = Vector2(0, 0)
+y_ratio = 0.0
+_post_init_hook_hack = 0
+
+[sub_resource type="Resource" id="Resource_gxght"]
+script = ExtResource("3_t4syd")
+texture = ExtResource("2_sepkv")
+map_size = Vector2i(12, 12)
+tile_size = 145
+offset = Vector2(109.56, 12.33)
+y_ratio = 0.576
+_post_init_hook_hack = 0
+
+[node name="Map" type="Node2D" groups=["Doodads", "EnemySpawnLocation", "PlayerSpawnLocation", "Units"]]
+script = ExtResource("1_ltwxt")
+texture = ExtResource("2_sepkv")
+map_size = Vector2i(12, 12)
+tile_size = 145
+offset = Vector2(109.56, 12.33)
+y_ratio = 0.576
+world = SubResource("Resource_780wi")
+
+[node name="PlayerSpawnLocation" parent="." instance=ExtResource("4_3q4rv")]
+position = Vector2(1011.36, 238.814)
+world = SubResource("Resource_gxght")
+
+[node name="EnemySpawnLocation" parent="." instance=ExtResource("5_ek7xr")]
+position = Vector2(1202.88, 349.131)
+world = SubResource("Resource_gxght")
+map_pos = Vector2(3.985, 0)
+
+[node name="EasyDoodad" parent="." instance=ExtResource("6_2virn")]
+position = Vector2(1540.03, 543.329)
+texture = ExtResource("7_qdrbk")
+offset = Vector2(11, 0)
+world = SubResource("Resource_gxght")
+map_pos = Vector2(11, 0)
+
+[node name="unit" type="Node2D" parent="."]
+
+[node name="cursor" type="Node2D" parent="."]
+
+[node name="overlay" type="Node2D" parent="."]
+
+[node name="pathing" type="Node2D" parent="."]
+
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
+[connection signal="world_changed" from="WorldInstance" to="WorldInstance" method="_on_world_changed"]

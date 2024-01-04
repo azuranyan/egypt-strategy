@@ -1,10 +1,10 @@
 @tool
+## The base class for objects placed in the map.
+class_name MapObject
 extends Node2D
 
-class_name MapObject
 
-
-signal world_changed
+signal map_changed
 signal map_pos_changed
 
 
@@ -15,11 +15,15 @@ signal map_pos_changed
 @export var display_icon: Texture2D
 
 ## The reference to the world.
-@export var world: World:
+@export var map: NewMap:
 	set(value):
-		world = value
-		_refresh_position()
-		world_changed.emit()
+		if map:
+			map.world_changed.disconnect(_on_world_changed)
+		map = value
+		if map:
+			map.world_changed.connect(_on_world_changed)
+		_refresh_position.call_deferred() # idk why but this has to be deferred
+		map_changed.emit()
 		
 ## Position of this object in uniform space.
 @export var map_pos: Vector2:
@@ -48,8 +52,13 @@ signal map_pos_changed
 		
 
 func _refresh_position():
-	if world:
-		position = world.uniform_to_screen(map_pos)
+	if map:
+		position = map.to_global(map_pos)
 	else:
-		position = Vector2.ZERO
+		position = map_pos
 	position.y += vertical_offset
+	
+
+func _on_world_changed():
+	_refresh_position()
+	

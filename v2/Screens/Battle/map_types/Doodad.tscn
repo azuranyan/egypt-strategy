@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://86byh8q1hmuu"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Doodad.gd" id="1_l5bk1"]
+
+[node name="EasyDoodad" type="Node2D"]
+script = ExtResource("1_l5bk1")
+pathing = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

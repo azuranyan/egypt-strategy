@@ -1,0 +1,126 @@
+@tool
+class_name Map2
+extends Node2D
+
+
+signal world_changed
+
+# World changes are quite expensive so we only refresh on a fixed time.
+const WORLD_CHANGE_UPDATE_FREQUENCY: float = 0.0
+
+
+@export_subgroup("World")
+
+## The image source.
+@export var texture: Texture2D:
+	set(value):
+		texture = value
+		if not is_node_ready():
+			await ready
+		_queue_update()
+
+## The size of the map.
+@export var map_size: Vector2i:
+	set(value):
+		map_size = value
+		if not is_node_ready():
+			await ready
+		_queue_update()
+
+## Tile size deduced from source (in world_instance size units).
+@export var tile_size: int:
+	set(value):
+		tile_size = value
+		if not is_node_ready():
+			await ready
+		_queue_update()
+
+## The off-center offset of the level (in world_instance size units).
+@export var offset: Vector2:
+	set(value):
+		offset = value
+		if not is_node_ready():
+			await ready
+		_queue_update()
+
+## Ratio of tile height to its width.
+@export var y_ratio: float:
+	set(value):
+		y_ratio = value
+		if not is_node_ready():
+			await ready
+		_queue_update()
+		
+@export_subgroup("World")
+
+@export_subgroup("Export")
+
+## Used only to Save As. Do not modify directly.
+@export var world: World
+
+
+var world_instance: WorldInstance
+var _world_update_cooldown: float = 0
+
+func _ready():
+	world = World.new()
+	world_instance = preload("res://Screens/Battle/map/WorldInstance.tscn").instantiate()
+	world_instance.z_index -= 10
+	add_child(world_instance, false, Node.INTERNAL_MODE_BACK)
+
+	
+func _process(delta):
+	_world_update_cooldown -= delta
+	if _world_update_cooldown <= 0:
+		_update_world()
+		set_process(false)
+		
+
+func _get_configuration_warnings() -> PackedStringArray:
+	if _world_update_cooldown > 0:
+		return ['updating']
+	return []
+	
+	
+func _on_child_entered_tree(node: Node):
+	if node is MapObject:
+		# node may not be ready at this point and doing anything to it before
+		# it's ready causes tons of headache
+		if not node.is_node_ready():
+			await node.ready
+		_map_object_added(node)
+
+
+func _on_child_exiting_tree(node: Node):
+	if node is MapObject:
+		_map_object_removed(node)
+		
+		
+func _queue_update():
+	if WORLD_CHANGE_UPDATE_FREQUENCY >= 0:
+		_world_update_cooldown = WORLD_CHANGE_UPDATE_FREQUENCY
+		update_configuration_warnings()
+		set_process(true)
+	else:
+		_update_world()
+	
+
+func _update_world():
+	world.texture = texture
+	world.map_size = map_size
+	world.tile_size = tile_size
+	world.offset = offset
+	world.y_ratio = y_ratio
+	world.recalculate_uniform_transforms()
+	world.recalculate_world_transforms()
+	world_instance.world = world
+	world_changed.emit()
+	
+	
+func _map_object_added(obj: MapObject):
+	obj.world = world
+	
+	
+func _map_object_removed(obj: MapObject):
+	pass
+	#obj.world = null

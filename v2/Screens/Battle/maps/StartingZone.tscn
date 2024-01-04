@@ -1,8 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://btf3bu5kpnvls"]
+[gd_scene load_steps=21 format=3 uid="uid://btf3bu5kpnvls"]
 
 [ext_resource type="PackedScene" uid="uid://yogx0cijn3hw" path="res://Screens/Battle/Map.tscn" id="1_hhx1l"]
-[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/world/StartingZone.tres" id="2_5pj4c"]
+[ext_resource type="Resource" uid="uid://4r1ua5xy7blu" path="res://Screens/Battle/data/world/StartingZone.tres" id="2_5pj4c"]
 [ext_resource type="PackedScene" uid="uid://bp1nvlsojoyl3" path="res://Screens/Battle/map/Doodad.tscn" id="2_l1dl3"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Doodad2.gd" id="3_2apet"]
 [ext_resource type="Resource" uid="uid://b3l0n53fl6pgq" path="res://Screens/Battle/data/doodad_type/Tree_01.tres" id="4_bcxp5"]
 [ext_resource type="Resource" uid="uid://w1dikkjdlw0p" path="res://Screens/Battle/data/doodad_type/Cactus_01.tres" id="5_xowu2"]
 [ext_resource type="Resource" uid="uid://co0kb7nsxpfbc" path="res://Screens/Battle/data/doodad_type/Rock_01.tres" id="6_806xf"]
@@ -17,94 +18,98 @@
 [ext_resource type="Resource" uid="uid://de7lrgsuw64kn" path="res://Screens/Battle/data/doodad_type/Building_01.tres" id="15_dqhi4"]
 [ext_resource type="Resource" uid="uid://ucbncq7yami4" path="res://Screens/Battle/data/doodad_type/Tree_05.tres" id="16_q6gfo"]
 [ext_resource type="PackedScene" uid="uid://duq8g22qdgw1a" path="res://Screens/Battle/map/SpriteObject.tscn" id="17_054x2"]
-[ext_resource type="Texture2D" uid="uid://i1jlix6q5ohf" path="res://Screens/Battle/crossed-circle.png" id="18_j8cgc"]
+[ext_resource type="Texture2D" uid="uid://bdwybukrdt2l7" path="res://Screens/Battle/crossed-circle.png" id="18_j8cgc"]
 [ext_resource type="PackedScene" uid="uid://bapcm0dk2sp5e" path="res://Screens/Battle/map/TileObject.tscn" id="19_ufq8s"]
 
 [node name="StartingZone" instance=ExtResource("1_hhx1l")]
 world = ExtResource("2_5pj4c")
 
-[node name="Tree_01" parent="." index="0" instance=ExtResource("2_l1dl3")]
-position = Vector2(1517.16, 543.329)
+[node name="Doodad2" type="Node2D" parent="." index="0"]
+script = ExtResource("3_2apet")
+world = ExtResource("2_5pj4c")
+pathing = 2
+
+[node name="Tree_01" parent="." index="1" instance=ExtResource("2_l1dl3")]
+position = Vector2(1347.78, 432.596)
 doodad_type = ExtResource("4_bcxp5")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(7, 0)
 
-[node name="Cactus_01" parent="." index="1" instance=ExtResource("2_l1dl3")]
-position = Vector2(1011.36, 834.671)
+[node name="Cactus_01" parent="." index="2" instance=ExtResource("2_l1dl3")]
+position = Vector2(1011.36, 626.379)
 doodad_type = ExtResource("5_xowu2")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(7, 7)
 
-[node name="Rock_01" parent="." index="2" instance=ExtResource("2_l1dl3")]
-position = Vector2(939.099, 793.051)
+[node name="Rock_01" parent="." index="3" instance=ExtResource("2_l1dl3")]
+position = Vector2(963.295, 598.696)
 doodad_type = ExtResource("6_806xf")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(6, 7)
 
-[node name="Tree_02" parent="." index="3" instance=ExtResource("2_l1dl3")]
-position = Vector2(1444.9, 501.709)
+[node name="Tree_02" parent="." index="4" instance=ExtResource("2_l1dl3")]
+position = Vector2(1299.72, 404.913)
 doodad_type = ExtResource("7_88qsb")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(6, 0)
 
-[node name="Tree_03" parent="." index="4" instance=ExtResource("2_l1dl3")]
-position = Vector2(1083.61, 626.57)
+[node name="Tree_03" parent="." index="5" instance=ExtResource("2_l1dl3")]
+position = Vector2(1059.42, 487.963)
 doodad_type = ExtResource("8_narak")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(5, 4)
 
-[node name="Shrub_01" parent="." index="5" instance=ExtResource("2_l1dl3")]
-position = Vector2(1228.13, 460.089)
+[node name="Shrub_01" parent="." index="6" instance=ExtResource("2_l1dl3")]
+position = Vector2(1155.54, 377.23)
 doodad_type = ExtResource("9_uq5vg")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(4, 1)
 
-[node name="Barrel_01" parent="." index="6" instance=ExtResource("2_l1dl3")]
-position = Vector2(939.099, 460.089)
+[node name="Barrel_01" parent="." index="7" instance=ExtResource("2_l1dl3")]
+position = Vector2(963.295, 377.23)
 doodad_type = ExtResource("10_4ph38")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(2, 3)
 
-[node name="Barrel_02" parent="." index="7" instance=ExtResource("2_l1dl3")]
-position = Vector2(1011.36, 418.468)
+[node name="Barrel_02" parent="." index="8" instance=ExtResource("2_l1dl3")]
+position = Vector2(1011.36, 349.547)
 doodad_type = ExtResource("11_61uuy")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(2, 2)
 
-[node name="Shrub_02" parent="." index="8" instance=ExtResource("2_l1dl3")]
-position = Vector2(866.841, 418.468)
+[node name="Shrub_02" parent="." index="9" instance=ExtResource("2_l1dl3")]
+position = Vector2(915.234, 349.546)
 doodad_type = ExtResource("12_pqhko")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(1, 3)
 
-[node name="Post_01" parent="." index="9" instance=ExtResource("2_l1dl3")]
-position = Vector2(794.584, 460.089)
+[node name="Post_01" parent="." index="10" instance=ExtResource("2_l1dl3")]
+position = Vector2(867.173, 377.23)
 doodad_type = ExtResource("13_ukam3")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(1, 4)
 
-[node name="Tree_04" parent="." index="10" instance=ExtResource("2_l1dl3")]
-position = Vector2(577.811, 584.949)
+[node name="Tree_04" parent="." index="11" instance=ExtResource("2_l1dl3")]
+position = Vector2(722.989, 460.279)
 doodad_type = ExtResource("14_teh2l")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(1, 7)
 
-[node name="Building_01" parent="." index="11" instance=ExtResource("2_l1dl3")]
-visible = false
-position = Vector2(1011.36, 335.228)
+[node name="Building_01" parent="." index="12" instance=ExtResource("2_l1dl3")]
+position = Vector2(1011.36, 294.18)
 doodad_type = ExtResource("15_dqhi4")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(1, 1)
 
-[node name="Tree_05" parent="." index="12" instance=ExtResource("2_l1dl3")]
-position = Vector2(505.554, 543.329)
+[node name="Tree_05" parent="." index="13" instance=ExtResource("2_l1dl3")]
+position = Vector2(674.928, 432.596)
 doodad_type = ExtResource("16_q6gfo")
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(0, 7)
 
-[node name="Impassable_01" parent="." index="13" instance=ExtResource("17_054x2")]
+[node name="Impassable_01" parent="." index="14" instance=ExtResource("17_054x2")]
 visibility_layer = 512
-position = Vector2(722.326, 418.468)
+position = Vector2(819.112, 349.547)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
 world = ExtResource("2_5pj4c")
@@ -112,9 +117,9 @@ map_pos = Vector2(0, 4)
 pathing = 4
 no_show = true
 
-[node name="Impassable_02" parent="." index="14" instance=ExtResource("17_054x2")]
+[node name="Impassable_02" parent="." index="15" instance=ExtResource("17_054x2")]
 visibility_layer = 512
-position = Vector2(1155.87, 418.468)
+position = Vector2(1107.48, 349.546)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
 world = ExtResource("2_5pj4c")
@@ -122,9 +127,9 @@ map_pos = Vector2(3, 1)
 pathing = 4
 no_show = true
 
-[node name="Impassable_03" parent="." index="15" instance=ExtResource("17_054x2")]
+[node name="Impassable_03" parent="." index="16" instance=ExtResource("17_054x2")]
 visibility_layer = 512
-position = Vector2(1228.13, 376.848)
+position = Vector2(1155.54, 321.863)
 texture = ExtResource("18_j8cgc")
 fit_to_grid = true
 world = ExtResource("2_5pj4c")
@@ -132,84 +137,84 @@ map_pos = Vector2(3, 0)
 pathing = 4
 no_show = true
 
-[node name="Player_Spawn_01" parent="." index="16" instance=ExtResource("19_ufq8s")]
+[node name="Player_Spawn_01" parent="." index="17" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(1011.36, 668.19)
+position = Vector2(1011.36, 515.646)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(5, 5)
 no_show = true
 metadata/spawn_point = "player"
 
-[node name="Player_Spawn_02" parent="." index="17" instance=ExtResource("19_ufq8s")]
+[node name="Player_Spawn_02" parent="." index="18" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(1083.61, 709.81)
+position = Vector2(1059.42, 543.329)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(6, 5)
 no_show = true
 metadata/spawn_point = "player"
 
-[node name="Player_Spawn_03" parent="." index="18" instance=ExtResource("19_ufq8s")]
+[node name="Player_Spawn_03" parent="." index="19" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(1155.87, 584.949)
+position = Vector2(1107.48, 460.279)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(5, 3)
 no_show = true
 metadata/spawn_point = "player"
 
-[node name="Player_Spawn_04" parent="." index="19" instance=ExtResource("19_ufq8s")]
+[node name="Player_Spawn_04" parent="." index="20" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(1228.13, 626.57)
+position = Vector2(1155.54, 487.963)
 color = Color(0.290196, 0.423529, 1, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(6, 3)
 no_show = true
 metadata/spawn_point = "player"
 
-[node name="AI_Spawn_01" parent="." index="20" instance=ExtResource("19_ufq8s")]
+[node name="AI_Spawn_01" parent="." index="21" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(1300.39, 501.709)
+position = Vector2(1203.6, 404.913)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(5, 1)
 no_show = true
 metadata/spawn_point = "ai"
 
-[node name="AI_Spawn_02" parent="." index="21" instance=ExtResource("19_ufq8s")]
+[node name="AI_Spawn_02" parent="." index="22" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(939.099, 543.329)
+position = Vector2(963.295, 432.596)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(3, 4)
 no_show = true
 metadata/spawn_point = "ai"
 
-[node name="AI_Spawn_03" parent="." index="22" instance=ExtResource("19_ufq8s")]
+[node name="AI_Spawn_03" parent="." index="23" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(794.584, 626.57)
+position = Vector2(867.173, 487.963)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(3, 6)
 no_show = true
 metadata/spawn_point = "ai"
 
-[node name="AI_Spawn_04" parent="." index="23" instance=ExtResource("19_ufq8s")]
+[node name="AI_Spawn_04" parent="." index="24" instance=ExtResource("19_ufq8s")]
 visibility_layer = 512
 z_index = -1
-position = Vector2(722.326, 501.709)
+position = Vector2(819.112, 404.913)
 color = Color(1, 0.337255, 0.290196, 0.34902)
 world = ExtResource("2_5pj4c")
 map_pos = Vector2(1, 5)
 no_show = true
 metadata/spawn_point = "ai"
 
-[connection signal="world_changed" from="WorldInstance" to="WorldInstance" method="_on_world_changed" flags=18]
+[connection signal="world_changed" from="WorldInstance" to="WorldInstance" method="_on_world_changed"]
