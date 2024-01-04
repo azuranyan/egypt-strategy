@@ -8,6 +8,7 @@ signal world_changed
 # World changes are quite expensive so we only refresh on a fixed time.
 const WORLD_CHANGE_UPDATE_FREQUENCY: float = 0.0
 
+const OUT_OF_BOUNDS := Vector2(69, 420)
 
 @export_subgroup("World")
 
@@ -108,22 +109,23 @@ func get_internal_size() -> Vector2:
 	
 
 ## Returns the internal scaling.
-func get_internal_scaling() -> Vector2:
+func get_internal_scale() -> Vector2:
 	return $TextureRect.size / get_internal_size()
 
 
 ## Returns the global coordinates of uniform v.
 func to_global(v: Vector2) -> Vector2:
+	#return get_global_transform() * world_transform * ((v + Vector2(0.5, 0.5)) * tile_size)
 	return get_global_transform() * world_transform * (v * tile_size)
 
 
 ## Returns the uniform coordinates of global v.
 func to_uniform(v: Vector2) -> Vector2:
 	var m := get_global_transform() * world_transform * Transform2D(0, Vector2(tile_size, tile_size), 0, Vector2.ZERO)
+	#return m.affine_inverse() * v - Vector2(0.5, 0.5)
 	return m.affine_inverse() * v
 	
 	
-
 ## Recalculates world transforms.
 func recalculate_world_transforms():
 	_transform_errors.clear()

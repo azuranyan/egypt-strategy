@@ -26,7 +26,7 @@ extends MapObject
 		_update()
 	
 	
-func _on_world_changed():
+func _on_map_changed():
 	_update()
 
 
@@ -38,9 +38,8 @@ func _update():
 	$Sprite2D.texture = texture
 	
 	if map:
-		
-		$Sprite2D.position = world.get_viewport_offset() - map.to_global(offset)
-		$Sprite2D.scale = world.get_viewport_scale()
+		$Sprite2D.position = map.to_global(offset) - position*2
+		$Sprite2D.scale = map.get_internal_scale()
 	else:
 		$Sprite2D.position = Vector2.ZERO
 		$Sprite2D.scale = Vector2.ONE

@@ -2,8 +2,12 @@
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Doodad.gd" id="1_l5bk1"]
 
-[node name="EasyDoodad" type="Node2D"]
+[node name="Doodad" type="Node2D"]
 script = ExtResource("1_l5bk1")
 pathing = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+centered = false
+
+[connection signal="map_changed" from="." to="." method="_on_map_changed"]
+[connection signal="map_pos_changed" from="." to="." method="_on_map_pos_changed"]
