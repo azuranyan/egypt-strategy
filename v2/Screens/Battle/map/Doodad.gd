@@ -22,7 +22,7 @@ signal doodad_type_changed
 func _refresh():
 	if not is_node_ready():
 		await self.ready
-	
+	var world
 	if doodad_type:
 		sprite.texture = doodad_type.texture
 		

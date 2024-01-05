@@ -1,50 +1,70 @@
 @tool
-extends MapObject
+class_name NewDoodad extends MapObject
+
 
 ## The model (texture) to use.
 @export var texture: Texture2D:
 	set(value):
+		if texture == value:
+			return
 		texture = value
-		if not is_node_ready():
-			await ready
-		_update()
+		if is_node_ready():
+			_update_doodad()
 
+## Lock sprite to world transform.
+@export var lock_to_world: bool = true:
+	set(value):
+		if lock_to_world == value:
+			return
+		lock_to_world = value
+		if is_node_ready():
+			_update_doodad()
+			
 ## Used to adjust the visual center of the doodad.
 @export var offset: Vector2:
 	set(value):
+		if offset == value:
+			return
 		offset = value
-		if not is_node_ready():
-			await ready
-		_update()
+		if is_node_ready():
+			_update_doodad()
 
-## Lock map pos to equal offset. Useful for repositioning objects.
-@export var lock_map_pos: bool = true:
+## Offset is in uniform coordinates.
+@export var uniform_offset: bool:
 	set(value):
-		lock_map_pos = value
-		if not is_node_ready():
-			await ready
-		_update()
+		if uniform_offset == value:
+			return
+		uniform_offset = value
+		if is_node_ready():
+			_update_doodad()
+		
+		
+		
+var _last_sprite_pos: Vector2
+
+
+func _ready():
+	super._ready()
+	_update_doodad()
 	
-	
-func _on_map_changed():
-	_update()
 
-
-func _on_map_pos_changed():
-	_update()
-
-
-func _update():
+func _update_doodad():
 	$Sprite2D.texture = texture
 	
-	if map:
-		$Sprite2D.position = map.to_global(offset) - position*2
-		$Sprite2D.scale = map.get_internal_scale()
-	else:
-		$Sprite2D.position = Vector2.ZERO
-		$Sprite2D.scale = Vector2.ONE
-		
-	if lock_map_pos:
-		if map_pos != offset:
-			map_pos = offset
+	var offs := (world.as_global(map_pos + offset) - position) if uniform_offset else offset
 	
+	if lock_to_world and world:
+		var origin := -world.as_global(Vector2.ZERO)
+		var parent_offset := -(world.as_global(Vector2.ZERO) - position)
+		$Sprite2D.centered = false
+		$Sprite2D.position = origin - parent_offset + offs
+		$Sprite2D.scale = world.get_internal_scale()
+	else:
+		$Sprite2D.centered = true
+		$Sprite2D.position = offs
+		$Sprite2D.scale = Vector2.ONE
+	
+		
+func _on_map_pos_changed():
+	_update_doodad()
+	pass

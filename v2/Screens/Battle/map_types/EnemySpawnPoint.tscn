@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://dt5a8j6l6ab2y"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/spawn_point.gd" id="1_lgth1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_3spk4"]
+font_size = 22
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="EnemySpawnPoint" type="Node2D"]
+visibility_layer = 512
+script = ExtResource("1_lgth1")
+spawn_type = "Enemy"
+no_show = true
+debug_tile_color = Color(0.8, 0.1, 0.1, 0.4)
+
+[node name="Label" type="Label" parent="."]
+offset_left = -26.0
+offset_top = -31.0
+offset_right = 27.0
+text = "E"
+label_settings = SubResource("LabelSettings_3spk4")
+horizontal_alignment = 1
+vertical_alignment = 1

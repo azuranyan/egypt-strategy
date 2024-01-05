@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://71s6mj5boaby"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_editor/MapEditor.gd" id="1_3434u"]
+
+[node name="MapEditor" type="Node2D"]
+script = ExtResource("1_3434u")

@@ -43,8 +43,8 @@ func _process(delta: float):
 	# overwrite position because map_pos computation sometimes makes it choppy
 	unit.position = position + path_follow.position
 	
-	var v := unit.world.screen_to_world(path_follow.position) - unit.world.screen_to_world(_old_pos)
-	unit.facing = atan2(v.y, v.x)
+	#var v := unit.world.screen_to_world(path_follow.position) - unit.world.screen_to_world(_old_pos)
+	#unit.facing = atan2(v.y, v.x)
 	
 	if path_follow.progress_ratio >= 1:
 		walking_finished.emit()

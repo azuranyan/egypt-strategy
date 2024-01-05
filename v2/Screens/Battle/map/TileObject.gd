@@ -22,14 +22,16 @@ func _refresh_tile():
 	var p := PackedVector2Array()
 	p.resize(4)
 	p.fill(Vector2.ZERO)
+	var world
 	
 	if world:
+		pass
 		# recalculate position of tile
-		var pos := world.uniform_to_world(map_pos)
-		p[0] = world.world_to_screen(Vector2(-0.5, -0.5) * world.tile_size + pos) - position
-		p[1] = world.world_to_screen(Vector2(+0.5, -0.5) * world.tile_size + pos) - position
-		p[2] = world.world_to_screen(Vector2(+0.5, +0.5) * world.tile_size + pos) - position
-		p[3] = world.world_to_screen(Vector2(-0.5, +0.5) * world.tile_size + pos) - position
+		#var pos := world.uniform_to_world(map_pos)
+		#p[0] = world.world_to_screen(Vector2(-0.5, -0.5) * world.tile_size + pos) - position
+		#p[1] = world.world_to_screen(Vector2(+0.5, -0.5) * world.tile_size + pos) - position
+		#p[2] = world.world_to_screen(Vector2(+0.5, +0.5) * world.tile_size + pos) - position
+		#p[3] = world.world_to_screen(Vector2(-0.5, +0.5) * world.tile_size + pos) - position
 	
 	rect.polygon = p
 	

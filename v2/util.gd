@@ -1,5 +1,24 @@
 class_name Util
 
+## Use this because godot is fucking stupid.
+static func get_canvas_size(node: Node) -> Vector2:
+	# IT SHOULD JUST BE THIS, BUT
+	#return node.get_viewport().size
+	
+	# THERE'S NO WAY TO GET IT PROPERLY BECAUSE
+	# THIS IS DIFFERENT IN THE EDITOR (WHICH RETURNS ***THE PANEL SIZE***
+	# LIKE THE FUCKING ASS BACKWARDS SMART APE OF A FUCNTION IT IS) AND THERE'S
+	# NO PROPER DOCUMENTED FUNCTION THAT RETURNS THE SIZE OF THAT BLUE AREA
+	# LIKE JESUS FUCKING CHRIST AFTER YOU SAID TO USE THE CANVAS COORDINATE
+	# SYSTEM BECAUSE SCREEN SCALING AND VIEWPORT AND CAMERA SHIT IS A HEADACHE
+	# AND IM TRYING TO DO THAT BUT YOU'RE NOT GIVING ME EASY ACCESS TO THE
+	# """""""VIEWPORT"""""" SIZE??? HOLY FUCKING SHIT THIS IS STUPID
+	
+	# extremely stupid hardcoded viewport size which will cause you lots
+	# of scaling headaches later on, but we have no other choice because
+	# of the beautiful engine design and existing solutions
+	return Vector2(1920, 1080)
+
 
 ## Simple do nothing function.
 static func do_nothing():

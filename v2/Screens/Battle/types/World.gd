@@ -2,7 +2,7 @@
 extends Resource
 
 ## Class depicting a world.
-class_name World
+class_name NewWorld
 
 
 ## The image source.

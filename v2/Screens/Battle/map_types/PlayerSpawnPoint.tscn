@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://conf6sokwx7ww"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/spawn_point.gd" id="1_ghcyq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_00wtu"]
+font_size = 22
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="PlayerSpawnPoint" type="Node2D"]
+visibility_layer = 512
+script = ExtResource("1_ghcyq")
+spawn_type = "Player"
+no_show = true
+debug_tile_color = Color(0.00392157, 0.254902, 0.992157, 0.4)
+
+[node name="Label" type="Label" parent="."]
+offset_left = -26.0
+offset_top = -31.0
+offset_right = 27.0
+text = "P"
+label_settings = SubResource("LabelSettings_00wtu")
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bg3djjkbmlv2r"]
+[gd_scene load_steps=13 format=3 uid="uid://bg3djjkbmlv2r"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_nlile"]
 [ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_hffm8"]
@@ -7,12 +7,11 @@
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_c10ln"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/ObjectContainer.gd" id="5_7lvne"]
 [ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="5_f1lhi"]
-[ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="5_mql1q"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/cursor.gd" id="5_mql1q"]
 [ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="6_ml1x5"]
-[ext_resource type="PackedScene" uid="uid://dggdd7fpr8qn5" path="res://Screens/Battle/map_types/Barrier.tscn" id="8_ydvf1"]
-[ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="9_6415n"]
-[ext_resource type="PackedScene" uid="uid://dt5a8j6l6ab2y" path="res://Screens/Battle/map_types/EnemySpawnPoint.tscn" id="9_xl0rt"]
-[ext_resource type="PackedScene" uid="uid://conf6sokwx7ww" path="res://Screens/Battle/map_types/PlayerSpawnPoint.tscn" id="10_qv147"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/map_object.gd" id="9_6415n"]
+[ext_resource type="PackedScene" uid="uid://dt5a8j6l6ab2y" path="res://Screens/Battle/map_types/enemy_spawn_point.tscn" id="9_xl0rt"]
+[ext_resource type="PackedScene" uid="uid://conf6sokwx7ww" path="res://Screens/Battle/map_types/player_spawn_point.tscn" id="10_qv147"]
 
 [node name="Map" type="Node2D" node_paths=PackedStringArray("world")]
 script = ExtResource("1_nlile")
@@ -20,14 +19,13 @@ world = NodePath("World")
 metadata/_edit_lock_ = true
 
 [node name="World" type="Node2D" parent="."]
+position = Vector2(-1, 0)
 script = ExtResource("3_i0cah")
 texture = ExtResource("3_hffm8")
 map_size = Vector2i(12, 12)
 tile_size = 67.995
 offset = Vector2(1011.33, 208.347)
 y_ratio = 0.579
-metadata/_edit_lock_ = true
-metadata/_edit_group_ = true
 
 [node name="FullRect" type="Control" parent="World"]
 layout_mode = 3
@@ -62,108 +60,46 @@ world = NodePath("../World")
 tile_size = 67.995
 size = Vector2i(12, 12)
 thickness = 1.5
-metadata/_edit_lock_ = true
 
 [node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
-position = Vector2(974, 334)
+position = Vector2(945, 307)
 script = ExtResource("5_mql1q")
 world = NodePath("../World")
 texture = ExtResource("6_ml1x5")
-vertical_offset = -2.865
-metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Cursor"]
-position = Vector2(0, -2.865)
-rotation = 0.524835
-scale = Vector2(0.434042, 0.434042)
-skew = 0.521126
-texture = ExtResource("6_ml1x5")
+position = Vector2(1, 0)
 centered = false
 
 [node name="ObjectContainer" type="Node2D" parent="."]
 script = ExtResource("5_7lvne")
 
-[node name="Barrier" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(727, 515)
-map_pos = Vector2(2.55092, 8.46464)
-
-[node name="Barrier2" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(763, 486)
-map_pos = Vector2(2.40443, 7.5694)
-
-[node name="Barrier3" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(810, 445)
-map_pos = Vector2(2.1568, 6.34422)
-
-[node name="Barrier4" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(849, 420)
-map_pos = Vector2(2.11336, 5.48962)
-
-[node name="Barrier5" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(833, 401)
-map_pos = Vector2(1.60571, 5.31476)
-
-[node name="Barrier6" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(782, 379)
-map_pos = Vector2(0.680199, 5.44998)
-
-[node name="Barrier7" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(674, 543)
-map_pos = Vector2(2.50266, 9.51871)
-
-[node name="Barrier8" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(635, 563)
-map_pos = Vector2(2.4563, 10.2835)
-
-[node name="Barrier9" parent="ObjectContainer" instance=ExtResource("8_ydvf1")]
-position = Vector2(586, 593)
-map_pos = Vector2(2.48556, 11.3319)
-
 [node name="Doodad2" parent="ObjectContainer" instance=ExtResource("4_6qpf8")]
-position = Vector2(1525, 537)
+visible = false
+position = Vector2(1010.33, 208.347)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
 texture = ExtResource("5_f1lhi")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(11.2448, 0.561066)
+show_debug_tile = true
 
 [node name="Sprite2D" parent="ObjectContainer/Doodad2" index="1"]
-position = Vector2(-1525, -537)
+position = Vector2(-1010.33, -208.347)
 scale = Vector2(0.46875, 0.46875)
 texture = ExtResource("5_f1lhi")
-centered = false
 
 [node name="MapObject" type="Node2D" parent="ObjectContainer"]
-position = Vector2(1213, 642)
+position = Vector2(1391, 459)
 script = ExtResource("9_6415n")
-map_pos = Vector2(9.88607, 5.69158)
+map_pos = Vector2(8.46071, 0.54323)
 
 [node name="EnemySpawnPoint" parent="ObjectContainer" instance=ExtResource("9_xl0rt")]
-position = Vector2(829, 569)
-map_pos = Vector2(4.58155, 8.37379)
-
-[node name="EnemySpawnPoint2" parent="ObjectContainer" instance=ExtResource("9_xl0rt")]
-position = Vector2(1054, 441)
-map_pos = Vector2(4.62241, 3.73493)
-
-[node name="EnemySpawnPoint3" parent="ObjectContainer" instance=ExtResource("9_xl0rt")]
-position = Vector2(1119, 460)
-map_pos = Vector2(5.63963, 3.40023)
-
-[node name="EnemySpawnPoint4" parent="ObjectContainer" instance=ExtResource("9_xl0rt")]
-position = Vector2(881, 608)
-map_pos = Vector2(5.8228, 8.5335)
+position = Vector2(780, 441)
+map_pos = Vector2(1.78338, 6.57396)
 
 [node name="PlayerSpawnPoint" parent="ObjectContainer" instance=ExtResource("10_qv147")]
-position = Vector2(994, 685)
-map_pos = Vector2(8.38092, 8.74137)
-
-[node name="PlayerSpawnPoint2" parent="ObjectContainer" instance=ExtResource("10_qv147")]
-position = Vector2(967, 642)
-map_pos = Vector2(7.32782, 8.24983)
-
-[node name="PlayerSpawnPoint3" parent="ObjectContainer" instance=ExtResource("10_qv147")]
-position = Vector2(1118, 574)
-map_pos = Vector2(7.67678, 5.45817)
+position = Vector2(1069, 464)
+map_pos = Vector2(5.20191, 3.98164)
 
 [connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
 [connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]

@@ -43,7 +43,7 @@ func _update_fit_to_grid():
 		
 func _refresh():
 	var m = Transform2D()
-	
+	var world
 	if fit_to_grid:
 		if world:
 			# scale to downsize to unit vector

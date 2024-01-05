@@ -4,10 +4,11 @@
 
 [node name="Doodad" type="Node2D"]
 script = ExtResource("1_l5bk1")
+lock_to_world = null
+uniform_offset = null
 pathing = 2
+metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-centered = false
 
-[connection signal="map_changed" from="." to="." method="_on_map_changed"]
 [connection signal="map_pos_changed" from="." to="." method="_on_map_pos_changed"]

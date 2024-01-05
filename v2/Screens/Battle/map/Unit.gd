@@ -172,7 +172,7 @@ static func create(node: Node, kwargs: Dictionary) -> Unit:
 
 func _ready():
 	# we can only connect after _ready
-	world_changed.connect(_on_world_changed)
+	#world_changed.connect(_on_world_changed)
 	unit_type_changed.connect(_on_unit_type_changed)
 	
 	unit_name_changed.connect(_on_unit_name_changed)
@@ -379,7 +379,7 @@ func to_standby():
 
 func _on_world_changed():
 	var m = Transform2D()
-	
+	var world
 	if world:
 		# scale to downsize to unit vector
 		var shadow_scale := 1.0
