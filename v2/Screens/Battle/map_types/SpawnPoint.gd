@@ -1,5 +1,5 @@
 @tool
-extends MapObject
+class_name SpawnPoint extends MapObject
 
 
 @export_enum("Player", "Enemy") var spawn_type: String:

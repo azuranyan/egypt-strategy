@@ -122,9 +122,8 @@ func snap(node: Node2D):
 		node.map_pos = Vector2(int(node.map_pos.x), int(node.map_pos.y))
 	else:
 		var v := as_uniform(node.position)
-		print('snap ', node.position, ' -> ',  as_global(Vector2(int(v.x), int(v.y))))
 		node.position = as_global(Vector2(int(v.x), int(v.y)))
-	
+
 	
 ## Recalculates world transforms.
 func recalculate_world_transforms():

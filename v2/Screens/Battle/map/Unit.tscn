@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://b6fvp0wup6fkc"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map/Unit.gd" id="1_ggmfr"]
-[ext_resource type="Texture2D" uid="uid://drlkpesis0pbn" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_n2i2l"]
+[ext_resource type="Texture2D" uid="uid://gdp52yomtcia" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_n2i2l"]
 [ext_resource type="PackedScene" uid="uid://ce6s6ofk01nub" path="res://Screens/Battle/map/UnitModel.tscn" id="4_q3tgg"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cytam"]

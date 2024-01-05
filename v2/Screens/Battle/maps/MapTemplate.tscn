@@ -1,0 +1,77 @@
+[gd_scene load_steps=7 format=3 uid="uid://begyva740bdfa"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_coh00"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/World.gd" id="2_e7xj8"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_yrvwk"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_f2l7x"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="5_6ctye"]
+[ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="6_d7vew"]
+
+[node name="Map" type="Node2D"]
+script = ExtResource("1_coh00")
+metadata/_edit_lock_ = true
+
+[node name="World" type="Node2D" parent="."]
+script = ExtResource("2_e7xj8")
+texture = ExtResource("3_yrvwk")
+map_size = Vector2i(12, 12)
+tile_size = 67.995
+offset = Vector2(1011.33, 208.347)
+y_ratio = 0.579
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="FullRect" type="Control" parent="World"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="World/FullRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("3_yrvwk")
+expand_mode = 3
+
+[node name="Grid" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+self_modulate = Color(0, 0, 0, 0.376471)
+position = Vector2(1011.33, 208.347)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+script = ExtResource("4_f2l7x")
+world = NodePath("../World")
+tile_size = 67.995
+size = Vector2i(12, 12)
+thickness = 1.5
+metadata/_edit_lock_ = true
+
+[node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(801, 275)
+script = ExtResource("5_6ctye")
+world = NodePath("../World")
+texture = ExtResource("6_d7vew")
+vertical_offset = -2.865
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Cursor"]
+position = Vector2(0, -2.865)
+rotation = 0.524835
+scale = Vector2(0.434042, 0.434042)
+skew = 0.521126
+texture = ExtResource("6_d7vew")
+centered = false
+
+[connection signal="map_changed" from="." to="Grid" method="_on_map_map_changed"]
+[connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
+[connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]

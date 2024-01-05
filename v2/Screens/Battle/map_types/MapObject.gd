@@ -76,11 +76,17 @@ var map: NewMap
 ## A reference to the world.
 var world: World
 		
+## Last computed global position.
 var _global_pos: Vector2
 	
 ## The debug tile object.
 var _debug_tile: Polygon2D
 	
+	
+## Returns the cell this object resides in.
+func cell() -> Vector2i:
+	return Vector2i(int(map_pos.x + 999) - 999, int(map_pos.y + 999) - 999)
+
 	
 func _ready():
 	_create_debug_tile()
@@ -149,7 +155,7 @@ func _update_tile():
 	if world:
 		tile_size = world.tile_size
 		_debug_tile.transform = world.world_transform
-		_debug_tile.position = world.as_global(Vector2i(map_pos)) - position
+		_debug_tile.position = world.as_global(cell()) - position
 	else:
 		tile_size = 100 
 		_debug_tile.transform = Transform2D()

@@ -99,10 +99,10 @@ modulate = Color(0.94902, 0.290196, 0.392157, 1)
 z_index = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-speed_scale = 0.7
 libraries = {
 "": SubResource("AnimationLibrary_cjy8q")
 }
+speed_scale = 0.7
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 8
