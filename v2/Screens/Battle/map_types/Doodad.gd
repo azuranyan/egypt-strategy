@@ -1,5 +1,6 @@
 @tool
-class_name NewDoodad extends MapObject
+class_name NewDoodad
+extends MapObject
 
 
 ## The model (texture) to use.

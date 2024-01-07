@@ -1,6 +1,7 @@
 @tool
 ## The base class for objects placed in the map.
-class_name MapObject extends Node2D
+class_name MapObject
+extends Node2D
 
 
 signal map_pos_changed
@@ -83,11 +84,6 @@ var _global_pos: Vector2
 var _debug_tile: Polygon2D
 	
 	
-## Returns the cell this object resides in.
-func cell() -> Vector2i:
-	return Vector2i(int(map_pos.x + 999) - 999, int(map_pos.y + 999) - 999)
-
-	
 func _ready():
 	_create_debug_tile()
 	_update()
@@ -123,6 +119,40 @@ func _create_debug_tile():
 	add_child(_debug_tile, false, Node.INTERNAL_MODE_FRONT)
 	
 	
+func _enter_map(map: NewMap, world: World):
+	self.map = map
+	self.world = world
+	map.ready.connect(map_ready)
+	map_enter()
+	
+
+func _exit_map():
+	map_exit()
+	map.ready.disconnect(map_ready)
+	self.map = null
+	self.world = null
+	
+	
+## Returns the cell this object resides in.
+func cell() -> Vector2i:
+	return Vector2i(int(map_pos.x + 999) - 999, int(map_pos.y + 999) - 999)
+
+
+## Called when map object enters the map.
+func map_enter():
+	pass
+	
+
+## Called when map object exits the map.
+func map_exit():
+	pass
+	
+
+## Called when map is ready.
+func map_ready():
+	pass
+
+
 func _update():
 	_update_position()
 	_update_misc()

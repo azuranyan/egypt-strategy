@@ -1,3 +1,4 @@
+@tool
 # Draws the unit's movement path using an autotile.
 class_name UnitPath
 extends TileMap
@@ -22,10 +23,11 @@ func initialize(walkable_cells: Array) -> void:
 	
 
 # Finds and draws the path between `cell_start` and `cell_end`.
-func draw(cell_start: Vector2, cell_end: Vector2) -> void:
+func draw(cell_start: Vector2, cell_end: Vector2, clear := true) -> void:
 	# We first clear any tiles on the tilemap, then let the Astar2D (PathFinder) find the
 	# path for us.
-	clear()
+	if clear:
+		clear()
 	current_path = _pathfinder.calculate_point_path(cell_start, cell_end)
 	# And we draw a tile for every cell in the path.
 	for cell in current_path:
@@ -39,3 +41,9 @@ func draw(cell_start: Vector2, cell_end: Vector2) -> void:
 func stop() -> void:
 	_pathfinder = null
 	clear()
+
+
+func _on_world_world_changed():
+	var unit_scale := Vector2.ONE / Vector2(tile_set.tile_size) * world.tile_size
+	var m := Transform2D(0, unit_scale, 0, Vector2.ZERO)
+	transform = world.world_transform * m

@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://bg3djjkbmlv2r"]
+[gd_scene load_steps=40 format=3 uid="uid://bg3djjkbmlv2r"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_nlile"]
 [ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_hffm8"]
@@ -6,18 +6,23 @@
 [ext_resource type="PackedScene" uid="uid://86byh8q1hmuu" path="res://Screens/Battle/map_types/Doodad.tscn" id="4_6qpf8"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_c10ln"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/ObjectContainer.gd" id="5_7lvne"]
+[ext_resource type="Texture2D" uid="uid://cexdb403hn61g" path="res://Screens/Battle/arrows.svg" id="5_20y86"]
 [ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="5_f1lhi"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="5_mql1q"]
 [ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="6_ml1x5"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitPath.gd" id="6_vwvou"]
 [ext_resource type="PackedScene" uid="uid://dggdd7fpr8qn5" path="res://Screens/Battle/map_types/Barrier.tscn" id="8_ydvf1"]
 [ext_resource type="PackedScene" uid="uid://dd8q27lfwya5" path="res://Screens/Battle/map_types/DummyDoodad.tscn" id="9_6v8r0"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="9_6415n"]
 [ext_resource type="PackedScene" uid="uid://dt5a8j6l6ab2y" path="res://Screens/Battle/map_types/EnemySpawnPoint.tscn" id="9_xl0rt"]
 [ext_resource type="PackedScene" uid="uid://conf6sokwx7ww" path="res://Screens/Battle/map_types/PlayerSpawnPoint.tscn" id="10_qv147"]
 [ext_resource type="Texture2D" uid="uid://ctux8o02k4l4" path="res://Screens/Battle/maps/StartingZoneObj2.png" id="12_fc3i5"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/TerrainOverlay.gd" id="13_bduti"]
+[ext_resource type="Texture2D" uid="uid://d2p4nsytdvqb4" path="res://Screens/Battle/terrain_overlay.png" id="13_e6qb6"]
 [ext_resource type="Texture2D" uid="uid://c6gu0q3dd2tmb" path="res://Screens/Battle/maps/StartingZoneObj3.png" id="13_mdwdb"]
 [ext_resource type="Texture2D" uid="uid://bux03apf6bnja" path="res://Screens/Battle/maps/StartingZoneObj4.png" id="16_xrtce"]
 [ext_resource type="Texture2D" uid="uid://ce26nbqgwb03x" path="res://Screens/Battle/maps/StartingZoneObj5.png" id="17_1ji1t"]
+[ext_resource type="PackedScene" uid="uid://bfaahdyj1kl0" path="res://Screens/Battle/map_types/unit/UnitDriver.tscn" id="17_imi68"]
 [ext_resource type="Texture2D" uid="uid://4kbratak2qv" path="res://Screens/Battle/maps/StartingZoneObj6.png" id="18_6fpme"]
 [ext_resource type="Texture2D" uid="uid://b0drjr0yf2kc1" path="res://Screens/Battle/maps/StartingZoneObj7.png" id="19_67err"]
 [ext_resource type="Texture2D" uid="uid://cutd476pww52u" path="res://Screens/Battle/maps/StartingZoneObj8.png" id="20_xr3bx"]
@@ -26,6 +31,83 @@
 [ext_resource type="Texture2D" uid="uid://breu1nfxkbfwu" path="res://Screens/Battle/maps/StartingZoneObj11.png" id="23_7rck2"]
 [ext_resource type="Texture2D" uid="uid://bwr1pfoajmkjg" path="res://Screens/Battle/maps/StartingZoneObj12.png" id="25_y8hjm"]
 [ext_resource type="Texture2D" uid="uid://bj715w6cd71ui" path="res://Screens/Battle/maps/StartingZoneObj13.png" id="26_5x6eb"]
+[ext_resource type="PackedScene" uid="uid://clakgmdpcknuy" path="res://Screens/Battle/map_types/unit/Unit.tscn" id="31_8807m"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mb61g"]
+texture = ExtResource("5_20y86")
+texture_region_size = Vector2i(80, 80)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/terrains_peering_bit/right_side = 0
+1:0/0/terrains_peering_bit/left_side = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/terrains_peering_bit/bottom_side = 0
+2:0/0/terrains_peering_bit/top_side = 0
+0:1/0 = 0
+0:1/0/terrain_set = 0
+0:1/0/terrain = 0
+0:1/0/terrains_peering_bit/right_side = 0
+0:1/0/terrains_peering_bit/bottom_side = 0
+1:1/0 = 0
+1:1/0/terrain_set = 0
+1:1/0/terrain = 0
+1:1/0/terrains_peering_bit/bottom_side = 0
+1:1/0/terrains_peering_bit/left_side = 0
+2:1/0 = 0
+2:1/0/terrain_set = 0
+2:1/0/terrain = 0
+2:1/0/terrains_peering_bit/bottom_side = 0
+3:1/0 = 0
+3:1/0/terrain_set = 0
+3:1/0/terrain = 0
+3:1/0/terrains_peering_bit/left_side = 0
+0:2/0 = 0
+0:2/0/terrain_set = 0
+0:2/0/terrain = 0
+0:2/0/terrains_peering_bit/right_side = 0
+0:2/0/terrains_peering_bit/top_side = 0
+1:2/0 = 0
+1:2/0/terrain_set = 0
+1:2/0/terrain = 0
+1:2/0/terrains_peering_bit/left_side = 0
+1:2/0/terrains_peering_bit/top_side = 0
+2:2/0 = 0
+2:2/0/terrain_set = 0
+2:2/0/terrain = 0
+2:2/0/terrains_peering_bit/top_side = 0
+3:2/0 = 0
+3:2/0/terrain_set = 0
+3:2/0/terrain = 0
+3:2/0/terrains_peering_bit/right_side = 0
+
+[sub_resource type="TileSet" id="TileSet_ovx2u"]
+tile_size = Vector2i(80, 80)
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "Terrain 0"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/1 = SubResource("TileSetAtlasSource_mb61g")
+
+[sub_resource type="Animation" id="Animation_wxmf6"]
+length = 0.001
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_khcib"]
 resource_name = "blink"
@@ -43,26 +125,36 @@ tracks/0/keys = {
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_wxmf6"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_8087j"]
 _data = {
 "RESET": SubResource("Animation_wxmf6"),
 "blink": SubResource("Animation_khcib")
 }
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_02t6r"]
+texture = ExtResource("13_e6qb6")
+margins = Vector2i(1, 1)
+separation = Vector2i(2, 0)
+texture_region_size = Vector2i(78, 78)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+3:0/0 = 0
+3:0/0/terrain_set = 0
+3:0/0/terrain = 0
+
+[sub_resource type="TileSet" id="TileSet_wu6a4"]
+tile_size = Vector2i(80, 80)
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "Terrain 0"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/1 = SubResource("TileSetAtlasSource_02t6r")
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_nlile")
@@ -72,7 +164,7 @@ metadata/_edit_lock_ = true
 script = ExtResource("3_i0cah")
 texture = ExtResource("3_hffm8")
 map_size = Vector2i(12, 12)
-tile_size = 68.155
+tile_size = 68.0
 offset = Vector2(1011.25, 208.212)
 y_ratio = 0.579
 metadata/_edit_lock_ = true
@@ -101,41 +193,30 @@ texture = ExtResource("3_hffm8")
 expand_mode = 3
 
 [node name="Grid" type="Node2D" parent="." node_paths=PackedStringArray("world")]
-self_modulate = Color(0.533333, 0.321569, 0.117647, 0.376471)
+self_modulate = Color(0.65098, 0.317647, 0.0666667, 0.376471)
 position = Vector2(1011.25, 208.212)
 rotation = 0.524835
 scale = Vector2(0.81708, 0.81708)
 skew = 0.521126
 script = ExtResource("4_c10ln")
 world = NodePath("../World")
-tile_size = 68.155
+tile_size = 68.0
 size = Vector2i(12, 12)
 thickness = 1.5
 metadata/_edit_lock_ = true
 
-[node name="Internal" type="Node2D" parent="."]
-y_sort_enabled = true
-script = ExtResource("5_7lvne")
-metadata/_edit_lock_ = true
-
-[node name="CursorTarget" type="Node2D" parent="Internal"]
-position = Vector2(852.547, 579.737)
-script = ExtResource("9_6415n")
-map_pos = Vector2(5.01075, 8.30382)
-metadata/_edit_group_ = true
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Internal/CursorTarget"]
-libraries = {
-"": SubResource("AnimationLibrary_8087j")
-}
-
-[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Internal/CursorTarget"]
-remote_path = NodePath("../../../Cursor")
-update_rotation = false
-update_scale = false
+[node name="UnitPath" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1011.25, 208.212)
+rotation = 0.524835
+scale = Vector2(0.694518, 0.694518)
+skew = 0.521126
+tile_set = SubResource("TileSet_ovx2u")
+format = 2
+script = ExtResource("6_vwvou")
+world = NodePath("../World")
 
 [node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
-position = Vector2(852.547, 579.737)
+position = Vector2(1015.99, 602.102)
 script = ExtResource("5_mql1q")
 world = NodePath("../World")
 texture = ExtResource("6_ml1x5")
@@ -146,134 +227,150 @@ metadata/_edit_group_ = true
 [node name="Sprite2D" type="Sprite2D" parent="Cursor"]
 position = Vector2(0, -3.005)
 rotation = 0.524835
-scale = Vector2(0.435063, 0.435063)
+scale = Vector2(0.434074, 0.434074)
 skew = 0.521126
 texture = ExtResource("6_ml1x5")
 centered = false
 
-[node name="Pathing" type="Node2D" parent="."]
+[node name="Stuff" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 metadata/_edit_group_ = true
 
-[node name="DummyDoodad" type="Node2D" parent="Pathing"]
+[node name="CursorTarget" type="Node2D" parent="Stuff"]
+position = Vector2(1015.99, 602.102)
+script = ExtResource("9_6415n")
+map_pos = Vector2(7.12341, 7.02484)
+metadata/_edit_group_ = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Stuff/CursorTarget"]
+libraries = {
+"": SubResource("AnimationLibrary_8087j")
+}
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Stuff/CursorTarget"]
+remote_path = NodePath("../../../Cursor")
+update_rotation = false
+update_scale = false
+
+[node name="DummyDoodad" type="Node2D" parent="Stuff"]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
-[node name="DummyDoodad" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(495.71, 540.645)
+[node name="DummyDoodad" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(496.883, 539.889)
 map_pos = Vector2(0.608085, 11.3055)
 
-[node name="DummyDoodad2" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(670.119, 422.368)
+[node name="DummyDoodad2" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(670.895, 421.881)
 map_pos = Vector2(0.298186, 7.37664)
 
-[node name="DummyDoodad3" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(814.458, 467.474)
+[node name="DummyDoodad3" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(814.905, 466.884)
 map_pos = Vector2(2.60394, 6.68737)
 
-[node name="DummyDoodad4" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(963.809, 444.419)
+[node name="DummyDoodad4" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(963.916, 443.882)
 map_pos = Vector2(3.74035, 4.72476)
 
-[node name="DummyDoodad5" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1105.14, 413.347)
+[node name="DummyDoodad5" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1104.93, 412.88)
 map_pos = Vector2(4.64987, 2.70165)
 
-[node name="DummyDoodad6" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1157.26, 437.403)
+[node name="DummyDoodad6" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1156.93, 436.882)
 map_pos = Vector2(5.62171, 2.59195)
 
-[node name="DummyDoodad7" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(869.588, 442.415)
+[node name="DummyDoodad7" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(869.91, 441.882)
 map_pos = Vector2(2.72689, 5.66638)
 
-[node name="DummyDoodad8" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(767.347, 436.401)
+[node name="DummyDoodad8" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(767.902, 435.882)
 map_pos = Vector2(1.55838, 6.61935)
 
-[node name="DummyDoodad9" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1192.35, 468.476)
+[node name="DummyDoodad9" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1191.93, 467.884)
 map_pos = Vector2(6.54247, 2.78476)
 
-[node name="DummyDoodad10" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1261.51, 431.389)
+[node name="DummyDoodad10" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1260.94, 430.881)
 map_pos = Vector2(6.59548, 1.40264)
 
-[node name="DummyDoodad11" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1021.95, 415.351)
+[node name="DummyDoodad11" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1021.92, 414.88)
 map_pos = Vector2(3.82265, 3.60072)
 
-[node name="DummyDoodad12" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(918.703, 469.478)
+[node name="DummyDoodad12" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(918.913, 468.884)
 map_pos = Vector2(3.7214, 5.64175)
 
-[node name="DummyDoodad13" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1254.49, 391.295)
+[node name="DummyDoodad13" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1253.94, 390.878)
 map_pos = Vector2(5.80424, 0.757001)
 
-[node name="DummyDoodad14" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(912.689, 788.227)
+[node name="DummyDoodad14" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(912.914, 786.907)
 map_pos = Vector2(9.37059, 11.4157)
 
-[node name="DummyDoodad15" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(968.82, 758.156)
+[node name="DummyDoodad15" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(968.919, 756.904)
 map_pos = Vector2(9.41413, 10.2945)
 
-[node name="DummyDoodad16" parent="Pathing/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1020.94, 782.213)
+[node name="DummyDoodad16" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
+position = Vector2(1020.92, 780.907)
 map_pos = Vector2(10.386, 10.1848)
 
-[node name="Barrier" type="Node2D" parent="Pathing"]
+[node name="Barrier" type="Node2D" parent="Stuff"]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
-[node name="Barrier1" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(770.355, 419.361)
+[node name="Barrier1" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(770.902, 418.88)
 map_pos = Vector2(1.28424, 6.28281)
 
-[node name="Barrier2" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(724.246, 391.295)
+[node name="Barrier2" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(724.899, 390.878)
 map_pos = Vector2(0.302964, 6.25828)
 
-[node name="Barrier3" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(817.465, 445.422)
+[node name="Barrier3" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(817.906, 444.882)
 map_pos = Vector2(2.24, 6.26103)
 
-[node name="Barrier4" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(866.58, 416.354)
+[node name="Barrier4" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(866.909, 415.88)
 map_pos = Vector2(2.2287, 5.23059)
 
-[node name="Barrier5" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(912.689, 443.417)
+[node name="Barrier5" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(912.913, 442.882)
 map_pos = Vector2(3.19202, 5.23716)
 
-[node name="Barrier6" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(963.809, 415.351)
+[node name="Barrier6" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(963.916, 414.88)
 map_pos = Vector2(3.21948, 4.20389)
 
-[node name="Barrier7" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1155.26, 418.358)
+[node name="Barrier7" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1154.93, 417.881)
 map_pos = Vector2(5.25965, 2.27149)
 
-[node name="Barrier8" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1059.03, 369.243)
+[node name="Barrier8" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1058.92, 368.877)
 map_pos = Vector2(3.38122, 2.38974)
 
-[node name="Barrier9" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1104.14, 396.307)
+[node name="Barrier9" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1103.93, 395.879)
 map_pos = Vector2(4.33414, 2.40672)
 
-[node name="Barrier10" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1018.94, 390.292)
+[node name="Barrier10" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1018.92, 389.879)
 map_pos = Vector2(3.34243, 3.1829)
 
-[node name="Barrier13" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1252.49, 367.238)
+[node name="Barrier13" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1251.94, 366.877)
 map_pos = Vector2(5.35238, 0.346738)
 
-[node name="Barrier14" parent="Pathing/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1210.39, 411.342)
+[node name="Barrier14" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
+position = Vector2(1209.93, 410.88)
 map_pos = Vector2(5.70589, 1.57379)
 
 [node name="SpawnPoints" type="Node2D" parent="."]
@@ -281,132 +378,166 @@ y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
 [node name="EnemySpawnPoint" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(770.355, 598.782)
+position = Vector2(770.902, 597.894)
 map_pos = Vector2(4.49926, 9.49783)
 
 [node name="EnemySpawnPoint2" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(1353.72, 483.511)
+position = Vector2(1352.95, 482.885)
 map_pos = Vector2(8.48619, 1.37987)
 
 [node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(1393.82, 628.853)
+position = Vector2(1392.95, 627.896)
 map_pos = Vector2(11.5065, 3.56823)
 
 [node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(782.383, 489.525)
+position = Vector2(782.903, 488.886)
 map_pos = Vector2(2.6663, 7.41529)
 
 [node name="PlayerSpawnPoint" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(1209.39, 678.97)
+position = Vector2(1208.94, 677.901)
 map_pos = Vector2(10.4911, 6.37977)
 
 [node name="PlayerSpawnPoint2" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(1204.37, 571.718)
+position = Vector2(1203.93, 570.892)
 map_pos = Vector2(8.51725, 4.50994)
 
 [node name="PlayerSpawnPoint3" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(969.823, 532.627)
+position = Vector2(969.917, 531.889)
 map_pos = Vector2(5.38331, 6.24292)
 
 [node name="PlayerSpawnPoint4" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(965.813, 656.918)
+position = Vector2(965.917, 655.898)
 map_pos = Vector2(7.56887, 8.51168)
+
+[node name="TerrainOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1011.25, 208.212)
+rotation = 0.524835
+scale = Vector2(0.694518, 0.694518)
+skew = 0.521126
+tile_set = SubResource("TileSet_wu6a4")
+format = 2
+layer_0/tile_data = PackedInt32Array(720905, 131073, 0, 720906, 131073, 0, 655370, 131073, 0, 589835, 131073, 0, 655371, 131073, 0, 720907, 131073, 0, 786443, 131073, 0, 851979, 131073, 0, 786444, 131073, 0, 720908, 131073, 0, 655372, 131073, 0, 786442, 131073, 0, 720909, 131073, 0)
+script = ExtResource("13_bduti")
+world = NodePath("../World")
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
+[node name="UnitDriver" parent="Entities" node_paths=PackedStringArray("target") instance=ExtResource("17_imi68")]
+target = NodePath("../Unit")
+
+[node name="Unit" parent="Entities" instance=ExtResource("31_8807m")]
+position = Vector2(749, 520)
+facing = -3.3
+walk_speed = 100.0
+map_pos = Vector2(2.87256, 8.32664)
+
 [node name="Doodad1" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1543.17, 524.608)
+visible = false
+position = Vector2(1541.96, 523.889)
 texture = ExtResource("5_f1lhi")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(11.1881, 0.150783)
 
 [node name="Doodad2" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1007.91, 854.382)
+visible = false
+position = Vector2(1007.92, 852.913)
 texture = ExtResource("12_fc3i5")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(11.544, 11.6132)
 
 [node name="Doodad3" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(950.778, 815.29)
+visible = false
+position = Vector2(950.915, 813.909)
 texture = ExtResource("13_mdwdb")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(10.2507, 11.5055)
 
 [node name="Doodad4" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1478.02, 502.556)
+visible = false
+position = Vector2(1476.96, 501.887)
 texture = ExtResource("16_xrtce")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(10.117, 0.431603)
 
 [node name="Doodad5" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1087.1, 638.876)
+visible = false
+position = Vector2(1086.93, 637.897)
 texture = ExtResource("17_1ji1t")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(8.5039, 6.93006)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1265.52, 496.542)
+visible = false
+position = Vector2(1264.94, 495.886)
 texture = ExtResource("18_6fpme")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(7.80454, 2.52851)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(937.747, 459.455)
+visible = false
+position = Vector2(937.915, 458.883)
 texture = ExtResource("19_67err")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(3.73938, 5.26455)
 
 [node name="Doodad8" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1056.03, 439.408)
+visible = false
+position = Vector2(1011, 412)
 texture = ExtResource("20_xr3bx")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(4.60729, 3.67821)
+map_pos = Vector2(3.65736, 3.66256)
 
 [node name="Doodad9" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(921.71, 467.474)
+visible = false
+position = Vector2(921.914, 466.884)
 texture = ExtResource("21_bmjq4")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(3.71668, 5.57463)
 
 [node name="Doodad10" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(736.275, 462.462)
+visible = false
+position = Vector2(736.9, 461.884)
 texture = ExtResource("22_fwufi")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(1.70299, 7.40872)
 
 [node name="Doodad11" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(574.896, 595.775)
+visible = false
+position = Vector2(575.889, 594.893)
 texture = ExtResource("23_7rck2")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(2.41749, 11.4718)
 
 [node name="Doodad12" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1010.92, 312.109)
+visible = false
+position = Vector2(1010.92, 311.873)
 texture = ExtResource("25_y8hjm")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(1.85828, 1.86514)
 
 [node name="Doodad13" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(531.794, 556.683)
+visible = false
+position = Vector2(532.886, 555.89)
 texture = ExtResource("26_5x6eb")
 lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(1.26984, 11.2185)
 
-[connection signal="map_changed" from="." to="Grid" method="_on_map_map_changed"]
 [connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
 [connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]
+[connection signal="world_changed" from="World" to="UnitPath" method="_on_world_world_changed"]
+[connection signal="world_changed" from="World" to="TerrainOverlay" method="_on_world_world_changed"]

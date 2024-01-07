@@ -1,0 +1,113 @@
+[gd_scene load_steps=12 format=3 uid="uid://clakgmdpcknuy"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Unit.gd" id="1_f35qy"]
+[ext_resource type="PackedScene" uid="uid://d1u5syg77qfdo" path="res://Screens/Battle/map_types/unit/UnitModel.tscn" id="2_0vydj"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_g7v0r"]
+[ext_resource type="Texture2D" uid="uid://dubut3aaxkpvo" path="res://Screens/Battle/sprites/hp_bar.png" id="3_07oig"]
+[ext_resource type="Texture2D" uid="uid://gdp52yomtcia" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_up13u"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pq1ln"]
+texture = ExtResource("3_07oig")
+separation = Vector2i(1, 0)
+texture_region_size = Vector2i(60, 100)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_xymca"]
+tile_size = Vector2i(60, 100)
+sources/2 = SubResource("TileSetAtlasSource_pq1ln")
+
+[sub_resource type="Animation" id="Animation_l7nvc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UnitModel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_4d8wl"]
+resource_name = "highlight"
+length = 1.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UnitModel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.9, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1.5, 1.5, 1.5, 1), Color(1.5, 1.5, 1.5, 0), Color(1.5, 1.5, 1.5, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_1evga"]
+resource_name = "highlight_red"
+length = 1.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UnitModel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0, 0, 0.431373), Color(1, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xege1"]
+_data = {
+"RESET": SubResource("Animation_l7nvc"),
+"highlight": SubResource("Animation_4d8wl"),
+"highlight_red": SubResource("Animation_1evga")
+}
+
+[node name="Unit" type="Node2D"]
+script = ExtResource("1_f35qy")
+walk_speed = null
+sprite_frames = ExtResource("2_g7v0r")
+model_scale = Vector2(0.575, 0.575)
+pathing = 1
+show_debug_tile = false
+
+[node name="NOTE" type="Label" parent="."]
+visible = false
+offset_left = -360.0
+offset_top = -272.0
+offset_right = 536.0
+offset_bottom = -223.0
+text = "The placeholder sprite has an offset and does not flip symmetrically.
+This causes a weird offset when changing facing which should be fixed in the real sprite sheet."
+
+[node name="HPBar" type="TileMap" parent="."]
+visible = false
+scale = Vector2(0.125, 0.125)
+tile_set = SubResource("TileSet_xymca")
+format = 2
+layer_0/tile_data = PackedInt32Array(-196610, 2, 0, -196609, 65538, 0, -262144, 131074, 0, -262142, 2, 0, -262141, 65538, 0, -262140, 65538, 0, -262139, 65538, 0, -262138, 65538, 0, -262137, 65538, 0, -262136, 65538, 0, -262135, 131074, 0, -131071, 2, 0, -131070, 65538, 0, -131069, 65538, 0, -131068, 65538, 0, -131067, 65538, 0, -131066, 65538, 0, -131065, 65538, 0, -131064, 131074, 0)
+
+[node name="UnitModel" parent="." instance=ExtResource("2_0vydj")]
+scale = Vector2(0.575, 0.575)
+
+[node name="Shadow" type="Sprite2D" parent="UnitModel"]
+visible = false
+modulate = Color(0, 0, 0, 0.392157)
+show_behind_parent = true
+texture = ExtResource("3_up13u")
+
+[node name="Highlight" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_xege1")
+}

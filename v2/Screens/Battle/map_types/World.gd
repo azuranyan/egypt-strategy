@@ -1,6 +1,7 @@
 @tool
 ## Contains the world data like texture and transforms.
-class_name World extends Node2D
+class_name World
+extends Node2D
 
 
 signal world_changed
@@ -117,12 +118,21 @@ func as_uniform(v: Vector2) -> Vector2:
 	
 	
 ## Snaps the node to the cell.
+# TODO do not use, awful func to be replaced later
 func snap(node: Node2D):
 	if node is MapObject:
 		node.map_pos = Vector2(int(node.map_pos.x), int(node.map_pos.y))
 	else:
 		var v := as_uniform(node.position)
 		node.position = as_global(Vector2(int(v.x), int(v.y)))
+		
+
+## Returns the cell as an index for a 1D array. This only takes the world bounds,
+## so callers should make sure it's not trying to use with playable bounds.
+# TODO prob should not be here? idk. feels very much like implementation detail;
+# heck even the description sounds so much like an implementation detail
+func to_index(v: Vector2) -> int:
+	return int(v.y) * map_size.x + v.x
 
 	
 ## Recalculates world transforms.

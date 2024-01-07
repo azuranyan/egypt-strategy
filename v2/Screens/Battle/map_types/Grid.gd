@@ -1,6 +1,7 @@
 @tool
 ## Simple grid class that syncs itself to world changes.
-class_name Grid extends Node2D
+class_name Grid
+extends Node2D
 
 @export var world: World:
 	set(value):

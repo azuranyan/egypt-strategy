@@ -1,5 +1,6 @@
 @tool
-class_name Cursor extends Node2D
+class_name Cursor
+extends Node2D
 
 
 @export var world: World:

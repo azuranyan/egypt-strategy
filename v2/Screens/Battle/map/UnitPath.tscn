@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://b2dwrqycqblmj"]
+[gd_scene load_steps=5 format=3 uid="uid://b2dwrqycqblmj"]
 
-[ext_resource type="Texture2D" uid="uid://dg2vmg80jil26" path="res://Screens/Battle/arrows.svg" id="1_kouhi"]
-[ext_resource type="Script" path="res://Screens/Battle/map/UnitPath.gd" id="1_le5xn"]
-[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_yrjn4"]
+[ext_resource type="Texture2D" uid="uid://cexdb403hn61g" path="res://Screens/Battle/arrows.svg" id="1_kouhi"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitPath.gd" id="1_le5xn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mb61g"]
 texture = ExtResource("1_kouhi")
@@ -68,4 +67,3 @@ sources/1 = SubResource("TileSetAtlasSource_mb61g")
 tile_set = SubResource("TileSet_3bm48")
 format = 2
 script = ExtResource("1_le5xn")
-world = ExtResource("3_yrjn4")

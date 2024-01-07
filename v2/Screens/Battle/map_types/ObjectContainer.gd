@@ -1,5 +1,6 @@
 @tool
-class_name ObjectContainer extends Node2D
+class_name ObjectContainer
+extends Node2D
 
 signal object_added(obj: MapObject)
 signal object_removed(obj: MapObject)
@@ -25,7 +26,6 @@ func _add_object(node: Node):
 		node.object_added.connect(_add_object)
 		node.object_removed.connect(_remove_object)
 	elif node is MapObject:
-		print('container: ', node, ' added')
 		object_added.emit(node)
 
 
@@ -34,7 +34,6 @@ func _remove_object(node: Node):
 		node.object_added.disconnect(_add_object)
 		node.object_removed.disconnect(_remove_object)
 	elif node is MapObject:
-		print('container: ', node, ' removed')
 		object_removed.emit(node)
 	
 	

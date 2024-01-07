@@ -26,34 +26,25 @@ static func do_nothing():
 
 
 ## Simple suboptimal flood fill algorithm.
-static func flood_fill(cell: Vector2, max_distance: int, _bounds: Rect2i, condition: Callable = func(_br): return true) -> PackedVector2Array:
-	var re := PackedVector2Array()
-	var stack := [cell]
+static func flood_fill(cell: Vector2, max_distance: float, bounds: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
+	var dest = PackedVector2Array()
 	
-	while not stack.is_empty():
-		var current = stack.pop_back()
+	# for degen case where int <= 0 we skip
+	if max_distance > 0:
+		var stack := [cell]
 		
-		# various checks
-		var out_of_bounds: bool = not _bounds.has_point(current)
-		var dupe: bool = current in re
-		var out_of_range: bool = cell_distance(current, cell) > max_distance
-		
-		if out_of_bounds or dupe or out_of_range:
-			continue
-		
-		if condition.call(current):
-			re.append(current)
-		
-		for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-			var coords: Vector2 = current + direction
+		while not stack.is_empty():
+			var p: Vector2 = stack.pop_back()
 			
-			if not _bounds.has_point(coords) or coords in re:
-				continue
+			dest.append(p)
 			
-			if condition.call(current):
-				stack.append(coords) # not ideal
-	return re
-	
+			for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+				var q: Vector2 = p + direction
+				
+				if q not in dest and bounds.has_point(q) and cell_distance(q, cell) <= max_distance and condition.call(q):
+					stack.append(q)
+					
+	return dest
 
 ## Returns the cell distance between two cells.
 static func cell_distance(a: Vector2, b: Vector2) -> int:
