@@ -1,10 +1,20 @@
-[gd_scene load_steps=12 format=3 uid="uid://clakgmdpcknuy"]
+[gd_scene load_steps=15 format=3 uid="uid://clakgmdpcknuy"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Unit.gd" id="1_f35qy"]
 [ext_resource type="PackedScene" uid="uid://d1u5syg77qfdo" path="res://Screens/Battle/map_types/unit/UnitModel.tscn" id="2_0vydj"]
+[ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_e0urf"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_g7v0r"]
+[ext_resource type="Resource" uid="uid://qpdrrn4yu0p4" path="res://Screens/Battle/data/attack/alara_basic.tres" id="2_ohwmu"]
 [ext_resource type="Texture2D" uid="uid://dubut3aaxkpvo" path="res://Screens/Battle/sprites/hp_bar.png" id="3_07oig"]
 [ext_resource type="Texture2D" uid="uid://gdp52yomtcia" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_up13u"]
+
+[sub_resource type="Resource" id="Resource_kqmg7"]
+script = ExtResource("2_e0urf")
+name = ""
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0.691342, 0.83295, 1)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pq1ln"]
 texture = ExtResource("3_07oig")
@@ -76,9 +86,29 @@ _data = {
 
 [node name="Unit" type="Node2D"]
 script = ExtResource("1_f35qy")
-walk_speed = null
+chara = SubResource("Resource_kqmg7")
 sprite_frames = ExtResource("2_g7v0r")
 model_scale = Vector2(0.575, 0.575)
+maxhp = 5
+hp = 5
+move = 3
+damage = 2
+range = 2
+stat_growth_1 = {
+"damage": 0,
+"maxhp": 0,
+"move": 1,
+"range": 0
+}
+stat_growth_2 = {
+"damage": 0,
+"maxhp": 1,
+"move": 0,
+"range": 0
+}
+basic_attack = ExtResource("2_ohwmu")
+selectable = null
+alive = null
 pathing = 1
 show_debug_tile = false
 
@@ -107,7 +137,23 @@ modulate = Color(0, 0, 0, 0.392157)
 show_behind_parent = true
 texture = ExtResource("3_up13u")
 
+[node name="Control" type="Control" parent="UnitModel"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -137.0
+offset_right = 35.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="Highlight" type="AnimationPlayer" parent="."]
 libraries = {
 "": SubResource("AnimationLibrary_xege1")
 }
+
+[connection signal="map_pos_changed" from="." to="." method="_on_map_pos_changed"]

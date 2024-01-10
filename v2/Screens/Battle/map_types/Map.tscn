@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://bg3djjkbmlv2r"]
+[gd_scene load_steps=39 format=3 uid="uid://bg3djjkbmlv2r"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_nlile"]
 [ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_hffm8"]
@@ -22,7 +22,6 @@
 [ext_resource type="Texture2D" uid="uid://c6gu0q3dd2tmb" path="res://Screens/Battle/maps/StartingZoneObj3.png" id="13_mdwdb"]
 [ext_resource type="Texture2D" uid="uid://bux03apf6bnja" path="res://Screens/Battle/maps/StartingZoneObj4.png" id="16_xrtce"]
 [ext_resource type="Texture2D" uid="uid://ce26nbqgwb03x" path="res://Screens/Battle/maps/StartingZoneObj5.png" id="17_1ji1t"]
-[ext_resource type="PackedScene" uid="uid://bfaahdyj1kl0" path="res://Screens/Battle/map_types/unit/UnitDriver.tscn" id="17_imi68"]
 [ext_resource type="Texture2D" uid="uid://4kbratak2qv" path="res://Screens/Battle/maps/StartingZoneObj6.png" id="18_6fpme"]
 [ext_resource type="Texture2D" uid="uid://b0drjr0yf2kc1" path="res://Screens/Battle/maps/StartingZoneObj7.png" id="19_67err"]
 [ext_resource type="Texture2D" uid="uid://cutd476pww52u" path="res://Screens/Battle/maps/StartingZoneObj8.png" id="20_xr3bx"]
@@ -158,7 +157,6 @@ sources/1 = SubResource("TileSetAtlasSource_02t6r")
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_nlile")
-metadata/_edit_lock_ = true
 
 [node name="World" type="Node2D" parent="."]
 script = ExtResource("3_i0cah")
@@ -167,8 +165,8 @@ map_size = Vector2i(12, 12)
 tile_size = 68.0
 offset = Vector2(1011.25, 208.212)
 y_ratio = 0.579
-metadata/_edit_lock_ = true
 metadata/_edit_group_ = true
+metadata/_edit_lock_ = true
 
 [node name="FullRect" type="Control" parent="World"]
 layout_mode = 3
@@ -214,23 +212,6 @@ tile_set = SubResource("TileSet_ovx2u")
 format = 2
 script = ExtResource("6_vwvou")
 world = NodePath("../World")
-
-[node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
-position = Vector2(1015.99, 602.102)
-script = ExtResource("5_mql1q")
-world = NodePath("../World")
-texture = ExtResource("6_ml1x5")
-vertical_offset = -3.005
-metadata/_edit_lock_ = true
-metadata/_edit_group_ = true
-
-[node name="Sprite2D" type="Sprite2D" parent="Cursor"]
-position = Vector2(0, -3.005)
-rotation = 0.524835
-scale = Vector2(0.434074, 0.434074)
-skew = 0.521126
-texture = ExtResource("6_ml1x5")
-centered = false
 
 [node name="Stuff" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -386,8 +367,8 @@ position = Vector2(1352.95, 482.885)
 map_pos = Vector2(8.48619, 1.37987)
 
 [node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(1392.95, 627.896)
-map_pos = Vector2(11.5065, 3.56823)
+position = Vector2(1343, 647)
+map_pos = Vector2(11.3302, 4.43073)
 
 [node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
 position = Vector2(782.903, 488.886)
@@ -398,43 +379,80 @@ position = Vector2(1208.94, 677.901)
 map_pos = Vector2(10.4911, 6.37977)
 
 [node name="PlayerSpawnPoint2" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(1203.93, 570.892)
-map_pos = Vector2(8.51725, 4.50994)
+position = Vector2(1202, 551)
+map_pos = Vector2(8.13989, 4.17281)
 
 [node name="PlayerSpawnPoint3" parent="SpawnPoints" instance=ExtResource("10_qv147")]
 position = Vector2(969.917, 531.889)
 map_pos = Vector2(5.38331, 6.24292)
 
 [node name="PlayerSpawnPoint4" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(965.917, 655.898)
-map_pos = Vector2(7.56887, 8.51168)
+position = Vector2(961, 627)
+map_pos = Vector2(6.99875, 8.04381)
 
-[node name="TerrainOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+[node name="PathingOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
 position = Vector2(1011.25, 208.212)
 rotation = 0.524835
 scale = Vector2(0.694518, 0.694518)
 skew = 0.521126
 tile_set = SubResource("TileSet_wu6a4")
 format = 2
-layer_0/tile_data = PackedInt32Array(720905, 131073, 0, 720906, 131073, 0, 655370, 131073, 0, 589835, 131073, 0, 655371, 131073, 0, 720907, 131073, 0, 786443, 131073, 0, 851979, 131073, 0, 786444, 131073, 0, 720908, 131073, 0, 655372, 131073, 0, 786442, 131073, 0, 720909, 131073, 0)
 script = ExtResource("13_bduti")
 world = NodePath("../World")
+
+[node name="AttackOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1011.25, 208.212)
+rotation = 0.524835
+scale = Vector2(0.694518, 0.694518)
+skew = 0.521126
+tile_set = SubResource("TileSet_wu6a4")
+format = 2
+script = ExtResource("13_bduti")
+world = NodePath("../World")
+
+[node name="TargetOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1011.25, 208.212)
+rotation = 0.524835
+scale = Vector2(0.694518, 0.694518)
+skew = 0.521126
+tile_set = SubResource("TileSet_wu6a4")
+format = 2
+script = ExtResource("13_bduti")
+world = NodePath("../World")
+
+[node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1015.99, 602.102)
+script = ExtResource("5_mql1q")
+world = NodePath("../World")
+texture = ExtResource("6_ml1x5")
+vertical_offset = -3.005
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Cursor"]
+position = Vector2(0, -3.005)
+rotation = 0.524835
+scale = Vector2(0.434074, 0.434074)
+skew = 0.521126
+texture = ExtResource("6_ml1x5")
+centered = false
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
-[node name="UnitDriver" parent="Entities" node_paths=PackedStringArray("target") instance=ExtResource("17_imi68")]
-target = NodePath("../Unit")
-
 [node name="Unit" parent="Entities" instance=ExtResource("31_8807m")]
-position = Vector2(749, 520)
+position = Vector2(1203, 489)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(2.87256, 8.32664)
+move = 6
+range = 4
+selectable = true
+alive = true
+map_pos = Vector2(7.03679, 3.04891)
+show_debug_tile = true
 
 [node name="Doodad1" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1541.96, 523.889)
 texture = ExtResource("5_f1lhi")
 lock_to_world = true
@@ -442,7 +460,6 @@ uniform_offset = false
 map_pos = Vector2(11.1881, 0.150783)
 
 [node name="Doodad2" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1007.92, 852.913)
 texture = ExtResource("12_fc3i5")
 lock_to_world = true
@@ -450,7 +467,6 @@ uniform_offset = false
 map_pos = Vector2(11.544, 11.6132)
 
 [node name="Doodad3" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(950.915, 813.909)
 texture = ExtResource("13_mdwdb")
 lock_to_world = true
@@ -458,7 +474,6 @@ uniform_offset = false
 map_pos = Vector2(10.2507, 11.5055)
 
 [node name="Doodad4" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1476.96, 501.887)
 texture = ExtResource("16_xrtce")
 lock_to_world = true
@@ -466,15 +481,13 @@ uniform_offset = false
 map_pos = Vector2(10.117, 0.431603)
 
 [node name="Doodad5" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
-position = Vector2(1086.93, 637.897)
+position = Vector2(1220, 585)
 texture = ExtResource("17_1ji1t")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(8.5039, 6.93006)
+map_pos = Vector2(8.93769, 4.59626)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1264.94, 495.886)
 texture = ExtResource("18_6fpme")
 lock_to_world = true
@@ -482,7 +495,6 @@ uniform_offset = false
 map_pos = Vector2(7.80454, 2.52851)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(937.915, 458.883)
 texture = ExtResource("19_67err")
 lock_to_world = true
@@ -490,7 +502,6 @@ uniform_offset = false
 map_pos = Vector2(3.73938, 5.26455)
 
 [node name="Doodad8" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1011, 412)
 texture = ExtResource("20_xr3bx")
 lock_to_world = true
@@ -498,7 +509,6 @@ uniform_offset = false
 map_pos = Vector2(3.65736, 3.66256)
 
 [node name="Doodad9" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(921.914, 466.884)
 texture = ExtResource("21_bmjq4")
 lock_to_world = true
@@ -506,7 +516,6 @@ uniform_offset = false
 map_pos = Vector2(3.71668, 5.57463)
 
 [node name="Doodad10" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(736.9, 461.884)
 texture = ExtResource("22_fwufi")
 lock_to_world = true
@@ -514,7 +523,6 @@ uniform_offset = false
 map_pos = Vector2(1.70299, 7.40872)
 
 [node name="Doodad11" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(575.889, 594.893)
 texture = ExtResource("23_7rck2")
 lock_to_world = true
@@ -522,7 +530,6 @@ uniform_offset = false
 map_pos = Vector2(2.41749, 11.4718)
 
 [node name="Doodad12" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(1010.92, 311.873)
 texture = ExtResource("25_y8hjm")
 lock_to_world = true
@@ -530,7 +537,6 @@ uniform_offset = false
 map_pos = Vector2(1.85828, 1.86514)
 
 [node name="Doodad13" parent="Entities" instance=ExtResource("4_6qpf8")]
-visible = false
 position = Vector2(532.886, 555.89)
 texture = ExtResource("26_5x6eb")
 lock_to_world = true
@@ -540,4 +546,4 @@ map_pos = Vector2(1.26984, 11.2185)
 [connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
 [connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]
 [connection signal="world_changed" from="World" to="UnitPath" method="_on_world_world_changed"]
-[connection signal="world_changed" from="World" to="TerrainOverlay" method="_on_world_world_changed"]
+[connection signal="world_changed" from="World" to="PathingOverlay" method="_on_world_world_changed"]

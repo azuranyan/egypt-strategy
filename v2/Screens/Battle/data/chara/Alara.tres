@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Chara" load_steps=3 format=3 uid="uid://d4b7hg8644pc7"]
 
-[ext_resource type="Texture2D" uid="uid://ojjq2i75v6e6" path="res://Screens/Overworld/Portraits/Alara.png" id="1_d85jr"]
+[ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="1_d85jr"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Chara.gd" id="2_c8vyw"]
 
 [resource]

@@ -85,13 +85,13 @@ var _debug_tile: Polygon2D
 	
 	
 func _ready():
+	set_notify_transform(true)
 	_create_debug_tile()
 	_update()
 	
 
 func _enter_tree() -> void:
-	if Engine.is_editor_hint():
-		set_notify_transform(true)
+	pass
 
 		
 func _exit_tree():
@@ -99,10 +99,8 @@ func _exit_tree():
 	
 	
 func _notification(what: int) -> void:
-	if Engine.is_editor_hint():
-		# horrible check with recomputing but it's editor-only anyway...
-		if what == NOTIFICATION_TRANSFORM_CHANGED and _global_pos != position:
-			map_pos = world.as_uniform(position)
+	if what == NOTIFICATION_TRANSFORM_CHANGED and _global_pos != position:
+		map_pos = world.as_uniform(position)
 		
 	
 func _create_debug_tile():
@@ -124,6 +122,8 @@ func _enter_map(map: NewMap, world: World):
 	self.world = world
 	map.ready.connect(map_ready)
 	map_enter()
+	if map.is_node_ready():
+		ready.connect(map_ready, CONNECT_ONE_SHOT)
 	
 
 func _exit_map():
@@ -134,8 +134,9 @@ func _exit_map():
 	
 	
 ## Returns the cell this object resides in.
-func cell() -> Vector2i:
-	return Vector2i(int(map_pos.x + 999) - 999, int(map_pos.y + 999) - 999)
+func cell() -> Vector2:
+	# kinda shite but it is what it is
+	return Vector2(int(snapped(map_pos.x, 0.01)), int(snapped(map_pos.y, 0.01)))
 
 
 ## Called when map object enters the map.

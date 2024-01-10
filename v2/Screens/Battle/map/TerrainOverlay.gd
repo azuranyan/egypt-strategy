@@ -1,6 +1,6 @@
+class_name TerrainOverlay
 extends TileMap
 
-class_name TerrainOverlay
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

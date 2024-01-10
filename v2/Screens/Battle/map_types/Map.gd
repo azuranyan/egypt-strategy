@@ -13,33 +13,30 @@ const OUT_OF_BOUNDS := Vector2(69, 420)
 const PLAYABLE_BOUNDS := 5
 
 
-var world: World
-
 # World changes are quite expensive so we only refresh on a fixed time.
 @export var world_update_frequency: float = 0.5
 
 
+# The world is initialized in a different way, earlier than other variables.
+var world: World
+
 var _world_update_cooldown: float = 0
 var _errors: PackedStringArray = []
 
+@onready var unit_path := $UnitPath
+@onready var pathing_overlay := $PathingOverlay
+@onready var attack_overlay := $AttackOverlay
+@onready var target_overlay := $TargetOverlay
+
+@onready var test_unit := $Entities/Unit
 
 #region Node
 func _ready():
 	update_configuration_warnings()
+	_snap_all_objects()
 	# will force a tick of update after _ready
 	set_process(true)
 	
-	
-	# TODO custom draw unit path given path
-	#var path := [Vector2(0, 0), Vector2(3, 0), Vector2(3, 4), Vector2(0, 4), Vector2(0, 0)]
-	# change draw() name, godot intellisense craps out
-	# having to call initialize() is dum
-	$UnitPath.initialize(Util.flood_fill($Entities/Unit.cell(), 999, get_world_bounds()))
-	$UnitPath.draw(Vector2.ZERO, Vector2(11, 2))
-	$Entities/UnitDriver.start_driver($UnitPath.current_path)
-	
-	
-
 
 func _enter_tree():
 	child_entered_tree.connect(_on_child_entered_tree)
@@ -77,13 +74,44 @@ func _get_configuration_warnings() -> PackedStringArray:
 	
 ## Returns the spawn points of given spawn type.
 func get_spawn_points(spawn_type: String) -> Array[SpawnPoint]:
-	var arr: Array[SpawnPoint] = []
-	for obj in get_tree().get_nodes_in_group("MapObjects"):
-		if obj is SpawnPoint:
-			if obj.spawn_type == spawn_type:
-				arr.append(obj)
-	return arr
+	var z: Array[SpawnPoint] = []
+	z.assign(_get_objects().filter(func (x): return x is SpawnPoint and x.spawn_type == spawn_type))
+	return z
 			
+			
+## Returns all the units owned by empire or all units if empire == null.
+func get_units(empire: Empire = null) -> Array[NewUnit]:
+	return get_objects().filter(func(x): _is_selectable_unit(x) and (empire == null or x.empire == empire))
+		
+
+## Returns the unit in cell.
+func get_unit(cell: Vector2, empire: Empire = null) -> NewUnit:
+	for obj in _get_objects():
+		if _is_selectable_unit(obj) and obj.cell() == cell and (empire == null or obj.empire == empire):
+			return obj as NewUnit
+	return null
+	
+
+func _is_selectable_unit(obj: MapObject) -> bool:
+	return obj is NewUnit and obj.alive
+			
+			
+## Returns all the objects.
+func get_objects() -> Array[MapObject]:
+	# yes, this is horrible
+	var z: Array[MapObject] = []
+	z.assign(_get_objects())
+	return z
+	
+	
+func _get_objects() -> Array[Node]:
+	return get_tree().get_nodes_in_group("MapObjects")
+	
+	
+## Returns all the objects at cell.
+func get_objects_at(cell: Vector2) -> Array[MapObject]:
+	return get_objects().filter(func (x): return x.cell() == cell)
+
 
 ## Returns the playable rect area.
 func get_playable_bounds() -> Rect2:
@@ -94,6 +122,17 @@ func get_playable_bounds() -> Rect2:
 func get_world_bounds() -> Rect2:
 	return Rect2(Vector2.ZERO, world.map_size)
 	
+
+## Returns the cell of a point.
+func to_cell(p: Vector2) -> Vector2:
+	# kinda shite but it is what it is
+	return Vector2(int(snapped(p.x, 0.01)), int(snapped(p.y, 0.01)))
+	
+	
+func _snap_all_objects():
+	for obj in _get_objects():
+		obj.map_pos = obj.cell()
+		
 	
 func _queue_update():
 	if world_update_frequency >= 0:
