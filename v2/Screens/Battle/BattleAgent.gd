@@ -3,7 +3,7 @@ class_name BattleAgent
 
 
 ## Reference to the battle object.
-var battle: Battle
+var battle: BattleManager
 
 ## Reference to the empire this agent is controlling.
 var empire: Empire
@@ -33,7 +33,7 @@ func do_turn():
 func do_action(action: Callable, args := []):
 	# check before taking action, because sometimes this can be true before
 	# taking any action (e.g. units dying from poison)
-	if battle._evaluate_victory_conditions():
+	if battle.evaluate_victory_conditions():
 		should_end = true
 		return
 	
@@ -43,13 +43,12 @@ func do_action(action: Callable, args := []):
 	
 	# check for auto end turn
 	if Globals.prefs.auto_end_turn:
-		var units := battle.get_owned_units()
-		for u in units:
-			if battle.can_move(u) or battle.can_attack(u):
+		for u in battle.get_owned_units(empire):
+			if not u.has_moved or not u.has_attacked:
 				should_end = false
 				break
 	
 	# need to re-evaluate after every action
-	if battle._evaluate_victory_conditions():
+	if battle.evaluate_victory_conditions():
 		should_end = true
 		return

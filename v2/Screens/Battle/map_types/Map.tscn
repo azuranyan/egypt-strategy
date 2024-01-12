@@ -219,9 +219,9 @@ script = ExtResource("5_7lvne")
 metadata/_edit_group_ = true
 
 [node name="CursorTarget" type="Node2D" parent="Stuff"]
-position = Vector2(1015.99, 602.102)
+position = Vector2(1011.25, 597.975)
 script = ExtResource("9_6415n")
-map_pos = Vector2(7.12341, 7.02484)
+map_pos = Vector2(7, 7)
 metadata/_edit_group_ = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Stuff/CursorTarget"]
@@ -239,156 +239,156 @@ y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
 [node name="DummyDoodad" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(496.883, 539.889)
-map_pos = Vector2(0.608085, 11.3055)
+position = Vector2(482.334, 514.454)
+map_pos = Vector2(0, 11)
 
 [node name="DummyDoodad2" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(670.895, 421.881)
-map_pos = Vector2(0.298186, 7.37664)
+position = Vector2(674.667, 403.093)
+map_pos = Vector2(0, 7)
 
 [node name="DummyDoodad3" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(814.905, 466.884)
-map_pos = Vector2(2.60394, 6.68737)
+position = Vector2(818.917, 430.934)
+map_pos = Vector2(2, 6)
 
 [node name="DummyDoodad4" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(963.916, 443.882)
-map_pos = Vector2(3.74035, 4.72476)
+position = Vector2(963.167, 403.093)
+map_pos = Vector2(3, 4)
 
 [node name="DummyDoodad5" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1104.93, 412.88)
-map_pos = Vector2(4.64987, 2.70165)
+position = Vector2(1107.42, 375.253)
+map_pos = Vector2(4, 2)
 
 [node name="DummyDoodad6" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1156.93, 436.882)
-map_pos = Vector2(5.62171, 2.59195)
+position = Vector2(1155.5, 403.093)
+map_pos = Vector2(5, 2)
 
 [node name="DummyDoodad7" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(869.91, 441.882)
-map_pos = Vector2(2.72689, 5.66638)
+position = Vector2(867, 403.093)
+map_pos = Vector2(2, 5)
 
 [node name="DummyDoodad8" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(767.902, 435.882)
-map_pos = Vector2(1.55838, 6.61935)
+position = Vector2(770.834, 403.093)
+map_pos = Vector2(1, 6)
 
 [node name="DummyDoodad9" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1191.93, 467.884)
-map_pos = Vector2(6.54247, 2.78476)
+position = Vector2(1203.58, 430.934)
+map_pos = Vector2(6, 2)
 
 [node name="DummyDoodad10" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1260.94, 430.881)
-map_pos = Vector2(6.59548, 1.40264)
+position = Vector2(1251.67, 403.093)
+map_pos = Vector2(6, 1)
 
 [node name="DummyDoodad11" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1021.92, 414.88)
-map_pos = Vector2(3.82265, 3.60072)
+position = Vector2(1011.25, 375.253)
+map_pos = Vector2(3, 3)
 
 [node name="DummyDoodad12" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(918.913, 468.884)
-map_pos = Vector2(3.7214, 5.64175)
+position = Vector2(915.083, 430.934)
+map_pos = Vector2(3, 5)
 
 [node name="DummyDoodad13" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1253.94, 390.878)
-map_pos = Vector2(5.80424, 0.757001)
+position = Vector2(1251.67, 347.413)
+map_pos = Vector2(5, 0)
 
 [node name="DummyDoodad14" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(912.914, 786.907)
-map_pos = Vector2(9.37059, 11.4157)
+position = Vector2(915.083, 765.016)
+map_pos = Vector2(9, 11)
 
 [node name="DummyDoodad15" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(968.919, 756.904)
-map_pos = Vector2(9.41413, 10.2945)
+position = Vector2(963.167, 737.176)
+map_pos = Vector2(9, 10)
 
 [node name="DummyDoodad16" parent="Stuff/DummyDoodad" instance=ExtResource("9_6v8r0")]
-position = Vector2(1020.92, 780.907)
-map_pos = Vector2(10.386, 10.1848)
+position = Vector2(1011.25, 765.016)
+map_pos = Vector2(10, 10)
 
 [node name="Barrier" type="Node2D" parent="Stuff"]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
 [node name="Barrier1" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(770.902, 418.88)
-map_pos = Vector2(1.28424, 6.28281)
+position = Vector2(770.834, 403.093)
+map_pos = Vector2(1, 6)
 
 [node name="Barrier2" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(724.899, 390.878)
-map_pos = Vector2(0.302964, 6.25828)
+position = Vector2(722.75, 375.253)
+map_pos = Vector2(0, 6)
 
 [node name="Barrier3" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(817.906, 444.882)
-map_pos = Vector2(2.24, 6.26103)
+position = Vector2(818.917, 430.934)
+map_pos = Vector2(2, 6)
 
 [node name="Barrier4" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(866.909, 415.88)
-map_pos = Vector2(2.2287, 5.23059)
+position = Vector2(867, 403.093)
+map_pos = Vector2(2, 5)
 
 [node name="Barrier5" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(912.913, 442.882)
-map_pos = Vector2(3.19202, 5.23716)
+position = Vector2(915.083, 430.934)
+map_pos = Vector2(3, 5)
 
 [node name="Barrier6" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(963.916, 414.88)
-map_pos = Vector2(3.21948, 4.20389)
+position = Vector2(963.167, 403.093)
+map_pos = Vector2(3, 4)
 
 [node name="Barrier7" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1154.93, 417.881)
-map_pos = Vector2(5.25965, 2.27149)
+position = Vector2(1155.5, 403.093)
+map_pos = Vector2(5, 2)
 
 [node name="Barrier8" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1058.92, 368.877)
-map_pos = Vector2(3.38122, 2.38974)
+position = Vector2(1059.33, 347.413)
+map_pos = Vector2(3, 2)
 
 [node name="Barrier9" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1103.93, 395.879)
-map_pos = Vector2(4.33414, 2.40672)
+position = Vector2(1107.42, 375.253)
+map_pos = Vector2(4, 2)
 
 [node name="Barrier10" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1018.92, 389.879)
-map_pos = Vector2(3.34243, 3.1829)
+position = Vector2(1011.25, 375.253)
+map_pos = Vector2(3, 3)
 
 [node name="Barrier13" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1251.94, 366.877)
-map_pos = Vector2(5.35238, 0.346738)
+position = Vector2(1251.67, 347.413)
+map_pos = Vector2(5, 0)
 
 [node name="Barrier14" parent="Stuff/Barrier" instance=ExtResource("8_ydvf1")]
-position = Vector2(1209.93, 410.88)
-map_pos = Vector2(5.70589, 1.57379)
+position = Vector2(1203.58, 375.253)
+map_pos = Vector2(5, 1)
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
 [node name="EnemySpawnPoint" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(770.902, 597.894)
-map_pos = Vector2(4.49926, 9.49783)
+position = Vector2(770.834, 570.135)
+map_pos = Vector2(4, 9)
 
 [node name="EnemySpawnPoint2" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(1352.95, 482.885)
-map_pos = Vector2(8.48619, 1.37987)
+position = Vector2(1347.83, 458.774)
+map_pos = Vector2(8, 1)
 
 [node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(1343, 647)
-map_pos = Vector2(11.3302, 4.43073)
+position = Vector2(1347.83, 625.815)
+map_pos = Vector2(11, 4)
 
 [node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("9_xl0rt")]
-position = Vector2(782.903, 488.886)
-map_pos = Vector2(2.6663, 7.41529)
+position = Vector2(770.834, 458.774)
+map_pos = Vector2(2, 7)
 
 [node name="PlayerSpawnPoint" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(1208.94, 677.901)
-map_pos = Vector2(10.4911, 6.37977)
+position = Vector2(1203.58, 653.655)
+map_pos = Vector2(10, 6)
 
 [node name="PlayerSpawnPoint2" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(1202, 551)
-map_pos = Vector2(8.13989, 4.17281)
+position = Vector2(1203.58, 542.294)
+map_pos = Vector2(8, 4)
 
 [node name="PlayerSpawnPoint3" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(969.917, 531.889)
-map_pos = Vector2(5.38331, 6.24292)
+position = Vector2(963.167, 514.454)
+map_pos = Vector2(5, 6)
 
 [node name="PlayerSpawnPoint4" parent="SpawnPoints" instance=ExtResource("10_qv147")]
-position = Vector2(961, 627)
-map_pos = Vector2(6.99875, 8.04381)
+position = Vector2(963.167, 625.815)
+map_pos = Vector2(7, 8)
 
 [node name="PathingOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
 position = Vector2(1011.25, 208.212)
@@ -421,7 +421,7 @@ script = ExtResource("13_bduti")
 world = NodePath("../World")
 
 [node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
-position = Vector2(1015.99, 602.102)
+position = Vector2(1011.25, 597.975)
 script = ExtResource("5_mql1q")
 world = NodePath("../World")
 texture = ExtResource("6_ml1x5")
@@ -441,107 +441,116 @@ centered = false
 y_sort_enabled = true
 script = ExtResource("5_7lvne")
 
-[node name="Unit" parent="Entities" instance=ExtResource("31_8807m")]
-position = Vector2(1203, 489)
+[node name="Unit2" parent="Entities" instance=ExtResource("31_8807m")]
+position = Vector2(770.834, 514.454)
 facing = -3.3
 walk_speed = 100.0
 move = 6
 range = 4
-selectable = true
-alive = true
-map_pos = Vector2(7.03679, 3.04891)
+map_pos = Vector2(3, 8)
 show_debug_tile = true
+metadata/default_owner = "Lysandra"
+
+[node name="Unit" parent="Entities" instance=ExtResource("31_8807m")]
+position = Vector2(674.667, 514.454)
+facing = -3.3
+walk_speed = 100.0
+move = 6
+range = 4
+map_pos = Vector2(2, 9)
+show_debug_tile = true
+metadata/default_owner = "Alara"
 
 [node name="Doodad1" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1541.96, 523.889)
+position = Vector2(1540.17, 514.454)
 texture = ExtResource("5_f1lhi")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(11.1881, 0.150783)
+map_pos = Vector2(11, 0)
 
 [node name="Doodad2" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1007.92, 852.913)
+position = Vector2(1011.25, 820.697)
 texture = ExtResource("12_fc3i5")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(11.544, 11.6132)
+map_pos = Vector2(11, 11)
 
 [node name="Doodad3" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(950.915, 813.909)
+position = Vector2(963.167, 792.856)
 texture = ExtResource("13_mdwdb")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(10.2507, 11.5055)
+map_pos = Vector2(10, 11)
 
 [node name="Doodad4" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1476.96, 501.887)
+position = Vector2(1492.08, 486.614)
 texture = ExtResource("16_xrtce")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(10.117, 0.431603)
+map_pos = Vector2(10, 0)
 
 [node name="Doodad5" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1220, 585)
+position = Vector2(1203.58, 542.294)
 texture = ExtResource("17_1ji1t")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(8.93769, 4.59626)
+map_pos = Vector2(8, 4)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1264.94, 495.886)
+position = Vector2(1251.67, 458.774)
 texture = ExtResource("18_6fpme")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(7.80454, 2.52851)
+map_pos = Vector2(7, 2)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(937.915, 458.883)
+position = Vector2(915.083, 430.934)
 texture = ExtResource("19_67err")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(3.73938, 5.26455)
+map_pos = Vector2(3, 5)
 
 [node name="Doodad8" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1011, 412)
+position = Vector2(1011.25, 375.253)
 texture = ExtResource("20_xr3bx")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(3.65736, 3.66256)
+map_pos = Vector2(3, 3)
 
 [node name="Doodad9" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(921.914, 466.884)
+position = Vector2(915.083, 430.934)
 texture = ExtResource("21_bmjq4")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(3.71668, 5.57463)
+map_pos = Vector2(3, 5)
 
 [node name="Doodad10" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(736.9, 461.884)
+position = Vector2(722.75, 430.934)
 texture = ExtResource("22_fwufi")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(1.70299, 7.40872)
+map_pos = Vector2(1, 7)
 
 [node name="Doodad11" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(575.889, 594.893)
+position = Vector2(578.501, 570.135)
 texture = ExtResource("23_7rck2")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(2.41749, 11.4718)
+map_pos = Vector2(2, 11)
 
 [node name="Doodad12" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(1010.92, 311.873)
+position = Vector2(1011.25, 263.892)
 texture = ExtResource("25_y8hjm")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(1.85828, 1.86514)
+map_pos = Vector2(1, 1)
 
 [node name="Doodad13" parent="Entities" instance=ExtResource("4_6qpf8")]
-position = Vector2(532.886, 555.89)
+position = Vector2(530.417, 542.294)
 texture = ExtResource("26_5x6eb")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(1.26984, 11.2185)
+map_pos = Vector2(1, 11)
 
 [connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
 [connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]

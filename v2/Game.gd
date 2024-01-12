@@ -104,16 +104,17 @@ static func register_data(subdir: String, get_id: Callable):
 ## Factory for Battle agents.
 func create_agent_for(empire: Empire) -> BattleAgent:
 	var agent: BattleAgent
-	if empire.is_player_owned():
-		agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
-	else:
-		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
-	agent.battle = battle
+	agent = BattleAgent.new()
+	#if empire.is_player_owned():
+	#	agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
+	#else:
+	#	agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
+	agent.battle = null
 	agent.empire = empire
 	battle.add_child(agent)
 	agent.initialize()
 	return agent
-	
+
 		
 ## Replaces the top screen with another.
 func transition_screen(new: Node, transition: String = ''):

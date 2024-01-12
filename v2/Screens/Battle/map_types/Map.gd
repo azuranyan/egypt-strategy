@@ -28,8 +28,6 @@ var _errors: PackedStringArray = []
 @onready var attack_overlay := $AttackOverlay
 @onready var target_overlay := $TargetOverlay
 
-@onready var test_unit := $Entities/Unit
-
 #region Node
 func _ready():
 	update_configuration_warnings()
@@ -77,12 +75,14 @@ func get_spawn_points(spawn_type: String) -> Array[SpawnPoint]:
 	var z: Array[SpawnPoint] = []
 	z.assign(_get_objects().filter(func (x): return x is SpawnPoint and x.spawn_type == spawn_type))
 	return z
-			
-			
+
+
 ## Returns all the units owned by empire or all units if empire == null.
 func get_units(empire: Empire = null) -> Array[NewUnit]:
-	return get_objects().filter(func(x): _is_selectable_unit(x) and (empire == null or x.empire == empire))
-		
+	var z: Array[NewUnit] = []
+	z.assign(_get_objects().filter(func (x): _is_selectable_unit(x) and (empire == null or x.empire == empire)))
+	return z
+
 
 ## Returns the unit in cell.
 func get_unit(cell: Vector2, empire: Empire = null) -> NewUnit:
@@ -90,12 +90,12 @@ func get_unit(cell: Vector2, empire: Empire = null) -> NewUnit:
 		if _is_selectable_unit(obj) and obj.cell() == cell and (empire == null or obj.empire == empire):
 			return obj as NewUnit
 	return null
-	
+
 
 func _is_selectable_unit(obj: MapObject) -> bool:
 	return obj is NewUnit and obj.alive
-			
-			
+
+
 ## Returns all the objects.
 func get_objects() -> Array[MapObject]:
 	# yes, this is horrible

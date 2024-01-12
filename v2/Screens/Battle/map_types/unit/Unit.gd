@@ -170,6 +170,12 @@ var empire: Empire
 ## Mapping of status effect -> duration.
 var status_effects := {}
 
+var has_moved: bool
+
+var has_attacked: bool
+
+var has_taken_action: bool
+
 
 @onready var model: NewUnitModel = $UnitModel
 		

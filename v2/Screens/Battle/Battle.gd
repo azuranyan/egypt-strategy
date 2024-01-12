@@ -463,7 +463,7 @@ func _unload_map():
 
 func _evaluate_victory_conditions() -> bool:
 	for c in context.victory_conditions:
-		context.result = c.evaluate(self)
+		#context.result = c.evaluate(self)
 		if context.result != Result.None:
 			context.should_end = true
 			return true

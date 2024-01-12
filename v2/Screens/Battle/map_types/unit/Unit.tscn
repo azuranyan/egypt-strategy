@@ -107,8 +107,6 @@ stat_growth_2 = {
 "range": 0
 }
 basic_attack = ExtResource("2_ohwmu")
-selectable = null
-alive = null
 pathing = 1
 show_debug_tile = false
 

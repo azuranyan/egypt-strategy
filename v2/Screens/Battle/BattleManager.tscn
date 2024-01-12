@@ -1,11 +1,210 @@
-[gd_scene load_steps=18 format=3 uid="uid://bfo6inl2uutjo"]
+[gd_scene load_steps=23 format=3 uid="uid://bfo6inl2uutjo"]
 
 [ext_resource type="Script" path="res://Screens/Battle/BattleManager.gd" id="1_7nbam"]
 [ext_resource type="Texture2D" uid="uid://d11ms4wwvkbwg" path="res://Screens/Battle/Test_Map_Mockup_V8_HD.png" id="2_cy4xa"]
-[ext_resource type="PackedScene" uid="uid://bg3djjkbmlv2r" path="res://Screens/Battle/map_types/Map.tscn" id="2_wb1y3"]
 [ext_resource type="FontFile" uid="uid://b1mr3ff8qpetx" path="res://Rakkas-Regular.ttf" id="3_leprk"]
 [ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="4_bdp4j"]
 [ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="4_c2fdo"]
+
+[sub_resource type="Animation" id="Animation_7yf1u"]
+resource_name = "turn_banner.player"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TurnBanner/Control/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TurnBanner/Control/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TurnBanner/Control:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TurnBanner/Control:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 540), Vector2(0, 0), Vector2(0, 0), Vector2(0, 540)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_wuq27"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TurnBanner/Control/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TurnBanner/Control/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TurnBanner/Control:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TurnBanner/Control:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_oxtu6"]
+resource_name = "turn_banner.enemy"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TurnBanner/Control/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TurnBanner/Control/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TurnBanner/Control:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TurnBanner/Control:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 540), Vector2(0, 0), Vector2(0, 0), Vector2(0, 540)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_t6u46"]
+resource_name = "character_selected"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_05h7i"]
+_data = {
+"RESET": SubResource("Animation_wuq27"),
+"character_selected": SubResource("Animation_t6u46"),
+"turn_banner.enemy": SubResource("Animation_oxtu6"),
+"turn_banner.player": SubResource("Animation_7yf1u")
+}
 
 [sub_resource type="Gradient" id="Gradient_6tuyg"]
 offsets = PackedFloat32Array(0)
@@ -54,20 +253,21 @@ font_size = 26
 font_color = Color(0.235294, 0.188235, 0.12549, 1)
 outline_color = Color(0.235294, 0.188235, 0.12549, 1)
 
-[sub_resource type="Animation" id="Animation_hemgg"]
-resource_name = "shake"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:offset")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(5, 0), Vector2(-2, 0), Vector2(4, 0), Vector2(-3, 0), Vector2(3, 0), Vector2(-2, 0), Vector2(5, 0), Vector2(-1, 0), Vector2(-2, 0), Vector2(2, 0)]
-}
+[sub_resource type="LabelSettings" id="LabelSettings_po1sw"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 55
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ik2xm"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 55
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
 
 [sub_resource type="Animation" id="Animation_cep1i"]
 length = 0.001
@@ -84,23 +284,26 @@ tracks/0/keys = {
 "values": [Vector2(0, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_hemgg"]
+resource_name = "shake"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(5, 0), Vector2(-2, 0), Vector2(4, 0), Vector2(-3, 0), Vector2(3, 0), Vector2(-2, 0), Vector2(5, 0), Vector2(-1, 0), Vector2(-2, 0), Vector2(2, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lj2o0"]
 _data = {
 "RESET": SubResource("Animation_cep1i"),
 "shake": SubResource("Animation_hemgg")
 }
-
-[sub_resource type="GDScript" id="GDScript_aiobb"]
-script/source = "extends SubViewport
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	if Engine.is_editor_hint():
-		canvas_cull_mask = ~(0)
-	else:
-		canvas_cull_mask = ~(1 << 9)
-"
 
 [node name="BattleManager" type="Control"]
 layout_mode = 3
@@ -110,6 +313,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7nbam")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_05h7i")
+}
+autoplay = "RESET"
 
 [node name="Background" type="CanvasLayer" parent="."]
 layer = -1
@@ -466,6 +675,68 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
+[node name="TurnBanner" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="Control" type="Control" parent="TurnBanner"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="TurnBanner/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 643.0
+offset_top = 505.0
+offset_right = -643.0
+offset_bottom = -505.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="TurnBanner/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -247.0
+offset_top = -39.0
+offset_right = 247.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "PLAYER TURN"
+label_settings = SubResource("LabelSettings_po1sw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="TurnBanner/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -247.0
+offset_top = -39.0
+offset_right = 247.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "ENEMY TURN"
+label_settings = SubResource("LabelSettings_ik2xm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -488,8 +759,6 @@ speed_scale = 3.0
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 transparent_bg = true
 handle_input_locally = false
+canvas_cull_mask = 4294966783
 size = Vector2i(1920, 1080)
 render_target_update_mode = 4
-script = SubResource("GDScript_aiobb")
-
-[node name="Map" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_wb1y3")]

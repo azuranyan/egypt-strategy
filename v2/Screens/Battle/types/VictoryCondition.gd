@@ -1,15 +1,15 @@
 extends Resource
 class_name VictoryCondition
 
-
-func evaluate(battle: Battle) -> Battle.Result:
-	if battle.get_owned_units(battle.context.defender).is_empty():
-		return Battle.Result.AttackerVictory
+# TODO 
+func evaluate(battle: BattleManager) -> BattleManager.Result:
+	if battle.empire_units[battle.defender].is_empty():
+		return BattleManager.Result.AttackerVictory
 		
-	if battle.get_owned_units(battle.context.attacker).is_empty():
-		return Battle.Result.DefenderVictory
+	if battle.empire_units[battle.attacker].is_empty():
+		return BattleManager.Result.DefenderVictory
 		
-	return Battle.Result.None
+	return BattleManager.Result.None
 	
 
 func win_description() -> String:
