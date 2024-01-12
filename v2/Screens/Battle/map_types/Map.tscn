@@ -552,7 +552,6 @@ lock_to_world = true
 uniform_offset = false
 map_pos = Vector2(1, 11)
 
-[connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
 [connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]
 [connection signal="world_changed" from="World" to="UnitPath" method="_on_world_world_changed"]
 [connection signal="world_changed" from="World" to="PathingOverlay" method="_on_world_world_changed"]

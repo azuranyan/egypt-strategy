@@ -3,7 +3,7 @@ class_name BattleAgent
 
 
 ## Reference to the battle object.
-var battle: BattleManager
+var battle: Battle
 
 ## Reference to the empire this agent is controlling.
 var empire: Empire

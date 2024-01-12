@@ -1,4 +1,4 @@
-class_name BattleManager
+class_name Battle
 extends Control
 
 
@@ -31,7 +31,7 @@ enum Result {
 
 
 var empire_units := {}
-var map: NewMap
+var map: Map
 var cursor: Cursor
 var player: Empire
 var ai: Empire
@@ -94,7 +94,7 @@ func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_S:
-				set_unit_standby(map.test_unit, map.test_unit.map_pos != NewMap.OUT_OF_BOUNDS)
+				set_unit_standby(map.test_unit, map.test_unit.map_pos != Map.OUT_OF_BOUNDS)
 			KEY_A:
 				damage_unit(map.test_unit, 'test', 1)
 			KEY_D:
@@ -187,11 +187,11 @@ func set_camera_follow(obj: Node2D):
 
 func create_agent(empire: Empire) -> BattleAgent:
 	var agent: BattleAgent
-	agent = BattleAgent.new()
-	#if empire.is_player_owned():
-	#	agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
-	#else:
-	#	agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
+	if empire.is_player_owned():
+		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
+		#agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
+	else:
+		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
 	agent.battle = self
 	agent.empire = empire
 	add_child(agent)
@@ -225,8 +225,8 @@ func release_lock():
 #region Unit Functions
 # TODO walk_unit, unit_use_attack, set_unit, etc
 ## Returns units owned by game.
-func get_owned_units(empire: Empire, standby := false) -> Array[NewUnit]:
-	var re: Array[NewUnit] = []
+func get_owned_units(empire: Empire, standby := false) -> Array[Unit]:
+	var re: Array[Unit] = []
 	if standby:
 		for unit in empire_units[empire]:
 			re.append(unit)
@@ -239,9 +239,9 @@ func get_owned_units(empire: Empire, standby := false) -> Array[NewUnit]:
 	
 	
 ## Spawns a unit.
-func spawn_unit(path: String, empire: Empire, custom_name := "", pos := NewMap.OUT_OF_BOUNDS, heading := Unit.Heading.East) -> NewUnit:
+func spawn_unit(path: String, empire: Empire, custom_name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.East) -> Unit:
 	#assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
-	var unit := load(path).instantiate() as NewUnit
+	var unit := load(path).instantiate() as Unit
 	unit.display_name = custom_name if custom_name != "" else unit.chara.name
 	
 	add_unit(unit, empire, pos, heading)
@@ -249,13 +249,13 @@ func spawn_unit(path: String, empire: Empire, custom_name := "", pos := NewMap.O
 	
 
 ## Adds the unit if it's not already yet.
-func add_unit(unit: NewUnit, empire: Empire, pos := NewMap.OUT_OF_BOUNDS, heading := Unit.Heading.East):
+func add_unit(unit: Unit, empire: Empire, pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.East):
 	if not unit.has_meta("Battle_init_ready"):
 		if unit.get_parent() == null:
 			map.get_node("Entities").add_child(unit)
 		
 		unit.empire = empire
-		if pos == NewMap.OUT_OF_BOUNDS:
+		if pos == Map.OUT_OF_BOUNDS:
 			set_unit_standby(unit, true)
 		else:
 			unit.map_pos = pos
@@ -267,7 +267,7 @@ func add_unit(unit: NewUnit, empire: Empire, pos := NewMap.OUT_OF_BOUNDS, headin
 	
 
 ## Removes the unit from the map.
-func remove_unit(unit: NewUnit):
+func remove_unit(unit: Unit):
 	if unit.has_meta("Battle_init_ready"):
 		unit.get_parent().remove_child(unit)
 		empire_units[unit.empire].erase(unit)
@@ -275,23 +275,23 @@ func remove_unit(unit: NewUnit):
 	
 	
 ## Kills a unit.
-func kill_unit(unit: NewUnit):
+func kill_unit(unit: Unit):
 	unit.add_to_group('units_dead')
 	unit.alive = false
 	
 
 ## Revives a unit.
-func revive_unit(unit: NewUnit, hp: int):
+func revive_unit(unit: Unit, hp: int):
 	unit.hp = mini(hp, unit.maxhp)
 	unit.add_to_group('units_alive')
 	unit.alive = true
 
 
 ## Standby unit.
-func set_unit_standby(unit: NewUnit, standby: bool):
+func set_unit_standby(unit: Unit, standby: bool):
 	if standby:
 		unit.set_meta("Battle_unit_standby_old_pos", unit.map_pos)
-		unit.map_pos = NewMap.OUT_OF_BOUNDS
+		unit.map_pos = Map.OUT_OF_BOUNDS
 		unit.add_to_group('units_standby')
 	else:
 		var pos: Vector2 = unit.get_meta("Battle_unit_standby_old_pos", Vector2.ZERO)
@@ -300,7 +300,7 @@ func set_unit_standby(unit: NewUnit, standby: bool):
 
 	
 ## Inflict damage upon a unit.
-func damage_unit(unit: NewUnit, source: Variant, amount: int):
+func damage_unit(unit: Unit, source: Variant, amount: int):
 	var vul := false
 	var blk := false
 	# if unit has vul, increase damage taken by 1
@@ -334,7 +334,7 @@ func damage_unit(unit: NewUnit, source: Variant, amount: int):
 	
 
 ## Heals unit.
-func heal_unit(unit: NewUnit, _source: Variant, amount: int):
+func heal_unit(unit: Unit, _source: Variant, amount: int):
 	# unit might have been killed prior to this within the same frame,
 	# before dead units are processed
 	if unit.alive:
@@ -344,31 +344,31 @@ func heal_unit(unit: NewUnit, _source: Variant, amount: int):
 
 
 #region Draw
-func draw_unit_path(unit: NewUnit, target_cell: Vector2):
+func draw_unit_path(unit: Unit, target_cell: Vector2):
 	map.unit_path.initialize(unit.get_pathable_cells())
 	map.unit_path.draw(unit.cell(), target_cell)
 
 
-func draw_unit_pathable_cells(unit: NewUnit):
+func draw_unit_pathable_cells(unit: Unit):
 	map.pathing_overlay.draw(unit.get_pathable_cells(), 2) # green
 
 
-func draw_unit_attack_range(unit: NewUnit, attack: Attack):
-	map.attack_overlay.draw(unit.get_attack_range(attack), 3) # red
+func draw_unit_attack_range(unit: Unit, attack: Attack):
+	map.attack_overlay.draw(unit.get_attack_range_cells(attack), 3) # red
 	
 	
-func draw_unit_attack_targets(unit: NewUnit, attack: Attack, target: Variant, target_rotation: Variant, is_multi_target := false):
+func draw_unit_attack_targets(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant, is_multi_target := false):
 	if is_multi_target:
 		map.attack_overlay.clear()
 		for i in target.size():
-			var cells := unit.get_attack_target(attack, target[i], target_rotation[i])
+			var cells := unit.get_attack_target_cells(attack, target[i], target_rotation[i])
 			map.target_overlay.draw(cells, 1, false) # blue
 	else:
-		var cells := unit.get_attack_target(attack, target, target_rotation)
+		var cells := unit.get_attack_target_cells(attack, target, target_rotation)
 		map.target_overlay.draw(cells, 1, true) # blue
 		
 		
-func draw_floating_number(unit: NewUnit, number: int, color: Color):
+func draw_floating_number(unit: Unit, number: int, color: Color):
 	# create the node
 	var node := preload("res://Screens/Battle/FloatingNumber.tscn").instantiate()
 	var anim := node.get_node('AnimationPlayer') as AnimationPlayer
@@ -459,7 +459,7 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 
 func _load_map(scene: PackedScene):
 	print("Loading map '%s'" % scene.resource_path)
-	map = scene.instantiate() as NewMap
+	map = scene.instantiate() as Map
 	
 	viewport.add_child(map)
 	cursor = map.get_node("Cursor")
@@ -476,7 +476,7 @@ func _unload_map():
 	
 func _redistribute_units():
 	for u in map.get_objects():
-		if not u is NewUnit:
+		if not u is Unit:
 			continue
 		
 		if not u.has_meta("default_owner"):
@@ -566,7 +566,7 @@ func _do_battle(agent: Dictionary) -> Result:
 	return result
 	
 	
-func _tick_status_effects(unit: NewUnit):
+func _tick_status_effects(unit: Unit):
 	var expired_effects := []
 	for effect in unit.status_effects:
 		unit.status_effects[effect] -= 1

@@ -1,5 +1,5 @@
 @tool
-class_name NewUnitModel
+class_name UnitModel
 extends Node2D
 
 

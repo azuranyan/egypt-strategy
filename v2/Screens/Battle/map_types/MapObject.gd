@@ -72,7 +72,7 @@ const DEBUG_TILE_NAME := "Internal_MapObject__debug_tile"
 @export var display_icon: Texture2D
 		
 ## A reference to the map.
-var map: NewMap
+var map: Map
 	
 ## A reference to the world.
 var world: World
@@ -117,7 +117,7 @@ func _create_debug_tile():
 	add_child(_debug_tile, false, Node.INTERNAL_MODE_FRONT)
 	
 	
-func _enter_map(map: NewMap, world: World):
+func _enter_map(map: Map, world: World):
 	self.map = map
 	self.world = world
 	map.ready.connect(map_ready)

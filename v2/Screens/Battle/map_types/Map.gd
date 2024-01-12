@@ -1,5 +1,5 @@
 @tool
-class_name NewMap
+class_name Map
 extends Node2D
 
 
@@ -12,6 +12,23 @@ const OUT_OF_BOUNDS := Vector2(69, 420)
 ## Extra size around the map world that isn't playable but still interactible.
 const PLAYABLE_BOUNDS := 5
 
+## Pathing group ordered by increasing strictness.
+enum Pathing {
+	## Object is always passable.
+	NONE,
+	
+	## Object is impassable to enemy units.
+	UNIT,
+	
+	## Object is impassable but can by bypassed with a special movement skill.
+	DOODAD,
+	
+	## Object is impassable but can by bypassed with a special movement skill.
+	TERRAIN,
+	
+	## Object is impassable and cannot be bypassed.
+	IMPASSABLE,
+}
 
 # World changes are quite expensive so we only refresh on a fixed time.
 @export var world_update_frequency: float = 0.5
@@ -78,22 +95,22 @@ func get_spawn_points(spawn_type: String) -> Array[SpawnPoint]:
 
 
 ## Returns all the units owned by empire or all units if empire == null.
-func get_units(empire: Empire = null) -> Array[NewUnit]:
-	var z: Array[NewUnit] = []
+func get_units(empire: Empire = null) -> Array[Unit]:
+	var z: Array[Unit] = []
 	z.assign(_get_objects().filter(func (x): _is_selectable_unit(x) and (empire == null or x.empire == empire)))
 	return z
 
 
 ## Returns the unit in cell.
-func get_unit(cell: Vector2, empire: Empire = null) -> NewUnit:
+func get_unit(cell: Vector2, empire: Empire = null) -> Unit:
 	for obj in _get_objects():
 		if _is_selectable_unit(obj) and obj.cell() == cell and (empire == null or obj.empire == empire):
-			return obj as NewUnit
+			return obj as Unit
 	return null
 
 
 func _is_selectable_unit(obj: MapObject) -> bool:
-	return obj is NewUnit and obj.alive
+	return obj is Unit and obj.alive
 
 
 ## Returns all the objects.

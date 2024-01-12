@@ -1,4 +1,4 @@
-class_name NewUnitDriver
+class_name UnitDriver
 extends Path2D
 
 
@@ -10,7 +10,7 @@ signal _walking_finished
 
 
 ## The target unit to move around.
-@export var target: NewUnit
+@export var target: Unit
 
 
 var _walking: bool

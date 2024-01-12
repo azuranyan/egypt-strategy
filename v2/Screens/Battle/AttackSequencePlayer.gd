@@ -22,8 +22,8 @@ func use_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Uni
 	
 	# play animations
 	for t in targets:
-		t.model.play_animation(attack.target_animation)
-	unit.model.play_animation(attack.user_animation)
+		t.model.play_animation(attack.target_animation, false)
+	unit.model.play_animation(attack.user_animation, false)
 	
 	# spawn effects
 	var uuid := 'AttackSequencePlayer_use_attack_%s' % _use_attack_id
@@ -79,8 +79,8 @@ func use_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Uni
 	
 func effect_done(c: CurryEffect):
 	# stop animations
-	c.target.model.play_animation("idle")
-	c.unit.model.play_animation("idle")
+	c.target.stop_animation()
+	c.unit.stop_animation()
 	
 	c.queue_free()
 	_map[c.uuid].erase(c)

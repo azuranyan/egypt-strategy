@@ -1,15 +1,14 @@
 @tool
-class_name NewUnit
+class_name Unit
 extends MapObject
-
-
-const HEADING_ANGLES := [0, PI/2, PI, PI*3/4]
 
 
 signal stat_changed(stat, value)
 
 signal status_effect_added(effect)
 signal status_effect_removed(effect)
+
+const HEADING_ANGLES := [0, PI/2, PI, PI*3/4]
 
 ## Default walk (phase friendly units).
 const PHASE_NONE = 0
@@ -52,6 +51,19 @@ enum Behavior {
 	
 	## Aims to inflict as many enemies with negative status as possible, will choose different target if already afflicted.
 	StatusApplier,
+}
+
+## Headings
+enum Heading {East, South, West, North}
+
+
+enum {
+	ATTACK_OK = 0,
+	ATTACK_NOT_UNLOCKED,
+	ATTACK_TARGET_INSIDE_MIN_RANGE,
+	ATTACK_TARGET_OUT_OF_RANGE,
+	ATTACK_NO_TARGETS,
+	ATTACK_INVALID_TARGET,
 }
 
 
@@ -177,7 +189,7 @@ var has_attacked: bool
 var has_taken_action: bool
 
 
-@onready var model: NewUnitModel = $UnitModel
+@onready var model: UnitModel = $UnitModel
 		
 		
 var _pathable_cells: PackedVector2Array
@@ -255,12 +267,12 @@ func remove_status_effect(effect: String):
 	
 	
 ## Returns true if the other unit is an ally.
-func is_ally(other: NewUnit) -> bool:
+func is_ally(other: Unit) -> bool:
 	return other.empire == empire
 	
 
 ## Returns true if the other unit is an enemy.
-func is_enemy(other: NewUnit) -> bool:
+func is_enemy(other: Unit) -> bool:
 	return other.empire != empire
 	
 	
@@ -270,9 +282,14 @@ func get_pathable_cells() -> PackedVector2Array:
 	
 
 ## Returns an array of cells in the attack range.
-func get_attack_range(attack: Attack) -> PackedVector2Array:
+func get_attack_range(attack: Attack) -> int:
+	return attack.range if attack.range >= 0 else range
+	
+	
+## Returns an array of cells in the attack range.
+func get_attack_range_cells(attack: Attack) -> PackedVector2Array:
 	var _cell: Vector2 = cell()
-	var arr := Util.flood_fill(_cell, attack.range if attack.range >= 0 else range, map.get_playable_bounds())
+	var arr := Util.flood_fill(_cell, get_attack_range(attack), map.get_playable_bounds())
 	
 	if attack.min_range <= 0:
 		return arr
@@ -285,7 +302,7 @@ func get_attack_range(attack: Attack) -> PackedVector2Array:
 	
 	
 ## Returns an array of cells in the target aoe.
-func get_attack_target(attack: Attack, target: Vector2i, target_rotation: float = 0) -> PackedVector2Array:
+func get_attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
 	if attack.melee:
 		target_rotation = get_heading() * PI/2
 	
@@ -299,6 +316,66 @@ func get_attack_target(attack: Attack, target: Vector2i, target_rotation: float 
 		
 	return re
 
+
+## Returns a list of units in range of the attack.
+func get_attack_target_units(attack: Attack, target: Vector2, target_rotation: float) -> Array[Unit]:
+	var re: Array[Unit] = []
+	for target_cell in get_attack_target_cells(attack, target, target_rotation):
+		var u := map.get_unit(target_cell)
+		if u:
+			re.append(u)
+	return re
+	
+	
+## Checks if the attack 
+func check_use_attack(attack: Attack, target_cell: Vector2, target_rotation: float) -> int:
+	# check for bond level
+	if attack == special_attack and bond < 2:
+		return ATTACK_NOT_UNLOCKED
+	
+	# check for minimum range
+	if attack.min_range > 0:
+		if target_cell in Util.flood_fill(cell(), attack.min_range, map.get_world_bounds()):
+			return ATTACK_TARGET_INSIDE_MIN_RANGE
+		
+	# check for range
+	if target_cell not in Util.flood_fill(cell(), get_attack_range(attack), map.get_world_bounds()):
+		return ATTACK_TARGET_OUT_OF_RANGE
+		
+	# check for any targets
+	var target_cells := get_attack_target_cells(attack, target_cell, target_rotation)
+	var targets := map.get_units().filter(func(x): return x in target_cells)
+	if targets.is_empty():
+		return ATTACK_NO_TARGETS
+		
+	# check for valid targets
+	var has_valid_target := false
+	for t in targets:
+		var target_flags := attack.get_target_flags()
+		if  (target_flags & 1 != 0 and is_enemy(t)) or \
+			(target_flags & 2 != 0 and not is_enemy(t)) or \
+			(target_flags & 4 != 0 and self == t):
+			has_valid_target = true
+			break
+	if not has_valid_target: 			# causes the attack to release as long
+		return ATTACK_INVALID_TARGET	# even if there are invalid targets
+	
+	return ATTACK_OK
+	
+	
+## Pathfinds to a target cell.
+func pathfind_cell(end: Vector2i) -> PackedVector2Array:
+	var start := cell()
+	var pathable := Util.flood_fill(cell(), 99, map.get_world_bounds(), func(x): return x == end or is_pathable(x))
+	var pathfinder := PathFinder.new(map.world, pathable)
+	var long_path := pathfinder.calculate_point_path(start, end)
+	
+	for i in long_path.size():
+		var p := long_path[i]
+		if Util.cell_distance(start, p) > move:# or not Globals.battle.is_placeable(unit, p):
+			return long_path.slice(0, i)
+	return long_path
+	
 	
 ## Returns true if this unit can path through cell.
 func is_pathable(cell: Vector2) -> bool:
