@@ -44,9 +44,14 @@ var should_end: bool
 var victory_conditions: Array[VictoryCondition]
 
 var _warnings = []
-var _lock := 0
+var _lock := {}
+var _waiting_for_lock := false
+
+var _camera_target_remote: RemoteTransform2D = null
+
 
 @onready var viewport := $SubViewportContainer/SubViewport
+@onready var camera := $SubViewportContainer/Camera2D
 	
 	
 ## Returns true if player won the battle.
@@ -83,6 +88,7 @@ static func player_battle_result_message(is_attacker: bool, result: Result) -> S
 	
 	
 func _ready():
+	Globals.battle = self
 	_test.call_deferred()
 	
 
@@ -93,14 +99,8 @@ func _exit_tree():
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_S:
-				set_unit_standby(map.test_unit, map.test_unit.map_pos != Map.OUT_OF_BOUNDS)
-			KEY_A:
-				damage_unit(map.test_unit, 'test', 1)
-			KEY_D:
-				heal_unit(map.test_unit, 'test', 1)
 			KEY_SPACE:
-				spawn_unit("res://Screens/Battle/map_types/unit/Unit.tscn", null, "", map.to_cell(map.world.as_uniform(get_global_mouse_position())))     
+				release_lock("debug pause")
 	
 	
 #region Core API
@@ -180,18 +180,35 @@ func show_message(type, message, blocking):
 	
 
 func set_camera_follow(obj: Node2D):
-	var remote := RemoteTransform2D.new()
-	obj.add_child(remote)
-	remote.remote_path = $SubViewportContainer/Camera2D.get_path()
+	if _camera_target_remote:
+		var target := _camera_target_remote.get_parent()
+		if target == obj:
+			return
+		target.remove_child(_camera_target_remote)
+		_camera_target_remote.queue_free()
+		_camera_target_remote = null
+	
+	_camera_target_remote = RemoteTransform2D.new()
+	obj.add_child(_camera_target_remote)
+	_camera_target_remote.remote_path = camera.get_path()
+	
+	
+func _unset_camera_follow(obj: Node2D):
+	if obj and _camera_target_remote:
+		obj.remove_child(_camera_target_remote)
+		_camera_target_remote.queue_free()
+		_camera_target_remote = null
 		
 
 func create_agent(empire: Empire) -> BattleAgent:
 	var agent: BattleAgent
 	if empire.is_player_owned():
-		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
+		agent = BattleAgentAIv2.new()
+		#agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
 		#agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
 	else:
-		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
+		agent = BattleAgentAIv2.new()
+		#agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
 	agent.battle = self
 	agent.empire = empire
 	add_child(agent)
@@ -206,24 +223,99 @@ func wait_for_death_animations():
 func evaluate_victory_conditions() -> Result:
 	var result: Result = Result.None
 	for vc in victory_conditions:
-		result = vc.evaluate(self)
+		#result = vc.evaluate(self)
 		if result != Result.None:
 			break
 	return result
 	
-	
-func acquire_lock():
-	_lock += 1
+
+## Stops the battle flow and waits until all locks are released.
+func acquire_lock(tag: String):
+	if tag not in _lock:
+		_lock[tag] = true
 	
 
-func release_lock():
-	if _lock > 0:
-		_lock -= 1
+## Releases an instance of lock.
+func release_lock(tag: String):
+	if tag in _lock:
+		_lock.erase(tag)
+		if _lock.is_empty() and _waiting_for_lock:
+			_continue.emit()
+		
+		
+func _wait_for_lock():
+	if _waiting_for_lock:
+		push_error("_wait_for_lock reentry detected")
+	else:
+		if not _lock.is_empty():
+			_waiting_for_lock = true
+			await _continue
+			_waiting_for_lock = false
 #endregion Core API
 
 
 #region Unit Functions
-# TODO walk_unit, unit_use_attack, set_unit, etc
+## Action
+func unit_action_pass(unit: Unit):
+	unit.has_moved = true
+	unit.has_attacked = true
+	unit.has_taken_action = false
+	
+
+## Action
+func unit_action_walk(unit: Unit, target: Vector2):
+	await unit.walk_towards(target)
+	unit.has_moved = true
+	unit.has_moved = true
+	unit.has_taken_action = true
+	
+
+## Action
+func unit_action_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
+	#await unit.use_attack(attack, target, target_rotation)
+	await _unit_use_attack(unit, attack, target, target_rotation)
+	unit.has_moved = true
+	unit.has_attacked = true
+	unit.has_taken_action = true
+
+
+func _unit_use_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
+	var old_target := _camera_target_remote.get_parent()
+	camera.drag_horizontal_enabled = false
+	camera.drag_vertical_enabled = false
+	camera.position_smoothing_enabled = false
+	set_camera_follow(unit) # TODO follow target, not unit
+	
+	$AttackHUD/AttackNameBox/Label.text = attack.name
+	$HUD.visible = false
+	$AttackHUD.visible = true
+	
+	# TODO camera follow target
+	await unit.use_attack(attack, target, target_rotation)
+	#unit.model.play_animation(attack.user_animation, false)
+	#
+	## we actually dont care about the multicast stat of the attack,
+	## if we're given an array we multicast regardless. it's up to
+	## the caller to make sure we're called with the right args
+	#if typeof(target) == TYPE_ARRAY:
+		#$Drivers/AttackMulticaster.use_attack_multicast(unit, attack, target, target_rotation)
+	#else:
+		#await _apply_attack_effects(unit, attack, target, target_rotation)
+	$AttackHUD.visible = false
+	$HUD.visible = true
+	camera.position_smoothing_enabled = true
+	set_camera_follow(old_target)
+	
+
+#func _apply_attack_effects(unit: Unit, attack: Attack, target: Vector2, target_rotation: float):
+	#var target_units := unit.get_attack_target_units(attack, target, target_rotation)
+	#for t in target_units: 
+		## this will requeue animation when multicasting but it's fine because
+		## multicast occurs in one frame and this will only be a redundant call
+		#t.model.play_animation(attack.target_animation, false)
+	#$Drivers/AttackSequencePlayer.use_attack.call_deferred(unit, attack, target, target_units)
+	#await $Drivers/AttackSequencePlayer.done
+	
 ## Returns units owned by game.
 func get_owned_units(empire: Empire, standby := false) -> Array[Unit]:
 	var re: Array[Unit] = []
@@ -235,6 +327,15 @@ func get_owned_units(empire: Empire, standby := false) -> Array[Unit]:
 			if unit.is_in_group('units_standby'):
 				continue
 			re.append(unit)
+	return re
+	
+	
+## Returns nearby units.
+func get_units_in_range(from: Vector2, distance: int, filter: Callable) -> Array[Unit]:
+	var re: Array[Unit] = []
+	for obj in map.get_objects():
+		if obj is Unit and Util.cell_distance(obj.map_pos, from) <= distance and filter.call(obj):
+			re.append(obj)
 	return re
 	
 	
@@ -264,7 +365,7 @@ func add_unit(unit: Unit, empire: Empire, pos := Map.OUT_OF_BOUNDS, heading := U
 		empire_units[unit.empire].append(unit)
 		
 		unit.set_meta("Battle_init_ready", true)
-	
+		
 
 ## Removes the unit from the map.
 func remove_unit(unit: Unit):
@@ -272,8 +373,7 @@ func remove_unit(unit: Unit):
 		unit.get_parent().remove_child(unit)
 		empire_units[unit.empire].erase(unit)
 		unit.remove_meta("Battle_init_ready")
-	
-	
+		
 ## Kills a unit.
 func kill_unit(unit: Unit):
 	unit.add_to_group('units_dead')
@@ -389,7 +489,6 @@ func draw_floating_number(unit: Unit, number: int, color: Color):
 	
 
 func show_turn_banner():
-	print("SHOW TURN BANNER")
 	set_process_input(false)
 	if on_turn.is_player_owned():
 		$AnimationPlayer.play("turn_banner.player")

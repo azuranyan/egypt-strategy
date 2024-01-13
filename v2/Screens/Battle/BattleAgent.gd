@@ -41,7 +41,6 @@ func do_action(action: Callable, args := []):
 	
 	await battle.wait_for_death_animations()
 	
-	# check for auto end turn
 	if Globals.prefs.auto_end_turn:
 		for u in battle.get_owned_units(empire):
 			if not u.has_moved or not u.has_attacked:

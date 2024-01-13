@@ -1,30 +1,16 @@
-extends Node
 class_name AttackSequencePlayer
+extends Node
 
 signal done
-
-
-var battle: Battle
 
 var _map := {}
 var _use_attack_id := 0
 
 
-func _ready():
-	battle = get_parent()
-			
-	
 ## This function was made like this to prevent signals tangling and awaiting
 ## and that one weird godot bug where animatedsprite2d created one after the
 ## other keeps the last one from playing and stuck at frame 0.
-func use_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Unit]):
-	print("%s%s used %s%s %s" % [unit.name, battle.map.cell(unit.map_pos), attack.name, target, targets])
-	
-	# play animations
-	for t in targets:
-		t.model.play_animation(attack.target_animation, false)
-	unit.model.play_animation(attack.user_animation, false)
-	
+func use_attack(unit: Unit, attack: Attack, target: Vector2, targets: Array[Unit]):
 	# spawn effects
 	var uuid := 'AttackSequencePlayer_use_attack_%s' % _use_attack_id
 	_use_attack_id += 1
@@ -39,7 +25,7 @@ func use_attack(unit: Unit, attack: Attack, target: Vector2i, targets: Array[Uni
 			
 			# setup effect
 			gfx.sprite_frames = preload("res://Screens/Battle/data/default_effects.tres")
-			gfx.position = battle.map.world.uniform_to_screen(t.map_pos) + Vector2(0, -50)
+			gfx.position = t.position + Vector2(0, -50)
 			gfx.scale = Vector2(0.5, 0.5)
 			gfx.play(eff.get_animation())
 			gfx.pause()

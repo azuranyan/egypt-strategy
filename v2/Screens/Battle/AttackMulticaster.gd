@@ -1,19 +1,19 @@
-extends Node
 class_name AttackMulticaster
-
+extends Node
 
 signal done
 
+@export var battle: Battle
 
 var counter := 0
 
 
-## Non-reentrant!
-func use_attack_multicast(unit: Unit, attack: Attack, target_cells: Array[Vector2i], target_rotation: float):
+## TODO Non-reentrant!
+func use_attack_multicast(unit: Unit, attack: Attack, targets: Array[Vector2], rotations: Array[float]):
 	var uuid := 'AttackMulticaster%s_%s' % [self.get_instance_id(), randi()]
-	for target_cell in target_cells:
+	for i in targets.size():
 		var seq := func():
-			await Globals.battle.use_attack(unit, attack, target_cell, target_rotation)
+			await battle._apply_attack_effects(unit, attack, targets[i], rotations[i])
 			_decrement()
 		seq.call_deferred()
 		

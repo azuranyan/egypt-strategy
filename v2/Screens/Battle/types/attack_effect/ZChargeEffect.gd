@@ -10,7 +10,7 @@ const DIRECTIONS := [
 ]
 
 
-func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	var angle := user.map_pos.angle_to_point(target_unit.map_pos)
 	var direction := roundi(angle/(PI/2)) % 4
 	var new_pos := Vector2i(target_unit.map_pos - DIRECTIONS[direction])
@@ -19,6 +19,7 @@ func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, 
 		# TODO animate
 		user.map_pos = new_pos
 		user.facing = angle
+	attack.effect_complete(self)
 	
 	
 func get_effect_hint() -> String:

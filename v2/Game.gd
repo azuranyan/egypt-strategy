@@ -83,7 +83,9 @@ var world := {
 
 var scene_queue: Array[String] = []
 var overworld: Overworld = preload("res://Screens/Overworld/Overworld.tscn").instantiate()
-var battle: Battle = preload("res://Screens/Battle/BattleManager.tscn").instantiate()
+
+## Access to global battle variable.
+var battle: Battle
 
 var screen_stack: Array[Node] = []
 

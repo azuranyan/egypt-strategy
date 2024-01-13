@@ -44,6 +44,7 @@ var _errors: PackedStringArray = []
 @onready var pathing_overlay := $PathingOverlay
 @onready var attack_overlay := $AttackOverlay
 @onready var target_overlay := $TargetOverlay
+@onready var drivers := $Drivers
 
 #region Node
 func _ready():
@@ -97,7 +98,7 @@ func get_spawn_points(spawn_type: String) -> Array[SpawnPoint]:
 ## Returns all the units owned by empire or all units if empire == null.
 func get_units(empire: Empire = null) -> Array[Unit]:
 	var z: Array[Unit] = []
-	z.assign(_get_objects().filter(func (x): _is_selectable_unit(x) and (empire == null or x.empire == empire)))
+	z.assign(_get_objects().filter(func (x): return _is_selectable_unit(x) and (empire == null or x.empire == empire)))
 	return z
 
 
@@ -138,6 +139,11 @@ func get_playable_bounds() -> Rect2:
 ## Returns the world bounds where units can be placed.
 func get_world_bounds() -> Rect2:
 	return Rect2(Vector2.ZERO, world.map_size)
+	
+
+## Returns true if the point is within world bounds.
+func is_inside_bounds(v: Vector2) -> bool:
+	return get_world_bounds().has_point(v)
 	
 
 ## Returns the cell of a point.

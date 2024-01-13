@@ -93,15 +93,19 @@ func do_turn():
 		var chances := PackedFloat32Array()
 		var weight_sum := 0.0
 		for action in all_actions.duplicate():
-			var weight := evaluate(unit, action)
-			if weight > 0.0:
-				weight_sum += weight
-				weights.append(weight)
-				chances.append(weight_sum)
-				actions.append(action)
+			var weight : float = abs(evaluate(unit, action)) # TODO remove abs
+			weight_sum += weight
+			weights.append(weight)
+			chances.append(weight_sum)
+			actions.append(action)
+			#if weight > 0.0:
+			#	weight_sum += weight
+			#	weights.append(weight)
+			#	chances.append(weight_sum)
+			#	actions.append(action)
 				
 		# weighted selection
-		print('Doing action ', unit.display_name)
+		print('Doing action ', unit.display_name, " gen list: ", all_actions.size())
 		var roll := randf_range(0.0, weight_sum)
 		var action: Action = null
 		for i in actions.size():
@@ -120,21 +124,23 @@ func do_turn():
 	
 ## Actually performs the move.
 func do_unit_action(unit: Unit, action: Action):
+	var nearest := battle.get_nearest_units(unit.map_pos, unit.get_attack_range(unit.basic_attack), func(x): return x != unit)# and unit.is_enemy(x))
+	if not nearest.is_empty():
+		await battle.unit_action_attack(unit, unit.basic_attack, nearest[0].map_pos, 0)
+		return
+	
 	# do nothing
 	if unit.cell() == action.cell and not action.attack:
-		#battle.do_nothing(unit)
-		print(unit, " do nothing")
+		await battle.unit_action_pass(unit)
 		return
 		
 	# action
-	#await battle._walk_along(unit, pathfind_cell(unit, action.cell))
-	print(unit, " move")
+	await battle.unit_action_walk(unit, action.cell)
 	unit.has_moved = true
 	
 	# attack
 	if action.attack:
-		#await battle.use_attack(unit, action.attack, action.target, 0)
-		print(unit, " attack")
+		await battle.use_attack(unit, action.attack, action.target, 0)
 		unit.has_attacked = true
 		
 	unit.has_taken_action = true
@@ -151,6 +157,7 @@ func evaluate(unit: Unit, move: Action) -> float:
 	var nearest_ally: Unit = null
 	var nearest_enemy_dist := 9999
 	var nearest_ally_dist := 9999
+	
 	for u in battle.map.get_units():
 		var dist := Util.cell_distance(move.cell, u.map_pos)
 		if u.empire == empire:

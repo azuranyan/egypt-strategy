@@ -61,7 +61,7 @@ func start_driver(path: PackedVector2Array):
 	# if walking speed is invalid or path is empty, skip all the work
 	if target.walk_speed > 0 and not path.is_empty():
 		_old_pos = target.map_pos
-		curve.add_point(Vector2.ZERO)
+		#curve.add_point(Vector2.ZERO)
 			
 		for p in path:
 			curve.add_point(target.world.as_global(p) - position)

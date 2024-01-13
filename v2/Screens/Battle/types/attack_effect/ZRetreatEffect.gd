@@ -10,12 +10,13 @@ const DIRECTIONS := [
 ]
 
 
-func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, _target_unit: Unit) -> void:
+func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, _target_unit: Unit) -> void:
 	var new_pos := Vector2i(user.map_pos - DIRECTIONS[user.get_heading()])
 	
 	if battle.is_placeable(user, new_pos) and battle.map.is_inside_bounds(new_pos):
 		# TODO animate
 		user.map_pos = new_pos
+	attack.effect_complete(self)
 	
 	
 func get_effect_hint() -> String:

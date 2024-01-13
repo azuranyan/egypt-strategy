@@ -5,8 +5,9 @@ class_name FlatHealEffect
 @export var amount: int
 
 
-func apply(battle: Battle, user: Unit, _attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
-	battle.damage_unit(target_unit, user, -amount)
+func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
+	battle.heal_unit(target_unit, user, amount)
+	attack.effect_completed(self)
 	
 	
 func get_effect_hint() -> String:

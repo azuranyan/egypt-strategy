@@ -3,27 +3,38 @@ class_name Unit
 extends MapObject
 
 
+signal mouse_button_pressed(button: int, position: Vector2, pressed: bool)
+
 signal stat_changed(stat, value)
 
 signal status_effect_added(effect)
 signal status_effect_removed(effect)
 
+signal walking_started
+signal walking_finished
+
+signal attack_started(attack: Attack, target: Variant, target_rotation: Variant)
+signal attack_finished()
+
+signal _multicast_finished
+
+
 const HEADING_ANGLES := [0, PI/2, PI, PI*3/4]
 
 ## Default walk (phase friendly units).
-const PHASE_NONE = 0
+const PHASE_NONE := 0
 
 ## Ignores enemies.
-const PHASE_ENEMIES = 1 << 0
+const PHASE_ENEMIES := 1 << 0
 
 ## Ignores doodads.
-const PHASE_DOODADS = 1 << 1
+const PHASE_DOODADS := 1 << 1
 
 ## Ignores terrain.
-const PHASE_TERRAIN = 1 << 2
+const PHASE_TERRAIN := 1 << 2
 
 ## Ignores all pathing and placement restrictions.
-const PHASE_NO_CLIP = 1 << 3
+const PHASE_NO_CLIP := 1 << 3
 
 
 ## Dictates how his unit chooses its actions.
@@ -188,6 +199,10 @@ var has_attacked: bool
 
 var has_taken_action: bool
 
+var _driver: UnitDriver
+
+var _active_multicast_counter := 0
+
 
 @onready var model: UnitModel = $UnitModel
 		
@@ -216,7 +231,7 @@ func _ready():
 	
 	$UnitModel/Shadow.visible = false
 		
-		
+	
 func _update_bond():
 	stat_changed.emit('bond', bond)
 	for stat in stat_growth_1:
@@ -275,12 +290,67 @@ func is_ally(other: Unit) -> bool:
 func is_enemy(other: Unit) -> bool:
 	return other.empire != empire
 	
-	
-## Returns an array of cells this unit can path through.
-func get_pathable_cells() -> PackedVector2Array:
-	return _pathable_cells
-	
 
+## Uses basic attack.
+func use_attack(attack: Attack, target: Variant, target_rotation: Variant):
+	if not attack or (attack != basic_attack and attack != special_attack):
+		return
+	attack_started.emit(attack, target, target_rotation)
+	
+	play_animation(attack.user_animation, false)
+	if attack.multicast > 0:
+		await _use_attack_multicast(attack, target, target_rotation)
+	else:
+		await _use_attack(attack, target, target_rotation)
+		
+	attack_finished.emit()
+		
+	
+func _use_attack(attack: Attack, target: Vector2, target_rotation: float):
+	var timer := get_tree().create_timer(1)
+	
+	var target_units := get_attack_target_units(attack, target, target_rotation)
+	for target_unit in target_units:
+		target_unit.play_animation(attack.target_animation, false)
+	await attack.execute(self, target, target_units)
+	
+	# just in case we're playing an extra long animation or we finished early
+	if timer.time_left > 0:
+		await timer.timeout
+		
+	stop_animation()
+	for target_unit in target_units:
+		target_unit.stop_animation()
+
+	
+func _use_attack_multicast(attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
+	var timer := get_tree().create_timer(1)
+	
+	_active_multicast_counter = target.size()
+	var target_units = []
+	for i in target.size():
+		target_units[i] = get_attack_target_units(attack, target[i], target_rotation[i])
+		for target_unit in target_units[i]:
+			target_unit.play_animation(attack.target_animation, false)
+		var multicaster := func():
+			await attack.execute(self, target[i], target_units[i])
+			_active_multicast_counter -= 1
+			if _active_multicast_counter <= 0:
+				_active_multicast_counter = 0
+				_multicast_finished.emit()
+		multicaster.call_deferred()
+	await _multicast_finished
+		
+	# just in case we're playing an extra long animation or we finished early
+	if timer.time_left > 0:
+		await timer.timeout
+		
+	stop_animation()
+	for i in target.size():
+		for target_unit in target_units[i]:
+			target_unit.stop_animation()
+	
+	
 ## Returns an array of cells in the attack range.
 func get_attack_range(attack: Attack) -> int:
 	return attack.range if attack.range >= 0 else range
@@ -301,22 +371,6 @@ func get_attack_range_cells(attack: Attack) -> PackedVector2Array:
 	return re
 	
 	
-## Returns an array of cells in the target aoe.
-func get_attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
-	if attack.melee:
-		target_rotation = get_heading() * PI/2
-	
-	var re := PackedVector2Array()
-	for offs in attack.target_shape:
-		var m := Transform2D()
-		m = m.translated(offs)
-		m = m.rotated(target_rotation)
-		m = m.translated(target)
-		re.append(map.to_cell(m * Vector2.ZERO))
-		
-	return re
-
-
 ## Returns a list of units in range of the attack.
 func get_attack_target_units(attack: Attack, target: Vector2, target_rotation: float) -> Array[Unit]:
 	var re: Array[Unit] = []
@@ -327,6 +381,13 @@ func get_attack_target_units(attack: Attack, target: Vector2, target_rotation: f
 	return re
 	
 	
+## Returns an array of cells in the target aoe.
+func get_attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
+	if attack.melee:
+		target_rotation = get_heading() * PI/2
+	return attack.get_target_cells(target, target_rotation)
+
+
 ## Checks if the attack 
 func check_use_attack(attack: Attack, target_cell: Vector2, target_rotation: float) -> int:
 	# check for bond level
@@ -344,7 +405,7 @@ func check_use_attack(attack: Attack, target_cell: Vector2, target_rotation: flo
 		
 	# check for any targets
 	var target_cells := get_attack_target_cells(attack, target_cell, target_rotation)
-	var targets := map.get_units().filter(func(x): return x in target_cells)
+	var targets := map.get_units().filter(func(x): return x.cell() in target_cells)
 	if targets.is_empty():
 		return ATTACK_NO_TARGETS
 		
@@ -361,10 +422,49 @@ func check_use_attack(attack: Attack, target_cell: Vector2, target_rotation: flo
 		return ATTACK_INVALID_TARGET	# even if there are invalid targets
 	
 	return ATTACK_OK
+
+
+## Unit faces towards a point.
+func face_towards(target: Vector2):
+	facing = map_pos.angle_to_point(target)
+	
+	
+## Unit pathfinds and walk towards target.
+func walk_towards(target: Vector2):
+	await walk_along(pathfind_cell(target))
+	
+	
+## Walks unit along specified path.
+func walk_along(path: PackedVector2Array):
+	if is_walking():
+		stop_walking()
+		
+	walking_started.emit()
+		
+	_driver = preload("res://Screens/Battle/map_types/unit/UnitDriver.tscn").instantiate() as UnitDriver
+	_driver.target = self
+	map.drivers.add_child(_driver)
+	await _driver.start_driver(path)
+	
+	walking_finished.emit()
+			
+
+## Stops unit walking.
+func stop_walking():
+	if is_walking():
+		_driver.stop_driver()
+		map.drivers.remove_child(_driver)
+		_driver.queue_free()
+		_driver = null
+	
+	
+## Returns true if unit is walking.
+func is_walking() -> bool:
+	return _driver != null
 	
 	
 ## Pathfinds to a target cell.
-func pathfind_cell(end: Vector2i) -> PackedVector2Array:
+func pathfind_cell(end: Vector2) -> PackedVector2Array:
 	var start := cell()
 	var pathable := Util.flood_fill(cell(), 99, map.get_world_bounds(), func(x): return x == end or is_pathable(x))
 	var pathfinder := PathFinder.new(map.world, pathable)
@@ -375,6 +475,11 @@ func pathfind_cell(end: Vector2i) -> PackedVector2Array:
 		if Util.cell_distance(start, p) > move:# or not Globals.battle.is_placeable(unit, p):
 			return long_path.slice(0, i)
 	return long_path
+	
+	
+## Returns an array of cells this unit can path through.
+func get_pathable_cells() -> PackedVector2Array:
+	return _pathable_cells
 	
 	
 ## Returns true if this unit can path through cell.
@@ -425,4 +530,3 @@ func _on_map_pos_changed():
 	if _pathable_cells_origin != _cell:
 		_pathable_cells = Util.flood_fill(_cell, move, map.get_world_bounds(), is_pathable)
 		_pathable_cells_origin = _cell
-

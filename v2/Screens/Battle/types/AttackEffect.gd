@@ -41,7 +41,7 @@ func get_animation() -> String:
 
 ## Applies the attack effect.
 func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_unit: Unit) -> void:
-	pass
+	attack.effect_completed(self)
 	
 	
 ## Type of effect hint for the engine.

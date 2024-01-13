@@ -9,6 +9,7 @@ func apply(_battle: Battle, _user: Unit, attack: Attack, target_cell: Vector2i, 
 	target_unit.map_pos = target_cell
 	if face_target:
 		target_unit.face_towards(target_cell)
+	attack.effect_completed(self)
 	
 	
 func get_effect_hint() -> String:

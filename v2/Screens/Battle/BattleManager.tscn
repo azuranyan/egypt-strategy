@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://bfo6inl2uutjo"]
+[gd_scene load_steps=25 format=3 uid="uid://bfo6inl2uutjo"]
 
 [ext_resource type="Script" path="res://Screens/Battle/BattleManager.gd" id="1_7nbam"]
 [ext_resource type="Texture2D" uid="uid://d11ms4wwvkbwg" path="res://Screens/Battle/Test_Map_Mockup_V8_HD.png" id="2_cy4xa"]
@@ -74,6 +74,7 @@ resource_name = "character_selected"
 
 [sub_resource type="Animation" id="Animation_oxtu6"]
 resource_name = "turn_banner.enemy"
+length = 1.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -137,6 +138,7 @@ tracks/4/keys = {
 
 [sub_resource type="Animation" id="Animation_7yf1u"]
 resource_name = "turn_banner.player"
+length = 1.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -253,7 +255,14 @@ font_size = 26
 font_color = Color(0.235294, 0.188235, 0.12549, 1)
 outline_color = Color(0.235294, 0.188235, 0.12549, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_po1sw"]
+[sub_resource type="Gradient" id="Gradient_ygace"]
+offsets = PackedFloat32Array(0, 0.3, 0.7, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yyath"]
+gradient = SubResource("Gradient_ygace")
+
+[sub_resource type="LabelSettings" id="LabelSettings_ik2xm"]
 line_spacing = -18.835
 font = ExtResource("3_leprk")
 font_size = 55
@@ -261,7 +270,7 @@ font_color = Color(0.235294, 0.188235, 0.12549, 1)
 outline_size = 15
 outline_color = Color(0.937255, 0.901961, 0.870588, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_ik2xm"]
+[sub_resource type="LabelSettings" id="LabelSettings_po1sw"]
 line_spacing = -18.835
 font = ExtResource("3_leprk")
 font_size = 55
@@ -319,6 +328,8 @@ libraries = {
 "": SubResource("AnimationLibrary_05h7i")
 }
 autoplay = "RESET"
+
+[node name="Drivers" type="Node" parent="."]
 
 [node name="Background" type="CanvasLayer" parent="."]
 layer = -1
@@ -675,16 +686,51 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="TurnBanner" type="CanvasLayer" parent="."]
+[node name="AttackHUD" type="CanvasLayer" parent="."]
 visible = false
 
-[node name="Control" type="Control" parent="TurnBanner"]
+[node name="AttackNameBox" type="Control" parent="AttackHUD"]
 layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -424.0
+offset_top = 51.0
+offset_right = 424.0
+offset_bottom = 137.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="AttackHUD/AttackNameBox"]
+self_modulate = Color(0.937255, 0.901961, 0.870588, 1)
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = SubResource("GradientTexture1D_yyath")
+
+[node name="Label" type="Label" parent="AttackHUD/AttackNameBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Fire's Sojourner"
+label_settings = SubResource("LabelSettings_ik2xm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TurnBanner" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="Control" type="Control" parent="TurnBanner"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
 
 [node name="ColorRect" type="ColorRect" parent="TurnBanner/Control"]
 layout_mode = 1
