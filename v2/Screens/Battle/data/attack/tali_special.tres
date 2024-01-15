@@ -1,15 +1,21 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://5cduxd66lgfw"]
+[gd_resource type="Resource" script_class="Attack" load_steps=7 format=3 uid="uid://5cduxd66lgfw"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="1_fh2fk"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="1_k3irx"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_v676j"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="2_hc5n6"]
+
+[sub_resource type="Resource" id="Resource_l7hjg"]
+script = ExtResource("1_k3irx")
+sprite_frames = ExtResource("2_hc5n6")
+animation = "basic_heal"
+target = 2
 
 [sub_resource type="Resource" id="Resource_q38pl"]
 script = ExtResource("1_fh2fk")
 effect = "BLK"
 duration = 1
 target = 2
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_v676j")
@@ -23,4 +29,4 @@ range = 0
 min_range = 0
 multicast = 0
 melee = true
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_q38pl")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_l7hjg"), SubResource("Resource_q38pl")])

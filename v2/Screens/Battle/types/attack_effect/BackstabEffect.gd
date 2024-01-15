@@ -1,5 +1,5 @@
-extends AttackEffect
 class_name BackstabEffect
+extends AttackEffect
 	
 
 const DIRECTIONS := [
@@ -17,16 +17,5 @@ func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, t
 		# TODO animate
 		user.map_pos = new_pos
 		user.face_towards(target_unit.map_pos)
-	attack.effect_completed(self)
+	attack.effect_complete(self)
 	
-	
-func get_effect_hint() -> String:
-	return 'attack'
-	
-	
-func _default_description() -> String:
-	return 'Teleports user behind target.'
-
-
-func _default_animation() -> String:
-	return 'none'

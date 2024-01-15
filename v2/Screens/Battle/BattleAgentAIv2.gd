@@ -26,6 +26,12 @@ static func generate_move_attack_action(unit: Unit, cell: Vector2, attack: Attac
 				re.append(Action.move_attack(cell, attack, targettable))
 	return re
 	
+	
+func _input(event):
+	if event is InputEventKey and event.keycode == KEY_SPACE and event.pressed:
+		for v in agents.values():
+			v.nigglet.emit()
+			
 
 func prepare_units():
 	print('Agent is preparing units.')
@@ -85,7 +91,7 @@ func do_turn():
 		var unit: Unit = unit_action_queue.pop_back()
 		var agent := get_agent(unit)
 		
-		var action := agent.get_action()
+		var action := await  agent.get_action()
 		await do_action(do_unit_action, [unit, action])
 
 
@@ -119,15 +125,21 @@ func get_agent(unit: Unit) -> Agent:
 				pass
 	return agents[unit]
 
-
+signal paused
 func do_unit_action(unit: Unit, action: Action):
+	if unit.display_name == 'A':
+		await paused
+		
+		
 	# do nothing
 	if unit.cell() == action.cell and not action.attack:
 		await battle.unit_action_pass(unit)
 		return
 		
 	# action
+	battle.map.pathing_overlay.draw(unit.get_pathable_cells())
 	await battle.unit_action_walk(unit, action.cell)
+	battle.map.pathing_overlay.clear()
 	
 	# attack
 	if action.attack:
@@ -188,81 +200,38 @@ class Agent:
 
 class NormalMeleeAgent extends Agent:
 	
+	signal nigglet
 	func get_action() -> Action:
 		var enemies: Array[Unit] = battle.map.get_units().filter(unit.is_enemy)
 		var nearby: Array[Unit] = []
 		
-		# unit targeting:
-		# closest enemy
-		
-		# pathing:
-		# shortest travel distance to target
-		# shortest cell distance to target
-		
-		# attack targeting:
-		# least allies hit
-		# most enemies hit
-		
 		for enemy in enemies:
 			if Util.cell_distance(unit.map_pos, enemy.map_pos) < activation_radius:
 				nearby.append(enemy)
-		
+			
+		# if there are no enemy units within activation range, do nothing (heal)
 		if nearby.is_empty():
 			return Action.move_only(unit.cell())
 			
 		enemies.sort_custom(custom_compare)
 		var target := enemies[0]
 		
-		var points := {}
-		var moves := generate_action_list()
-		moves.sort_custom(func(a: Action, b: Action): 
-			if a.attack != null and b.attack == null:
-				return true
-			if a.attack == null and b.attack != null:
-				return false
-			var pts1 := 0
-			var pts2 := 0
-			if a.attack and b.attack:
-				var ta := unit.get_attack_target_units(a.attack, a.target, 0)
-				for t in ta:
-					if unit.is_ally(t):
-						pts1 -= 3
-					else:
-						pts1 += 1
-				var tb := unit.get_attack_target_units(b.attack, b.target, 0)
-				for t in tb:
-					if unit == t or unit.is_ally(t):
-						pts2 -= 3
-					else:
-						pts2 += 1
-				if pts1 > pts2:
-					return true
-				elif pts1 < pts2:
-					return false
-			return Util.cell_distance(a.cell, a.target) < Util.cell_distance(b.cell, b.target)
-			)
-		
-		return moves[0]
+		# if the enemy is reachable by special attack, do it
+		if Util.cell_distance(target.map_pos, unit.map_pos) <= unit.get_attack_range(unit.special_attack):
+			# TODO ff avoidance and maximize aoe
+			print("using special attack on ", target.map_pos)
+			return Action.move_attack(unit.map_pos, unit.special_attack, target.map_pos)
 			
-		
-		#
-		#var target_pool := enemies if nearby.is_empty() else nearby
-		#target_pool.sort_custom(custom_compare)
-		#
-		#var target := target_pool[0]
-		#
-		#var moves := generate_action_list()
-		#var chosen_move: Action
-		#for move in moves:
-			#if chosen_move == null:
-				#chosen_move = move
-			#else:
-				#var attack := ((move.attack != null) and (chosen_move.attack == null))
-				#var closer := Util.cell_distance(move.cell, move.target) < Util.cell_distance(chosen_move.cell, chosen_move.target)
-				#if attack or closer:
-					#chosen_move = move
-		#return chosen_move
-	
+		# if the enemy is reachable by basic attack, do it
+		if Util.cell_distance(target.map_pos, unit.map_pos) <= unit.get_attack_range(unit.basic_attack):
+			# TODO ff avoidance and maximize aoe
+			print("using basic attack on ", target.map_pos)
+			return Action.move_attack(unit.map_pos, unit.basic_attack, target.map_pos)
+			
+		# if the enemy is not immediately reachable, pathfind
+		var path := unit.pathfind_cell(target.cell())
+		return Action.move_only(path[path.size() - 1])
+			
 		
 	func custom_compare(a: Unit, b: Unit) -> bool:
 		var a_high_prio := is_high_priority(a)
@@ -278,7 +247,7 @@ class NormalMeleeAgent extends Agent:
 	func is_high_priority(u: Unit) -> bool:
 		return false
 		
-	
+
 	
 	
 	

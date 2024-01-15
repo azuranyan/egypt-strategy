@@ -148,8 +148,11 @@ func is_inside_bounds(v: Vector2) -> bool:
 
 ## Returns the cell of a point.
 func to_cell(p: Vector2) -> Vector2:
-	# kinda shite but it is what it is
-	return Vector2(int(snapped(p.x, 0.01)), int(snapped(p.y, 0.01)))
+	return Vector2(int(round(p.x)), int(round(p.y)))
+
+
+func cell(p: Vector2) -> Vector2:
+	return Vector2(int(round(p.x)), int(round(p.y)))
 	
 	
 func _snap_all_objects():

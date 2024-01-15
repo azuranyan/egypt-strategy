@@ -11,5 +11,6 @@ sprite_frames = ExtResource("2_ax8f5")
 position = Vector2(-8, 1)
 sprite_frames = ExtResource("2_ax8f5")
 animation = &"FrontIdle"
+frame_progress = 1.0
 offset = Vector2(0, -64)
 flip_h = true

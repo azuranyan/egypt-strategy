@@ -24,8 +24,6 @@ var _old_pos: Vector2
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	curve = Curve2D.new()
-	if target:
-		remote_transform.remote_path = target.get_path()
 	set_process(false)
 	
 	
@@ -55,11 +53,11 @@ func start_driver(path: PackedVector2Array):
 	# stop driver else we will leak signals and do weird stuff
 	stop_driver()
 	
-	# position us to the target, this makes the visuals better
 	position = target.position
+	remote_transform.remote_path = target.get_path()
 	
 	# if walking speed is invalid or path is empty, skip all the work
-	if target.walk_speed > 0 and not path.is_empty():
+	if target.walk_speed > 0 and not path.is_empty() and not (path.size() == 1 and path[0] == target.cell()):
 		_old_pos = target.map_pos
 		#curve.add_point(Vector2.ZERO)
 			
@@ -84,6 +82,7 @@ func start_driver(path: PackedVector2Array):
 		path_follow.progress = 0
 		curve.clear_points()
 	
+	remote_transform.remote_path = ""
 	_walking = false
 	walking_finished.emit()
 	

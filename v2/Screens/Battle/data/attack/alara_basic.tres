@@ -1,21 +1,33 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://qpdrrn4yu0p4"]
+[gd_resource type="Resource" script_class="Attack" load_steps=9 format=3 uid="uid://qpdrrn4yu0p4"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_56x5e"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_l4hpf"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="1_csvcq"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_l4hpf"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="2_rpx2v"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="3_mkfke"]
 
-[sub_resource type="Resource" id="Resource_0y462"]
+[sub_resource type="Resource" id="Resource_k25fr"]
+script = ExtResource("2_rpx2v")
+sprite_frames = ExtResource("3_mkfke")
+animation = "basic_damage"
+target = 0
+
+[sub_resource type="Resource" id="Resource_4mak1"]
+script = ExtResource("1_csvcq")
+animation = "hurt"
+target = 0
+
+[sub_resource type="Resource" id="Resource_j4xer"]
 script = ExtResource("1_l4hpf")
 flat_damage = 0
 stat = "damage"
 multiplier = 1.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_56x5e")
 name = "Attack"
-description = ""
+description = "Alara's basic attack"
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)])
@@ -24,4 +36,4 @@ range = -1
 min_range = 1
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_0y462")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_k25fr"), SubResource("Resource_4mak1"), SubResource("Resource_j4xer")])

@@ -1,0 +1,144 @@
+[gd_scene load_steps=8 format=3 uid="uid://c510q5va3g82t"]
+
+[ext_resource type="Script" path="res://Screens/Battle/PrepUnitButton.gd" id="1_xqbi7"]
+[ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="2_udeou"]
+[ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="3_7lgms"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1a17v"]
+line_spacing = -18.835
+font = ExtResource("3_7lgms")
+font_size = 20
+font_color = Color(0.937255, 0.901961, 0.870588, 1)
+outline_size = 6
+outline_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_u611q"]
+line_spacing = -18.835
+font = ExtResource("3_7lgms")
+font_size = 14
+font_color = Color(0.937255, 0.901961, 0.870588, 1)
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="Gradient" id="Gradient_yv1tp"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ibfhu"]
+gradient = SubResource("Gradient_yv1tp")
+
+[node name="PrepUnitButton" type="Control"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_xqbi7")
+highlighted = null
+metadata/_edit_group_ = true
+
+[node name="Control2" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.160784, 0.160784, 1)
+
+[node name="Control" type="Control" parent="Control2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect2" type="ColorRect" parent="Control2/Control"]
+clip_children = 2
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -156.5
+offset_right = -36.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control2/Control/ColorRect2"]
+layout_mode = 0
+offset_left = -18.0
+offset_top = -47.0
+offset_right = 132.0
+offset_bottom = 103.0
+texture = ExtResource("2_udeou")
+expand_mode = 3
+
+[node name="ColorRect3" type="ColorRect" parent="Control2/Control"]
+clip_children = 2
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -34.5
+offset_right = -32.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Control2/Control"]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 3.0
+offset_right = 308.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Alara"
+label_settings = SubResource("LabelSettings_1a17v")
+vertical_alignment = 2
+
+[node name="Label2" type="Label" parent="Control2/Control"]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 22.0
+offset_right = 320.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Boastful Bird God"
+label_settings = SubResource("LabelSettings_u611q")
+vertical_alignment = 2
+
+[node name="Selection" type="TextureRect" parent="."]
+visible = false
+modulate = Color(1.8, 1.4, 1.2, 0.294)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_ibfhu")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+keep_pressed_outside = true
+flat = true
+
+[connection signal="button_down" from="Button" to="." method="_on_button_button_down"]
+[connection signal="button_up" from="Button" to="." method="_on_button_button_up"]

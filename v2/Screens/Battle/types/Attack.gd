@@ -99,27 +99,38 @@ func get_target_cells(target: Vector2, target_rotation: float) -> PackedVector2A
 	return re
 
 
+## Executes the attack.
 func execute(user: Unit, target: Vector2, target_units: Array[Unit]):
 	var effect_counter := 0
 	for effect in effects:
+		effect.attack_started(Globals.battle, user, self)
 		for target_unit in target_units:
-			var gfx := AnimatedSprite2D.new()
-			target_unit.add_child(gfx)
-			gfx.sprite_frames = preload("res://Screens/Battle/data/default_effects.tres")
-			gfx.scale = Vector2(0.5, 0.5)
-			gfx.play(effect.get_animation())
-			gfx.animation_finished.connect(gfx.queue_free)
-			
-			var wrapper := func():
-				effect_counter += 1
-				effect.apply(Globals.battle, user, self, target, target_unit)
-			wrapper.call_deferred()
+			if _is_effect_target(user, target_unit, effect):
+				var wrapper := func():
+					effect_counter += 1
+					effect.apply(Globals.battle, user, self, target, target_unit)
+				wrapper.call_deferred()
 	
 	while effect_counter > 0:
 		await _effect_completed
 		effect_counter -= 1
 		
+	for effect in effects:
+		effect.attack_finished(Globals.battle, user, self)
 	
-func effect_completed(_effect: AttackEffect):
+	
+func _is_effect_target(unit: Unit, target: Unit, effect: AttackEffect) -> bool:
+	match effect.target:
+		0: # Enemy
+			return unit.is_enemy(target)
+		1: # Ally
+			return unit.is_ally(target)
+		2: # Self
+			return unit == target
+	return false
+	
+	
+## To be called by the effect once their effects are finished.
+func effect_complete(_effect: AttackEffect):
 	_effect_completed.emit()
 	

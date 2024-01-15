@@ -3,7 +3,7 @@ class_name Unit
 extends MapObject
 
 
-signal mouse_button_pressed(button: int, position: Vector2, pressed: bool)
+signal mouse_button_pressed(unit: Unit, button: int, position: Vector2, pressed: bool)
 
 signal stat_changed(stat, value)
 
@@ -132,6 +132,7 @@ enum {
 		maxhp = value
 		if is_node_ready():
 			stat_changed.emit('maxhp', value)
+			_update_stats()
 		
 @export var hp: int:
 	set(value):
@@ -140,6 +141,7 @@ enum {
 		hp = value
 		if is_node_ready():
 			stat_changed.emit('hp', value)
+			_update_stats()
 		
 @export var move: int:
 	set(value):
@@ -148,6 +150,7 @@ enum {
 		move = value
 		if is_node_ready():
 			stat_changed.emit('move', value)
+			_update_stats()
 		
 @export var damage: int:
 	set(value):
@@ -156,6 +159,7 @@ enum {
 		damage = value
 		if is_node_ready():
 			stat_changed.emit('damage', value)
+			_update_stats()
 		
 @export var range: int:
 	set(value):
@@ -164,6 +168,7 @@ enum {
 		range = value
 		if is_node_ready():
 			stat_changed.emit('range', value)
+			_update_stats()
 		
 @export_range(0, 2) var bond: int:
 	set(value):
@@ -172,6 +177,8 @@ enum {
 		bond = value
 		if is_node_ready():
 			_update_bond()
+			
+@export var special_unlocked: bool
 			
 @export var stat_growth_1: Dictionary = {'maxhp': 0, 'move': 0, 'damage': 0, 'range': 0}
 
@@ -203,12 +210,9 @@ var _driver: UnitDriver
 
 var _active_multicast_counter := 0
 
-
 @onready var model: UnitModel = $UnitModel
 		
 		
-var _pathable_cells: PackedVector2Array
-var _pathable_cells_origin: Vector2
 var _base_stats: Dictionary
 			
 			
@@ -230,7 +234,20 @@ func _ready():
 	model.scale = model_scale
 	
 	$UnitModel/Shadow.visible = false
+	
+	display_name = chara.name
+	display_icon = chara.portrait
+	_update_stats()
 		
+	
+func _update_stats():
+	$HUD/Label.text = display_name
+	if maxhp <= 0:
+		$HUD/ColorRect2.scale = Vector2.ONE
+	else:
+		$HUD/ColorRect2.scale.x = hp/maxhp
+	_update_bond()
+	
 	
 func _update_bond():
 	stat_changed.emit('bond', bond)
@@ -246,7 +263,7 @@ func _update_bond():
 func map_ready():
 	# the world is iso-like rotated at 45 degrees so this should be correct.
 	# if wonky things happen, then we'll just do the complete calculation
-	model.position.y = world.tile_size * sqrt(2) * world.y_ratio / 2
+	#model.position.y = world.tile_size * sqrt(2) * world.y_ratio / 2
 	$UnitModel/Shadow.scale = world.world_transform.get_scale() * Vector2(1, world.y_ratio) * 0.5
 	$UnitModel/Shadow.visible = true
 
@@ -254,6 +271,11 @@ func map_ready():
 ## Returns the direction this unit is facing.
 func get_heading() -> Unit.Heading:
 	return model.heading
+	
+	
+## Returns true if special is unlocked.
+func is_special_unlocked() -> bool:
+	return special_unlocked or bond >= 2
 	
 	
 ## Sets the direction this unit is facing.
@@ -279,6 +301,10 @@ func add_status_effect(effect: String, duration: int):
 func remove_status_effect(effect: String):
 	status_effects.erase(effect)
 	# TODO
+	
+	
+func is_player_owned() -> bool:
+	return empire != null and empire.is_player_owned()
 	
 	
 ## Returns true if the other unit is an ally.
@@ -310,8 +336,6 @@ func _use_attack(attack: Attack, target: Vector2, target_rotation: float):
 	var timer := get_tree().create_timer(1)
 	
 	var target_units := get_attack_target_units(attack, target, target_rotation)
-	for target_unit in target_units:
-		target_unit.play_animation(attack.target_animation, false)
 	await attack.execute(self, target, target_units)
 	
 	# just in case we're playing an extra long animation or we finished early
@@ -391,7 +415,7 @@ func get_attack_target_cells(attack: Attack, target: Vector2, target_rotation: f
 ## Checks if the attack 
 func check_use_attack(attack: Attack, target_cell: Vector2, target_rotation: float) -> int:
 	# check for bond level
-	if attack == special_attack and bond < 2:
+	if attack == special_attack and not is_special_unlocked():
 		return ATTACK_NOT_UNLOCKED
 	
 	# check for minimum range
@@ -440,7 +464,8 @@ func walk_along(path: PackedVector2Array):
 		stop_walking()
 		
 	walking_started.emit()
-		
+	
+	
 	_driver = preload("res://Screens/Battle/map_types/unit/UnitDriver.tscn").instantiate() as UnitDriver
 	_driver.target = self
 	map.drivers.add_child(_driver)
@@ -466,20 +491,21 @@ func is_walking() -> bool:
 ## Pathfinds to a target cell.
 func pathfind_cell(end: Vector2) -> PackedVector2Array:
 	var start := cell()
-	var pathable := Util.flood_fill(cell(), 99, map.get_world_bounds(), func(x): return x == end or is_pathable(x))
+	var pathable := get_pathable_cells()
+	if end not in pathable:
+		pathable.append(end)
 	var pathfinder := PathFinder.new(map.world, pathable)
 	var long_path := pathfinder.calculate_point_path(start, end)
 	
-	for i in long_path.size():
-		var p := long_path[i]
-		if Util.cell_distance(start, p) > move:# or not Globals.battle.is_placeable(unit, p):
-			return long_path.slice(0, i)
+	for i in range(long_path.size() - 1, -1, -1):
+		if is_placeable(long_path[i]) and Util.cell_distance(start, long_path[i]) <= move:
+			return long_path.slice(0, i + 1)
 	return long_path
 	
 	
 ## Returns an array of cells this unit can path through.
-func get_pathable_cells() -> PackedVector2Array:
-	return _pathable_cells
+func get_pathable_cells(limit_move := false) -> PackedVector2Array:
+	return Util.flood_fill(cell(), move if limit_move else 20, map.get_world_bounds(), is_pathable)
 	
 	
 ## Returns true if this unit can path through cell.
@@ -523,10 +549,3 @@ func _is_placeable_object(obj: MapObject) -> bool:
 		Map.Pathing.UNIT, Map.Pathing.IMPASSABLE:
 			return false
 	return true
-
-
-func _on_map_pos_changed():
-	var _cell: Vector2 = cell() # stupid fuck thinks it's a Vector2i
-	if _pathable_cells_origin != _cell:
-		_pathable_cells = Util.flood_fill(_cell, move, map.get_world_bounds(), is_pathable)
-		_pathable_cells_origin = _cell

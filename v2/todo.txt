@@ -6,13 +6,6 @@
 mark units with something when they have taken turn (E) in disgaea
 attack shape rotation is rotated 90 degrees
 overworld buttons need to be double clicked when clicked
-unit states in unit so we're not fiddling with stupid states and stuff
- - this also allows us to set unit on ghost or standby but keep its original position, so we can un-standby
- - can path and other stuff can also be implemented there, idgaf now
- - allows pathing over dead bodies
- - add x and y offset
-AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
-ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
 
 
 ## would be nice
@@ -58,7 +51,6 @@ remove dead untis from the map
 ##########################################################################################################
 
 12x12 grid
-lysandra is requried to be in the battle otherwise it wouldnt start
 mission objectives
  - always: lysandra must be there
  - you can't quit when you are attacked
@@ -68,3 +60,7 @@ overworld keyboard interactivity
 update the visuals to match the example
 main menu
 implement the AI behaviour system
+lysandra is requried to be in the battle otherwise it wouldnt start
+battle missions
+camera follow stops working after casting skill
+overworld keyboard interactivity

@@ -1,8 +1,19 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=6 format=3 uid="uid://cm3g3kwc45ib"]
+[gd_resource type="Resource" script_class="Attack" load_steps=10 format=3 uid="uid://cm3g3kwc45ib"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_flcsn"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_flcsn"]
+[ext_resource type="Script" path="res://Screens/Battle/types/AttackEffect.gd" id="1_g1cxt"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_q3yfy"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/ZBackstabEffect.gd" id="2_0bsx6"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/BackstabEffect.gd" id="2_0bsx6"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="2_r0t6v"]
+
+[sub_resource type="Resource" id="Resource_if8uw"]
+script = ExtResource("1_g1cxt")
+target = 0
+
+[sub_resource type="Resource" id="Resource_mtchi"]
+script = ExtResource("2_r0t6v")
+animation = "hurt"
+target = 0
 
 [sub_resource type="Resource" id="Resource_hqk0k"]
 script = ExtResource("1_flcsn")
@@ -10,14 +21,10 @@ flat_damage = 0
 stat = "damage"
 multiplier = 1.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_cweup"]
 script = ExtResource("2_0bsx6")
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_q3yfy")
@@ -31,4 +38,4 @@ range = -1
 min_range = 0
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_hqk0k"), SubResource("Resource_cweup")])
+effects = Array[ExtResource("1_g1cxt")]([SubResource("Resource_if8uw"), SubResource("Resource_mtchi"), SubResource("Resource_hqk0k"), SubResource("Resource_cweup")])

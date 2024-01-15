@@ -1,50 +1,54 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=10 format=3 uid="uid://bt0888vwkaq2i"]
+[gd_resource type="Resource" script_class="Attack" load_steps=15 format=3 uid="uid://bt0888vwkaq2i"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_gacmt"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="1_1ellk"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_gacmt"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_ptbto"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="2_ffncl"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="2_y2xke"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/RandomEffect.gd" id="3_2swjs"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="3_ciafc"]
+
+[sub_resource type="Resource" id="Resource_mvq4f"]
+script = ExtResource("1_1ellk")
+animation = "hurt"
+target = 0
+
+[sub_resource type="Resource" id="Resource_krmu0"]
+script = ExtResource("2_ffncl")
+sprite_frames = ExtResource("3_ciafc")
+animation = "basic_damage"
+target = 0
 
 [sub_resource type="Resource" id="Resource_6615r"]
 script = ExtResource("1_gacmt")
-flat_damage = 0
+flat_damage = 1
 stat = "damage"
-multiplier = 1.0
+multiplier = 0.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_2137o"]
 script = ExtResource("2_y2xke")
 effect = "VUL"
 duration = 1
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_ciwuv"]
 script = ExtResource("2_y2xke")
 effect = "PSN"
 duration = 2
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_klxf4"]
 script = ExtResource("2_y2xke")
 effect = "STN"
 duration = 1
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_ndwx7"]
 script = ExtResource("3_2swjs")
 effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_2137o"), SubResource("Resource_ciwuv"), SubResource("Resource_klxf4")])
 weights = Array[float]([50.0, 25.0, 25.0])
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_ptbto")
@@ -58,4 +62,4 @@ range = 2
 min_range = 0
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_6615r"), SubResource("Resource_ndwx7")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_mvq4f"), SubResource("Resource_krmu0"), SubResource("Resource_6615r"), SubResource("Resource_ndwx7")])

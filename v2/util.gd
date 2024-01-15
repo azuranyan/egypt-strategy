@@ -41,6 +41,9 @@ static func flood_fill(cell: Vector2, max_distance: float, bounds: Rect2, condit
 			for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
 				var q: Vector2 = p + direction
 				
+				if q in stack:
+					continue
+					
 				if q not in dest and bounds.has_point(q) and cell_distance(q, cell) <= max_distance and condition.call(q):
 					stack.append(q)
 					

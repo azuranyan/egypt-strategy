@@ -1,5 +1,5 @@
-extends AttackEffect
 class_name ChargeEffect
+extends AttackEffect
 	
 
 const DIRECTIONS := [
@@ -21,14 +21,3 @@ func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, t
 		user.facing = angle
 	attack.effect_complete(self)
 	
-	
-func get_effect_hint() -> String:
-	return 'attack'
-	
-	
-func _default_description() -> String:
-	return 'Charges towards target.'
-
-
-func _default_animation() -> String:
-	return 'none'

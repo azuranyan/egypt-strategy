@@ -2,6 +2,22 @@ class_name Battle
 extends Control
 
 
+signal battle_started
+signal battle_ended
+
+signal empire_preparation_started
+signal empire_preparation_ended
+
+signal turn_cycle_started
+signal turn_cycle_ended
+
+signal empire_turn_started
+signal empire_turn_ended
+
+signal action_started
+signal action_ended
+
+
 signal _continue
 
 
@@ -50,9 +66,9 @@ var _waiting_for_lock := false
 var _camera_target_remote: RemoteTransform2D = null
 
 
-@onready var viewport := $SubViewportContainer/SubViewport
-@onready var camera := $SubViewportContainer/Camera2D
-	
+@onready var viewport := $SubViewportContainer/SubViewport as SubViewport
+@onready var camera := $SubViewportContainer/Camera2D as Camera2D
+@onready var prep_unit_list := $HUD/PrepUnitList as PrepUnitList
 	
 ## Returns true if player won the battle.
 static func player_battle_result_win(is_attacker: bool, result: Result) -> bool:
@@ -94,18 +110,11 @@ func _ready():
 
 func _exit_tree():
 	request_ready()
-	
-	
-func _unhandled_input(event):
-	if event is InputEventKey and event.pressed:
-		match event.keycode:
-			KEY_SPACE:
-				release_lock("debug pause")
-	
+				
 	
 #region Core API
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick = null) -> bool:
-	if !_fulfills_attack_requirements(attacker, territory):
+	if !fulfills_attack_requirements(attacker, territory):
 		return false
 	
 	_start_battle.call_deferred(attacker, defender, territory, do_quick)
@@ -136,7 +145,7 @@ func _start_battle(attacker: Empire, defender: Empire, territory: Territory, do_
 	var result: Result = Result.None
 	
 	# start battle
-	BattleSignalBus.battle_started.emit(attacker, defender, territory)
+	battle_started.emit(attacker, defender, territory)
 	await Globals.play_queued_scenes()
 	
 	# do battle
@@ -150,33 +159,34 @@ func _start_battle(attacker: Empire, defender: Empire, territory: Territory, do_
 		result = await _real_battle(attacker, defender, territory)
 		
 	# end battle
-	BattleSignalBus.battle_ended.emit(result)
+	battle_ended.emit(result)
 	await Globals.play_queued_scenes()
 	
 	
 ## Returns true if the attacker can initiate the attack to territory.
-func _fulfills_attack_requirements(empire: Empire, territory: Territory) -> bool:
+func fulfills_attack_requirements(empire: Empire, territory: Territory) -> bool:
 	# TODO put battle requirements here
 	_warnings = []
 	return true
 
 
 ## Returns true if the attacker fulfills prep requirements over territory.
-func _fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
+func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
 	# TODO put battle requirements here
 	_warnings = []
 	return true
 	
 	
 ## Quit battle.
-func quit_battle():
-	# TODO show are you sure you want to quit
-	should_end = true
+func quit_battle(ask_for_confirmation := true, message := "Forfeit?"):
+	if ask_for_confirmation:
+		should_end = await show_pause_box(message, "Confirm", "Cancel")
+	else:
+		should_end = true
+		
 
-	
-func show_message(type, message, blocking):
-	# TODO place somewhere else
-	pass
+func show_pause_box(message: String, confirm = "Confirm", cancel = "Cancel") -> bool:
+	return await $Overlay/PauseBox.show_pause_box(message, confirm, cancel)
 	
 
 func set_camera_follow(obj: Node2D):
@@ -203,15 +213,13 @@ func _unset_camera_follow(obj: Node2D):
 func create_agent(empire: Empire) -> BattleAgent:
 	var agent: BattleAgent
 	if empire.is_player_owned():
-		agent = BattleAgentAIv2.new()
-		#agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
-		#agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
+		agent = BattleAgentPlayerv2.new()
 	else:
 		agent = BattleAgentAIv2.new()
 		#agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
 	agent.battle = self
 	agent.empire = empire
-	add_child(agent)
+	$Agents.add_child(agent)
 	agent.initialize()
 	return agent
 	
@@ -251,6 +259,121 @@ func _wait_for_lock():
 			_waiting_for_lock = true
 			await _continue
 			_waiting_for_lock = false
+			
+			
+func screen_to_global(pos: Vector2) -> Vector2:
+	return get_viewport().canvas_transform.affine_inverse() * pos
+
+
+func play_error():
+	if not $AudioStreamPlayer2D.is_playing():
+		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
+		$AudioStreamPlayer2D.play()
+
+
+var _selected_unit: Unit
+
+func set_selected_unit(unit: Unit):
+	_selected_unit = unit
+	if unit:
+		$HUD/CharacterPortrait/TextureRect.texture = unit.chara.portrait
+		$HUD/CharacterPortrait/Label.text = unit.chara.name.to_upper()
+		$HUD/CharacterPortrait.visible = true
+		$HUD/RestButton.visible = unit.is_player_owned() and not unit.has_attacked
+		$HUD/FightButton.visible = unit.is_player_owned() and not unit.has_attacked
+		$HUD/DiefyButton.visible = unit.is_player_owned() and not unit.has_attacked
+		$HUD/DiefyButton.disabled = not unit.is_special_unlocked()
+	else:
+		$HUD/CharacterPortrait.visible = false
+		$HUD/RestButton.visible = false
+		$HUD/FightButton.visible = false
+		$HUD/DiefyButton.visible = false
+		
+#enum {
+	#STATE_STANDBY,
+	#STATE_HOVER_UNIT,
+	#STATE_UNIT_SELECTED,
+	#STATE_ATTACK_SELECTED,
+	#STATE_ATTACK_SEQUENCE,
+#}
+#
+#var _state := 0
+#func hover_cell(cell: Vector2):
+	#_selected_cell = cell
+	#cursor.position = map.world.as_global(cell)
+	#
+	#if _selected_unit:
+		#if not _selected_unit.has_taken_action:
+			#map.unit_path.draw(_selected_unit.cell(), cell)
+		#return
+	#
+	#var hovered := map.get_unit(cell)
+	#if hovered:
+		#$HUD/CharacterPortrait/TextureRect.texture = hovered.chara.portrait
+		#$HUD/CharacterPortrait/Label.text = hovered.display_name
+		#$HUD/CharacterPortrait.visible = true
+	#else:
+		#$HUD/CharacterPortrait.visible = false
+		#
+#
+#func select_unit(unit: Unit):
+	#if unit:
+		#$HUD/CharacterPortrait/TextureRect.texture = unit.chara.portrait
+		#$HUD/CharacterPortrait/Label.text = unit.display_name
+		#$HUD/CharacterPortrait.visible = true
+		#$HUD/RestButton.visible = unit.is_player_owned()
+		#$HUD/FightButton.visible = unit.is_player_owned()
+		#$HUD/DiefyButton.visible = unit.is_player_owned()
+		#$HUD/DiefyButton.disabled = not unit.is_special_unlocked()
+		#if not unit.has_taken_action:
+			#var pathable := unit.get_pathable_cells(true)
+			#map.pathing_overlay.draw(pathable)
+			#map.unit_path.initialize(pathable)
+		#_selected_unit = unit
+	#else:
+		#$HUD/RestButton.visible = false
+		#$HUD/FightButton.visible = false
+		#$HUD/DiefyButton.visible = false
+		#map.pathing_overlay.clear()
+		#map.unit_path.clear()
+		#if _selected_unit and not _selected_unit.has_taken_action:
+			#
+			#await unit_action_walk(_selected_unit, _selected_cell)
+		#_selected_unit = null
+	#
+	#
+#func select_attack(attack: Attack):
+	#_selected_attack = attack
+	#if attack:
+		#pass
+	#else:
+		#pass
+		#
+		#
+#func hover_attack_target(cell: Vector2):
+	#pass
+	#
+	#
+#func select_attack_target(cell: Vector2):
+	#_selected_multicast_queue.append(cell)
+	#
+	#
+#func cancel():
+	#match _state:
+		#STATE_ATTACK_SEQUENCE:
+			#pass
+		#STATE_ATTACK_SELECTED:
+			#while not _selected_multicast_queue.is_empty():
+				#_selected_multicast_queue.pop_back()
+				#var reselect: Vector2 = _selected_multicast_queue.pop_back()
+				#select_attack_target(reselect)
+				#
+		#STATE_UNIT_SELECTED:
+			#pass
+		#STATE_HOVER_UNIT:
+			#pass
+		#STATE_STANDBY:
+			#pass
 #endregion Core API
 
 
@@ -264,17 +387,23 @@ func unit_action_pass(unit: Unit):
 
 ## Action
 func unit_action_walk(unit: Unit, target: Vector2):
+	$HUD.visible = false
+	var old_target := _camera_target_remote.get_parent()
+	set_camera_follow(unit)
 	await unit.walk_towards(target)
+	$HUD.visible = true
+	set_camera_follow(old_target)
 	unit.has_moved = true
-	unit.has_moved = true
+	#unit.has_attacked = false
 	unit.has_taken_action = true
 	
 
 ## Action
 func unit_action_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
-	#await unit.use_attack(attack, target, target_rotation)
+	$HUD.visible = false
 	await _unit_use_attack(unit, attack, target, target_rotation)
-	unit.has_moved = true
+	$HUD.visible = true
+	#unit.has_moved = true
 	unit.has_attacked = true
 	unit.has_taken_action = true
 
@@ -286,35 +415,17 @@ func _unit_use_attack(unit: Unit, attack: Attack, target: Variant, target_rotati
 	camera.position_smoothing_enabled = false
 	set_camera_follow(unit) # TODO follow target, not unit
 	
-	$AttackHUD/AttackNameBox/Label.text = attack.name
+	$Overlay/AttackNameBox/Label.text = attack.name
 	$HUD.visible = false
-	$AttackHUD.visible = true
+	$Overlay/AttackNameBox.visible = true
 	
-	# TODO camera follow target
 	await unit.use_attack(attack, target, target_rotation)
-	#unit.model.play_animation(attack.user_animation, false)
-	#
-	## we actually dont care about the multicast stat of the attack,
-	## if we're given an array we multicast regardless. it's up to
-	## the caller to make sure we're called with the right args
-	#if typeof(target) == TYPE_ARRAY:
-		#$Drivers/AttackMulticaster.use_attack_multicast(unit, attack, target, target_rotation)
-	#else:
-		#await _apply_attack_effects(unit, attack, target, target_rotation)
-	$AttackHUD.visible = false
+	
+	$Overlay/AttackNameBox.visible = false
 	$HUD.visible = true
 	camera.position_smoothing_enabled = true
 	set_camera_follow(old_target)
 	
-
-#func _apply_attack_effects(unit: Unit, attack: Attack, target: Vector2, target_rotation: float):
-	#var target_units := unit.get_attack_target_units(attack, target, target_rotation)
-	#for t in target_units: 
-		## this will requeue animation when multicasting but it's fine because
-		## multicast occurs in one frame and this will only be a redundant call
-		#t.model.play_animation(attack.target_animation, false)
-	#$Drivers/AttackSequencePlayer.use_attack.call_deferred(unit, attack, target, target_units)
-	#await $Drivers/AttackSequencePlayer.done
 	
 ## Returns units owned by game.
 func get_owned_units(empire: Empire, standby := false) -> Array[Unit]:
@@ -337,6 +448,22 @@ func get_units_in_range(from: Vector2, distance: int, filter: Callable) -> Array
 		if obj is Unit and Util.cell_distance(obj.map_pos, from) <= distance and filter.call(obj):
 			re.append(obj)
 	return re
+	
+	
+## Finds a unit by name.
+func find_unit(unit_name: String) -> Unit:
+	for u in map._get_objects():
+		if u is Unit and u.display_name == unit_name:
+			return u
+	return null
+	
+
+## Returns the unit at given pos.
+func get_unit_at(cell: Vector2) -> Unit:
+	for u in map._get_objects():
+		if u is Unit and u.cell() == cell:
+			return u
+	return null
 	
 	
 ## Spawns a unit.
@@ -395,7 +522,8 @@ func set_unit_standby(unit: Unit, standby: bool):
 		unit.add_to_group('units_standby')
 	else:
 		var pos: Vector2 = unit.get_meta("Battle_unit_standby_old_pos", Vector2.ZERO)
-		unit.map_pos = pos
+		if unit.map_pos == Map.OUT_OF_BOUNDS:
+			unit.map_pos = pos
 		unit.remove_from_group('units_standby')
 
 	
@@ -449,8 +577,8 @@ func draw_unit_path(unit: Unit, target_cell: Vector2):
 	map.unit_path.draw(unit.cell(), target_cell)
 
 
-func draw_unit_pathable_cells(unit: Unit):
-	map.pathing_overlay.draw(unit.get_pathable_cells(), 2) # green
+func draw_unit_pathable_cells(unit: Unit, use_alt_color := false):
+	map.pathing_overlay.draw(unit.get_pathable_cells(true), 1 if use_alt_color else 2) # yes, 1 is the alt color
 
 
 func draw_unit_attack_range(unit: Unit, attack: Attack):
@@ -613,7 +741,7 @@ func _do_battle(agent: Dictionary) -> Result:
 	var result := Result.None
 	while not should_end:
 		print("Turn '%s'" % turns)
-		BattleSignalBus.turn_cycle_started.emit()
+		turn_cycle_started.emit()
 		await Globals.play_queued_scenes()
 		
 		for empire in [attacker, defender]:
@@ -641,12 +769,12 @@ func _do_battle(agent: Dictionary) -> Result:
 			await show_turn_banner()
 			set_camera_follow(cursor)
 			
-			BattleSignalBus.empire_turn_started.emit()
+			empire_turn_started.emit()
 			await Globals.play_queued_scenes()
 			
 			await agent[empire].do_turn()
 			
-			BattleSignalBus.empire_turn_ended.emit()
+			empire_turn_ended.emit()
 			await Globals.play_queued_scenes()
 			
 			# post-turn
@@ -657,7 +785,7 @@ func _do_battle(agent: Dictionary) -> Result:
 				# tick duration of status effects
 				_tick_status_effects(u)
 				
-		BattleSignalBus.turn_cycle_ended.emit()
+		turn_cycle_ended.emit()
 		await Globals.play_queued_scenes()
 		
 		turns += 1
@@ -681,6 +809,8 @@ func _tick_status_effects(unit: Unit):
 #endregion Testing
 func _test():
 	var a := Empire.new()
+	a.set_meta("player", true)
+	a.units = ['A', 'B']
 	a.leader = preload("res://Screens/Battle/data/chara/Lysandra.tres")
 	var b := Empire.new()
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")

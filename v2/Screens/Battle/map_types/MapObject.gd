@@ -45,7 +45,7 @@ const DEBUG_TILE_NAME := "Internal_MapObject__debug_tile"
 			_update_misc()
 			
 ## Shows the editor debug tile.
-@export var show_debug_tile: bool = true:
+@export var show_debug_tile: bool:
 	set(value):
 		if show_debug_tile == value:
 			return
@@ -136,7 +136,8 @@ func _exit_map():
 ## Returns the cell this object resides in.
 func cell() -> Vector2:
 	# kinda shite but it is what it is
-	return Vector2(int(snapped(map_pos.x, 0.01)), int(snapped(map_pos.y, 0.01)))
+	#return Vector2(int(snapped(map_pos.x, 0.01)), int(snapped(map_pos.y, 0.01)))
+	return Vector2(roundi(map_pos.x), roundi(map_pos.y))
 
 
 ## Called when map object enters the map.
@@ -186,7 +187,7 @@ func _update_tile():
 	if world:
 		tile_size = world.tile_size
 		_debug_tile.transform = world.world_transform
-		_debug_tile.position = world.as_global(cell()) - position
+		_debug_tile.position = world.as_aligned(cell()) - position
 	else:
 		tile_size = 100 
 		_debug_tile.transform = Transform2D()
@@ -197,4 +198,8 @@ func _update_tile():
 	_debug_tile.polygon = p
 	
 	_debug_tile.self_modulate = debug_tile_color
-	_debug_tile.visible = show_debug_tile
+	#_debug_tile.visible = show_debug_tile
+	if show_debug_tile:
+		_debug_tile.visibility_layer = 1
+	else:
+		_debug_tile.visibility_layer = 1 << 9

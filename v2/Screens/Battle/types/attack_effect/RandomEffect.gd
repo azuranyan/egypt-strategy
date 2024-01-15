@@ -1,5 +1,5 @@
-extends AttackEffect
 class_name RandomEffect
+extends AttackEffect
 
 
 @export var effects: Array[AttackEffect]
@@ -25,15 +25,3 @@ func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, ta
 			eff = effects[i]
 	
 	eff.apply(battle, user, attack, target_cell, target_unit)
-	
-	
-func get_effect_hint() -> String:
-	return 'attack'
-	
-	
-func _default_description() -> String:
-	return "Does random effects."
-
-
-func _default_animation() -> String:
-	return 'basic_damage'

@@ -1,5 +1,5 @@
-extends AttackEffect
 class_name KnockbackEffect
+extends AttackEffect
 	
 
 const DIRECTIONS := [
@@ -21,16 +21,7 @@ func apply(battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, t
 		target_unit.map_pos = new_pos
 	else:
 		battle.damage_unit(target_unit, self, 1)
-	attack.effect_completed(self)
+		
+	attack.effect_complete(self)
 	
 	
-func get_effect_hint() -> String:
-	return 'cc'
-	
-	
-func _default_description() -> String:
-	return 'Knocks unit back.'
-
-
-func _default_animation() -> String:
-	return 'none'

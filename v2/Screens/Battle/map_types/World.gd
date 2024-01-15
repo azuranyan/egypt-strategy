@@ -116,6 +116,10 @@ func as_global(v: Vector2) -> Vector2:
 func as_uniform(v: Vector2) -> Vector2:
 	return _cached_global_inverse * v
 	
+
+func as_aligned(v: Vector2) -> Vector2:
+	return as_global(v - Vector2(0.5, 0.5))
+	
 	
 ## Snaps the node to the cell.
 # TODO do not use, awful func to be replaced later
@@ -154,6 +158,9 @@ func recalculate_world_transforms():
 	
 	var m = Transform2D()
 	if _transform_errors.size() == 0:
+		# apply centering
+		#m = m.translated(Vector2(0.5, 0.5) * tile_size)
+		
 		# apply world skew
 		m = m.rotated(deg_to_rad(45))
 		
@@ -162,6 +169,7 @@ func recalculate_world_transforms():
 		
 		# apply offset
 		m = m.translated(offset)
+		
 		
 	world_transform = m
 	world_inverse = m.affine_inverse()
@@ -172,7 +180,8 @@ func recalculate_world_transforms():
 ## Recalculates combined world and global transform.
 func recalculate_global_transform():
 	# cache this so we dont recompute everytime
-	_cached_global_transform = get_global_transform() * world_transform * Transform2D(0, Vector2(tile_size, tile_size), 0, Vector2.ZERO)#.scaled(Vector2(tile_size, tile_size))
+	#_cached_global_transform = get_global_transform() * world_transform * Transform2D(0, Vector2(tile_size, tile_size), 0, Vector2.ZERO)#.scaled(Vector2(tile_size, tile_size))
+	_cached_global_transform = get_global_transform() * world_transform * Transform2D(0, Vector2(tile_size, tile_size), 0, Vector2(0.5, 0.5) * tile_size)
 	_cached_global_inverse = _cached_global_transform.affine_inverse()
 	
 	
