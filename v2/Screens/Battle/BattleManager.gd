@@ -276,8 +276,8 @@ var _selected_unit: Unit
 func set_selected_unit(unit: Unit):
 	_selected_unit = unit
 	if unit:
-		$HUD/CharacterPortrait/TextureRect.texture = unit.chara.portrait
-		$HUD/CharacterPortrait/Label.text = unit.chara.name.to_upper()
+		$HUD/CharacterPortrait/TextureRect.texture = unit.display_icon
+		$HUD/CharacterPortrait/Label.text = unit.display_name.to_upper()
 		$HUD/CharacterPortrait.visible = true
 		$HUD/RestButton.visible = unit.is_player_owned() and not unit.has_attacked
 		$HUD/FightButton.visible = unit.is_player_owned() and not unit.has_attacked
@@ -288,92 +288,6 @@ func set_selected_unit(unit: Unit):
 		$HUD/RestButton.visible = false
 		$HUD/FightButton.visible = false
 		$HUD/DiefyButton.visible = false
-		
-#enum {
-	#STATE_STANDBY,
-	#STATE_HOVER_UNIT,
-	#STATE_UNIT_SELECTED,
-	#STATE_ATTACK_SELECTED,
-	#STATE_ATTACK_SEQUENCE,
-#}
-#
-#var _state := 0
-#func hover_cell(cell: Vector2):
-	#_selected_cell = cell
-	#cursor.position = map.world.as_global(cell)
-	#
-	#if _selected_unit:
-		#if not _selected_unit.has_taken_action:
-			#map.unit_path.draw(_selected_unit.cell(), cell)
-		#return
-	#
-	#var hovered := map.get_unit(cell)
-	#if hovered:
-		#$HUD/CharacterPortrait/TextureRect.texture = hovered.chara.portrait
-		#$HUD/CharacterPortrait/Label.text = hovered.display_name
-		#$HUD/CharacterPortrait.visible = true
-	#else:
-		#$HUD/CharacterPortrait.visible = false
-		#
-#
-#func select_unit(unit: Unit):
-	#if unit:
-		#$HUD/CharacterPortrait/TextureRect.texture = unit.chara.portrait
-		#$HUD/CharacterPortrait/Label.text = unit.display_name
-		#$HUD/CharacterPortrait.visible = true
-		#$HUD/RestButton.visible = unit.is_player_owned()
-		#$HUD/FightButton.visible = unit.is_player_owned()
-		#$HUD/DiefyButton.visible = unit.is_player_owned()
-		#$HUD/DiefyButton.disabled = not unit.is_special_unlocked()
-		#if not unit.has_taken_action:
-			#var pathable := unit.get_pathable_cells(true)
-			#map.pathing_overlay.draw(pathable)
-			#map.unit_path.initialize(pathable)
-		#_selected_unit = unit
-	#else:
-		#$HUD/RestButton.visible = false
-		#$HUD/FightButton.visible = false
-		#$HUD/DiefyButton.visible = false
-		#map.pathing_overlay.clear()
-		#map.unit_path.clear()
-		#if _selected_unit and not _selected_unit.has_taken_action:
-			#
-			#await unit_action_walk(_selected_unit, _selected_cell)
-		#_selected_unit = null
-	#
-	#
-#func select_attack(attack: Attack):
-	#_selected_attack = attack
-	#if attack:
-		#pass
-	#else:
-		#pass
-		#
-		#
-#func hover_attack_target(cell: Vector2):
-	#pass
-	#
-	#
-#func select_attack_target(cell: Vector2):
-	#_selected_multicast_queue.append(cell)
-	#
-	#
-#func cancel():
-	#match _state:
-		#STATE_ATTACK_SEQUENCE:
-			#pass
-		#STATE_ATTACK_SELECTED:
-			#while not _selected_multicast_queue.is_empty():
-				#_selected_multicast_queue.pop_back()
-				#var reselect: Vector2 = _selected_multicast_queue.pop_back()
-				#select_attack_target(reselect)
-				#
-		#STATE_UNIT_SELECTED:
-			#pass
-		#STATE_HOVER_UNIT:
-			#pass
-		#STATE_STANDBY:
-			#pass
 #endregion Core API
 
 
@@ -467,11 +381,18 @@ func get_unit_at(cell: Vector2) -> Unit:
 	
 	
 ## Spawns a unit.
-func spawn_unit(path: String, empire: Empire, custom_name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.East) -> Unit:
-	#assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
-	var unit := load(path).instantiate() as Unit
-	unit.display_name = custom_name if custom_name != "" else unit.chara.name
-	
+func spawn_unit(id: String, empire: Empire, custom_name := "", pos := Map.OUT_OF_BOUNDS, heading := Unit.Heading.East) -> Unit:
+	var unit: Unit
+	if FileAccess.file_exists("res://Screens/Battle/data/unit/%s.tres" % id):
+		unit = load("res://Screens/Battle/data/unit/%s.tres" % id).instantiate() as Unit
+	else:
+		var unit_type := load("res://Screens/Battle/data/unit_type/%s.tres" % id) as UnitType
+		if not unit_type:
+			unit_type = load("res://Screens/Battle/data/unit_type/Dummy.tres") as UnitType
+		unit = preload("res://Screens/Battle/map_types/unit/Unit.tscn").instantiate() as Unit
+		unit.unit_type = unit_type
+	if custom_name != "":
+		unit.display_name = custom_name
 	add_unit(unit, empire, pos, heading)
 	return unit
 	
@@ -810,7 +731,7 @@ func _tick_status_effects(unit: Unit):
 func _test():
 	var a := Empire.new()
 	a.set_meta("player", true)
-	a.units = ['A', 'B']
+	a.units = ['Alara', 'Lysandra']
 	a.leader = preload("res://Screens/Battle/data/chara/Lysandra.tres")
 	var b := Empire.new()
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")

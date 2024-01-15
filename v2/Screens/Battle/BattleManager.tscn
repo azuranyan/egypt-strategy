@@ -1174,8 +1174,6 @@ text = "Cancel"
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 
-[connection signal="empire_turn_ended" from="." to="HUD" method="_on_battle_manager_empire_turn_ended"]
-[connection signal="empire_turn_started" from="." to="HUD" method="_on_battle_manager_empire_turn_started"]
 [connection signal="focus_entered" from="HUD/FightButton" to="HUD" method="_on_fight_button_focus_entered"]
 [connection signal="focus_exited" from="HUD/FightButton" to="HUD" method="_on_fight_button_focus_exited"]
 [connection signal="mouse_entered" from="HUD/FightButton" to="HUD" method="_on_fight_button_mouse_entered"]

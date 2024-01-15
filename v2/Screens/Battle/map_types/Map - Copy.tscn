@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://bg3djjkbmlv2r"]
+[gd_scene load_steps=40 format=3 uid="uid://bg3djjkbmlv2r"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_u6ecx"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/World.gd" id="2_71t3t"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="15_4bw0m"]
 [ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="16_sms3w"]
 [ext_resource type="PackedScene" uid="uid://clakgmdpcknuy" path="res://Screens/Battle/map_types/unit/Unit.tscn" id="17_150hv"]
+[ext_resource type="Texture2D" uid="uid://c0vehwtyciijf" path="res://Screens/Overworld/Portraits/placeholder.webp" id="18_3oa1i"]
 [ext_resource type="PackedScene" uid="uid://86byh8q1hmuu" path="res://Screens/Battle/map_types/Doodad.tscn" id="19_he28i"]
 [ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="20_hbw26"]
 [ext_resource type="Texture2D" uid="uid://ctux8o02k4l4" path="res://Screens/Battle/maps/StartingZoneObj2.png" id="21_ojlom"]
@@ -457,6 +458,8 @@ position = Vector2(769.834, 486.614)
 facing = -3.3
 walk_speed = 100.0
 map_pos = Vector2(2, 7)
+display_name = "Dummy"
+display_icon = ExtResource("18_3oa1i")
 metadata/default_owner = "Lysandra"
 
 [node name="Unit2" parent="Entities" instance=ExtResource("17_150hv")]
@@ -465,6 +468,8 @@ position = Vector2(673.667, 542.294)
 facing = -3.3
 walk_speed = 100.0
 map_pos = Vector2(2, 9)
+display_name = "Dummy"
+display_icon = ExtResource("18_3oa1i")
 metadata/default_owner = "Alara"
 
 [node name="Unit3" parent="Entities" instance=ExtResource("17_150hv")]
@@ -473,6 +478,8 @@ position = Vector2(625.584, 570.135)
 facing = -3.3
 walk_speed = 100.0
 map_pos = Vector2(2, 10)
+display_name = "Dummy"
+display_icon = ExtResource("18_3oa1i")
 metadata/default_owner = "Alara"
 
 [node name="Unit4" parent="Entities" instance=ExtResource("17_150hv")]
@@ -481,6 +488,8 @@ position = Vector2(721.75, 681.495)
 facing = -3.3
 walk_speed = 100.0
 map_pos = Vector2(5, 11)
+display_name = "Dummy"
+display_icon = ExtResource("18_3oa1i")
 metadata/default_owner = "Alara"
 
 [node name="Doodad1" parent="Entities" instance=ExtResource("19_he28i")]
@@ -519,11 +528,11 @@ uniform_offset = false
 map_pos = Vector2(8, 6)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1239, 485)
+position = Vector2(817.917, 570.135)
 texture = ExtResource("25_jj4m2")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(6.8497, 2.09232)
+map_pos = Vector2(4, 8)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("19_he28i")]
 position = Vector2(914.083, 458.774)

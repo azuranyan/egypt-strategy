@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://dkcjussxvqer"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_8xdc1"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_8xdc1"]
 [ext_resource type="Resource" uid="uid://cm3g3kwc45ib" path="res://Screens/Battle/data/attack/tali_basic.tres" id="1_oxorg"]
 [ext_resource type="Resource" uid="uid://t3800uynfq65" path="res://Screens/Battle/data/chara/Tali.tres" id="2_cipkv"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_ou715"]

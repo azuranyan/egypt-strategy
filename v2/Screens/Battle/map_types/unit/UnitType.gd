@@ -1,8 +1,8 @@
 @tool
-extends Resource
-
-## Flyweight class for a unit.
 class_name UnitType
+extends Resource
+## Flyweight class for a unit.
+
 
 ## Dictates how his unit chooses its actions.
 enum Behavior {

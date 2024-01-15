@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://dm37wpgx22flt" path="res://Screens/Battle/data/chara/Lysandra.tres" id="1_86ubo"]
 [ext_resource type="Resource" uid="uid://dhgc8m3jtq1j" path="res://Screens/Battle/data/attack/lysandra_basic.tres" id="1_h7lj5"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_lcic4"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_lcic4"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_1n4b3"]
 [ext_resource type="Resource" uid="uid://0gn3h525f2d5" path="res://Screens/Battle/data/attack/lysandra_special.tres" id="4_4o68y"]
 

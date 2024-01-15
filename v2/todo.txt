@@ -64,3 +64,5 @@ lysandra is requried to be in the battle otherwise it wouldnt start
 battle missions
 camera follow stops working after casting skill
 overworld keyboard interactivity
+
+spawn -> unit if unit.tscn exists, otherwise load from unit_type

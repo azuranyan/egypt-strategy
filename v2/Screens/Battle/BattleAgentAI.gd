@@ -58,7 +58,7 @@ func prepare_units():
 
 func _spawn_unit(cell: Vector2, type_name: String):
 	print('  spawning %s at %s' % [type_name, cell])
-	var unit := battle.spawn_unit("res://Screens/Battle/map_types/unit/Unit.tscn", empire, type_name, cell) # TODO fix type spawned
+	var unit := battle.spawn_unit(type_name, empire, type_name, cell)
 	unit.face_towards(_get_closest_player_spawn_point(cell))
 	
 	

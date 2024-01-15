@@ -56,7 +56,7 @@ func initialize():
 	
 func prepare_units():
 	for roster_unit in empire.units:
-		var unit = battle.spawn_unit("res://Screens/Battle/map_types/unit/Unit.tscn", empire, roster_unit)
+		var unit = battle.spawn_unit(roster_unit, empire, roster_unit)
 		unit.mouse_button_pressed.connect(on_unit_mouse_button_pressed)
 		battle.prep_unit_list.add_unit(unit)
 	

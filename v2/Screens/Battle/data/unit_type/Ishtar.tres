@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://cu1r2bai288i2" path="res://Screens/Battle/data/attack/ishtar_basic.tres" id="1_3aj1v"]
 [ext_resource type="Resource" uid="uid://huxgesii8gou" path="res://Screens/Battle/data/chara/Ishtar.tres" id="2_vdmxq"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_ifk28"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="3_ifk28"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_0f4qp"]
 [ext_resource type="Resource" uid="uid://7tok7eijv3qj" path="res://Screens/Battle/data/attack/ishtar_special.tres" id="4_ux8co"]
 

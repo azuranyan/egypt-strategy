@@ -1,13 +1,10 @@
-[gd_scene load_steps=18 format=3 uid="uid://clakgmdpcknuy"]
+[gd_scene load_steps=15 format=3 uid="uid://clakgmdpcknuy"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Unit.gd" id="1_f35qy"]
 [ext_resource type="PackedScene" uid="uid://d1u5syg77qfdo" path="res://Screens/Battle/map_types/unit/UnitModel.tscn" id="2_0vydj"]
-[ext_resource type="Resource" uid="uid://d4b7hg8644pc7" path="res://Screens/Battle/data/chara/Alara.tres" id="2_31qxt"]
-[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_g7v0r"]
-[ext_resource type="Resource" uid="uid://qpdrrn4yu0p4" path="res://Screens/Battle/data/attack/alara_basic.tres" id="2_ohwmu"]
 [ext_resource type="Texture2D" uid="uid://dubut3aaxkpvo" path="res://Screens/Battle/sprites/hp_bar.png" id="3_07oig"]
 [ext_resource type="Texture2D" uid="uid://gdp52yomtcia" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_up13u"]
-[ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="5_jyohc"]
+[ext_resource type="Texture2D" uid="uid://c0vehwtyciijf" path="res://Screens/Overworld/Portraits/placeholder.webp" id="4_5wpuo"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Control.gd" id="8_i6hns"]
 [ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="9_vcf46"]
 
@@ -84,30 +81,10 @@ font = ExtResource("9_vcf46")
 
 [node name="Unit" type="Node2D"]
 script = ExtResource("1_f35qy")
-chara = ExtResource("2_31qxt")
-sprite_frames = ExtResource("2_g7v0r")
 model_scale = Vector2(0.575, 0.575)
-maxhp = 5
-hp = 5
-move = 3
-damage = 2
-range = 2
-stat_growth_1 = {
-"damage": 0,
-"maxhp": 0,
-"move": 1,
-"range": 0
-}
-stat_growth_2 = {
-"damage": 0,
-"maxhp": 1,
-"move": 0,
-"range": 0
-}
-basic_attack = ExtResource("2_ohwmu")
 pathing = 1
-display_name = "Alara"
-display_icon = ExtResource("5_jyohc")
+display_name = "Dummy"
+display_icon = ExtResource("4_5wpuo")
 
 [node name="NOTE" type="Label" parent="."]
 visible = false
@@ -186,7 +163,7 @@ anchor_right = 1.0
 offset_top = 2.0
 offset_bottom = 19.0
 grow_horizontal = 2
-text = "Alara"
+text = "Dummy"
 label_settings = SubResource("LabelSettings_kkbel")
 horizontal_alignment = 1
 

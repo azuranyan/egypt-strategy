@@ -43,10 +43,10 @@ func update_highlighted():
 
 func update_unit():
 	if unit:
-		$Control2/Control/ColorRect2/TextureRect.texture = unit.chara.portrait
-		$Control2/Control/Label.text = unit.chara.name
-		$Control2/Control/Label2.text = unit.chara.title
-		$Control2/Control/ColorRect3.modulate = unit.chara.map_color
+		$Control2/Control/ColorRect2/TextureRect.texture = unit.display_icon
+		$Control2/Control/Label.text = unit.display_name
+		$Control2/Control/Label2.text = unit.unit_type.chara.title
+		$Control2/Control/ColorRect3.modulate = unit.unit_type.chara.map_color
 	else:
 		$Control2/Control/ColorRect2/TextureRect.texture = null
 		$Control2/Control/Label.text = ""

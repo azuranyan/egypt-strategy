@@ -80,17 +80,13 @@ enum {
 
 @export_subgroup("Character")
 
-## Preset character information.
-@export var chara: Chara # TODO chara cannot be null
-
-## The sprite frames of the model.
-@export var sprite_frames: SpriteFrames:
+@export var unit_type: UnitType:
 	set(value):
-		if sprite_frames == value:
+		if unit_type == value:
 			return
-		sprite_frames = value
+		unit_type = value
 		if is_node_ready():
-			model.sprite_frames = sprite_frames
+			_update_unit_type()
 	
 ## The scale of the model.
 @export var model_scale := Vector2.ONE:
@@ -102,7 +98,7 @@ enum {
 			model.scale = model_scale
 
 ## The behavior of this unit.
-@export var behavior: Behavior
+@export var behavior: UnitType.Behavior
 
 
 @export_subgroup("Movement")
@@ -122,10 +118,15 @@ enum {
 ## Objects this unit can phase through.
 @export_flags("Enemies:1", "Doodads:2", "Terrain:4", "No Clip:8") var phase = PHASE_NONE
 
+@export_subgroup("Others")
 
-@export_subgroup("Stats")
+@export var selectable: bool = true # TODO
 
-@export var maxhp: int:
+@export var alive: bool = true
+
+@export var special_unlocked: bool
+
+var maxhp: int:
 	set(value):
 		if maxhp == value:
 			return
@@ -134,7 +135,7 @@ enum {
 			stat_changed.emit('maxhp', value)
 			_update_stats()
 		
-@export var hp: int:
+var hp: int:
 	set(value):
 		if hp == value:
 			return
@@ -143,7 +144,7 @@ enum {
 			stat_changed.emit('hp', value)
 			_update_stats()
 		
-@export var move: int:
+var move: int:
 	set(value):
 		if move == value:
 			return
@@ -152,7 +153,7 @@ enum {
 			stat_changed.emit('move', value)
 			_update_stats()
 		
-@export var damage: int:
+var damage: int:
 	set(value):
 		if damage == value:
 			return
@@ -161,7 +162,7 @@ enum {
 			stat_changed.emit('damage', value)
 			_update_stats()
 		
-@export var range: int:
+var range: int:
 	set(value):
 		if range == value:
 			return
@@ -170,7 +171,7 @@ enum {
 			stat_changed.emit('range', value)
 			_update_stats()
 		
-@export_range(0, 2) var bond: int:
+var bond: int:
 	set(value):
 		if bond == value:
 			return
@@ -178,21 +179,13 @@ enum {
 		if is_node_ready():
 			_update_bond()
 			
-@export var special_unlocked: bool
+var stat_growth_1: Dictionary = {'maxhp': 0, 'move': 0, 'damage': 0, 'range': 0}
+
+var stat_growth_2: Dictionary = {'maxhp': 0, 'move': 0, 'damage': 0, 'range': 0}
 			
-@export var stat_growth_1: Dictionary = {'maxhp': 0, 'move': 0, 'damage': 0, 'range': 0}
+var basic_attack: Attack
 
-@export var stat_growth_2: Dictionary = {'maxhp': 0, 'move': 0, 'damage': 0, 'range': 0}
-			
-@export var basic_attack: Attack
-
-@export var special_attack: Attack
-
-@export_subgroup("Others")
-
-@export var selectable: bool = true # TODO
-
-@export var alive: bool = true
+var special_attack: Attack
 
 ## The owner empire.
 var empire: Empire
@@ -228,17 +221,40 @@ func _ready():
 		"range" = range,
 	}
 	
-	# TODO rearrange
+	_update_unit_type()
+	
 	model.facing = facing
-	model.sprite_frames = sprite_frames
 	model.scale = model_scale
 	
 	$UnitModel/Shadow.visible = false
 	
-	display_name = chara.name
-	display_icon = chara.portrait
 	_update_stats()
 		
+		
+func _update_unit_type():
+	if not unit_type:
+		return
+	
+	display_name = unit_type.name
+	display_icon = unit_type.chara.portrait
+	model.sprite_frames = unit_type.sprite_frames
+	
+	maxhp = unit_type.stat_maxhp
+	hp = maxhp
+	move = unit_type.stat_mov
+	damage = unit_type.stat_dmg
+	range = unit_type.stat_rng
+	stat_growth_1.maxhp = unit_type.stat_growth_1.maxhp
+	stat_growth_1.move = unit_type.stat_growth_1.mov
+	stat_growth_1.damage = unit_type.stat_growth_1.dmg
+	stat_growth_1.range = unit_type.stat_growth_1.rng
+	stat_growth_2.maxhp = unit_type.stat_growth_2.maxhp
+	stat_growth_2.move = unit_type.stat_growth_2.mov
+	stat_growth_2.damage = unit_type.stat_growth_2.dmg
+	stat_growth_2.range = unit_type.stat_growth_2.rng
+	basic_attack = unit_type.basic_attack
+	special_attack = unit_type.special_attack
+
 	
 func _update_stats():
 	$HUD/Label.text = display_name
