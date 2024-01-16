@@ -80,7 +80,9 @@ enum {
 
 @export_subgroup("Character")
 
-@export var unit_type: UnitType:
+# godot is a fucking pest and couldn't use UnitType but works if qualified as Resource
+# and doesn't work with preload either. FUCKING DIPSHIT
+@export var unit_type: Resource = load("res://Screens/Battle/data/unit_type/Dummy.tres"):
 	set(value):
 		if unit_type == value:
 			return
@@ -120,11 +122,11 @@ enum {
 
 @export_subgroup("Others")
 
-@export var selectable: bool = true # TODO
-
-@export var alive: bool = true
+@export var selectable: bool = true
 
 @export var special_unlocked: bool
+
+var alive: bool = true
 
 var maxhp: int:
 	set(value):
@@ -211,16 +213,6 @@ var _base_stats: Dictionary
 			
 func _ready():
 	super._ready()
-	
-	# save initial stats into _base_stats
-	_base_stats = {
-		"maxhp" = maxhp,
-		"hp" = hp,
-		"move" = move,
-		"damage" = damage,
-		"range" = range,
-	}
-	
 	_update_unit_type()
 	
 	model.facing = facing
@@ -234,7 +226,6 @@ func _ready():
 func _update_unit_type():
 	if not unit_type:
 		return
-	
 	display_name = unit_type.name
 	display_icon = unit_type.chara.portrait
 	model.sprite_frames = unit_type.sprite_frames
@@ -254,6 +245,13 @@ func _update_unit_type():
 	stat_growth_2.range = unit_type.stat_growth_2.rng
 	basic_attack = unit_type.basic_attack
 	special_attack = unit_type.special_attack
+	_base_stats = {
+		"maxhp" = maxhp,
+		"hp" = hp,
+		"move" = move,
+		"damage" = damage,
+		"range" = range,
+	}
 
 	
 func _update_stats():
@@ -262,7 +260,6 @@ func _update_stats():
 		$HUD/ColorRect2.scale = Vector2.ONE
 	else:
 		$HUD/ColorRect2.scale.x = hp/maxhp
-	_update_bond()
 	
 	
 func _update_bond():

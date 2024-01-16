@@ -191,6 +191,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 2
 texture = ExtResource("3_1hs2a")
 expand_mode = 3
 
@@ -452,35 +453,35 @@ centered = false
 y_sort_enabled = true
 script = ExtResource("7_xsyws")
 
-[node name="Unit1" parent="Entities" instance=ExtResource("17_150hv")]
+[node name="X1" parent="Entities" instance=ExtResource("17_150hv")]
 position = Vector2(769.834, 486.614)
 facing = -3.3
 walk_speed = 100.0
 map_pos = Vector2(2, 7)
 metadata/default_owner = "Lysandra"
 
-[node name="Unit2" parent="Entities" instance=ExtResource("17_150hv")]
+[node name="X2" parent="Entities" instance=ExtResource("17_150hv")]
 modulate = Color(0.462745, 0.262745, 0.243137, 1)
-position = Vector2(673.667, 542.294)
+position = Vector2(817.917, 570.135)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(2, 9)
+map_pos = Vector2(4, 8)
 metadata/default_owner = "Alara"
 
-[node name="Unit3" parent="Entities" instance=ExtResource("17_150hv")]
+[node name="X3" parent="Entities" instance=ExtResource("17_150hv")]
 modulate = Color(0.462745, 0.262745, 0.243137, 1)
-position = Vector2(625.584, 570.135)
+position = Vector2(817.917, 681.495)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(2, 10)
+map_pos = Vector2(6, 10)
 metadata/default_owner = "Alara"
 
-[node name="Unit4" parent="Entities" instance=ExtResource("17_150hv")]
+[node name="X4" parent="Entities" instance=ExtResource("17_150hv")]
 modulate = Color(0.462745, 0.262745, 0.243137, 1)
-position = Vector2(721.75, 681.495)
+position = Vector2(817.917, 625.815)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(5, 11)
+map_pos = Vector2(5, 9)
 metadata/default_owner = "Alara"
 
 [node name="Doodad1" parent="Entities" instance=ExtResource("19_he28i")]
@@ -519,11 +520,11 @@ uniform_offset = false
 map_pos = Vector2(8, 6)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1239, 485)
+position = Vector2(1250.67, 486.614)
 texture = ExtResource("25_jj4m2")
 lock_to_world = true
 uniform_offset = false
-map_pos = Vector2(6.8497, 2.09232)
+map_pos = Vector2(7, 2)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("19_he28i")]
 position = Vector2(914.083, 458.774)

@@ -65,4 +65,10 @@ battle missions
 camera follow stops working after casting skill
 overworld keyboard interactivity
 
-spawn -> unit if unit.tscn exists, otherwise load from unit_type
+camera does not follow walking
+
+should not be able to interact_move if has_moved
+
+if basic_attack == special_attack, problems arise because the game is designed to check for equality and will crap itself
+if both are the same attacks
+

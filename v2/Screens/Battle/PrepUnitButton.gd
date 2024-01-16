@@ -58,6 +58,12 @@ func update_selected():
 	prep_unit_list.button_selected(self, selected)
 
 
+func _input(event):
+	if event is InputEventMouseMotion:
+		if selected:
+			prep_unit_list.unit_dragged.emit(unit, event.global_position)
+	
+	
 func _on_button_button_down():
 	highlighted = true
 	selected = true

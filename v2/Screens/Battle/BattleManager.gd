@@ -63,13 +63,17 @@ var _warnings = []
 var _lock := {}
 var _waiting_for_lock := false
 
+var _selected_unit: Unit
+var _battle_phase: bool
+
 var _camera_target_remote: RemoteTransform2D = null
 
 
 @onready var viewport := $SubViewportContainer/SubViewport as SubViewport
 @onready var camera := $SubViewportContainer/Camera2D as Camera2D
-@onready var prep_unit_list := $HUD/PrepUnitList as PrepUnitList
-	
+@onready var hud := $HUD as BattleHUD
+
+
 ## Returns true if player won the battle.
 static func player_battle_result_win(is_attacker: bool, result: Result) -> bool:
 	if is_attacker:
@@ -188,6 +192,15 @@ func quit_battle(ask_for_confirmation := true, message := "Forfeit?"):
 func show_pause_box(message: String, confirm = "Confirm", cancel = "Cancel") -> bool:
 	return await $Overlay/PauseBox.show_pause_box(message, confirm, cancel)
 	
+	
+func show_message_box(message: String):
+	$HUD/MessageBox/Label.text = message
+	$HUD/MessageBox.visible = true
+		
+		
+func hide_message_box():
+	$HUD/MessageBox.visible = false
+		
 
 func set_camera_follow(obj: Node2D):
 	if _camera_target_remote:
@@ -269,25 +282,41 @@ func play_error():
 	if not $AudioStreamPlayer2D.is_playing():
 		$AudioStreamPlayer2D.stream = preload("res://error-126627.wav")
 		$AudioStreamPlayer2D.play()
-
-
-var _selected_unit: Unit
-
-func set_selected_unit(unit: Unit):
-	_selected_unit = unit
-	if unit:
-		$HUD/CharacterPortrait/TextureRect.texture = unit.display_icon
-		$HUD/CharacterPortrait/Label.text = unit.display_name.to_upper()
-		$HUD/CharacterPortrait.visible = true
-		$HUD/RestButton.visible = unit.is_player_owned() and not unit.has_attacked
-		$HUD/FightButton.visible = unit.is_player_owned() and not unit.has_attacked
-		$HUD/DiefyButton.visible = unit.is_player_owned() and not unit.has_attacked
-		$HUD/DiefyButton.disabled = not unit.is_special_unlocked()
+		
+	
+func show_turn_banner():
+	set_process_input(false)
+	var hud_visible := hud.visible
+	show_hud(false)
+	if on_turn.is_player_owned():
+		$AnimationPlayer.play("turn_banner.player")
+		cursor.visible = true
 	else:
-		$HUD/CharacterPortrait.visible = false
-		$HUD/RestButton.visible = false
-		$HUD/FightButton.visible = false
-		$HUD/DiefyButton.visible = false
+		$AnimationPlayer.play("turn_banner.enemy")
+		cursor.visible = false
+	await $AnimationPlayer.animation_finished
+	show_hud(hud_visible)
+	set_process_input(true)
+	
+	
+func show_attack_banner(attack: Attack):
+	set_process_input(false)
+	var hud_visible := hud.visible
+	show_hud(false)
+	if attack:
+		$Overlay/AttackNameBox/Label.text = attack.name
+		$Overlay/AttackNameBox.visible = true
+	else:
+		$Overlay/AttackNameBox.visible = false
+	show_hud(hud_visible)
+	set_process_input(true)
+
+
+func show_hud(show: bool):
+	hud.show_ui(show)
+	cursor.visible = show
+	
+
 #endregion Core API
 
 
@@ -301,44 +330,43 @@ func unit_action_pass(unit: Unit):
 
 ## Action
 func unit_action_walk(unit: Unit, target: Vector2):
-	$HUD.visible = false
-	var old_target := _camera_target_remote.get_parent()
-	set_camera_follow(unit)
+	set_process_input(false)
+	hud.visible = false
+	# TODO camera follow
+	#var old_target := _camera_target_remote.get_parent()
+	#set_camera_follow(unit)
 	await unit.walk_towards(target)
-	$HUD.visible = true
-	set_camera_follow(old_target)
+	hud.visible = true
+	#set_camera_follow(old_target)
 	unit.has_moved = true
 	#unit.has_attacked = false
 	unit.has_taken_action = true
+	set_process_input(true)
 	
 
 ## Action
 func unit_action_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
-	$HUD.visible = false
+	set_process_input(false)
 	await _unit_use_attack(unit, attack, target, target_rotation)
-	$HUD.visible = true
 	#unit.has_moved = true
 	unit.has_attacked = true
 	unit.has_taken_action = true
+	set_process_input(true)
 
 
 func _unit_use_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
-	var old_target := _camera_target_remote.get_parent()
-	camera.drag_horizontal_enabled = false
-	camera.drag_vertical_enabled = false
-	camera.position_smoothing_enabled = false
-	set_camera_follow(unit) # TODO follow target, not unit
+	#var old_target := _camera_target_remote.get_parent()
+	#camera.drag_horizontal_enabled = false
+	#camera.drag_vertical_enabled = false
+	#camera.position_smoothing_enabled = false
+	#set_camera_follow(unit) # TODO follow target, not unit
 	
-	$Overlay/AttackNameBox/Label.text = attack.name
-	$HUD.visible = false
-	$Overlay/AttackNameBox.visible = true
-	
+	show_attack_banner(attack)
 	await unit.use_attack(attack, target, target_rotation)
+	show_attack_banner(null)
 	
-	$Overlay/AttackNameBox.visible = false
-	$HUD.visible = true
-	camera.position_smoothing_enabled = true
-	set_camera_follow(old_target)
+	#camera.position_smoothing_enabled = true
+	#set_camera_follow(old_target)
 	
 	
 ## Returns units owned by game.
@@ -426,6 +454,7 @@ func remove_unit(unit: Unit):
 func kill_unit(unit: Unit):
 	unit.add_to_group('units_dead')
 	unit.alive = false
+	unit.selectable = false
 	
 
 ## Revives a unit.
@@ -433,6 +462,7 @@ func revive_unit(unit: Unit, hp: int):
 	unit.hp = mini(hp, unit.maxhp)
 	unit.add_to_group('units_alive')
 	unit.alive = true
+	unit.selectable = true
 
 
 ## Standby unit.
@@ -536,18 +566,6 @@ func draw_floating_number(unit: Unit, number: int, color: Color):
 	await anim.animation_finished
 	node.queue_free()
 	
-
-func show_turn_banner():
-	set_process_input(false)
-	if on_turn.is_player_owned():
-		$AnimationPlayer.play("turn_banner.player")
-		cursor.visible = true
-	else:
-		$AnimationPlayer.play("turn_banner.enemy")
-		cursor.visible = false
-	await $AnimationPlayer.animation_finished
-	set_process_input(true)
-	
 #endregion Draw
 
 
@@ -570,6 +588,8 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	await Globals.screen_ready
 	_load_map(territory.maps[0])
 	
+	_battle_phase = false
+	hud.show_ui(true)
 	var agent := {
 		attacker: create_agent(attacker), 
 		defender: create_agent(defender), 
@@ -582,6 +602,8 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	
 	var result := Result.None
 	if await _player_prep_phase(agent[player]):
+		_battle_phase = true
+		hud.show_ui(true)
 		result = await _do_battle(agent)
 		
 		var message := player_battle_result_message(attacker.is_player_owned(), result)

@@ -3,6 +3,7 @@ extends Control
 
 
 signal unit_selected(unit: Unit)
+signal unit_dragged(unit: Unit, position: Vector2)
 
 
 var buttons := {}
