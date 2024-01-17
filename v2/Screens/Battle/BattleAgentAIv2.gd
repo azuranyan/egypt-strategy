@@ -84,7 +84,7 @@ func do_turn():
 	should_end = false
 	var unit_action_queue: Array[Unit] = []
 	for u in battle.get_owned_units(battle.on_turn):
-		if not u.has_attacked or not u.has_moved:
+		if u.can_act():
 			unit_action_queue.append(u)
 			
 	while not (should_end or unit_action_queue.is_empty()):
@@ -143,7 +143,7 @@ func do_unit_action(unit: Unit, action: Action):
 	
 	# attack
 	if action.attack:
-		await battle.unit_action_attack(unit, action.attack, action.target, 0)
+		await battle.unit_action_attack(unit, action.attack, [action.target], [0])
 	
 
 	

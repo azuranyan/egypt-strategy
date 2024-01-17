@@ -17,6 +17,12 @@ signal empire_turn_ended
 signal action_started
 signal action_ended
 
+signal unit_added(unit: Unit)
+signal unit_removed(unit: Unit)
+signal unit_standby(unit: Unit, standby: bool)
+signal unit_taken_damage(unit: Unit, source: Variant, amount: int) # TODO
+signal unit_died(unit: Unit) # TODO
+signal unit_revived(unit: Unit) # TODO
 
 signal _continue
 
@@ -300,16 +306,11 @@ func show_turn_banner():
 	
 	
 func show_attack_banner(attack: Attack):
-	set_process_input(false)
-	var hud_visible := hud.visible
-	show_hud(false)
 	if attack:
 		$Overlay/AttackNameBox/Label.text = attack.name
 		$Overlay/AttackNameBox.visible = true
 	else:
 		$Overlay/AttackNameBox.visible = false
-	show_hud(hud_visible)
-	set_process_input(true)
 
 
 func show_hud(show: bool):
@@ -323,9 +324,7 @@ func show_hud(show: bool):
 #region Unit Functions
 ## Action
 func unit_action_pass(unit: Unit):
-	unit.has_moved = true
-	unit.has_attacked = true
-	unit.has_taken_action = false
+	unit.turn_flags = Unit.TURN_DONE
 	
 
 ## Action
@@ -337,36 +336,32 @@ func unit_action_walk(unit: Unit, target: Vector2):
 	#set_camera_follow(unit)
 	await unit.walk_towards(target)
 	hud.visible = true
-	#set_camera_follow(old_target)
-	unit.has_moved = true
-	#unit.has_attacked = false
-	unit.has_taken_action = true
+	unit.turn_flags |= Unit.TURN_MOVED
 	set_process_input(true)
 	
 
 ## Action
-func unit_action_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
+func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
 	set_process_input(false)
-	await _unit_use_attack(unit, attack, target, target_rotation)
-	#unit.has_moved = true
-	unit.has_attacked = true
-	unit.has_taken_action = true
-	set_process_input(true)
-
-
-func _unit_use_attack(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant):
 	#var old_target := _camera_target_remote.get_parent()
 	#camera.drag_horizontal_enabled = false
 	#camera.drag_vertical_enabled = false
 	#camera.position_smoothing_enabled = false
 	#set_camera_follow(unit) # TODO follow target, not unit
 	
+	var hud_visible := hud.visible
+	show_hud(false)
 	show_attack_banner(attack)
+	
 	await unit.use_attack(attack, target, target_rotation)
+	
 	show_attack_banner(null)
+	show_hud(hud_visible)
 	
 	#camera.position_smoothing_enabled = true
 	#set_camera_follow(old_target)
+	unit.turn_flags |= Unit.TURN_ATTACKED
+	set_process_input(true)
 	
 	
 ## Returns units owned by game.
@@ -441,6 +436,7 @@ func add_unit(unit: Unit, empire: Empire, pos := Map.OUT_OF_BOUNDS, heading := U
 		empire_units[unit.empire].append(unit)
 		
 		unit.set_meta("Battle_init_ready", true)
+		unit_added.emit(unit)
 		
 
 ## Removes the unit from the map.
@@ -449,6 +445,7 @@ func remove_unit(unit: Unit):
 		unit.get_parent().remove_child(unit)
 		empire_units[unit.empire].erase(unit)
 		unit.remove_meta("Battle_init_ready")
+		unit_removed.emit(unit)
 		
 ## Kills a unit.
 func kill_unit(unit: Unit):
@@ -476,6 +473,7 @@ func set_unit_standby(unit: Unit, standby: bool):
 		if unit.map_pos == Map.OUT_OF_BOUNDS:
 			unit.map_pos = pos
 		unit.remove_from_group('units_standby')
+	unit_standby.emit(unit, standby)
 
 	
 ## Inflict damage upon a unit.
@@ -535,16 +533,11 @@ func draw_unit_pathable_cells(unit: Unit, use_alt_color := false):
 func draw_unit_attack_range(unit: Unit, attack: Attack):
 	map.attack_overlay.draw(unit.get_attack_range_cells(attack), 3) # red
 	
-	
-func draw_unit_attack_targets(unit: Unit, attack: Attack, target: Variant, target_rotation: Variant, is_multi_target := false):
-	if is_multi_target:
-		map.attack_overlay.clear()
-		for i in target.size():
-			var cells := unit.get_attack_target_cells(attack, target[i], target_rotation[i])
-			map.target_overlay.draw(cells, 1, false) # blue
-	else:
-		var cells := unit.get_attack_target_cells(attack, target, target_rotation)
-		map.target_overlay.draw(cells, 1, true) # blue
+		
+func draw_unit_attack_target(unit: Unit, attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
+	for i in target.size():
+		var cells := unit.get_attack_target_cells(attack, target[i], target_rotation[i])
+		map.target_overlay.draw(cells, 1, false) # blue
 		
 		
 func draw_floating_number(unit: Unit, number: int, color: Color):
@@ -586,14 +579,15 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> R
 	print("Entering real battle.")
 	Globals.push_screen(self)
 	await Globals.screen_ready
-	_load_map(territory.maps[0])
-	
-	_battle_phase = false
-	hud.show_ui(true)
 	var agent := {
 		attacker: create_agent(attacker), 
 		defender: create_agent(defender), 
 	}
+	
+	_load_map(territory.maps[0])
+	
+	_battle_phase = false
+	hud.show_ui(true)
 	
 	await agent[ai].prepare_units()
 		
@@ -657,8 +651,10 @@ func _redistribute_units():
 		match u.get_meta("default_owner"):
 			attacker.leader.name:
 				add_unit(u, attacker, u.map_pos)
+				u.set_meta("Battle_unit_pre_placed", true)
 			defender.leader.name:
 				add_unit(u, defender, u.map_pos)
+				u.set_meta("Battle_unit_pre_placed", true)
 			_:
 				u.queue_free()
 		
@@ -693,10 +689,7 @@ func _do_battle(agent: Dictionary) -> Result:
 			
 			# pre-turn
 			for u in get_owned_units(empire):
-				var stunned: bool = 'STN' in u.status_effects
-				u.has_moved = stunned
-				u.has_attacked = stunned
-				u.has_taken_action = stunned
+				u.turn_flags = Unit.TURN_NEW if not 'STN' in u.status_effects else Unit.TURN_DONE
 					
 				# should be here so we can properly evaluate w/l
 				# conditions before the turn actually starts
@@ -722,7 +715,7 @@ func _do_battle(agent: Dictionary) -> Result:
 			
 			# post-turn
 			for u in get_owned_units(empire):
-				if not u.has_taken_action:
+				if not u.has_taken_action():
 					heal_unit(u, self, 1) 
 				
 				# tick duration of status effects
@@ -753,7 +746,7 @@ func _tick_status_effects(unit: Unit):
 func _test():
 	var a := Empire.new()
 	a.set_meta("player", true)
-	a.units = ['Alara', 'Lysandra']
+	a.units = ['Alara', 'Lysandra', 'Maia', 'Tali', 'Eirene']
 	a.leader = preload("res://Screens/Battle/data/chara/Lysandra.tres")
 	var b := Empire.new()
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")

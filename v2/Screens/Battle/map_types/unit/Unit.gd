@@ -67,6 +67,7 @@ enum Behavior {
 ## Headings
 enum Heading {East, South, West, North}
 
+const DIRECTIONS := [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, Vector2.UP]
 
 enum {
 	ATTACK_OK = 0,
@@ -75,6 +76,13 @@ enum {
 	ATTACK_TARGET_OUT_OF_RANGE,
 	ATTACK_NO_TARGETS,
 	ATTACK_INVALID_TARGET,
+}
+
+enum {
+	TURN_NEW = 0,
+	TURN_MOVED = 1 << 0,
+	TURN_ATTACKED = 1 << 1,
+	TURN_DONE = 1 << 2,
 }
 
 
@@ -195,11 +203,7 @@ var empire: Empire
 ## Mapping of status effect -> duration.
 var status_effects := {}
 
-var has_moved: bool
-
-var has_attacked: bool
-
-var has_taken_action: bool
+var turn_flags: int
 
 var _driver: UnitDriver
 
@@ -329,21 +333,40 @@ func is_ally(other: Unit) -> bool:
 func is_enemy(other: Unit) -> bool:
 	return other.empire != empire
 	
+	
+## Returns true if this unit can move.
+func can_move() -> bool:
+	return turn_flags & (TURN_DONE | TURN_ATTACKED | TURN_MOVED) == 0
+	
+	
+## Returns true if this unit can attack.
+func can_attack() -> bool:
+	return turn_flags & (TURN_DONE | TURN_ATTACKED) == 0
+
+
+## Returns true if this unit can act.
+func can_act() -> bool:
+	return (turn_flags & TURN_DONE == 0) and ((turn_flags & TURN_ATTACKED == 0) or (turn_flags & TURN_ATTACKED == 0))
+
+
+## Returns true if this unit has taken any actions.
+func has_taken_action() -> bool:
+	return turn_flags & (TURN_ATTACKED | TURN_MOVED) == 0
+	
+	
+## Resets the turn flags.
+func reset_turn_flags():
+	turn_flags = TURN_NEW
+
 
 ## Uses basic attack.
-func use_attack(attack: Attack, target: Variant, target_rotation: Variant):
+func use_attack(attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
 	if not attack or (attack != basic_attack and attack != special_attack):
 		return
 	attack_started.emit(attack, target, target_rotation)
-	
-	play_animation(attack.user_animation, false)
-	if attack.multicast > 0:
-		await _use_attack_multicast(attack, target, target_rotation)
-	else:
-		await _use_attack(attack, target, target_rotation)
-		
+	await _use_attack_multicast(attack, target, target_rotation)
 	attack_finished.emit()
-		
+	
 	
 func _use_attack(attack: Attack, target: Vector2, target_rotation: float):
 	var timer := get_tree().create_timer(1)
@@ -364,13 +387,12 @@ func _use_attack_multicast(attack: Attack, target: Array[Vector2], target_rotati
 	var timer := get_tree().create_timer(1)
 	
 	_active_multicast_counter = target.size()
-	var target_units = []
+	var all_target_units: Array[Unit] = []
 	for i in target.size():
-		target_units[i] = get_attack_target_units(attack, target[i], target_rotation[i])
-		for target_unit in target_units[i]:
-			target_unit.play_animation(attack.target_animation, false)
 		var multicaster := func():
-			await attack.execute(self, target[i], target_units[i])
+			var target_units := get_attack_target_units(attack, target[i], target_rotation[i])
+			all_target_units.append_array(target_units)
+			await attack.execute(self, target[i], target_units)
 			_active_multicast_counter -= 1
 			if _active_multicast_counter <= 0:
 				_active_multicast_counter = 0
@@ -383,9 +405,8 @@ func _use_attack_multicast(attack: Attack, target: Array[Vector2], target_rotati
 		await timer.timeout
 		
 	stop_animation()
-	for i in target.size():
-		for target_unit in target_units[i]:
-			target_unit.stop_animation()
+	for target_unit in all_target_units:
+		target_unit.stop_animation()
 	
 	
 ## Returns an array of cells in the attack range.
@@ -478,11 +499,11 @@ func walk_along(path: PackedVector2Array):
 		
 	walking_started.emit()
 	
-	
-	_driver = preload("res://Screens/Battle/map_types/unit/UnitDriver.tscn").instantiate() as UnitDriver
-	_driver.target = self
-	map.drivers.add_child(_driver)
-	await _driver.start_driver(path)
+	if not (path.size() == 0 or (path.size() == 1 and path[0] == cell())):
+		_driver = preload("res://Screens/Battle/map_types/unit/UnitDriver.tscn").instantiate() as UnitDriver
+		_driver.target = self
+		map.drivers.add_child(_driver)
+		await _driver.start_driver(path)
 	
 	walking_finished.emit()
 			

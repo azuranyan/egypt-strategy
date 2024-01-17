@@ -29,9 +29,9 @@ func set_selected_unit(unit: Unit):
 		$CharacterPortrait/TextureRect.texture = unit.display_icon
 		$CharacterPortrait/Label.text = unit.display_name.to_upper()
 		$CharacterPortrait.visible = true
-		$RestButton.visible = unit.is_player_owned() and not unit.has_attacked
-		$FightButton.visible = unit.is_player_owned() and not unit.has_attacked
-		$DiefyButton.visible = unit.is_player_owned() and not unit.has_attacked
+		$RestButton.visible = unit.is_player_owned() and unit.can_act()
+		$FightButton.visible = unit.is_player_owned() and unit.can_attack()
+		$DiefyButton.visible = unit.is_player_owned() and unit.can_attack()
 		$DiefyButton.disabled = not unit.is_special_unlocked()
 	else:
 		$CharacterPortrait.visible = false

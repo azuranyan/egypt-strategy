@@ -11,11 +11,7 @@ var buttons := {}
 var active_button: PrepUnitButton
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
+## Adds a unit to the list.
 func add_unit(unit: Unit):
 	if unit in buttons:
 		return
@@ -27,6 +23,7 @@ func add_unit(unit: Unit):
 	$ScrollContainer/VBoxContainer.sort_children
 	
 	
+## Remove a unit from the list.
 func remove_unit(unit: Unit):
 	if unit not in buttons:
 		return
@@ -34,10 +31,12 @@ func remove_unit(unit: Unit):
 	buttons.erase(unit)
 
 
+## Returns the selected unit.
 func get_selected_unit() -> Unit:
 	return active_button.unit if active_button else null
 
 
+## Called by the button when it's selected.
 func button_selected(button: PrepUnitButton, selected: bool):
 	if selected:
 		active_button = button

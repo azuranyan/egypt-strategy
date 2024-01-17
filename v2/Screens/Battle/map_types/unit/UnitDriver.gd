@@ -56,8 +56,8 @@ func start_driver(path: PackedVector2Array):
 	position = target.position
 	remote_transform.remote_path = target.get_path()
 	
-	# if walking speed is invalid or path is empty, skip all the work
-	if target.walk_speed > 0 and not path.is_empty() and not (path.size() == 1 and path[0] == target.cell()):
+	# skip all the work if walking speed is invalid 
+	if target.walk_speed > 0:
 		_old_pos = target.map_pos
 		#curve.add_point(Vector2.ZERO)
 			

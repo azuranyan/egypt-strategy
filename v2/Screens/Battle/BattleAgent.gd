@@ -12,7 +12,7 @@ var empire: Empire
 var should_end := false
 
 
-## To be overriden. Called before the battle starts.
+## To be overriden. Called before the battle starts and before the map is loaded.
 func initialize():
 	pass
 
@@ -43,7 +43,7 @@ func do_action(action: Callable, args := []):
 	
 	if Globals.prefs.auto_end_turn:
 		for u in battle.get_owned_units(empire):
-			if not u.has_moved or not u.has_attacked:
+			if u.can_act():
 				should_end = false
 				break
 	

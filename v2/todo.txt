@@ -66,9 +66,28 @@ camera follow stops working after casting skill
 overworld keyboard interactivity
 
 camera does not follow walking
-
-should not be able to interact_move if has_moved
-
 if basic_attack == special_attack, problems arise because the game is designed to check for equality and will crap itself
 if both are the same attacks
 
+cursor out of map and into battle
+ - set cursor layer
+ - remove cursor jank nodes
+ - make camera follow work again
+
+casting a skill on enemy control doesnt work
+ - put the trigger on all units
+
+
+multicast attack targeting is wonky
+
+
+when dragging from prep_unit_list, cursor does not follow
+when rotating, disable cursor and transform into rotate widget
+
+undo move not working
+mission objectives and bonus goal not implemented
+removing unit cannot be undo'd
+change cursor when on top of unit or cell
+click and drop prep not working
+attack rotation not working
+ - melee cannot be rotated

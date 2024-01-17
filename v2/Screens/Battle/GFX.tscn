@@ -7,12 +7,10 @@ script/source = "extends AnimatedSprite2D
 
 
 func _ready():
-	print(\"GFX STARTED \", name)
 	play()
 
 
 func _on_animation_finished():
-	print(\"GFX ENDED \", name)
 	queue_free()
 "
 
