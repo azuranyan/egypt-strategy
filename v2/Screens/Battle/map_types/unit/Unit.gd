@@ -205,6 +205,8 @@ var status_effects := {}
 
 var turn_flags: int
 
+var _standby_pos: Vector2
+
 var _driver: UnitDriver
 
 var _active_multicast_counter := 0
@@ -275,6 +277,30 @@ func _update_bond():
 		if bond >= 2:
 			v += stat_growth_2[stat]
 		set(stat, v)
+		
+	
+func _update_position():
+	super._update_position()
+	if cell() == Map.OUT_OF_BOUNDS:
+		add_to_group("standby_units")
+	else:
+		remove_from_group("standby_units")
+		
+		
+## Sets the unit standby status.
+func set_standby(standby: bool):
+	if standby:
+		_standby_pos = map_pos
+		map_pos = Map.OUT_OF_BOUNDS
+		add_to_group("standby_units")
+	else:
+		map_pos = _standby_pos
+		remove_from_group("standby_units")
+	
+
+## Returns true if the unit is on standby.
+func is_standby() -> bool:
+	return is_in_group("standby_units")
 	
 	
 func map_ready():
@@ -385,7 +411,7 @@ func _use_attack(attack: Attack, target: Vector2, target_rotation: float):
 	
 func _use_attack_multicast(attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
 	var timer := get_tree().create_timer(1)
-	
+	play_animation(attack.user_animation, false)
 	_active_multicast_counter = target.size()
 	var all_target_units: Array[Unit] = []
 	for i in target.size():

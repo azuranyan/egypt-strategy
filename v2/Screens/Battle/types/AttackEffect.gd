@@ -18,5 +18,5 @@ func attack_finished(battle: Battle, user: Unit, attack: Attack):
 
 ## Applies the attack effect. Should call attack.effect_completed(self) when done.
 func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_unit: Unit) -> void:
-	attack.effect_completed(self)
+	attack.effect_complete(self)
 	

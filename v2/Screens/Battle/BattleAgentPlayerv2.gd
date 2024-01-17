@@ -86,7 +86,8 @@ func initialize():
 	battle.hud.start_battle_pressed.connect(interact_start_battle)
 	battle.hud.end_turn_pressed.connect(interact_end_turn)
 	battle.hud.attack_pressed.connect(interact_select_attack)
-	
+	battle.hud.pass_pressed.connect(interact_pass)
+	battle.hud.undo_move_pressed.connect(interact_cancel)
 	
 	
 func prepare_units():
@@ -106,6 +107,7 @@ func prepare_units():
 	# TODO allow quitting from prep
 	await _done_prep
 	state = STATE_NONE
+	undo_stack.clear()
 	
 	battle.show_hud(false)
 	for spawn_point in spawn_points:
@@ -137,7 +139,10 @@ func _unhandled_input(event):
 		interact_move_pointer(battle.screen_to_global(event.position))
 			
 	if event is InputEventMouseButton and event.pressed:
-		interact_select_cell(cursor_pos)
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			interact_select_cell(cursor_pos)
+		else:
+			interact_cancel()
 		
 	if event is InputEventKey:
 		if event.keycode == KEY_ALT:
@@ -182,7 +187,7 @@ func pop_undo_action():
 	if action is PlaceUnitAction:
 		interact_remove_unit(action.unit)
 		if action.swap:
-			battle.set_unit_standby(action.swap, false)
+			action.swap.set_standby(false)
 			action.swap.map_pos = action.cell
 			battle.hud.prep_unit_list.remove_unit(action.swap)
 	elif action is RelocateUnitAction:
@@ -267,6 +272,28 @@ func interact_end_turn():
 	_done_turn.emit()
 			
 			
+func interact_pass():
+	undo_stack.append(SavedUnitState.new(selected_unit))
+	selected_unit.turn_flags |= Unit.TURN_DONE
+
+
+func interact_cancel():
+	if active_attack:
+		var unit := selected_unit
+		_select_attack(null, null)
+		_select_unit(unit)
+	elif selected_unit:
+		_select_unit(null)
+	else:
+		if not undo_stack.is_empty():
+			var action = undo_stack.pop_back()
+			
+			action.unit.map_pos = action.cell
+			action.unit.facing = action.facing
+			action.unit.turn_flags = action.turn_flags
+			_select_unit(action.unit)
+		
+		
 ## Places unit to the field.
 func interact_place_unit(unit: Unit, pos: Vector2):
 	update_message_box()
@@ -293,7 +320,7 @@ func interact_place_unit(unit: Unit, pos: Vector2):
 ## Removes unit from the field.
 func interact_remove_unit(unit: Unit):
 	update_message_box()
-	battle.set_unit_standby(unit, true)
+	unit.set_standby(true)
 	battle.hud.prep_unit_list.add_unit(unit)
 	
 
@@ -388,6 +415,7 @@ func _select_move(cell: Vector2):
 	if cell in selected_unit.get_pathable_cells(true):
 		update_message_box()
 		var unit := selected_unit
+		undo_stack.append(SavedUnitState.new(selected_unit))
 		_select_unit(null)
 		await battle.unit_action_walk(unit, cell)
 		state = STATE_BATTLE_STANDBY
@@ -405,6 +433,8 @@ func _select_attack(unit: Unit, attack: Attack):
 	multicast_targets.clear()
 	multicast_rotations.clear()
 	battle.hud.set_selected_attack(attack)
+	battle.map.attack_overlay.clear()
+	battle.map.target_overlay.clear()
 	if attack:
 		if attack.melee:
 			pass
@@ -441,6 +471,7 @@ func _use_attack(unit: Unit, attack: Attack, target: Array[Vector2], target_rota
 	battle.map.target_overlay.clear()
 	target = target.duplicate()
 	target_rotation = target_rotation.duplicate()
+	undo_stack.clear()
 	_select_attack(null, null)
 	await battle.unit_action_attack(unit, attack, target, target_rotation)
 	state = STATE_BATTLE_STANDBY
@@ -517,7 +548,7 @@ class PlaceUnitAction:
 	
 
 class RelocateUnitAction:
-	var unit: Unit
+	var unit: Unit # TODO cleanup this ugly shit
 	var swap: Unit
 	var old_cell: Vector2
 	var new_cell: Vector2
@@ -528,3 +559,15 @@ class RelocateUnitAction:
 		self.old_cell = old_cell
 		self.new_cell = new_cell
 	
+
+class SavedUnitState:
+	var unit: Unit
+	var facing: float
+	var cell: Vector2
+	var turn_flags: int
+	
+	func _init(save: Unit):
+		unit = save
+		facing = save.facing
+		cell = save.cell()
+		turn_flags = save.turn_flags

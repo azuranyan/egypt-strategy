@@ -19,7 +19,6 @@ signal action_ended
 
 signal unit_added(unit: Unit)
 signal unit_removed(unit: Unit)
-signal unit_standby(unit: Unit, standby: bool)
 signal unit_taken_damage(unit: Unit, source: Variant, amount: int) # TODO
 signal unit_died(unit: Unit) # TODO
 signal unit_revived(unit: Unit) # TODO
@@ -180,10 +179,15 @@ func fulfills_attack_requirements(empire: Empire, territory: Territory) -> bool:
 	return true
 
 
-## Returns true if the attacker fulfills prep requirements over territory.
+## Returns true if the player fulfills prep requirements over territory.
 func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
-	# TODO put battle requirements here
-	_warnings = []
+	var hero_deployed := false
+	for unit in get_owned_units(empire):
+		if unit.unit_type.chara == empire.leader:
+			hero_deployed = true
+	if not hero_deployed:
+		_warnings = ["%s required" % empire.leader.name]
+		return false
 	return true
 	
 	
@@ -365,15 +369,10 @@ func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], targ
 	
 	
 ## Returns units owned by game.
-func get_owned_units(empire: Empire, standby := false) -> Array[Unit]:
+func get_owned_units(empire: Empire, include_standby := false) -> Array[Unit]:
 	var re: Array[Unit] = []
-	if standby:
-		for unit in empire_units[empire]:
-			re.append(unit)
-	else:
-		for unit in empire_units[empire]:
-			if unit.is_in_group('units_standby'):
-				continue
+	for unit in empire_units[empire]:
+		if include_standby or not unit.is_standby():
 			re.append(unit)
 	return re
 	
@@ -427,10 +426,7 @@ func add_unit(unit: Unit, empire: Empire, pos := Map.OUT_OF_BOUNDS, heading := U
 			map.get_node("Entities").add_child(unit)
 		
 		unit.empire = empire
-		if pos == Map.OUT_OF_BOUNDS:
-			set_unit_standby(unit, true)
-		else:
-			unit.map_pos = pos
+		unit.map_pos = pos
 		unit.set_heading(heading)
 		
 		empire_units[unit.empire].append(unit)
@@ -460,20 +456,6 @@ func revive_unit(unit: Unit, hp: int):
 	unit.add_to_group('units_alive')
 	unit.alive = true
 	unit.selectable = true
-
-
-## Standby unit.
-func set_unit_standby(unit: Unit, standby: bool):
-	if standby:
-		unit.set_meta("Battle_unit_standby_old_pos", unit.map_pos)
-		unit.map_pos = Map.OUT_OF_BOUNDS
-		unit.add_to_group('units_standby')
-	else:
-		var pos: Vector2 = unit.get_meta("Battle_unit_standby_old_pos", Vector2.ZERO)
-		if unit.map_pos == Map.OUT_OF_BOUNDS:
-			unit.map_pos = pos
-		unit.remove_from_group('units_standby')
-	unit_standby.emit(unit, standby)
 
 	
 ## Inflict damage upon a unit.

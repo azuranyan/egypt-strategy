@@ -57,10 +57,8 @@ mission objectives
 camera follow stops working after casting skill
  - hotfixed with cast skill camera target, might have to be perma fixed with better input mode control procedure
 overworld keyboard interactivity
-update the visuals to match the example
 main menu
 implement the AI behaviour system
-lysandra is requried to be in the battle otherwise it wouldnt start
 battle missions
 camera follow stops working after casting skill
 overworld keyboard interactivity
@@ -74,20 +72,12 @@ cursor out of map and into battle
  - remove cursor jank nodes
  - make camera follow work again
 
-casting a skill on enemy control doesnt work
- - put the trigger on all units
-
-
-multicast attack targeting is wonky
-
-
 when dragging from prep_unit_list, cursor does not follow
 when rotating, disable cursor and transform into rotate widget
 
-undo move not working
 mission objectives and bonus goal not implemented
 removing unit cannot be undo'd
-change cursor when on top of unit or cell
-click and drop prep not working
 attack rotation not working
- - melee cannot be rotated
+ - melee should not be rotated
+
+keyboard controls are broken
