@@ -34,7 +34,7 @@ target = 0
 [resource]
 script = ExtResource("1_34vom")
 name = "Vulnerability"
-description = ""
+description = "Inflicts vulnerability to enemy."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])

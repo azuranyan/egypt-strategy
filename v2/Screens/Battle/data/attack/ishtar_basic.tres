@@ -59,7 +59,7 @@ target = 1
 [resource]
 script = ExtResource("1_a84vy")
 name = "Magic"
-description = ""
+description = "Stuns the enemy or removes poison from ally."
 user_animation = "attack"
 target_animation = "idle"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])

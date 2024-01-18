@@ -21,7 +21,6 @@ extends BattleAgent
 # currently it calls outside directly to output errors. it shouldnt be their
 # responsibility esp the error handling is also an interact
 
-signal _done_prep
 signal _done_turn
 
 
@@ -77,7 +76,7 @@ func exit_state(_st: int):
 	pass
 
 
-func initialize():
+func _initialize():
 	state = STATE_NONE
 	battle.unit_added.connect(_on_battle_unit_added)
 	battle.unit_removed.connect(_on_battle_unit_removed)
@@ -89,12 +88,15 @@ func initialize():
 	battle.hud.pass_pressed.connect(interact_pass)
 	battle.hud.undo_move_pressed.connect(interact_cancel)
 	
+	battle.hud.prep_unit_list.visible = false
+
 	
-func prepare_units():
+func _enter_prepare_units():
 	state = STATE_PREP
 	for roster_unit in empire.units:
 		var unit = battle.spawn_unit(roster_unit, empire, roster_unit)
 		battle.hud.prep_unit_list.add_unit(unit)
+	battle.hud.prep_unit_list.visible = true
 		
 	battle.show_hud(true)
 	battle.hud.prep_unit_list.unit_selected.connect(_on_prep_unit_list_unit_selected)
@@ -103,22 +105,28 @@ func prepare_units():
 	spawn_points.assign(battle.map.get_spawn_points('Player'))
 	for spawn_point in spawn_points:
 		spawn_point.no_show = false
-	
-	# TODO allow quitting from prep
-	await _done_prep
+
+
+func _exit_prepare_units():
 	state = STATE_NONE
 	undo_stack.clear()
 	
 	battle.show_hud(false)
 	for spawn_point in spawn_points:
 		spawn_point.no_show = true
+	
 
-
-func do_turn():
+func _enter_turn():
 	state = STATE_BATTLE_STANDBY
-	await _done_turn
+	
+	
+func _exit_turn():
 	state = STATE_NONE
 
+
+func _get_errors() -> PackedStringArray:
+	return []
+	
 
 func _input(event):
 	# initiating rotate with mmb on the unit wont work if this isnt here
@@ -149,17 +157,20 @@ func _unhandled_input(event):
 			alt_held = event.pressed
 		else:
 			if event.pressed:
-				set_mouse_input_mode(false)
 				match event.keycode:
 					KEY_ESCAPE:
 						interact_quit()
 					KEY_W:
+						set_mouse_input_mode(false)
 						interact_move_cursor(cursor_pos + Vector2.UP)
 					KEY_S:
+						set_mouse_input_mode(false)
 						interact_move_cursor(cursor_pos + Vector2.DOWN)
 					KEY_A:
+						set_mouse_input_mode(false)
 						interact_move_cursor(cursor_pos + Vector2.LEFT)
 					KEY_D:
+						set_mouse_input_mode(false)
 						interact_move_cursor(cursor_pos + Vector2.RIGHT)
 	
 	
@@ -241,7 +252,7 @@ func release_dragging(unit: Unit, pos: Vector2):
 	
 func interact_start_battle():
 	if await battle.fulfills_prep_requirements(empire, battle.territory):
-		_done_prep.emit()
+		end_prepare_units()
 	else:
 		var str := "\n".join(battle._warnings)
 		battle.show_pause_box(str, "Confirm", null)
@@ -249,27 +260,11 @@ func interact_start_battle():
 		
 		
 func interact_quit():
-	if await battle.show_pause_box("Retreat?"):
-		if battle.defender == empire:
-			battle.show_pause_box("Cannot quit!", "Confirm", null)
-		else:
-			battle.should_end = true
-			match state:
-				STATE_NONE:
-					pass
-				STATE_PREP:
-					_done_prep.emit()
-				STATE_BATTLE_STANDBY:
-					interact_end_turn()
-				STATE_BATTLE_SELECTING_MOVE:
-					interact_end_turn()
-				STATE_BATTLE_SELECTING_TARGET:
-					interact_end_turn()
+	await battle.quit_battle(empire, "Forfeit?")
 					
 					
 func interact_end_turn():
-	should_end = true
-	_done_turn.emit()
+	end_turn()
 			
 			
 func interact_pass():
@@ -493,33 +488,34 @@ func _on_unit_mouse_button_pressed(unit: Unit, button: int, position: Vector2, p
 			rotated_unit = unit
 		else:
 			rotated_unit = null
-		return
-	
-	match state:
-		STATE_NONE:
-			pass
-		STATE_PREP:
-			if unit.is_player_owned() and not unit.get_meta("Battle_unit_pre_placed", false):
-				if button == MOUSE_BUTTON_LEFT:
-					if pressed:
-						initiate_dragging(unit, position, true)
-					else:
-						release_dragging(unit, unit.position)
-				elif button == MOUSE_BUTTON_RIGHT and pressed:
-					interact_remove_unit(unit)
-		STATE_BATTLE_STANDBY:
-			if pressed:
-				interact_select_unit(unit)
-		STATE_BATTLE_SELECTING_MOVE:
-			if pressed:
-				# qol: only click unit when it can move, otherwise ignore
-				if unit.is_player_owned() and unit.can_move() and unit != selected_unit:
+	elif button == MOUSE_BUTTON_RIGHT and pressed:
+		interact_cancel()
+	else:
+		match state:
+			STATE_NONE:
+				pass
+			STATE_PREP:
+				if unit.is_player_owned() and not unit.get_meta("Battle_unit_pre_placed", false):
+					if button == MOUSE_BUTTON_LEFT:
+						if pressed:
+							initiate_dragging(unit, position, true)
+						else:
+							release_dragging(unit, unit.position)
+					elif button == MOUSE_BUTTON_RIGHT and pressed:
+						interact_remove_unit(unit)
+			STATE_BATTLE_STANDBY:
+				if pressed:
 					interact_select_unit(unit)
-				else:
+			STATE_BATTLE_SELECTING_MOVE:
+				if pressed:
+					# qol: only click unit when it can move, otherwise ignore
+					if unit.is_player_owned() and unit.can_move() and unit != selected_unit:
+						interact_select_unit(unit)
+					else:
+						interact_select_cell(cursor_pos)
+			STATE_BATTLE_SELECTING_TARGET:
+				if pressed: 
 					interact_select_cell(cursor_pos)
-		STATE_BATTLE_SELECTING_TARGET:
-			if pressed:
-				interact_select_unit(unit)
 
 
 func _on_prep_unit_list_unit_selected(unit: Unit):

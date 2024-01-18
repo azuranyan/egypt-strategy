@@ -24,7 +24,7 @@ target = 0
 [resource]
 script = ExtResource("1_incvm")
 name = "Cleave"
-description = ""
+description = "Damages multiple units in front."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, -1), Vector2i(0, 1)])

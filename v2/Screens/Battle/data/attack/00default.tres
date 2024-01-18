@@ -13,7 +13,7 @@ target = 0
 [resource]
 script = ExtResource("2_cunx4")
 name = "Placeholder"
-description = ""
+description = "Placeholder attack."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])

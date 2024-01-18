@@ -1,7 +1,7 @@
 extends Resource
 class_name VictoryCondition
 
-# TODO 
+
 func evaluate(battle: Battle) -> Battle.Result:
 	if battle.empire_units[battle.defender].is_empty():
 		return Battle.Result.AttackerVictory

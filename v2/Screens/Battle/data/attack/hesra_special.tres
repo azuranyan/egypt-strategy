@@ -26,7 +26,7 @@ target = 0
 [resource]
 script = ExtResource("1_fv0lw")
 name = "Poison"
-description = ""
+description = "Poisons the enemy."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])

@@ -26,15 +26,12 @@ static func generate_move_attack_action(unit: Unit, cell: Vector2, attack: Attac
 				re.append(Action.move_attack(cell, attack, targettable))
 	return re
 	
-	
-func _input(event):
-	if event is InputEventKey and event.keycode == KEY_SPACE and event.pressed:
-		for v in agents.values():
-			v.nigglet.emit()
 			
+func _initialize():
+	pass
+	
 
-func prepare_units():
-	print('Agent is preparing units.')
+func _enter_prepare_units():
 	var spawnable: Array[String] = empire.units.duplicate()
 	var spawned_leader := false
 	
@@ -60,7 +57,30 @@ func prepare_units():
 		_spawn_unit(spawn_point.cell(), type_name)
 		
 		spawnable.erase(type_name)
+	end_prepare_units()
 		
+		
+func _exit_prepare_units():
+	pass
+	
+
+func _enter_turn():
+	var unit_action_queue: Array[Unit] = []
+	for u in battle.get_owned_units(battle.on_turn):
+		if u.can_act():
+			unit_action_queue.append(u)
+			
+	while not unit_action_queue.is_empty():
+		var unit: Unit = unit_action_queue.pop_back()
+		var agent := get_agent(unit)
+		
+		await do_unit_action(unit, agent.get_action())
+	end_turn()
+
+
+func _exit_turn():
+	pass
+
 
 func _spawn_unit(cell: Vector2, type_name: String):
 	print('  spawning %s at %s' % [type_name, cell])
@@ -79,22 +99,7 @@ func _get_closest_player_spawn_point(cell: Vector2) -> Vector2:
 			closest = sp.map_pos
 	return closest
 		
-
-func do_turn():
-	should_end = false
-	var unit_action_queue: Array[Unit] = []
-	for u in battle.get_owned_units(battle.on_turn):
-		if u.can_act():
-			unit_action_queue.append(u)
-			
-	while not (should_end or unit_action_queue.is_empty()):
-		var unit: Unit = unit_action_queue.pop_back()
-		var agent := get_agent(unit)
 		
-		var action := await  agent.get_action()
-		await do_action(do_unit_action, [unit, action])
-
-
 func get_agent(unit: Unit) -> Agent:
 	if unit not in agents:
 		match unit.behavior:
@@ -125,12 +130,8 @@ func get_agent(unit: Unit) -> Agent:
 				pass
 	return agents[unit]
 
-signal paused
+
 func do_unit_action(unit: Unit, action: Action):
-	if unit.display_name == 'A':
-		await paused
-		
-		
 	# do nothing
 	if unit.cell() == action.cell and not action.attack:
 		await battle.unit_action_pass(unit)
@@ -146,7 +147,6 @@ func do_unit_action(unit: Unit, action: Action):
 		await battle.unit_action_attack(unit, action.attack, [action.target], [0])
 	
 
-	
 class Action:
 	var cell: Vector2
 	var attack: Attack
@@ -200,7 +200,6 @@ class Agent:
 
 class NormalMeleeAgent extends Agent:
 	
-	signal nigglet
 	func get_action() -> Action:
 		var enemies: Array[Unit] = battle.map.get_units().filter(unit.is_enemy)
 		var nearby: Array[Unit] = []

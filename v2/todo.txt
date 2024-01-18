@@ -4,7 +4,6 @@
 
 ## minor
 mark units with something when they have taken turn (E) in disgaea
-attack shape rotation is rotated 90 degrees
 overworld buttons need to be double clicked when clicked
 
 
@@ -13,7 +12,6 @@ sprite viewer
 disgaea style enum targetable units in attack range
 disgaea style target and caster placement 
 damage counter for consecutive attacks
-allow scrolling on character list
 Globals empires, territories -> empire, territory
 
 
@@ -32,8 +30,6 @@ battle
  
 spawning 
  - better spawning marker, also allow specifying chance tables
- - allow adding units to the map and assigning them to player spawn
-<<<<<<< Updated upstream
  - dead enemy ai can move on their turn after killed by player in their turn
 =======
 
@@ -50,10 +46,6 @@ remove dead untis from the map
 ## v2 demo+
 ##########################################################################################################
 
-12x12 grid
-mission objectives
- - always: lysandra must be there
- - you can't quit when you are attacked
 camera follow stops working after casting skill
  - hotfixed with cast skill camera target, might have to be perma fixed with better input mode control procedure
 overworld keyboard interactivity
@@ -81,3 +73,9 @@ attack rotation not working
  - melee should not be rotated
 
 keyboard controls are broken
+
+
+movement after doing action with a diff unit feels jank
+ sometimes
+
+small delay after unit dies

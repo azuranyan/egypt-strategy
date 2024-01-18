@@ -13,7 +13,7 @@ target = 2
 [resource]
 script = ExtResource("2_wyw7p")
 name = "Recover"
-description = ""
+description = "Heals self for 2 hp."
 user_animation = "attack"
 target_animation = "heal"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])

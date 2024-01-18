@@ -20,10 +20,10 @@ target = 0
 [resource]
 script = ExtResource("1_vr0ys")
 name = "Poison"
-description = ""
+description = "Damages and inflicts poison."
 user_animation = "attack"
 target_animation = "hurt"
-target_shape = null
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
 allow_rotation = false
 range = 1
 min_range = 0

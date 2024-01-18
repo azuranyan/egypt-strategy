@@ -209,8 +209,6 @@ var _standby_pos: Vector2
 
 var _driver: UnitDriver
 
-var _active_multicast_counter := 0
-
 @onready var model: UnitModel = $UnitModel
 		
 		
@@ -377,7 +375,7 @@ func can_act() -> bool:
 
 ## Returns true if this unit has taken any actions.
 func has_taken_action() -> bool:
-	return turn_flags & (TURN_ATTACKED | TURN_MOVED) == 0
+	return turn_flags & (TURN_ATTACKED | TURN_MOVED) != 0
 	
 	
 ## Resets the turn flags.
@@ -385,7 +383,7 @@ func reset_turn_flags():
 	turn_flags = TURN_NEW
 
 
-## Uses basic attack.
+## Uses attack.
 func use_attack(attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
 	if not attack or (attack != basic_attack and attack != special_attack):
 		return
@@ -394,34 +392,18 @@ func use_attack(attack: Attack, target: Array[Vector2], target_rotation: Array[f
 	attack_finished.emit()
 	
 	
-func _use_attack(attack: Attack, target: Vector2, target_rotation: float):
-	var timer := get_tree().create_timer(1)
-	
-	var target_units := get_attack_target_units(attack, target, target_rotation)
-	await attack.execute(self, target, target_units)
-	
-	# just in case we're playing an extra long animation or we finished early
-	if timer.time_left > 0:
-		await timer.timeout
-		
-	stop_animation()
-	for target_unit in target_units:
-		target_unit.stop_animation()
-
-	
 func _use_attack_multicast(attack: Attack, target: Array[Vector2], target_rotation: Array[float]):
 	var timer := get_tree().create_timer(1)
 	play_animation(attack.user_animation, false)
-	_active_multicast_counter = target.size()
+	var capture := {active_multicast_counter = target.size()}
 	var all_target_units: Array[Unit] = []
 	for i in target.size():
 		var multicaster := func():
 			var target_units := get_attack_target_units(attack, target[i], target_rotation[i])
 			all_target_units.append_array(target_units)
 			await attack.execute(self, target[i], target_units)
-			_active_multicast_counter -= 1
-			if _active_multicast_counter <= 0:
-				_active_multicast_counter = 0
+			capture.active_multicast_counter -= 1
+			if capture.active_multicast_counter <= 0:
 				_multicast_finished.emit()
 		multicaster.call_deferred()
 	await _multicast_finished

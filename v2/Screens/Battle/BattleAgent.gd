@@ -2,52 +2,109 @@ extends Node
 class_name BattleAgent
 
 
+signal _prepare_units_done
+signal _turn_done
+
+
+enum {
+	AGENT_STATE_STANDBY,
+	AGENT_STATE_PREPARE_UNITS,
+	AGENT_STATE_TURN,
+}
+
+
 ## Reference to the battle object.
 var battle: Battle
 
 ## Reference to the empire this agent is controlling.
 var empire: Empire
 
-## A flag set when the turn should end.
-var should_end := false
+var _state: int
 
 
-## To be overriden. Called before the battle starts and before the map is loaded.
-func initialize():
-	pass
+func _ready():
+	set_process_input(false)
+
+
+## Called before the battle starts and before the map is loaded.
+func initialize(_battle: Battle, _empire: Empire):
+	print(self, ' initializing.')
+	_state = AGENT_STATE_STANDBY
+	battle = _battle
+	empire = _empire
+	_initialize()
+	_state = AGENT_STATE_STANDBY
 
 
 ## Called by the engine to fill in units.
-func prepare_units():
-	pass
+func prepare_units() -> Dictionary:
+	print(self, ' preparing units.')
+	set_process_input(true)
+	_state = AGENT_STATE_PREPARE_UNITS
+	_enter_prepare_units.call_deferred()
+	await _prepare_units_done
+	_state = AGENT_STATE_STANDBY
+	_exit_prepare_units()
+	var prep_errors := _get_errors()
+	var re := {
+		is_error = not prep_errors.is_empty(),
+		errors = prep_errors,
+	}
+	set_process_input(false)
+	return re
 
 
 ## Called by the engine for doing the agent's turn.
 func do_turn():
-	# while not should_end:
-	#  await do_action(your_custom_action)
-	await do_action(Util.do_nothing)
+	print(self, ' doing turn.')
+	set_process_input(true)
+	_state = AGENT_STATE_TURN
+	_enter_turn.call_deferred()
+	await _turn_done
+	_state = AGENT_STATE_STANDBY
+	_exit_turn()
+	set_process_input(false)
 	
 	
-## Wraps the callable action with necessary calls and waits for it to finish.
-func do_action(action: Callable, args := []):
-	# check before taking action, because sometimes this can be true before
-	# taking any action (e.g. units dying from poison)
-	if battle.evaluate_victory_conditions():
-		should_end = true
-		return
+## Unconditionally ends all processes.
+func force_end():
+	if _state == AGENT_STATE_PREPARE_UNITS:
+		end_prepare_units()
+	elif _state == AGENT_STATE_TURN:
+		end_turn()
 	
-	await action.callv(args)
 	
-	await battle.wait_for_death_animations()
+## Unconditionally ends prepare unit phase.
+func end_prepare_units():
+	if _state == AGENT_STATE_PREPARE_UNITS:
+		_prepare_units_done.emit()
 	
-	if Globals.prefs.auto_end_turn:
-		for u in battle.get_owned_units(empire):
-			if u.can_act():
-				should_end = false
-				break
 	
-	# need to re-evaluate after every action
-	if battle.evaluate_victory_conditions():
-		should_end = true
-		return
+## Unconditionally ends the turn phase.
+func end_turn():
+	if _state == AGENT_STATE_TURN:
+		_turn_done.emit()
+		
+	
+func _initialize():
+	pass
+	
+	
+func _enter_prepare_units():
+	pass
+	
+	
+func _exit_prepare_units():
+	pass
+	
+	
+func _enter_turn():
+	pass
+	
+	
+func _exit_turn():
+	pass
+	
+	
+func _get_errors() -> PackedStringArray:
+	return []
