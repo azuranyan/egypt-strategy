@@ -136,7 +136,7 @@ func snap(node: Node2D):
 # TODO prob should not be here? idk. feels very much like implementation detail;
 # heck even the description sounds so much like an implementation detail
 func to_index(v: Vector2) -> int:
-	return int(v.y) * map_size.x + v.x
+	return int(v.y * map_size.x + v.x)
 
 	
 ## Recalculates world transforms.
@@ -144,10 +144,6 @@ func recalculate_world_transforms():
 	_transform_errors.clear()
 	
 	var internal_size := get_internal_size()
-	 
-	var ws = internal_size
-	var yr = y_ratio
-	
 	if internal_size.x == 0 or internal_size.y == 0:
 		_transform_errors.append('Invalid internal size (check texture).')
 	
@@ -158,14 +154,11 @@ func recalculate_world_transforms():
 	
 	var m = Transform2D()
 	if _transform_errors.size() == 0:
-		# apply centering
-		#m = m.translated(Vector2(0.5, 0.5) * tile_size)
-		
 		# apply world skew
 		m = m.rotated(deg_to_rad(45))
 		
 		# apply y_ratio
-		m = m.scaled(Vector2(1, yr))
+		m = m.scaled(Vector2(1, y_ratio))
 		
 		# apply offset
 		m = m.translated(offset)

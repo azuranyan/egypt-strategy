@@ -46,7 +46,7 @@ func _update():
 	sprite.texture = texture
 	if world:
 		var scaling := Vector2(world.tile_size, world.tile_size) / texture.get_size() 
-		var offset := Vector2(0, vertical_offset) #- Vector2(0.5, 0.5) * world.tile_size 
+		#var offset := Vector2(0, vertical_offset) #- Vector2(0.5, 0.5) * world.tile_size 
 		sprite.transform = world.world_transform * Transform2D(0, scaling, 0, Vector2.ZERO)
 		sprite.position = Vector2(0, sqrt(2) * world.y_ratio / -2) * world.tile_size 
 		sprite.position.y += vertical_offset

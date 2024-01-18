@@ -62,26 +62,12 @@ var spawn_points := []
 var undo_stack := []
 
 
-func transition_to(new_state: int):
-	exit_state(state)
-	enter_state(new_state)
-	state = new_state
-	
-	
-func enter_state(_st: int):
-	pass
-	
-	
-func exit_state(_st: int):
-	pass
-
-
 func _initialize():
 	state = STATE_NONE
 	battle.unit_added.connect(_on_battle_unit_added)
 	battle.unit_removed.connect(_on_battle_unit_removed)
 
-	battle.hud.undo_place_pressed.connect(pop_undo_action)
+	battle.hud.undo_place_pressed.connect(interact_cancel)
 	battle.hud.start_battle_pressed.connect(interact_start_battle)
 	battle.hud.end_turn_pressed.connect(interact_end_turn)
 	battle.hud.attack_pressed.connect(interact_select_attack)
@@ -122,6 +108,7 @@ func _enter_turn():
 	
 func _exit_turn():
 	state = STATE_NONE
+	undo_stack.clear()
 
 
 func _get_errors() -> PackedStringArray:
@@ -251,11 +238,11 @@ func release_dragging(unit: Unit, pos: Vector2):
 	
 	
 func interact_start_battle():
-	if await battle.fulfills_prep_requirements(empire, battle.territory):
+	if battle.fulfills_prep_requirements(empire, battle.territory):
 		end_prepare_units()
 	else:
-		var str := "\n".join(battle._warnings)
-		battle.show_pause_box(str, "Confirm", null)
+		var warnings := "\n".join(battle._warnings)
+		battle.show_pause_box(warnings, "Confirm", null)
 		return
 		
 		
@@ -273,6 +260,10 @@ func interact_pass():
 
 
 func interact_cancel():
+	if _state == STATE_PREP:
+		pop_undo_action() # TODO unify interact_cancel and pop to one function
+		return
+		
 	if active_attack:
 		var unit := selected_unit
 		_select_attack(null, null)
@@ -412,6 +403,7 @@ func _select_move(cell: Vector2):
 		var unit := selected_unit
 		undo_stack.append(SavedUnitState.new(selected_unit))
 		_select_unit(null)
+		state = STATE_NONE
 		await battle.unit_action_walk(unit, cell)
 		state = STATE_BATTLE_STANDBY
 		
@@ -428,6 +420,7 @@ func _select_attack(unit: Unit, attack: Attack):
 	multicast_targets.clear()
 	multicast_rotations.clear()
 	battle.hud.set_selected_attack(attack)
+	battle.map.pathing_overlay.clear()
 	battle.map.attack_overlay.clear()
 	battle.map.target_overlay.clear()
 	if attack:
@@ -468,6 +461,7 @@ func _use_attack(unit: Unit, attack: Attack, target: Array[Vector2], target_rota
 	target_rotation = target_rotation.duplicate()
 	undo_stack.clear()
 	_select_attack(null, null)
+	state = STATE_NONE
 	await battle.unit_action_attack(unit, attack, target, target_rotation)
 	state = STATE_BATTLE_STANDBY
 
@@ -483,26 +477,22 @@ func _on_battle_unit_removed(unit: Unit):
 	
 	
 func _on_unit_mouse_button_pressed(unit: Unit, button: int, position: Vector2, pressed: bool):
-	if unit.is_player_owned() and button == MOUSE_BUTTON_MIDDLE:
-		if pressed:
-			rotated_unit = unit
-		else:
-			rotated_unit = null
+	# unit inputs still go through even if _unhandled_input is offline because
+	# these are separate entities and is not affected by input toggle.
+	if state == STATE_NONE:
+		pass
+	elif button == MOUSE_BUTTON_MIDDLE and unit.is_player_owned():
+		rotated_unit = unit if pressed else null
 	elif button == MOUSE_BUTTON_RIGHT and pressed:
 		interact_cancel()
-	else:
+	elif button == MOUSE_BUTTON_LEFT:
 		match state:
-			STATE_NONE:
-				pass
 			STATE_PREP:
 				if unit.is_player_owned() and not unit.get_meta("Battle_unit_pre_placed", false):
-					if button == MOUSE_BUTTON_LEFT:
-						if pressed:
-							initiate_dragging(unit, position, true)
-						else:
-							release_dragging(unit, unit.position)
-					elif button == MOUSE_BUTTON_RIGHT and pressed:
-						interact_remove_unit(unit)
+					if pressed:
+						initiate_dragging(unit, position, true)
+					else:
+						release_dragging(unit, unit.position)
 			STATE_BATTLE_STANDBY:
 				if pressed:
 					interact_select_unit(unit)
@@ -514,7 +504,7 @@ func _on_unit_mouse_button_pressed(unit: Unit, button: int, position: Vector2, p
 					else:
 						interact_select_cell(cursor_pos)
 			STATE_BATTLE_SELECTING_TARGET:
-				if pressed: 
+				if pressed:
 					interact_select_cell(cursor_pos)
 
 
@@ -537,10 +527,10 @@ class PlaceUnitAction:
 	var swap: Unit
 	var cell: Vector2
 	
-	func _init(unit: Unit, swap: Unit, cell: Vector2):
-		self.unit = unit
-		self.swap = swap
-		self.cell = cell
+	func _init(_unit: Unit, _swap: Unit, _cell: Vector2):
+		unit = _unit
+		swap = _swap
+		cell = _cell
 	
 
 class RelocateUnitAction:
@@ -549,11 +539,11 @@ class RelocateUnitAction:
 	var old_cell: Vector2
 	var new_cell: Vector2
 	
-	func _init(unit: Unit, swap: Unit, old_cell: Vector2, new_cell: Vector2):
-		self.unit = unit
-		self.swap = swap
-		self.old_cell = old_cell
-		self.new_cell = new_cell
+	func _init(_unit: Unit, _swap: Unit, _old_cell: Vector2, _new_cell: Vector2):
+		unit = _unit
+		swap = _swap
+		old_cell = _old_cell
+		new_cell = _new_cell
 	
 
 class SavedUnitState:

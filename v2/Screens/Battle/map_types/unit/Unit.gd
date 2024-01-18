@@ -263,7 +263,7 @@ func _update_stats():
 	if maxhp <= 0:
 		$HUD/ColorRect2.scale = Vector2.ONE
 	else:
-		$HUD/ColorRect2.scale.x = hp/maxhp
+		$HUD/ColorRect2.scale.x = float(hp)/maxhp
 	
 	
 func _update_bond():
@@ -551,9 +551,9 @@ func get_pathable_cells(limit_move := false) -> PackedVector2Array:
 	
 	
 ## Returns true if this unit can path through cell.
-func is_pathable(cell: Vector2) -> bool:
+func is_pathable(_cell: Vector2) -> bool:
 	if phase & PHASE_NO_CLIP == 0:
-		for obj in map.get_objects_at(cell):
+		for obj in map.get_objects_at(_cell):
 			if not _is_pathable_object(obj):
 				return false
 	return true
@@ -574,9 +574,9 @@ func _is_pathable_object(obj: MapObject) -> bool:
 	
 	
 ## Returns true if this unit can be placed on cell.
-func is_placeable(cell: Vector2) -> bool:
+func is_placeable(_cell: Vector2) -> bool:
 	if phase & PHASE_NO_CLIP == 0:
-		for obj in map.get_objects_at(cell):
+		for obj in map.get_objects_at(_cell):
 			if not _is_placeable_object(obj):
 				return false
 	return true

@@ -1,7 +1,7 @@
 class_name Util
 
 ## Use this because godot is fucking stupid.
-static func get_canvas_size(node: Node) -> Vector2:
+static func get_canvas_size(_node: Node) -> Vector2:
 	# IT SHOULD JUST BE THIS, BUT
 	#return node.get_viewport().size
 	
@@ -26,7 +26,7 @@ static func do_nothing():
 
 
 ## Simple suboptimal flood fill algorithm.
-static func flood_fill(cell: Vector2, max_distance: float, bounds: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
+static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var dest = PackedVector2Array()
 	
 	# for degen case where int <= 0 we skip
@@ -44,7 +44,7 @@ static func flood_fill(cell: Vector2, max_distance: float, bounds: Rect2, condit
 				if q in stack:
 					continue
 					
-				if q not in dest and bounds.has_point(q) and cell_distance(q, cell) <= max_distance and condition.call(q):
+				if q not in dest and rect.has_point(q) and cell_distance(q, cell) <= max_distance and condition.call(q):
 					stack.append(q)
 					
 	return dest

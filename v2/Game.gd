@@ -114,22 +114,22 @@ func transition_screen(new: Node, transition: String = ''):
 
 
 ## Pushes a new screen on top.
-func push_screen(new: Node, transition: String = ''):
+func push_screen(new: Node, transition_effect: String = ''):
 	# this check is not necessary but back() spits an error if null is empty
 	# which is undesirable instead of just being fucking quiet about it 
 	var old: Node = null if screen_stack.is_empty() else screen_stack.back()
 	screen_stack.push_back(new)
-	_transition.call_deferred(old, new, transition)
+	_transition.call_deferred(old, new, transition_effect)
 
 
 ## Pops the top screen and restores the previous screen.
-func pop_screen(transition: String = ''):
+func pop_screen(transition_effect: String = ''):
 	var old: Node = screen_stack.pop_back()
 	var new: Node = screen_stack.back()
-	_transition.call_deferred(old, new, transition)
+	_transition.call_deferred(old, new, transition_effect)
 	
 
-func _transition(old: Node, new: Node, _transition: String): # TODO different transitions
+func _transition(old: Node, new: Node, _transition_effect: String): # TODO different transitions
 	print('transitioning from ', old, ' to ', new)
 	# replace old screen with a dummy (dummy first to hide the remove)
 	var dummy := dummy_scene.instantiate()

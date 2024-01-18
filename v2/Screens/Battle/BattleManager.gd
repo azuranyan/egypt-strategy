@@ -69,9 +69,8 @@ var battle_result: Result
 
 var _warnings = []
 var _lock := {}
-var _waiting_for_lock := false
+var _waiting_for_lock := false # TODO this feature wasn't used
 
-var _selected_unit: Unit
 var _battle_phase: bool
 
 var _camera_target_remote: RemoteTransform2D = null
@@ -125,11 +124,11 @@ func _exit_tree():
 				
 	
 #region Core API
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, do_quick = null) -> bool:
-	if !fulfills_attack_requirements(attacker, territory):
+func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _do_quick: Variant = null) -> bool:
+	if !fulfills_attack_requirements(_attacker, _territory):
 		return false
 	
-	_start_battle.call_deferred(attacker, defender, territory, do_quick)
+	_start_battle.call_deferred(_attacker, _defender, _territory, _do_quick)
 	return true
 		
 
@@ -163,9 +162,9 @@ func _start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, 
 	var should_do_quick: bool = _do_quick if _do_quick != null else not (attacker.is_player_owned() or defender.is_player_owned())
 		
 	if should_do_quick:
-		await _quick_battle(attacker, defender, territory)
+		await _quick_battle()
 	else:
-		await _real_battle(attacker, defender, territory)
+		await _real_battle()
 		
 	# end battle
 	battle_ended.emit(battle_result)
@@ -173,27 +172,27 @@ func _start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, 
 	
 	
 ## Returns true if the attacker can initiate the attack to territory.
-func fulfills_attack_requirements(empire: Empire, territory: Territory) -> bool:
+func fulfills_attack_requirements(_empire: Empire, _territory: Territory) -> bool:
 	# TODO put battle requirements here
 	_warnings = []
 	return true
 
 
 ## Returns true if the player fulfills prep requirements over territory.
-func fulfills_prep_requirements(empire: Empire, territory: Territory) -> bool:
+func fulfills_prep_requirements(_empire: Empire, _territory: Territory) -> bool:
 	var hero_deployed := false
-	for unit in get_owned_units(empire):
-		if unit.unit_type.chara == empire.leader:
+	for unit in get_owned_units(_empire):
+		if unit.unit_type.chara == _empire.leader:
 			hero_deployed = true
 	if not hero_deployed:
-		_warnings = ["%s required" % empire.leader.name]
+		_warnings = ["%s required" % _empire.leader.name]
 		return false
 	return true
 	
 	
 ## Quit battle.
 func quit_battle(empire: Empire, message := "Retreat?"):
-	var retreat := await show_pause_box("Retreat?")
+	var retreat := await show_pause_box(message)
 	if not retreat:
 		return
 		
@@ -373,9 +372,9 @@ func show_attack_banner(attack: Attack):
 		$Overlay/AttackNameBox.visible = false
 
 
-func show_hud(show: bool):
-	hud.show_ui(show)
-	cursor.visible = show
+func show_hud(_show: bool):
+	hud.show_ui(_show)
+	cursor.visible = _show
 	
 
 #endregion Core API
@@ -605,13 +604,13 @@ func draw_floating_number(unit: Unit, number: int, color: Color):
 
 
 #region Internals
-func _quick_battle(attacker: Empire, defender: Empire, territory: Territory):
+func _quick_battle():
 	print("Entering quick battle.")
 	# TODO randomize or simulate the victor
 	battle_result = Result.AttackerVictory
 
 
-func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
+func _real_battle():
 	print("Entering real battle.")
 	Globals.push_screen(self)
 	await Globals.screen_ready
@@ -636,12 +635,12 @@ func _real_battle(attacker: Empire, defender: Empire, territory: Territory):
 		hud.show_ui(true)
 		await _do_battle()
 		
-		var message := player_battle_result_message(attacker.is_player_owned(), battle_result)
+		var message := Battle.player_battle_result_message(attacker.is_player_owned(), battle_result)
 		if message != '':
 			var node := preload("res://Screens/Battle/BattleResultsScreen.tscn").instantiate()
 			get_tree().root.add_child.call_deferred(node)
 			node.text = message
-			node.battle_won = player_battle_result_win(attacker.is_player_owned(), battle_result)
+			node.battle_won = Battle.player_battle_result_win(attacker.is_player_owned(), battle_result)
 			await node.animation_finished
 			node.queue_free()
 			
@@ -766,9 +765,9 @@ func _test():
 	a.leader = preload("res://Screens/Battle/data/chara/Lysandra.tres")
 	var b := Empire.new()
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")
-	var territory := Territory.new()
-	territory.maps = [preload("res://Screens/Battle/map_types/Map.tscn")]
-	start_battle(a, b, territory)
+	var terr := Territory.new()
+	terr.maps = [preload("res://Screens/Battle/map_types/Map.tscn")]
+	start_battle(a, b, terr)
 
 
 

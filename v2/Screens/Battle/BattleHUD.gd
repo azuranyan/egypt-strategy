@@ -50,7 +50,7 @@ func set_selected_attack(attack: Attack):
 	_selected_attack = attack
 	
 
-func show_ui(show: bool):
+func show_ui(_show: bool):
 	$UndoMoveButton.visible = battle._battle_phase
 	$EndTurnButton.visible = battle._battle_phase
 	$ActionOrderButton.visible = battle._battle_phase
@@ -59,7 +59,7 @@ func show_ui(show: bool):
 	$PrepUnitList.visible = not battle._battle_phase
 	$UndoPlaceButton.visible = not battle._battle_phase
 	$StartBattleButton.visible = not battle._battle_phase
-	visible = show
+	visible = _show
 	
 
 func _on_fight_button_focus_entered():

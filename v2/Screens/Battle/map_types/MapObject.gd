@@ -117,9 +117,9 @@ func _create_debug_tile():
 	add_child(_debug_tile, false, Node.INTERNAL_MODE_FRONT)
 	
 	
-func _enter_map(map: Map, world: World):
-	self.map = map
-	self.world = world
+func _enter_map(_map: Map, _world: World):
+	map = _map
+	world = _world
 	map.ready.connect(map_ready)
 	map_enter()
 	if map.is_node_ready():

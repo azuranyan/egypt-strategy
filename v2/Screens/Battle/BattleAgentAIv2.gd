@@ -152,16 +152,16 @@ class Action:
 	var attack: Attack
 	var target: Vector2
 	
-	static func move_only(cell: Vector2) -> Action:
-		return Action.new(cell, null, cell)
+	static func move_only(_cell: Vector2) -> Action:
+		return Action.new(_cell, null, _cell)
 		
-	static func move_attack(cell: Vector2, attack: Attack, target: Vector2) -> Action:
-		return Action.new(cell, attack, target)
+	static func move_attack(_cell: Vector2, _attack: Attack, _target: Vector2) -> Action:
+		return Action.new(_cell, _attack, _target)
 		
-	func _init(cell: Vector2, attack: Attack, target: Vector2):
-		self.cell = cell
-		self.attack = attack
-		self.target = target
+	func _init(_cell: Vector2, _attack: Attack, _target: Vector2):
+		cell = _cell
+		attack = _attack
+		target = _target
 
 
 class Agent:
@@ -175,9 +175,9 @@ class Agent:
 	var unit: Unit
 	
 	
-	func _init(battle: Battle, unit: Unit):
-		self.battle = battle
-		self.unit = unit
+	func _init(_battle: Battle, _unit: Unit):
+		battle = _battle
+		unit = _unit
 		activation_radius = unit.move + unit.get_attack_range(unit.basic_attack) + 2
 		
 	
@@ -243,8 +243,8 @@ class NormalMeleeAgent extends Agent:
 		return Util.cell_distance(unit.map_pos, a.map_pos) < Util.cell_distance(unit.map_pos, b.map_pos)
 		
 		
-	func is_high_priority(u: Unit) -> bool:
-		return false
+	func is_high_priority(_u: Unit) -> bool:
+		return false # TODO
 		
 
 	

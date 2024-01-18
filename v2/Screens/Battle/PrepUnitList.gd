@@ -20,7 +20,14 @@ func add_unit(unit: Unit):
 	button.unit = unit
 	$ScrollContainer/VBoxContainer.add_child(button)
 	buttons[unit] = button
-	$ScrollContainer/VBoxContainer.sort_children
+	_sort_buttons()
+	
+	
+func _sort_buttons():
+	var z := buttons.keys()
+	z.sort_custom(func (a, b): return a.display_name < b.display_name)
+	for i in z.size():
+		$ScrollContainer/VBoxContainer.move_child(buttons[z[i]], i)
 	
 	
 ## Remove a unit from the list.

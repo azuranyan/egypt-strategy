@@ -53,13 +53,13 @@ extends Node2D
 @onready var sprite := $Sprite as AnimatedSprite2D
 
 
-static func animation_name(animation: String, loop: bool, heading: Unit.Heading) -> String:
+static func generate_animation_name(_animation: String, _loop: bool, _heading: Unit.Heading) -> String:
 	# walk_loop -> FrontWalk_loop
-	var anim := animation.to_pascal_case()
-	if loop:
+	var anim := _animation.to_pascal_case()
+	if _loop:
 		anim = anim + "_loop"
 		
-	if heading == Unit.Heading.North or heading == Unit.Heading.West:
+	if _heading == Unit.Heading.North or _heading == Unit.Heading.West:
 		return "Back" + anim
 	else:
 		return "Front" + anim
@@ -82,13 +82,13 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 ## Returns the wrangled animation name.
 func get_animation_name() -> String:
-	return animation_name(animation, loop, heading)
+	return UnitModel.generate_animation_name(animation, loop, heading)
 	
 	
 ## Change animation.
-func play_animation(animation: String, loop: bool):
-	self.animation = animation
-	self.loop = loop
+func play_animation(_animation: String, _loop: bool):
+	animation = _animation
+	loop = _loop
 	sprite.play()
 
 
@@ -131,7 +131,7 @@ func _update_animation():
 	if sprite.sprite_frames.has_animation(anim):
 		sprite.animation = anim
 	else:
-		sprite.animation = animation_name("idle", loop, heading)
+		sprite.animation = UnitModel.generate_animation_name("idle", loop, heading)
 		# if animation has no idle, we won't show anything
 	
 	# for editor convenience, autoplay on changes

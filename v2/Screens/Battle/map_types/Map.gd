@@ -103,9 +103,9 @@ func get_units(empire: Empire = null) -> Array[Unit]:
 
 
 ## Returns the unit in cell.
-func get_unit(cell: Vector2, empire: Empire = null) -> Unit:
+func get_unit(_cell: Vector2, empire: Empire = null) -> Unit:
 	for obj in _get_objects():
-		if _is_selectable_unit(obj) and obj.cell() == cell and (empire == null or obj.empire == empire):
+		if _is_selectable_unit(obj) and obj.cell() == _cell and (empire == null or obj.empire == empire):
 			return obj as Unit
 	return null
 
@@ -127,8 +127,8 @@ func _get_objects() -> Array[Node]:
 	
 	
 ## Returns all the objects at cell.
-func get_objects_at(cell: Vector2) -> Array[MapObject]:
-	return get_objects().filter(func (x): return x.cell() == cell)
+func get_objects_at(_cell: Vector2) -> Array[MapObject]:
+	return get_objects().filter(func (x): return x.cell() == _cell)
 
 
 ## Returns the playable rect area.

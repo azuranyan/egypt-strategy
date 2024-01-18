@@ -23,10 +23,10 @@ func initialize(walkable_cells: Array) -> void:
 	
 
 # Finds and draws the path between `cell_start` and `cell_end`.
-func draw(cell_start: Vector2, cell_end: Vector2, clear := true) -> void:
+func draw(cell_start: Vector2, cell_end: Vector2, do_clear := true) -> void:
 	# We first clear any tiles on the tilemap, then let the Astar2D (PathFinder) find the
 	# path for us.
-	if clear:
+	if do_clear:
 		clear()
 	current_path = _pathfinder.calculate_point_path(cell_start, cell_end)
 	# And we draw a tile for every cell in the path.

@@ -14,8 +14,8 @@ enum {
 
 
 ## Draws terrain overlay.
-func draw(cells: PackedVector2Array, idx := TERRAIN_GREEN, clear := true):
-	if clear:
+func draw(cells: PackedVector2Array, idx := TERRAIN_GREEN, do_clear := true):
+	if do_clear:
 		clear()
 	for cell in cells:
 		# idk why it's source 1 but if the tileset shows an error in the editor

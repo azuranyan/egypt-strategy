@@ -40,10 +40,6 @@ extends MapObject
 			_update_doodad()
 		
 		
-		
-var _last_sprite_pos: Vector2
-
-
 func _ready():
 	super._ready()
 	_update_doodad()

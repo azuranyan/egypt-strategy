@@ -5,7 +5,7 @@ extends AttackEffect
 @export_enum("idle", "attack", "special", "walk", "hurt", "victory") var animation := "hurt"
 
 
-func apply(battle: Battle, user: Unit, attack: Attack, target_cell: Vector2i, target_unit: Unit) -> void:
+func apply(_battle: Battle, user: Unit, attack: Attack, _target_cell: Vector2i, target_unit: Unit) -> void:
 	var animation_target := user if target == 2 else target_unit
 	
 	animation_target.play_animation(animation, false)
