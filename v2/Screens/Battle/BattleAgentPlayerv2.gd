@@ -394,7 +394,7 @@ func _select_unit(unit: Unit):
 	battle.map.pathing_overlay.clear()
 	battle.hud.set_selected_unit(unit)
 	
-	if unit and unit.is_player_owned() and unit.can_move() and state == STATE_BATTLE_STANDBY:
+	if unit and unit.is_player_owned() and unit.can_move():
 		battle.draw_unit_pathable_cells(unit, false)
 		battle.map.unit_path.initialize(unit.get_pathable_cells(true))
 		state = STATE_BATTLE_SELECTING_MOVE
@@ -407,7 +407,7 @@ func _select_unit(unit: Unit):
 
 ## Attempt to issue a move command.
 func _select_move(cell: Vector2):
-	if cell in selected_unit.get_pathable_cells(true):
+	if selected_unit.is_placeable(cell):
 		update_message_box()
 		var unit := selected_unit
 		undo_stack.append(SavedUnitState.new(selected_unit))

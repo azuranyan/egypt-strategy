@@ -37,7 +37,7 @@ func initialize(_battle: Battle, _empire: Empire):
 
 
 ## Called by the engine to fill in units.
-func prepare_units() -> Dictionary:
+func prepare_units():
 	print(self, ' preparing units.')
 	set_process_input(true)
 	_state = AGENT_STATE_PREPARE_UNITS
@@ -45,13 +45,7 @@ func prepare_units() -> Dictionary:
 	await _prepare_units_done
 	_state = AGENT_STATE_STANDBY
 	_exit_prepare_units()
-	var prep_errors := _get_errors()
-	var re := {
-		is_error = not prep_errors.is_empty(),
-		errors = prep_errors,
-	}
 	set_process_input(false)
-	return re
 
 
 ## Called by the engine for doing the agent's turn.

@@ -208,9 +208,9 @@ func quit_battle(empire: Empire, message := "Retreat?"):
 	
 		
 func end_battle(result: Result):
-	get_agent(on_turn).end_turn()
 	battle_result = result
 	should_end = true
+	get_agent(on_turn).force_end()
 	
 
 func show_pause_box(message: String, confirm = "Confirm", cancel = "Cancel") -> bool:
@@ -508,7 +508,6 @@ func kill_unit(unit: Unit):
 	unit.add_to_group('units_dead')
 	unit.alive = false
 	unit.selectable = false
-	print("killed ", unit)
 	
 
 ## Revives a unit.
@@ -606,12 +605,6 @@ func draw_floating_number(unit: Unit, number: int, color: Color):
 
 
 #region Internals
-		
-		
-func _process_dead_units():
-	pass
-	
-	
 func _quick_battle(attacker: Empire, defender: Empire, territory: Territory):
 	print("Entering quick battle.")
 	# TODO randomize or simulate the victor
@@ -710,6 +703,8 @@ func _do_battle():
 		
 		for empire in [attacker, defender]:
 			print("On turn ", empire)
+			if should_end:
+				break
 			on_turn = empire
 			
 			# pre-turn
@@ -730,7 +725,6 @@ func _do_battle():
 			
 			if not check_for_turn_end(empire):
 				await get_agent(empire).do_turn()
-				
 			
 			empire_turn_ended.emit()
 			await Globals.play_queued_scenes()
@@ -742,7 +736,8 @@ func _do_battle():
 				
 				# tick duration of status effects
 				_tick_status_effects(u)
-			await wait_for_death_animations() 
+			check_for_turn_end(empire)
+			await wait_for_death_animations()
 				
 		turn_cycle_ended.emit()
 		await Globals.play_queued_scenes()
@@ -773,7 +768,7 @@ func _test():
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")
 	var territory := Territory.new()
 	territory.maps = [preload("res://Screens/Battle/map_types/Map.tscn")]
-	start_battle(b, a, territory)
+	start_battle(a, b, territory)
 
 
 
