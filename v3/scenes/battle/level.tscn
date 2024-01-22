@@ -1,0 +1,58 @@
+[gd_scene load_steps=3 format=3 uid="uid://c4wmeyhljuy5v"]
+
+[ext_resource type="Script" path="res://scenes/battle/level.gd" id="1_fmwlx"]
+[ext_resource type="Texture2D" uid="uid://cpomn0wcwygkb" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="1_s4xlk"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_fmwlx")
+
+[node name="World" type="Node2D" parent="."]
+z_index = -10
+
+[node name="Sprite2D" type="Sprite2D" parent="World"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_s4xlk")
+centered = false
+
+[node name="Grid" type="Node2D" parent="World"]
+
+[node name="WorldOverlays" type="Node2D" parent="."]
+visibility_layer = 2
+z_index = -5
+
+[node name="Pathing" type="Node2D" parent="WorldOverlays"]
+
+[node name="AttackRange" type="Node2D" parent="WorldOverlays"]
+
+[node name="TargetShape" type="Node2D" parent="WorldOverlays"]
+
+[node name="UnitPath" type="Node2D" parent="WorldOverlays"]
+
+[node name="CursorUnder" type="Node2D" parent="WorldOverlays"]
+position = Vector2(386, 239)
+
+[node name="Objects" type="Node2D" parent="."]
+visibility_layer = 4
+y_sort_enabled = true
+
+[node name="Cursor" type="Node2D" parent="Objects"]
+position = Vector2(386, 240)
+
+[node name="Under" type="Node2D" parent="Objects/Cursor"]
+position = Vector2(0, -1)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Objects/Cursor/Under"]
+remote_path = NodePath("../../../../WorldOverlays/CursorUnder")
+
+[node name="Over" type="Node2D" parent="Objects/Cursor"]
+position = Vector2(0, 1)
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Objects/Cursor/Over"]
+remote_path = NodePath("../../../../Overlays/CursorOver")
+
+[node name="Overlays" type="Node2D" parent="."]
+visibility_layer = 8
+z_index = 10
+
+[node name="CursorOver" type="Node2D" parent="Overlays"]
+position = Vector2(386, 241)

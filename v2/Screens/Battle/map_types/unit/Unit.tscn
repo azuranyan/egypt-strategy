@@ -1,10 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://clakgmdpcknuy"]
+[gd_scene load_steps=17 format=3 uid="uid://clakgmdpcknuy"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Unit.gd" id="1_f35qy"]
 [ext_resource type="PackedScene" uid="uid://d1u5syg77qfdo" path="res://Screens/Battle/map_types/unit/UnitModel.tscn" id="2_0vydj"]
 [ext_resource type="Resource" uid="uid://blc6hirmqo4k" path="res://Screens/Battle/data/unit_type/Dummy.tres" id="2_epvi5"]
 [ext_resource type="Texture2D" uid="uid://dubut3aaxkpvo" path="res://Screens/Battle/sprites/hp_bar.png" id="3_07oig"]
 [ext_resource type="Texture2D" uid="uid://gdp52yomtcia" path="res://Screens/Battle/sprites/unit_shadow.png" id="3_up13u"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/PathableComponent.gd" id="4_3q77v"]
 [ext_resource type="Texture2D" uid="uid://c0vehwtyciijf" path="res://Screens/Overworld/Portraits/placeholder.webp" id="4_5wpuo"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/Control.gd" id="8_i6hns"]
 [ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="9_vcf46"]
@@ -84,9 +85,14 @@ font = ExtResource("9_vcf46")
 script = ExtResource("1_f35qy")
 unit_type = ExtResource("2_epvi5")
 model_scale = Vector2(0.575, 0.575)
-pathing = 1
 display_name = "Dummy"
 display_icon = ExtResource("4_5wpuo")
+
+[node name="PathableComponent" type="Node2D" parent="." node_paths=PackedStringArray("_debug_tile")]
+visibility_layer = 512
+script = ExtResource("4_3q77v")
+pathing_group = 1
+_debug_tile = NodePath("")
 
 [node name="HPBar" type="TileMap" parent="."]
 visible = false
@@ -99,7 +105,6 @@ layer_0/tile_data = PackedInt32Array(-196610, 2, 0, -196609, 65538, 0, -262144, 
 scale = Vector2(0.575, 0.575)
 
 [node name="Shadow" type="Sprite2D" parent="UnitModel"]
-visible = false
 modulate = Color(0, 0, 0, 0.392157)
 show_behind_parent = true
 texture = ExtResource("3_up13u")
@@ -190,5 +195,3 @@ offset_bottom = -83.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
-
-[connection signal="mouse_button_pressed" from="." to="." method="_on_mouse_button_pressed"]

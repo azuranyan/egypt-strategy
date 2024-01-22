@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="World" load_steps=3 format=3 uid="uid://4r1ua5xy7blu"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="1_pd2g1"]
-[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_o7rmp"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="2_o7rmp"]
 
 [resource]
 script = ExtResource("1_pd2g1")

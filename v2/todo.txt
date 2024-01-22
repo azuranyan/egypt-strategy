@@ -67,15 +67,11 @@ cursor out of map and into battle
 when dragging from prep_unit_list, cursor does not follow
 when rotating, disable cursor and transform into rotate widget
 
-mission objectives and bonus goal not implemented
-removing unit cannot be undo'd
+bonus goal not implemented
 attack rotation not working
  - melee should not be rotated
 
 keyboard controls are broken
-
-
-movement after doing action with a diff unit feels jank
- sometimes
-
 small delay after unit dies
+
+handle multiple unit types in the same map

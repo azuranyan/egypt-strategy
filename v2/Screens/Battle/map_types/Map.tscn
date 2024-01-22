@@ -1,8 +1,8 @@
-[gd_scene load_steps=39 format=3 uid="uid://bg3djjkbmlv2r"]
+[gd_scene load_steps=38 format=3 uid="uid://o5h48qat1hol"]
 
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_u6ecx"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/World.gd" id="2_71t3t"]
-[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_1hs2a"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="3_yxnw8"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_uoc41"]
 [ext_resource type="Texture2D" uid="uid://cexdb403hn61g" path="res://Screens/Battle/arrows.svg" id="5_8r8mq"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitPath.gd" id="6_tfcuv"]
@@ -10,27 +10,26 @@
 [ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="8_0xc5y"]
 [ext_resource type="PackedScene" uid="uid://dd8q27lfwya5" path="res://Screens/Battle/map_types/DummyDoodad.tscn" id="9_gvj0n"]
 [ext_resource type="PackedScene" uid="uid://dggdd7fpr8qn5" path="res://Screens/Battle/map_types/Barrier.tscn" id="10_lbrm6"]
-[ext_resource type="PackedScene" uid="uid://dt5a8j6l6ab2y" path="res://Screens/Battle/map_types/EnemySpawnPoint.tscn" id="11_4i28w"]
-[ext_resource type="PackedScene" uid="uid://conf6sokwx7ww" path="res://Screens/Battle/map_types/PlayerSpawnPoint.tscn" id="12_j01c6"]
 [ext_resource type="Texture2D" uid="uid://d2p4nsytdvqb4" path="res://Screens/Battle/terrain_overlay.png" id="13_1syr8"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/TerrainOverlay.gd" id="14_kdflf"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="15_4bw0m"]
+[ext_resource type="PackedScene" uid="uid://do44p65c4ue5i" path="res://Screens/Battle/map_types/SpawnPoint.tscn" id="15_kqk2i"]
 [ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="16_sms3w"]
 [ext_resource type="PackedScene" uid="uid://clakgmdpcknuy" path="res://Screens/Battle/map_types/unit/Unit.tscn" id="17_150hv"]
+[ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://maps/starting_zone/sprites/StartingZoneObj1.png" id="18_5m3bv"]
 [ext_resource type="PackedScene" uid="uid://86byh8q1hmuu" path="res://Screens/Battle/map_types/Doodad.tscn" id="19_he28i"]
-[ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="20_hbw26"]
-[ext_resource type="Texture2D" uid="uid://ctux8o02k4l4" path="res://Screens/Battle/maps/StartingZoneObj2.png" id="21_ojlom"]
-[ext_resource type="Texture2D" uid="uid://c6gu0q3dd2tmb" path="res://Screens/Battle/maps/StartingZoneObj3.png" id="22_ralxv"]
-[ext_resource type="Texture2D" uid="uid://bux03apf6bnja" path="res://Screens/Battle/maps/StartingZoneObj4.png" id="23_a3buk"]
-[ext_resource type="Texture2D" uid="uid://ce26nbqgwb03x" path="res://Screens/Battle/maps/StartingZoneObj5.png" id="24_fr236"]
-[ext_resource type="Texture2D" uid="uid://4kbratak2qv" path="res://Screens/Battle/maps/StartingZoneObj6.png" id="25_jj4m2"]
-[ext_resource type="Texture2D" uid="uid://b0drjr0yf2kc1" path="res://Screens/Battle/maps/StartingZoneObj7.png" id="26_6ma5d"]
-[ext_resource type="Texture2D" uid="uid://cutd476pww52u" path="res://Screens/Battle/maps/StartingZoneObj8.png" id="27_f2tib"]
-[ext_resource type="Texture2D" uid="uid://cok51yqtcitbj" path="res://Screens/Battle/maps/StartingZoneObj9.png" id="28_23ns3"]
-[ext_resource type="Texture2D" uid="uid://cdcoimkkj31p5" path="res://Screens/Battle/maps/StartingZoneObj10.png" id="29_lvth0"]
-[ext_resource type="Texture2D" uid="uid://breu1nfxkbfwu" path="res://Screens/Battle/maps/StartingZoneObj11.png" id="30_45b1i"]
-[ext_resource type="Texture2D" uid="uid://bwr1pfoajmkjg" path="res://Screens/Battle/maps/StartingZoneObj12.png" id="31_cf83k"]
-[ext_resource type="Texture2D" uid="uid://bj715w6cd71ui" path="res://Screens/Battle/maps/StartingZoneObj13.png" id="32_6y6bm"]
+[ext_resource type="Texture2D" uid="uid://ctux8o02k4l4" path="res://maps/starting_zone/sprites/StartingZoneObj2.png" id="19_njh4j"]
+[ext_resource type="Texture2D" uid="uid://c6gu0q3dd2tmb" path="res://maps/starting_zone/sprites/StartingZoneObj3.png" id="20_eakyc"]
+[ext_resource type="Texture2D" uid="uid://bux03apf6bnja" path="res://maps/starting_zone/sprites/StartingZoneObj4.png" id="21_rgofb"]
+[ext_resource type="Texture2D" uid="uid://ce26nbqgwb03x" path="res://maps/starting_zone/sprites/StartingZoneObj5.png" id="22_fwc4n"]
+[ext_resource type="Texture2D" uid="uid://4kbratak2qv" path="res://maps/starting_zone/sprites/StartingZoneObj6.png" id="23_kigvb"]
+[ext_resource type="Texture2D" uid="uid://b0drjr0yf2kc1" path="res://maps/starting_zone/sprites/StartingZoneObj7.png" id="24_ane27"]
+[ext_resource type="Texture2D" uid="uid://cutd476pww52u" path="res://maps/starting_zone/sprites/StartingZoneObj8.png" id="25_wy1qo"]
+[ext_resource type="Texture2D" uid="uid://cok51yqtcitbj" path="res://maps/starting_zone/sprites/StartingZoneObj9.png" id="26_3uvoh"]
+[ext_resource type="Texture2D" uid="uid://cdcoimkkj31p5" path="res://maps/starting_zone/sprites/StartingZoneObj10.png" id="27_cmum4"]
+[ext_resource type="Texture2D" uid="uid://breu1nfxkbfwu" path="res://maps/starting_zone/sprites/StartingZoneObj11.png" id="28_j2jnl"]
+[ext_resource type="Texture2D" uid="uid://bwr1pfoajmkjg" path="res://maps/starting_zone/sprites/StartingZoneObj12.png" id="29_j0a6p"]
+[ext_resource type="Texture2D" uid="uid://bj715w6cd71ui" path="res://maps/starting_zone/sprites/StartingZoneObj13.png" id="30_jniov"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mb61g"]
 texture = ExtResource("5_8r8mq")
@@ -163,7 +162,7 @@ script = ExtResource("1_u6ecx")
 
 [node name="World" type="Node2D" parent="."]
 script = ExtResource("2_71t3t")
-texture = ExtResource("3_1hs2a")
+texture = ExtResource("3_yxnw8")
 map_size = Vector2i(12, 12)
 tile_size = 68.0
 offset = Vector2(1011.25, 208.212)
@@ -192,7 +191,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
-texture = ExtResource("3_1hs2a")
+texture = ExtResource("3_yxnw8")
 expand_mode = 3
 
 [node name="Grid" type="Node2D" parent="." node_paths=PackedStringArray("world")]
@@ -363,45 +362,16 @@ map_pos = Vector2(5, 1)
 y_sort_enabled = true
 script = ExtResource("7_xsyws")
 
-[node name="EnemySpawnPoint" parent="SpawnPoints" instance=ExtResource("11_4i28w")]
-position = Vector2(769.834, 597.975)
-map_pos = Vector2(4, 9)
-show_debug_tile = true
-
-[node name="EnemySpawnPoint2" parent="SpawnPoints" instance=ExtResource("11_4i28w")]
-position = Vector2(1346.83, 486.614)
-map_pos = Vector2(8, 1)
-show_debug_tile = true
-
-[node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("11_4i28w")]
-position = Vector2(1346.83, 653.655)
-map_pos = Vector2(11, 4)
-show_debug_tile = true
-
-[node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("11_4i28w")]
-position = Vector2(769.834, 486.614)
-map_pos = Vector2(2, 7)
-show_debug_tile = true
-
-[node name="PlayerSpawnPoint" parent="SpawnPoints" instance=ExtResource("12_j01c6")]
-position = Vector2(1202.58, 681.495)
-map_pos = Vector2(10, 6)
-show_debug_tile = true
-
-[node name="PlayerSpawnPoint2" parent="SpawnPoints" instance=ExtResource("12_j01c6")]
-position = Vector2(1202.58, 570.135)
-map_pos = Vector2(8, 4)
-show_debug_tile = true
-
-[node name="PlayerSpawnPoint3" parent="SpawnPoints" instance=ExtResource("12_j01c6")]
-position = Vector2(962.167, 542.294)
-map_pos = Vector2(5, 6)
-show_debug_tile = true
-
-[node name="PlayerSpawnPoint4" parent="SpawnPoints" instance=ExtResource("12_j01c6")]
-position = Vector2(962.167, 653.655)
-map_pos = Vector2(7, 8)
-show_debug_tile = true
+[node name="DebugOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(1011.25, 208.212)
+rotation = 0.524835
+scale = Vector2(0.694519, 0.694518)
+skew = 0.521126
+tile_set = SubResource("TileSet_wu6a4")
+format = 2
+layer_0/tile_data = PackedInt32Array(1, 1, 0, 0, 1, 0, 7, 1, 0, 8, 1, 0, 9, 1, 0, 10, 1, 0, 11, 1, 0, 65547, 1, 0, 131083, 1, 0, 196619, 1, 0, 262155, 1, 0, 327691, 1, 0, 393227, 1, 0, 458763, 1, 0, 655371, 1, 0, 589835, 1, 0, 524299, 1, 0, 720907, 1, 0, 720906, 1, 0, 720905, 1, 0, 720904, 1, 0, 720903, 1, 0)
+script = ExtResource("14_kdflf")
+world = NodePath("../World")
 
 [node name="PathingOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
 position = Vector2(1011.25, 208.212)
@@ -453,11 +423,16 @@ centered = false
 y_sort_enabled = true
 script = ExtResource("7_xsyws")
 
+[node name="SpawnPoint" parent="Entities" instance=ExtResource("15_kqk2i")]
+visibility_layer = 1
+position = Vector2(1010.25, 570.135)
+map_pos = Vector2(6, 6)
+
 [node name="X1" parent="Entities" instance=ExtResource("17_150hv")]
-position = Vector2(769.834, 486.614)
+position = Vector2(577.501, 597.975)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(2, 7)
+map_pos = Vector2(2, 11)
 metadata/default_owner = "Lysandra"
 
 [node name="X2" parent="Entities" instance=ExtResource("17_150hv")]
@@ -470,112 +445,92 @@ metadata/default_owner = "Alara"
 
 [node name="X3" parent="Entities" instance=ExtResource("17_150hv")]
 modulate = Color(0.462745, 0.262745, 0.243137, 1)
-position = Vector2(817.917, 681.495)
+position = Vector2(866, 653.655)
 facing = -3.3
 walk_speed = 100.0
-map_pos = Vector2(6, 10)
+map_pos = Vector2(6, 9)
 metadata/default_owner = "Alara"
 
 [node name="X4" parent="Entities" instance=ExtResource("17_150hv")]
 modulate = Color(0.462745, 0.262745, 0.243137, 1)
-position = Vector2(817.917, 625.815)
-facing = -3.3
+position = Vector2(866, 709.336)
+facing = -0.09
 walk_speed = 100.0
-map_pos = Vector2(5, 9)
+map_pos = Vector2(7, 10)
 metadata/default_owner = "Alara"
 
 [node name="Doodad1" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1539.17, 542.294)
-texture = ExtResource("20_hbw26")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(11, 0)
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("18_5m3bv")
 
 [node name="Doodad2" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1010.25, 848.537)
-texture = ExtResource("21_ojlom")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(11, 11)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("19_njh4j")
 
 [node name="Doodad3" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(962.167, 820.697)
-texture = ExtResource("22_ralxv")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(10, 11)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("20_eakyc")
 
 [node name="Doodad4" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1491.08, 514.454)
-texture = ExtResource("23_a3buk")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(10, 0)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("21_rgofb")
 
 [node name="Doodad5" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1106.42, 625.815)
-texture = ExtResource("24_fr236")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(8, 6)
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("22_fwc4n")
+
+[node name="Sprite2D" parent="Entities/Doodad5" index="0"]
+position = Vector2(-1010.25, -236.052)
+scale = Vector2(0.46875, 0.46875)
+texture = ExtResource("22_fwc4n")
+centered = false
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1250.67, 486.614)
-texture = ExtResource("25_jj4m2")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(7, 2)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("23_kigvb")
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(914.083, 458.774)
-texture = ExtResource("26_6ma5d")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(3, 5)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("24_ane27")
 
 [node name="Doodad8" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1010.25, 403.093)
-texture = ExtResource("27_f2tib")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(3, 3)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("25_wy1qo")
 
 [node name="Doodad9" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(914.083, 458.774)
-texture = ExtResource("28_23ns3")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(3, 5)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("26_3uvoh")
 
 [node name="Doodad10" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(721.75, 458.774)
-texture = ExtResource("29_lvth0")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(1, 7)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("27_cmum4")
 
 [node name="Doodad11" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(577.501, 597.975)
-texture = ExtResource("30_45b1i")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(2, 11)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("28_j2jnl")
 
 [node name="Doodad12" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(1010.25, 291.733)
-texture = ExtResource("31_cf83k")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(1, 1)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("29_j0a6p")
 
 [node name="Doodad13" parent="Entities" instance=ExtResource("19_he28i")]
-position = Vector2(529.417, 570.135)
-texture = ExtResource("32_6y6bm")
-lock_to_world = true
-uniform_offset = false
-map_pos = Vector2(1, 11)
+visible = false
+position = Vector2(1010.25, 236.052)
+texture = ExtResource("30_jniov")
 
 [connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
 [connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]
 [connection signal="world_changed" from="World" to="UnitPath" method="_on_world_world_changed"]
 [connection signal="world_changed" from="World" to="PathingOverlay" method="_on_world_world_changed"]
+
+[editable path="Entities/Doodad5"]

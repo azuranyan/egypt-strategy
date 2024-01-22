@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://iwbxb1e6hvvq"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/world.gd" id="1_3pqth"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_grid.gd" id="2_o5abx"]
+
+[node name="World" type="Node2D"]
+z_index = -100
+script = ExtResource("1_3pqth")
+map_size = Vector2i(0, 0)
+tile_size = 0.0
+y_ratio = 0.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+centered = false
+
+[node name="MapGrid" type="Node2D" parent="."]
+self_modulate = Color(0.651, 0.318, 0.067, 0.376)
+script = ExtResource("2_o5abx")
+tile_size = 68.0
+size = Vector2i(12, 12)
+thickness = 1.5

@@ -176,6 +176,10 @@ func _dequeue_scene():
 		scene_queue_finished.emit()
 		
 		
+## This is the entry point of the game.
+func start_game():
+	pass
+	
 #func load_scene(old_scene: String, new_scene: String, transition: String):
 #	var loading_screen_inst := SCENES.loading_screen.instantiate() as LoadingScreen
 #	get_tree().root.add_child.call_deferred(loading_screen_inst)

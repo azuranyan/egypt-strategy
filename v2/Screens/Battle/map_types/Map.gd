@@ -2,7 +2,6 @@
 class_name Map
 extends Node2D
 
-
 signal map_changed
 
 

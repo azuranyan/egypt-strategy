@@ -1,48 +1,393 @@
-[gd_scene load_steps=2 format=3 uid="uid://bjf4rts52td14"]
+[gd_scene load_steps=14 format=3 uid="uid://bhylsrvu4vitb"]
 
 [ext_resource type="Script" path="res://Screens/Dialogue/Dialogue.gd" id="1_b8sjv"]
+[ext_resource type="Theme" uid="uid://psiyd7sreioo" path="res://Screens/Dialogue/Theme.tres" id="2_d30p5"]
+[ext_resource type="Texture2D" uid="uid://dslsghamuy2o8" path="res://Screens/Overworld/ctc.png" id="3_2fs3v"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_label.gd" id="4_7g25h"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_reponses_menu.gd" id="5_sn55h"]
 
-[node name="Dialogue" type="Control"]
-z_index = 100
+[sub_resource type="Animation" id="Animation_q7veb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Balloon:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Balloon:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_aax35"]
+resource_name = "appear"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Balloon:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Balloon:modulate")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_msplt"]
+resource_name = "disappear"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Balloon:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.1, 1.1), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Balloon:modulate")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.2, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_x1kaq"]
+_data = {
+"RESET": SubResource("Animation_q7veb"),
+"appear": SubResource("Animation_aax35"),
+"disappear": SubResource("Animation_msplt")
+}
+
+[sub_resource type="Animation" id="Animation_da8tu"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Balloon/DialogBox/CTC/CenterContainer:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_vhegs"]
+resource_name = "ctc_bob"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Balloon/DialogBox/CTC/CenterContainer:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -10)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_x3see"]
+_data = {
+"RESET": SubResource("Animation_da8tu"),
+"ctc_bob": SubResource("Animation_vhegs")
+}
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_0yth7"]
+color = Color(0.235294, 0.211765, 0.184314, 0.913725)
+grow_begin = 0.0
+grow_end = 0.0
+thickness = 3
+
+[node name="Dialogue" type="CanvasLayer"]
+layer = 100
+visible = false
+script = ExtResource("1_b8sjv")
+
+[node name="EventSink" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_b8sjv")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_x1kaq")
+}
+autoplay = "RESET"
+speed_scale = 4.0
+
+[node name="Balloon" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 264.0
+offset_top = 819.0
+offset_right = -264.0
+offset_bottom = -37.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(696, 112)
+
+[node name="DialogBox" type="Panel" parent="Balloon"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -752.0
-offset_top = -251.0
-offset_right = 753.0
-offset_bottom = -42.0
+offset_left = -696.0
+offset_top = -224.0
+offset_right = 696.0
 grow_horizontal = 2
 grow_vertical = 0
-color = Color(0, 0, 0, 0.396078)
+mouse_filter = 1
+theme = ExtResource("2_d30p5")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="ColorRect"]
+[node name="CTC" type="Control" parent="Balloon/DialogBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -54.0
+offset_top = -51.0
+offset_right = -34.0
+offset_bottom = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Balloon/DialogBox/CTC"]
+root_node = NodePath("../../../..")
+libraries = {
+"": SubResource("AnimationLibrary_x3see")
+}
+autoplay = "ctc_bob"
+
+[node name="CenterContainer" type="CenterContainer" parent="Balloon/DialogBox/CTC"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 57.0
-offset_top = 27.0
-offset_right = -57.0
-offset_bottom = -27.0
+offset_right = 261.0
+offset_bottom = 265.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/normal_font_size = 24
-theme_override_font_sizes/bold_font_size = 24
-theme_override_font_sizes/italics_font_size = 24
-theme_override_font_sizes/bold_italics_font_size = 24
-theme_override_font_sizes/mono_font_size = 24
-text = "This is a text"
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="TextureRect" type="TextureRect" parent="Balloon/DialogBox/CTC/CenterContainer"]
+layout_mode = 2
+texture = ExtResource("3_2fs3v")
+
+[node name="HSeparator" type="HSeparator" parent="Balloon/DialogBox"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 20.0
+grow_horizontal = 2
+mouse_filter = 1
+theme_override_styles/separator = SubResource("StyleBoxLine_0yth7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/DialogBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 85.0
+offset_top = 34.0
+offset_right = -85.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="DialogueLabel" type="RichTextLabel" parent="Balloon/DialogBox/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme = ExtResource("2_d30p5")
+bbcode_enabled = true
+text = "Lorem ipsum dolor sit amet. Est necessitatibus nulla et quos debitis nam libero tempore. Ex aliquam quisquam in voluptatum dolor ea ullam delectus. Et voluptatum dignissimos et soluta quia et ipsa impedit. Ab animi harum et consequuntur magni et temporibus autem non aspernatur adipisci id iure velit.
+"
+fit_content = true
+scroll_active = false
+script = ExtResource("4_7g25h")
+skip_pause_at_abbreviations = PackedStringArray("Mr", "Mrs", "Ms", "Dr", "etc", "eg", "ex")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Balloon/DialogBox"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="Balloon/DialogBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/separator = SubResource("StyleBoxLine_0yth7")
+
+[node name="MenuButton" type="Button" parent="Balloon/DialogBox/HBoxContainer"]
+self_modulate = Color(0.235294, 0.211765, 0.184314, 1)
+layout_mode = 2
+theme = ExtResource("2_d30p5")
+theme_override_font_sizes/font_size = 18
+text = "Menu"
+flat = true
+
+[node name="HSeparator3" type="HSeparator" parent="Balloon/DialogBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/separator = SubResource("StyleBoxLine_0yth7")
+
+[node name="Panel" type="Panel" parent="Balloon/DialogBox"]
+layout_mode = 0
+offset_top = -58.0
+offset_right = 303.0
+offset_bottom = -8.0
+mouse_filter = 1
+theme = ExtResource("2_d30p5")
+
+[node name="MarginContainer2" type="MarginContainer" parent="Balloon/DialogBox/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/DialogBox/Panel/MarginContainer2"]
+layout_mode = 2
+alignment = 1
+
+[node name="CharacterLabel" type="RichTextLabel" parent="Balloon/DialogBox/Panel/MarginContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+theme = ExtResource("2_d30p5")
+theme_override_colors/default_color = Color(0.780392, 0.509804, 0.14902, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/normal_font_size = 36
+bbcode_enabled = true
+text = "Lysandra"
+fit_content = true
+scroll_active = false
+
+[node name="Responses" type="MarginContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -383.0
+offset_top = -447.0
+offset_right = 383.0
+offset_bottom = 154.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResponsesMenu" type="VBoxContainer" parent="Responses"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme = ExtResource("2_d30p5")
+script = ExtResource("5_sn55h")
+
+[node name="ResponseExample" type="Button" parent="Responses/ResponsesMenu"]
+layout_mode = 2
+text = "Response example"
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="gui_input" from="Balloon" to="." method="_on_balloon_gui_input"]
+[connection signal="response_selected" from="Responses/ResponsesMenu" to="." method="_on_responses_menu_response_selected"]

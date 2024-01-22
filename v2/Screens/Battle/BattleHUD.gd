@@ -51,6 +51,8 @@ func set_selected_attack(attack: Attack):
 	
 
 func show_ui(_show: bool):
+	# TODO
+	$MissionBox/VBoxContainer/Label.text = battle.victory_conditions[0].win_description()
 	$UndoMoveButton.visible = battle._battle_phase
 	$EndTurnButton.visible = battle._battle_phase
 	$ActionOrderButton.visible = battle._battle_phase

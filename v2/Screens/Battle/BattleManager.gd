@@ -1,3 +1,4 @@
+@tool
 class_name Battle
 extends Control
 
@@ -116,18 +117,23 @@ static func player_battle_result_message(is_attacker: bool, result: Result) -> S
 	
 func _ready():
 	Globals.battle = self
-	_test.call_deferred()
-	
 
+	if not Engine.is_editor_hint():
+		_test.call_deferred()
+		
+	_on_visibility_changed.call_deferred()
+	
+	
 func _exit_tree():
 	request_ready()
 				
-	
+				
 #region Core API
 func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _do_quick: Variant = null) -> bool:
 	if !fulfills_attack_requirements(_attacker, _territory):
 		return false
 	
+	visible = true
 	_start_battle.call_deferred(_attacker, _defender, _territory, _do_quick)
 	return true
 		
@@ -764,6 +770,7 @@ func _test():
 	a.units = ['Alara', 'Lysandra', 'Maia', 'Tali', 'Eirene']
 	a.leader = preload("res://Screens/Battle/data/chara/Lysandra.tres")
 	var b := Empire.new()
+	b.units = ['cultist_axe', 'cultist_bow', 'cultist_mace', 'cultist_priestess', 'cultist_spear', 'cultist_sword', 'cultist_witch']
 	b.leader = preload("res://Screens/Battle/data/chara/Alara.tres")
 	var terr := Territory.new()
 	terr.maps = [preload("res://Screens/Battle/map_types/Map.tscn")]
@@ -772,3 +779,8 @@ func _test():
 
 
 #endregion
+
+func _on_visibility_changed():
+	$Background.visible = visible
+	$HUD.visible = visible
+	$Overlay.visible = visible

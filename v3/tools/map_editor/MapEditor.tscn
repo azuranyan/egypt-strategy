@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dd1m01l7vm86n"]
+
+[ext_resource type="Script" path="res://tools/map_editor/MapEditor.gd" id="1_crx2v"]
+[ext_resource type="Script" path="res://tools/map_editor/WorldFigurator.gd" id="2_yvsws"]
+
+[node name="MapEditor" type="Node2D"]
+script = ExtResource("1_crx2v")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="WorldFigurator" type="Node2D" parent="."]
+position = Vector2(732, 97)
+script = ExtResource("2_yvsws")

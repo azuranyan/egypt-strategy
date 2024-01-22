@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://do44p65c4ue5i"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/SpawnPoint.gd" id="1_f4ooq"]
+
+[node name="SpawnPoint" type="Node2D"]
+visibility_layer = 512
+position = Vector2(0, 1)
+script = ExtResource("1_f4ooq")
+spawn_type = "Player"
+
+[node name="DebugTile" type="Polygon2D" parent="."]
+visible = false
+self_modulate = Color(0.1, 0.1, 0.8, 0.4)

@@ -438,13 +438,12 @@ grow_vertical = 2
 metadata/_edit_lock_ = true
 
 [node name="Camera2D" type="Camera2D" parent="SubViewportContainer"]
-position = Vector2(1011, 486)
+position = Vector2(960, 540)
 position_smoothing_enabled = true
 drag_left_margin = 0.6
 drag_top_margin = 0.6
 drag_right_margin = 0.6
 drag_bottom_margin = 0.6
-editor_draw_screen = false
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="SubViewportContainer/Camera2D"]
 libraries = {
@@ -1149,6 +1148,7 @@ text = "Cancel"
 
 [connection signal="empire_turn_ended" from="." to="HUD" method="_on_battle_manager_empire_turn_ended"]
 [connection signal="empire_turn_started" from="." to="HUD" method="_on_battle_manager_empire_turn_started"]
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="HUD/UndoMoveButton" to="HUD" method="_on_undo_move_button_pressed"]
 [connection signal="pressed" from="HUD/EndTurnButton" to="HUD" method="_on_end_turn_button_pressed"]
 [connection signal="pressed" from="HUD/RestButton" to="HUD" method="_on_rest_button_pressed"]

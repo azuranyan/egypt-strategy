@@ -1,0 +1,101 @@
+[gd_resource type="SpriteFrames" load_steps=8 format=3 uid="uid://dvq3wmi2jyw5c"]
+
+[ext_resource type="Texture2D" uid="uid://bbfqpox5i665e" path="res://characters/placeholder/sprites/BaseSpriteTesterBackAttack.png" id="1_uar03"]
+[ext_resource type="Texture2D" uid="uid://d3bh0b2uetasu" path="res://characters/placeholder/sprites/BaseSpriteTesterBackIdle.png" id="2_8ms6n"]
+[ext_resource type="Texture2D" uid="uid://bc7fyy8hy0vcw" path="res://characters/placeholder/sprites/BaseSpriteTesterBackWalk.png" id="3_efpo7"]
+[ext_resource type="Texture2D" uid="uid://cj6b36iqwn2t4" path="res://characters/placeholder/sprites/BaseSpriteTesterFrontAttack.png" id="4_uli46"]
+[ext_resource type="Texture2D" uid="uid://bbbq0btm6xjhn" path="res://characters/placeholder/sprites/BaseSpriteTesterFrontIdle.png" id="5_454kk"]
+[ext_resource type="Texture2D" uid="uid://du4w4s5mntb2a" path="res://characters/placeholder/sprites/BaseSpriteTesterFrontWalk.png" id="6_u6g46"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1dlh6"]
+atlas = ExtResource("1_uar03")
+region = Rect2(0, 0, 160, 160)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1dlh6")
+}],
+"loop": false,
+"name": &"back_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_8ms6n")
+}],
+"loop": false,
+"name": &"back_death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_efpo7")
+}],
+"loop": false,
+"name": &"back_hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_8ms6n")
+}],
+"loop": true,
+"name": &"back_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_efpo7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_8ms6n")
+}],
+"loop": true,
+"name": &"back_walk_loop",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_uli46")
+}],
+"loop": false,
+"name": &"front_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_454kk")
+}],
+"loop": false,
+"name": &"front_death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_u6g46")
+}],
+"loop": false,
+"name": &"front_hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_454kk")
+}],
+"loop": false,
+"name": &"front_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_u6g46")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_454kk")
+}],
+"loop": false,
+"name": &"front_walk_loop",
+"speed": 5.0
+}]

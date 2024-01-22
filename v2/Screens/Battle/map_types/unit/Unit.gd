@@ -210,17 +210,18 @@ var _standby_pos: Vector2
 var _driver: UnitDriver
 
 @onready var model: UnitModel = $UnitModel
-		
+@onready var pathable: PathableComponent = $PathableComponent
 		
 var _base_stats: Dictionary
-			
-			
+		
+		
 func _ready():
 	super._ready()
 	_update_unit_type()
 	
 	model.facing = facing
 	model.scale = model_scale
+	empire = empire
 	
 	$UnitModel/Shadow.visible = false
 	
@@ -533,10 +534,10 @@ func is_walking() -> bool:
 ## Pathfinds to a target cell.
 func pathfind_cell(end: Vector2) -> PackedVector2Array:
 	var start := cell()
-	var pathable := get_pathable_cells()
-	if end not in pathable:
-		pathable.append(end)
-	var pathfinder := PathFinder.new(map.world, pathable)
+	var pathable_cells := get_pathable_cells()
+	if end not in pathable_cells:
+		pathable_cells.append(end)
+	var pathfinder := PathFinder.new(map.world, pathable_cells)
 	var long_path := pathfinder.calculate_point_path(start, end)
 	
 	for i in range(long_path.size() - 1, -1, -1):
@@ -552,42 +553,10 @@ func get_pathable_cells(limit_move := false) -> PackedVector2Array:
 	
 ## Returns true if this unit can path through cell.
 func is_pathable(_cell: Vector2) -> bool:
-	if phase & PHASE_NO_CLIP == 0:
-		for obj in map.get_objects_at(_cell):
-			if not _is_pathable_object(obj):
-				return false
-	return true
-	
-
-func _is_pathable_object(obj: MapObject) -> bool:
-	match obj.pathing:
-		Map.Pathing.UNIT:
-			if is_enemy(obj):
-				return phase & PHASE_ENEMIES != 0
-		Map.Pathing.DOODAD:
-			return phase & PHASE_DOODADS != 0
-		Map.Pathing.TERRAIN:
-			return phase & PHASE_TERRAIN != 0
-		Map.Pathing.IMPASSABLE:
-			return false
-	return true
+	return PathableServer.is_pathable(self, _cell)
 	
 	
 ## Returns true if this unit can be placed on cell.
 func is_placeable(_cell: Vector2) -> bool:
-	if phase & PHASE_NO_CLIP == 0:
-		for obj in map.get_objects_at(_cell):
-			if not _is_placeable_object(obj):
-				return false
-	return true
+	return PathableServer.is_placeable(self, _cell)
 
-
-func _is_placeable_object(obj: MapObject) -> bool:
-	match obj.pathing:
-		Map.Pathing.DOODAD:
-			return phase & PHASE_DOODADS != 0
-		Map.Pathing.TERRAIN:
-			return phase & PHASE_TERRAIN != 0
-		Map.Pathing.UNIT, Map.Pathing.IMPASSABLE:
-			return false
-	return true
