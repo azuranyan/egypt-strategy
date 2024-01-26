@@ -4,7 +4,7 @@ extends Resource
 
 @export var adjacent: Array[Territory] = []
 
-@export var maps: Array[Territory] = []
+@export var maps: Array[PackedScene] = []
 
 
 

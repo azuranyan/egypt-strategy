@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://di4ivx6gftqqt"]
+
+[ext_resource type="PackedScene" uid="uid://l4ugqyc5847m" path="res://characters/alara/alara.tscn" id="1_crt3q"]
+
+[node name="Alara" instance=ExtResource("1_crt3q")]

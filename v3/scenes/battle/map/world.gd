@@ -63,8 +63,8 @@ func _update():
 		uniform_transform = Transform2D()
 		uniform_inverse = Transform2D()
 	
+	var viewport_size := Game.get_viewport_size()
 	$Sprite2D.texture = texture
-	var viewport_size := Vector2(1920, 1080) if Engine.is_editor_hint() else Vector2(get_viewport().size)
 	$Sprite2D.scale = viewport_size/get_internal_size()
 	
 	$MapGrid.tile_size = tile_size

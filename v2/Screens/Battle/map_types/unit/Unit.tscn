@@ -92,7 +92,7 @@ display_icon = ExtResource("4_5wpuo")
 visibility_layer = 512
 script = ExtResource("4_3q77v")
 pathing_group = 1
-_debug_tile = NodePath("")
+_debug_tile = NodePath("@Polygon2D@20433")
 
 [node name="HPBar" type="TileMap" parent="."]
 visible = false
@@ -105,6 +105,7 @@ layer_0/tile_data = PackedInt32Array(-196610, 2, 0, -196609, 65538, 0, -262144, 
 scale = Vector2(0.575, 0.575)
 
 [node name="Shadow" type="Sprite2D" parent="UnitModel"]
+visible = false
 modulate = Color(0, 0, 0, 0.392157)
 show_behind_parent = true
 texture = ExtResource("3_up13u")

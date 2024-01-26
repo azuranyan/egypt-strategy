@@ -1,58 +1,48 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4wmeyhljuy5v"]
+[gd_scene load_steps=5 format=3 uid="uid://c4wmeyhljuy5v"]
 
 [ext_resource type="Script" path="res://scenes/battle/level.gd" id="1_fmwlx"]
-[ext_resource type="Texture2D" uid="uid://cpomn0wcwygkb" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="1_s4xlk"]
+[ext_resource type="PackedScene" uid="uid://cux1v2yokvd78" path="res://scenes/battle/map/world.tscn" id="2_qkjxt"]
+[ext_resource type="Texture2D" uid="uid://bc072g56cn4u6" path="res://characters/alara/Alara.png" id="3_vbhbf"]
+[ext_resource type="PackedScene" uid="uid://bsngbbt6h7fms" path="res://scenes/battle/map/tile_overlay.tscn" id="4_qe7xh"]
 
 [node name="Level" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_fmwlx")
 
-[node name="World" type="Node2D" parent="."]
-z_index = -10
+[node name="SampleWorld" parent="." instance=ExtResource("2_qkjxt")]
 
-[node name="Sprite2D" type="Sprite2D" parent="World"]
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("1_s4xlk")
-centered = false
+[node name="Cursor" type="Node2D" parent="."]
+position = Vector2(1032, 622)
 
-[node name="Grid" type="Node2D" parent="World"]
+[node name="Sprite2D" type="Sprite2D" parent="Cursor"]
+scale = Vector2(0.11, 0.11)
+texture = ExtResource("3_vbhbf")
 
 [node name="WorldOverlays" type="Node2D" parent="."]
-visibility_layer = 2
-z_index = -5
+z_index = -90
 
-[node name="Pathing" type="Node2D" parent="WorldOverlays"]
+[node name="Pathing" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("4_qe7xh")]
+modulate = Color(0, 1, 0, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+world = NodePath("../../SampleWorld")
 
-[node name="AttackRange" type="Node2D" parent="WorldOverlays"]
+[node name="AttackRange" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("4_qe7xh")]
+modulate = Color(1, 0, 0, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+world = NodePath("../../SampleWorld")
 
-[node name="TargetShape" type="Node2D" parent="WorldOverlays"]
+[node name="TargetShape" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("4_qe7xh")]
+modulate = Color(0, 0, 1, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+world = NodePath("../../SampleWorld")
 
 [node name="UnitPath" type="Node2D" parent="WorldOverlays"]
-
-[node name="CursorUnder" type="Node2D" parent="WorldOverlays"]
-position = Vector2(386, 239)
-
-[node name="Objects" type="Node2D" parent="."]
-visibility_layer = 4
-y_sort_enabled = true
-
-[node name="Cursor" type="Node2D" parent="Objects"]
-position = Vector2(386, 240)
-
-[node name="Under" type="Node2D" parent="Objects/Cursor"]
-position = Vector2(0, -1)
-
-[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Objects/Cursor/Under"]
-remote_path = NodePath("../../../../WorldOverlays/CursorUnder")
-
-[node name="Over" type="Node2D" parent="Objects/Cursor"]
-position = Vector2(0, 1)
-
-[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Objects/Cursor/Over"]
-remote_path = NodePath("../../../../Overlays/CursorOver")
-
-[node name="Overlays" type="Node2D" parent="."]
-visibility_layer = 8
-z_index = 10
-
-[node name="CursorOver" type="Node2D" parent="Overlays"]
-position = Vector2(386, 241)

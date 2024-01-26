@@ -1,3 +1,10 @@
-[gd_scene format=3 uid="uid://dl8155ew1vheg"]
+[gd_scene load_steps=3 format=3 uid="uid://dl8155ew1vheg"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map_object.gd" id="1_oblxf"]
+[ext_resource type="Script" path="res://scenes/battle/map/components/pathing_component.gd" id="2_1priq"]
 
 [node name="Doodad" type="Node2D"]
+script = ExtResource("1_oblxf")
+
+[node name="PathingComponent" type="Node" parent="."]
+script = ExtResource("2_1priq")

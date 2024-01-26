@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://cgm41m46kwr2l"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map_object.gd" id="1_p3bik"]
+[ext_resource type="Texture2D" uid="uid://dc6lsi5xaek37" path="res://scenes/battle/map/data/detector.png" id="2_hal7b"]
+[ext_resource type="Script" path="res://scenes/battle/map/transformable.gd" id="2_ymiyj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1c5xt"]
+size = Vector2(32, 32)
+
+[node name="Detector" type="Node2D"]
+script = ExtResource("1_p3bik")
+type = "detector"
+
+[node name="Transformable2" type="Node2D" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("2_ymiyj")
+map_object = NodePath("..")
+internal_size = Vector2(70, 70)
+transform_flags = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Transformable2"]
+visibility_layer = 512
+z_index = 1
+scale = Vector2(0.84, 0.84)
+texture = ExtResource("2_hal7b")
+
+[node name="Transformable" type="Node2D" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("2_ymiyj")
+map_object = NodePath("..")
+internal_size = Vector2(64, 64)
+
+[node name="Area2D" type="Area2D" parent="Transformable"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Transformable/Area2D"]
+shape = SubResource("RectangleShape2D_1c5xt")

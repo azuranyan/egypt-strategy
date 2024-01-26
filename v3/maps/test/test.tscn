@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3 uid="uid://b6831iawh00s4"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_ispwp"]
+[ext_resource type="Script" path="res://scenes/battle/battle_result_evaluators/conquer_evaluator.gd" id="2_56tcr"]
+[ext_resource type="PackedScene" uid="uid://cux1v2yokvd78" path="res://scenes/battle/map/world.tscn" id="3_3b11c"]
+[ext_resource type="PackedScene" uid="uid://bsngbbt6h7fms" path="res://scenes/battle/map/tile_overlay.tscn" id="4_s0m6e"]
+
+[sub_resource type="Resource" id="Resource_ts3td"]
+script = ExtResource("2_56tcr")
+
+[node name="Test" type="Node2D" node_paths=PackedStringArray("world")]
+y_sort_enabled = true
+script = ExtResource("1_ispwp")
+world = NodePath("World")
+evaluators = Array[Resource("res://scenes/battle/battle_result_evaluator.gd")]([SubResource("Resource_ts3td")])
+
+[node name="World" parent="." instance=ExtResource("3_3b11c")]
+
+[node name="TileOverlay" parent="." node_paths=PackedStringArray("world") instance=ExtResource("4_s0m6e")]
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+world = NodePath("../World")

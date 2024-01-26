@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://sr5kvp457rtp"]
-
-[ext_resource type="Script" path="res://scenes/battle/map/pathing_component.gd" id="1_ocm0w"]
-
-[node name="PathingComponent" type="Node"]
-script = ExtResource("1_ocm0w")
-pathing_group = 1

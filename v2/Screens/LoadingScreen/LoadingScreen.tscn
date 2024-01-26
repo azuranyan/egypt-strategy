@@ -78,10 +78,10 @@ layer = 2
 script = ExtResource("1_vgmvs")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "fade_in"
 libraries = {
 "": SubResource("AnimationLibrary_nac18")
 }
+autoplay = "fade_in"
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

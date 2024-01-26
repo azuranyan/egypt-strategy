@@ -1,0 +1,138 @@
+[gd_scene load_steps=9 format=3 uid="uid://dawqwk1rwon1j"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map_objects/unit.gd" id="1_mky0p"]
+[ext_resource type="Theme" uid="uid://umyv3x1ykkt5" path="res://scenes/data/regular_theme.tres" id="3_qoxct"]
+[ext_resource type="Script" path="res://scenes/battle/map/transformable.gd" id="5_f6ik8"]
+[ext_resource type="Script" path="res://scenes/battle/map/pathable_component.gd" id="5_pe133"]
+
+[sub_resource type="Gradient" id="Gradient_peeo8"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.545455, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ot0m7"]
+gradient = SubResource("Gradient_peeo8")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0.965)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ssdq"]
+size = Vector2(24, 74)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_60xbw"]
+size = Vector2(32, 32)
+
+[node name="Unit" type="Node2D"]
+script = ExtResource("1_mky0p")
+type = "unit"
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Transformable" type="Node2D" parent="Sprite" node_paths=PackedStringArray("map_object")]
+script = ExtResource("5_f6ik8")
+map_object = NodePath("../..")
+internal_size = Vector2(64, 64)
+transform_flags = 1
+
+[node name="Shadow" type="Sprite2D" parent="Sprite/Transformable"]
+self_modulate = Color(0, 0, 0, 0.337255)
+scale = Vector2(1, 0.5625)
+texture = SubResource("GradientTexture2D_ot0m7")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Sprite"]
+position = Vector2(0, -37)
+scale = Vector2(0.575, 0.575)
+animation = &""
+
+[node name="MouseArea" type="Area2D" parent="Sprite"]
+unique_name_in_owner = true
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/MouseArea"]
+position = Vector2(0, -34)
+shape = SubResource("RectangleShape2D_1ssdq")
+debug_color = Color(0.938388, 1.12626e-05, 0.623911, 0.42)
+
+[node name="HUD" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -117.0
+offset_right = 90.0
+offset_bottom = -79.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.6, 0.6)
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control" type="Control" parent="HUD/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="HUD/MarginContainer/Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme = ExtResource("3_qoxct")
+text = "Placeholder"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ColorRect" type="ColorRect" parent="HUD/MarginContainer/Control"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.188235, 0.0470588, 0.054902, 1)
+
+[node name="HPBar" type="ColorRect" parent="HUD/MarginContainer/Control"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.403922, 0.796078, 0, 1)
+
+[node name="Transformable" type="Node2D" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("5_f6ik8")
+map_object = NodePath("..")
+internal_size = Vector2(64, 64)
+
+[node name="Area2D" type="Area2D" parent="Transformable"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Transformable/Area2D"]
+shape = SubResource("RectangleShape2D_60xbw")
+
+[node name="PathableComponent" type="Node" parent="."]
+script = ExtResource("5_pe133")
+pathing_group = 1
+
+[connection signal="property_changed" from="." to="." method="_on_property_changed"]
+[connection signal="stat_changed" from="." to="." method="_on_stat_changed"]

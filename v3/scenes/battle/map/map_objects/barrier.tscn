@@ -1,3 +1,25 @@
-[gd_scene format=3 uid="uid://dkb038jvle2wf"]
+[gd_scene load_steps=5 format=3 uid="uid://dkb038jvle2wf"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map_object.gd" id="1_vc60e"]
+[ext_resource type="Texture2D" uid="uid://cmoxw131jr0n3" path="res://scenes/battle/map/data/crossed-circle.png" id="2_6gfud"]
+[ext_resource type="Script" path="res://scenes/battle/map/pathable_component.gd" id="2_ydh53"]
+[ext_resource type="Script" path="res://scenes/battle/map/transformable.gd" id="3_xlulv"]
 
 [node name="Barrier" type="Node2D"]
+script = ExtResource("1_vc60e")
+type = "barrier"
+
+[node name="PathingComponent" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("2_ydh53")
+pathing_group = 4
+map_object = NodePath("..")
+
+[node name="Transformable" type="Node2D" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("3_xlulv")
+map_object = NodePath("..")
+internal_size = Vector2(240, 240)
+
+[node name="Sprite2D" type="Sprite2D" parent="Transformable"]
+visibility_layer = 512
+scale = Vector2(0.87, 0.87)
+texture = ExtResource("2_6gfud")

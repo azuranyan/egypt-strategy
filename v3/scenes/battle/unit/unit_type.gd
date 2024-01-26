@@ -3,7 +3,7 @@ extends Resource
 
 ## Dictates how his unit chooses its actions.
 enum Behavior {
-	## Unit is controlled by player.
+	## UnitState is controlled by player.
 	PLAYER_CONTROLLED,
 	
 	## Always advances towards nearest target and attacks.
@@ -33,7 +33,7 @@ enum Behavior {
 
 @export var character_info: CharacterInfo
 
-@export var sprite_frames: SpriteFrames = preload("res://characters/placeholder/sprite_frames.tres")
+@export var sprite_frames: SpriteFrames = preload("res://scenes/battle/unit/data/placeholder_sprite_frames.tres")
 
 @export var behavior: Behavior
 
