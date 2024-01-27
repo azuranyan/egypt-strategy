@@ -6,9 +6,7 @@ extends Node
 signal state_loaded
 
 
-@export var territory_name: String:
-	set(value):
-		territory_name = 
+@export var territory_name: String
 @export var adjacent: Array[Territory] = []
 @export var maps: Array[PackedScene] = []
 @export var empire: Empire:
