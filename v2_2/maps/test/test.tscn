@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://tswv0jrmndgy"]
+[gd_scene load_steps=8 format=3 uid="uid://tswv0jrmndgy"]
 
 [ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_fyf4x"]
 [ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_1pxfs"]
 [ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="3_qtici"]
+[ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="4_7feta"]
 [ext_resource type="Script" path="res://scenes/battle/map/map_object.gd" id="4_ntffg"]
 [ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="5_hmgmv"]
 [ext_resource type="Texture2D" uid="uid://dap4jyfjlxnbe" path="res://scenes/battle/data/detector.png" id="6_uma0q"]
@@ -18,7 +19,16 @@ world = NodePath("World")
 y_sort_enabled = true
 script = ExtResource("3_qtici")
 
+[node name="TileOverlay" parent="MapObjectContainer" node_paths=PackedStringArray("world") instance=ExtResource("4_7feta")]
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(131073, 458752, 0, 65536, 0, 0, 0, 0, 0, 1, 0, 0, 65537, 0, 0, 131072, 0, 0, 196609, 458752, 0, 262145, 458752, 0, 327681, 458752, 0, 393217, 0, 0, 458753, 0, 0, 524289, 0, 0, 589825, 0, 0, 655361, 0, 0, 655362, 0, 0, 655363, 0, 0, 589827, 0, 0, 524291, 0, 0, 458755, 0, 0, 458754, 0, 0, 393218, 458752, 0, 327682, 458752, 0, 262146, 458752, 0)
+world = NodePath("../../World")
+
 [node name="MapObject" type="Node2D" parent="MapObjectContainer"]
+position = Vector2(1107.63, 404.096)
 script = ExtResource("4_ntffg")
 map_position = Vector2(4, 2)
 
