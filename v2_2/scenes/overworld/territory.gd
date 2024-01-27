@@ -3,6 +3,12 @@ class_name Territory
 extends Node
 
 
+signal state_loaded
+
+
+@export var territory_name: String:
+	set(value):
+		territory_name = 
 @export var adjacent: Array[Territory] = []
 @export var maps: Array[PackedScene] = []
 @export var empire: Empire:
@@ -12,6 +18,8 @@ extends Node
 			empire.territories.clear()
 			empire.territories.append(self)
 			empire.home_territory = self
+		
+var id: int
 
 
 ## Returns true if empire is player owned.
@@ -27,3 +35,5 @@ func is_boss() -> bool:
 ## Returns the name of the leader.
 func leader_name() -> String:
 	return empire.leader_name()
+
+

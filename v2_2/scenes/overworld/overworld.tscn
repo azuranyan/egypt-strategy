@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scenes/overworld/territory.gd" id="6_q5swp"]
 
 [sub_resource type="Resource" id="Resource_noi3l"]
+resource_local_to_scene = true
 script = ExtResource("4_dd4no")
 name = "Lysandra Placeholder"
 gender = "F"
@@ -16,6 +17,7 @@ title = ""
 map_color = Color(0, 0, 0, 1)
 
 [sub_resource type="Resource" id="Resource_td17e"]
+resource_local_to_scene = true
 script = ExtResource("4_dd4no")
 name = "Sitri placeholder"
 gender = "F"
@@ -36,27 +38,38 @@ texture = ExtResource("2_27pdc")
 [node name="Player" type="Node" parent="Empires" node_paths=PackedStringArray("territories", "home_territory")]
 script = ExtResource("3_vu5m3")
 leader = SubResource("Resource_noi3l")
-territories = [NodePath("../../TerritoryButton/Territory")]
-home_territory = NodePath("../../TerritoryButton/Territory")
+territories = [NodePath("../../TerritoryButton/Base")]
+base_aggression = null
+aggression = null
+hp_multiplier = null
+home_territory = NodePath("../../TerritoryButton/Base")
 metadata/player_owned = true
 
 [node name="Sitri" type="Node" parent="Empires" node_paths=PackedStringArray("territories", "home_territory")]
 script = ExtResource("3_vu5m3")
 leader = SubResource("Resource_td17e")
-territories = [NodePath("../../TerritoryButton2/Territory")]
-home_territory = NodePath("../../TerritoryButton2/Territory")
+territories = [NodePath("../../TerritoryButton2/Boss")]
+base_aggression = null
+aggression = null
+hp_multiplier = null
+home_territory = NodePath("../../TerritoryButton2/Boss")
 metadata/boss = true
+
+[node name="RandomEmpireSelection" type="Node" parent="."]
 
 [node name="TerritoryButton" parent="." instance=ExtResource("2_gak2j")]
 position = Vector2(1475, 801)
 
-[node name="Territory" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("empire")]
+[node name="Base" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("empire")]
 script = ExtResource("6_q5swp")
+territory_name = null
 empire = NodePath("../../Empires/Player")
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("2_gak2j")]
 position = Vector2(273, 201)
 
-[node name="Territory" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("empire")]
+[node name="Boss" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent", "empire")]
 script = ExtResource("6_q5swp")
+territory_name = null
+adjacent = [null]
 empire = NodePath("../../Empires/Sitri")

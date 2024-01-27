@@ -10,6 +10,8 @@ extends Node
 @export var hp_multiplier: float = 1
 @export var home_territory: Territory
 
+var id: int
+
 
 ## Returns true if empire is player owned.
 func is_player_owned() -> bool:
