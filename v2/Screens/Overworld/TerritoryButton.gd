@@ -114,7 +114,7 @@ func _on_texture_button_toggled(button_pressed):
 		if territory.is_player_owned():
 			show_extended_player_panel()
 		else:
-			var adjacent: bool = Globals.empires["Lysandra"].is_territory_adjacent(self.territory)
+			var adjacent: bool = Game.empires["Lysandra"].is_territory_adjacent(self.territory)
 			show_extended_enemy_panel(adjacent)
 	else:
 		self.z_index -= 1
@@ -123,19 +123,19 @@ func _on_texture_button_toggled(button_pressed):
 		
 func _on_attack_button_pressed():
 	$TextureButton.button_pressed = false
-	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_attack_action(territory))
+	Game.overworld.player_choose_action.emit(Game.overworld.empire_attack_action(territory))
 
 
 func _on_inspect_button_pressed():
-	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_inspect_action())
+	Game.overworld.player_choose_action.emit(Game.overworld.empire_inspect_action())
 
 
 func _on_rest_button_pressed():
-	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_rest_action())
+	Game.overworld.player_choose_action.emit(Game.overworld.empire_rest_action())
 
 
 func _on_train_button_pressed():
-	Globals.overworld.player_choose_action.emit(Globals.overworld.empire_train_action(territory))
+	Game.overworld.player_choose_action.emit(Game.overworld.empire_train_action(territory))
 	
 
 func _on_child_entered_tree(node: Node):

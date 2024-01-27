@@ -103,12 +103,12 @@ func get_target_cells(target: Vector2, target_rotation: float) -> PackedVector2A
 func execute(user: Unit, target: Vector2, target_units: Array[Unit]):
 	var effect_counter := 0
 	for effect in effects:
-		effect.attack_started(Globals.battle, user, self)
+		effect.attack_started(Game.battle, user, self)
 		for target_unit in target_units:
 			if _is_effect_target(user, target_unit, effect):
 				var wrapper := func():
 					effect_counter += 1
-					effect.apply(Globals.battle, user, self, target, target_unit)
+					effect.apply(Game.battle, user, self, target, target_unit)
 				wrapper.call_deferred()
 	
 	while effect_counter > 0:
@@ -116,7 +116,7 @@ func execute(user: Unit, target: Vector2, target_units: Array[Unit]):
 		effect_counter -= 1
 		
 	for effect in effects:
-		effect.attack_finished(Globals.battle, user, self)
+		effect.attack_finished(Game.battle, user, self)
 	
 	
 func _is_effect_target(unit: Unit, target: Unit, effect: AttackEffect) -> bool:

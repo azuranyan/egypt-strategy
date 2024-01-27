@@ -90,6 +90,21 @@ var battle: Battle
 var screen_stack: Array[Node] = []
 
 
+## Special variable that is set to false when running from main.
+## This allows individual scenes to be tested from _ready()
+var test_individual_scenes := true
+
+
+## Returns the viewport size.
+func get_viewport_size() -> Vector2:
+	# TODO get_viewport().size doesn't work, even with stretch mode set to
+	# viewport. despite what godot says, it doesn't change the viewport to
+	# project settings set size if window is launched with a fixed size 
+	# like maximized and force window size.
+	return Vector2(1920, 1080)
+	
+	
+
 ## Registers data from /battle.
 static func register_data(subdir: String, get_id: Callable):
 	var path := "res://Screens/Battle/data/" + subdir + '/'
@@ -99,7 +114,7 @@ static func register_data(subdir: String, get_id: Callable):
 	while filename != "":
 		if !dir.current_is_dir() and filename.ends_with(".tres"):
 			var res = load(path + filename)
-			Globals.get(subdir)[get_id.call(res)] = res
+			Game.get(subdir)[get_id.call(res)] = res
 		filename = dir.get_next()
 		
 		
@@ -169,16 +184,25 @@ func notify_end_scene():
 	
 	
 func _dequeue_scene():
-	if not Globals.scene_queue.is_empty():
-		var scn: String = Globals.scene_queue.pop_front()
+	if not Game.scene_queue.is_empty():
+		var scn: String = Game.scene_queue.pop_front()
 		scene_started.emit(scn)
 	else:
 		scene_queue_finished.emit()
 		
 		
-## This is the entry point of the game.
-func start_game():
-	pass
+@export var dialog_resource: DialogueResource
+@export var title: String
+
+## The entry point of the game.
+func start_game(_args := {}):
+	test_individual_scenes = false
+	
+	var node := preload("res://Screens/Dialogue/Dialogue.tscn").instantiate()
+	add_child(node)
+	DialogueResource.new()
+	node.start(dialog_resource, title)
+	
 	
 #func load_scene(old_scene: String, new_scene: String, transition: String):
 #	var loading_screen_inst := SCENES.loading_screen.instantiate() as LoadingScreen

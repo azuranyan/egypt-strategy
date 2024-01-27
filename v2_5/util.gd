@@ -1,23 +1,5 @@
 class_name Util
-
-## Use this because godot is fucking stupid.
-static func get_canvas_size(_node: Node) -> Vector2:
-	# IT SHOULD JUST BE THIS, BUT
-	#return node.get_viewport().size
-	
-	# THERE'S NO WAY TO GET IT PROPERLY BECAUSE
-	# THIS IS DIFFERENT IN THE EDITOR (WHICH RETURNS ***THE PANEL SIZE***
-	# LIKE THE FUCKING ASS BACKWARDS SMART APE OF A FUCNTION IT IS) AND THERE'S
-	# NO PROPER DOCUMENTED FUNCTION THAT RETURNS THE SIZE OF THAT BLUE AREA
-	# LIKE JESUS FUCKING CHRIST AFTER YOU SAID TO USE THE CANVAS COORDINATE
-	# SYSTEM BECAUSE SCREEN SCALING AND VIEWPORT AND CAMERA SHIT IS A HEADACHE
-	# AND IM TRYING TO DO THAT BUT YOU'RE NOT GIVING ME EASY ACCESS TO THE
-	# """""""VIEWPORT"""""" SIZE??? HOLY FUCKING SHIT THIS IS STUPID
-	
-	# extremely stupid hardcoded viewport size which will cause you lots
-	# of scaling headaches later on, but we have no other choice because
-	# of the beautiful engine design and existing solutions
-	return Vector2(1920, 1080)
+## Collection of utility functions that doesnt belong anywhere else.
 
 
 ## Simple do nothing function.
@@ -25,7 +7,7 @@ static func do_nothing():
 	pass
 
 
-## Simple suboptimal flood fill algorithm.
+## Simple flood fill algorithm.
 static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var dest = PackedVector2Array()
 	
@@ -49,6 +31,7 @@ static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, conditio
 					
 	return dest
 
+
 ## Returns the cell distance between two cells.
 static func cell_distance(a: Vector2, b: Vector2) -> int:
 	var diff := (a - b).abs()
@@ -66,8 +49,8 @@ static func path_length(path: PackedVector2Array) -> float:
 		total += prev.distance_to(path[i])
 		prev = path[i]
 	return total
-	
-	
+
+
 ## Appends object to array if it doesn't exist.
 static func append_unique(arr, what):
 	if what not in arr:
@@ -83,7 +66,7 @@ static func bounds(size: Vector2) -> Rect2:
 static func boundsi(size: Vector2i) -> Rect2i:
 	return Rect2i(0, 0, size.x, size.y)
 
-	
+
 ## Returns a square path from a given path.
 static func make_square_path(path: PackedVector2Array) -> PackedVector2Array:
 	var re := PackedVector2Array()

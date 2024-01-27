@@ -92,7 +92,7 @@ display_icon = ExtResource("4_5wpuo")
 visibility_layer = 512
 script = ExtResource("4_3q77v")
 pathing_group = 1
-_debug_tile = NodePath("@Polygon2D@20433")
+_debug_tile = NodePath("")
 
 [node name="HPBar" type="TileMap" parent="."]
 visible = false

@@ -186,7 +186,7 @@
 	#if fulfills_attack_requirements(attacker, territory):
 		## do battle
 		#battle_started.emit(attacker, defender, territory)
-		#await Globals.play_queued_scenes()
+		#await Game.play_queued_scenes()
 		#
 		#var should_do_quick := not (attacker.is_player_owned() or defender.is_player_owned())
 		#if do_quick != null:
@@ -201,7 +201,7 @@
 		## error
 		#display_message(context.warnings)
 		#battle_ended.emit(Result.AttackerRequirementsError)
-	#await Globals.play_queued_scenes()
+	#await Game.play_queued_scenes()
 #
 #
 ### Returns true if the attacker can initiate the attack to territory.
@@ -296,19 +296,19 @@
 ### Real battle. 
 #func _real_battle(attacker: Empire, defender: Empire, territory: Territory) -> Result:
 	## pre-battle setup
-	#Globals.push_screen(self)
-	#await Globals.screen_ready
+	#Game.push_screen(self)
+	#await Game.screen_ready
 	#_load_map(territory.maps[0])
 	#
 	#var agent := {
-		#context.attacker: Globals.create_agent_for(context.attacker), 
-		#context.defender: Globals.create_agent_for(context.defender), 
+		#context.attacker: Game.create_agent_for(context.attacker), 
+		#context.defender: Game.create_agent_for(context.defender), 
 	#}
 	#
 	#await agent[context.ai].prepare_units()
 		#
 	## wait for the screen transition before proceeding
-	#await Globals.transition_finished
+	#await Game.transition_finished
 	#
 	## allow the player to prep
 	#$UI/DonePrep.visible = true
@@ -362,8 +362,8 @@
 	## post-battle setup
 	#for e in agent.values():
 		#e.queue_free()
-	#Globals.pop_screen()
-	#await Globals.transition_finished
+	#Game.pop_screen()
+	#await Game.transition_finished
 	#_unload_map()
 	#
 	#return context.result
@@ -381,7 +381,7 @@
 	## loop until battle finishes
 	#while not context.should_end:
 		#turn_cycle_started.emit()
-		#await Globals.play_queued_scenes()
+		#await Game.play_queued_scenes()
 		#
 		## allow both empires to take their turns
 		#for empire in [context.attacker, context.defender]:
@@ -391,15 +391,15 @@
 			#
 			#for u in get_owned_units():
 				## reset move and attack flags
-				#var stunned: bool = Globals.status_effect['STN'] in u.status_effects
+				#var stunned: bool = Game.status_effect['STN'] in u.status_effects
 				#set_can_move(u, not stunned)
 				#set_can_attack(u, not stunned)
 				#set_action_taken(u, stunned)
 					#
 				## tick poison at the very start of turn, should be here so we can 
 				## properly evaluate w/l conditions before the turn actually starts
-				#if Globals.status_effect['PSN'] in u.status_effects:
-					#damage_unit(u, Globals.status_effect['PSN'], 1)
+				#if Game.status_effect['PSN'] in u.status_effects:
+					#damage_unit(u, Game.status_effect['PSN'], 1)
 			#
 			## things can happen before/after doing any actions so make sure to check first
 			#if _evaluate_victory_conditions():
@@ -410,7 +410,7 @@
 			#
 			## do turn (note that the attacker always attacks first)
 			#turn_started.emit()
-			#await Globals.play_queued_scenes()
+			#await Game.play_queued_scenes()
 			#
 			##await _do_turn()
 			#_allow_quit = true
@@ -418,7 +418,7 @@
 			#_allow_quit = false
 						#
 			#turn_ended.emit()
-			#await Globals.play_queued_scenes()
+			#await Game.play_queued_scenes()
 			#
 			## do end-turn tick mechanics
 			#for u in get_owned_units():
@@ -430,7 +430,7 @@
 				#u.tick_status_effects()
 			#
 		#turn_cycle_ended.emit()
-		#await Globals.play_queued_scenes()
+		#await Game.play_queued_scenes()
 		#
 		## increment number of turns
 		#context.turns += 1
@@ -596,7 +596,7 @@
 	#assert(empire == context.attacker or empire == context.defender, "owner is neither empire!")	
 	#var unit := Unit.create(map, {
 		#world = map.world,
-		#unit_type = Globals.unit_type[tag],
+		#unit_type = Game.unit_type[tag],
 		#empire = empire,
 		#map_pos = pos,
 ##		facing = 0,
@@ -689,25 +689,25 @@
 ### Inflict damage upon a unit.
 #func damage_unit(unit: Unit, source: Variant, amount: int):
 	## if unit has block, remove block and set damage to 0
-	#if Globals.status_effect['BLK'] in unit.status_effects:
-		#unit.remove_status_effect(Globals.status_effect['BLK'])
+	#if Game.status_effect['BLK'] in unit.status_effects:
+		#unit.remove_status_effect(Game.status_effect['BLK'])
 		#amount = 0
 	#
 	## if unit has vul, increase damage taken by 1 
-	#if Globals.status_effect['VUL'] in unit.status_effects and amount >= 0:
+	#if Game.status_effect['VUL'] in unit.status_effects and amount >= 0:
 		## this also increases poison damage which effectively 
 		## doubles the damage making it a potent combo
 		##amount += 1
-		#if source != Globals.status_effect['VUL']:
-			#damage_unit(unit, Globals.status_effect['VUL'], 1)
+		#if source != Game.status_effect['VUL']:
+			#damage_unit(unit, Game.status_effect['VUL'], 1)
 		#
 	#unit.hp = clampi(unit.hp - amount, 0, unit.maxhp)
 	#
 	#var color := Color.WHITE
 	#if amount > 0:
-		#if source == Globals.status_effect['PSN']:
+		#if source == Game.status_effect['PSN']:
 			#color = Color(0.949, 0.29, 0.949)
-		#elif source == Globals.status_effect['VUL']:
+		#elif source == Game.status_effect['VUL']:
 			#color = Color(0.949, 0.949, 0.29)
 		#else:
 			#camera.get_node("AnimationPlayer").play('shake')
@@ -889,7 +889,7 @@
 	#var cond := func(p): return is_pathable(unit, p)
 	#var bounds := Rect2i(Vector2i.ZERO, map.world.map_size)
 	#return Util.flood_fill(map.cell(unit.map_pos), unit.mov, bounds, cond)
-	##return Globals.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size),  func(p): return is_pathable(unit, p))
+	##return Game.flood_fill(battle.map.cell(unit.map_pos), unit.mov, Rect2i(Vector2i.ZERO, battle.map.world.map_size),  func(p): return is_pathable(unit, p))
 	#
 #
 ### Returns a list of targetable cells.
@@ -1033,7 +1033,7 @@
 #
 #func _on_walking_started(unit):
 	#set_camera_follow(unit)
-	#if Globals.prefs.camera_follow_unit_move:
+	#if Game.prefs.camera_follow_unit_move:
 		#camera.drag_horizontal_enabled = false
 		#camera.drag_vertical_enabled = false
 	#set_process_unhandled_input(false)

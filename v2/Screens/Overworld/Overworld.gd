@@ -67,16 +67,16 @@ class_name Overworld
 	#context = Context.new()
 	#
 	## initialize turn order
-	#context.initial_turn_order.append(Globals.empires['Lysandra'])
-	#for ename in Globals.empires:
+	#context.initial_turn_order.append(Game.empires['Lysandra'])
+	#for ename in Game.empires:
 		#if ename != 'Lysandra' and ename != 'Sitri':
-			#context.initial_turn_order.append(Globals.empires[ename])
+			#context.initial_turn_order.append(Game.empires[ename])
 			#
 	## do the cycle
 	#while not context.should_end:
 		## allow scene to play after cycle start
 		#OverworldEvents.cycle_start.emit()
-		#await Globals.play_queued_scenes()
+		#await Game.play_queued_scenes()
 		#
 		## start the turns
 		#context.turn_queue = context.initial_turn_order.duplicate()
@@ -94,18 +94,18 @@ class_name Overworld
 				#
 			## allow scene to play before the start of a turn
 			#OverworldEvents.cycle_turn_start.emit(context.on_turn)
-			#await Globals.play_queued_scenes()
+			#await Game.play_queued_scenes()
 		#
 			#var action := await _get_turn_action(context.on_turn)
 			#await _execute_action(context.on_turn, action)
 			#
 			## allow scene to play after the end of a turn
 			#OverworldEvents.cycle_turn_end.emit(context.on_turn)
-			#await Globals.play_queued_scenes()
+			#await Game.play_queued_scenes()
 			#
 		## allow scene to play after cycle end
 		#OverworldEvents.cycle_end.emit()
-		#await Globals.play_queued_scenes()
+		#await Game.play_queued_scenes()
 		#
 		#context.turn_cycles += 1
 #
@@ -164,8 +164,8 @@ class_name Overworld
 			#display("%s attacks %s (%s)!" % [attacker.leader.name, territory.name, defender.leader.name])
 			#
 			## PRUNE call stack
-			#Globals.battle.start_battle.call_deferred(attacker, defender, territory)
-			#var result = await Globals.battle.battle_ended
+			#Game.battle.start_battle.call_deferred(attacker, defender, territory)
+			#var result = await Game.battle.battle_ended
 			#
 			#match result:
 				#Battle.Result.Cancelled:
@@ -212,7 +212,7 @@ class_name Overworld
 	#territory_set_owner(territory, empire)
 	#
 	## if home_territory, give the rest to the winning empire
-	#if Globals.prefs['defeat_if_home_territory_captured'] and territory == old_owner.home_territory:
+	#if Game.prefs['defeat_if_home_territory_captured'] and territory == old_owner.home_territory:
 		#print("    home territory is captured!")
 		#while !old_owner.territories.is_empty():
 			#var t: Territory = old_owner.territories.pop_back()
@@ -235,8 +235,8 @@ class_name Overworld
 		#
 #
 #func update_boss_spawn_condition():
-	#for t in Globals.territories.values():
-		#if t.get_leader() != Globals.chara["Sitri"] and !t.is_player_owned():
+	#for t in Game.territories.values():
+		#if t.get_leader() != Game.chara["Sitri"] and !t.is_player_owned():
 			#return
 	#
 	#OverworldEvents.all_territories_taken.emit()
@@ -247,9 +247,9 @@ class_name Overworld
 	## TODO spawn boss directly
 	#$TerritoryButton10.visible = true
 	#
-	#connect_territories(Globals.territories["Cursed Stronghold"], Globals.territories["Ruins of Atesh"])
+	#connect_territories(Game.territories["Cursed Stronghold"], Game.territories["Ruins of Atesh"])
 	#
-	#context.initial_turn_order.append(Globals.empires["Sitri"])
+	#context.initial_turn_order.append(Game.empires["Sitri"])
 	#
 #
 ### Displays message and prints to console.
@@ -268,27 +268,27 @@ class_name Overworld
 #
 ### Adds the territories to the global registry.
 #func register_territories_to_globals():
-	#Globals.territories.clear()
+	#Game.territories.clear()
 	#for c in get_children():
 		#if c is TerritoryButton:
-			#Globals.territories[c.territory.name] = c.territory
+			#Game.territories[c.territory.name] = c.territory
 			#
 #
 ### Assign territories and adds the empires to the global registry
 #func register_empires_to_globals():
-	#Globals.empires.clear()
+	#Game.empires.clear()
 	#
-	#_register_new_empire(Globals.chara["Lysandra"], Globals.territories["Zetennu"])
-	#_register_new_empire(Globals.chara["Sitri"], Globals.territories["Cursed Stronghold"])
+	#_register_new_empire(Game.chara["Lysandra"], Game.territories["Zetennu"])
+	#_register_new_empire(Game.chara["Sitri"], Game.territories["Cursed Stronghold"])
 	#
 	#var selection: Array[Chara] = []
-	#for c in Globals.chara.values():
+	#for c in Game.chara.values():
 		#if c.get_meta("territory_selection", false):
 			#selection.append(c)
 			#
 	#selection.shuffle()
 	## var i := 0
-	#for t in Globals.territories.values():
+	#for t in Game.territories.values():
 		#if t.empire == null:
 			## t.empire = _register_new_empire(selection[i], t)
 			## i = (i + 1) % selection.size()
@@ -300,7 +300,7 @@ class_name Overworld
 	#var empire := Empire.new()
 	#empire.leader = leader
 	#empire_give_territory(null, empire, home_territory, true)
-	#Globals.empires[leader.name] = empire
+	#Game.empires[leader.name] = empire
 	#return empire
 	#
 #

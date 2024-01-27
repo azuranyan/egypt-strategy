@@ -1,6 +1,6 @@
-[gd_scene load_steps=38 format=3 uid="uid://dmyoetm7htsiu"]
+[gd_scene load_steps=37 format=3 uid="uid://dmyoetm7htsiu"]
 
-[ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_lx4tv"]
+[ext_resource type="Script" path="res://Screens/Battle/map/Map.gd" id="1_lx4tv"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/World.gd" id="2_e4qqt"]
 [ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="3_it3qp"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_pulou"]
@@ -10,8 +10,7 @@
 [ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="8_161fh"]
 [ext_resource type="PackedScene" uid="uid://dd8q27lfwya5" path="res://Screens/Battle/map_types/DummyDoodad.tscn" id="9_nbgea"]
 [ext_resource type="PackedScene" uid="uid://dggdd7fpr8qn5" path="res://Screens/Battle/map_types/Barrier.tscn" id="10_q0y2r"]
-[ext_resource type="PackedScene" uid="uid://do44p65c4ue5i" path="res://Screens/Battle/map_types/SpawnPoint.tscn" id="11_skgeu"]
-[ext_resource type="PackedScene" path="res://Screens/Battle/map_types/PlayerSpawnPoint.tscn" id="12_tygpe"]
+[ext_resource type="PackedScene" uid="uid://do44p65c4ue5i" path="res://Screens/Battle/map_types/SpawnPoint.tscn" id="12_tygpe"]
 [ext_resource type="Texture2D" uid="uid://d2p4nsytdvqb4" path="res://Screens/Battle/terrain_overlay.png" id="13_xmkmv"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/TerrainOverlay.gd" id="14_7ta1i"]
 [ext_resource type="Script" path="res://Screens/Battle/map_types/Cursor.gd" id="15_4oyyy"]
@@ -362,45 +361,45 @@ map_pos = Vector2(5, 1)
 y_sort_enabled = true
 script = ExtResource("7_ev8td")
 
-[node name="EnemySpawnPoint" parent="SpawnPoints" instance=ExtResource("11_skgeu")]
+[node name="EnemySpawnPoint" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(769.834, 597.975)
 map_pos = Vector2(4, 9)
-show_debug_tile = true
 
-[node name="EnemySpawnPoint2" parent="SpawnPoints" instance=ExtResource("11_skgeu")]
+[node name="EnemySpawnPoint2" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(1346.83, 486.614)
 map_pos = Vector2(8, 1)
-show_debug_tile = true
 
-[node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("11_skgeu")]
+[node name="EnemySpawnPoint3" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(1346.83, 653.655)
 map_pos = Vector2(11, 4)
-show_debug_tile = true
 
-[node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("11_skgeu")]
+[node name="EnemySpawnPoint4" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(769.834, 486.614)
 map_pos = Vector2(2, 7)
-show_debug_tile = true
 
 [node name="PlayerSpawnPoint" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(1202.58, 681.495)
 map_pos = Vector2(10, 6)
-show_debug_tile = true
 
 [node name="PlayerSpawnPoint2" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(1202.58, 570.135)
 map_pos = Vector2(8, 4)
-show_debug_tile = true
 
 [node name="PlayerSpawnPoint3" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(962.167, 542.294)
 map_pos = Vector2(5, 6)
-show_debug_tile = true
 
 [node name="PlayerSpawnPoint4" parent="SpawnPoints" instance=ExtResource("12_tygpe")]
+visibility_layer = 1
 position = Vector2(962.167, 653.655)
 map_pos = Vector2(7, 8)
-show_debug_tile = true
 
 [node name="PathingOverlay" type="TileMap" parent="." node_paths=PackedStringArray("world")]
 position = Vector2(1011.25, 208.212)
@@ -455,92 +454,66 @@ script = ExtResource("7_ev8td")
 [node name="Doodad1" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1539.17, 542.294)
 texture = ExtResource("19_yp40t")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(11, 0)
 
 [node name="Doodad2" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1010.25, 848.537)
 texture = ExtResource("20_ds322")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(11, 11)
 
 [node name="Doodad3" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(962.167, 820.697)
 texture = ExtResource("21_kj2h6")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(10, 11)
 
 [node name="Doodad4" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1491.08, 514.454)
 texture = ExtResource("22_5ppnu")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(10, 0)
 
 [node name="Doodad5" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1106.42, 625.815)
 texture = ExtResource("23_cp84d")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(8, 6)
 
 [node name="Doodad6" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1250.67, 486.614)
 texture = ExtResource("24_ya6a3")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(7, 2)
 
 [node name="Doodad8" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1010.25, 403.093)
 texture = ExtResource("26_hy2mq")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(3, 3)
 
 [node name="Doodad9" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(914.083, 458.774)
 texture = ExtResource("27_hr4gx")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(3, 5)
 
 [node name="Doodad7" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(914.083, 458.774)
 texture = ExtResource("25_mybha")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(3, 5)
 
 [node name="Doodad10" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(721.75, 458.774)
 texture = ExtResource("28_0vg3j")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(1, 7)
 
 [node name="Doodad11" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(577.501, 597.975)
 texture = ExtResource("29_hgulw")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(2, 11)
 
 [node name="Doodad12" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(1010.25, 291.733)
 texture = ExtResource("30_hp655")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(1, 1)
 
 [node name="Doodad13" parent="Entities" instance=ExtResource("18_la0vr")]
 position = Vector2(529.417, 570.135)
 texture = ExtResource("31_26xve")
-lock_to_world = true
-uniform_offset = false
 map_pos = Vector2(1, 11)
 
 [connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]

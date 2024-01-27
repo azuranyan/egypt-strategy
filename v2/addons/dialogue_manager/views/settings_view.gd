@@ -28,7 +28,7 @@ enum PathTarget {
 @onready var revert_balloon_button: Button = $Runtime/CustomBalloon/RevertBalloonPath
 @onready var load_balloon_button: Button = $Runtime/CustomBalloon/LoadBalloonPath
 @onready var states_title: Label = $Runtime/StatesTitle
-@onready var globals_list: Tree = $Runtime/GlobalsList
+@onready var globals_list: Tree = $Runtime/Game.List
 
 # Advanced
 @onready var open_in_external_editor_button: CheckBox = $Advanced/OpenInExternalEditorButton

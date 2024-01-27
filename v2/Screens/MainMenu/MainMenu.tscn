@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Screens/MainMenu/mainmenu.gd" id="1_7mdom"]
 [ext_resource type="FontFile" uid="uid://b1mr3ff8qpetx" path="res://Rakkas-Regular.ttf" id="2_j2fgj"]
-[ext_resource type="Texture2D" uid="uid://cpxbmr4bev2co" path="res://Map_wo_Separators_Color_Filters_Blank.png" id="2_m10p3"]
+[ext_resource type="Texture2D" uid="uid://cpxbmr4bev2co" path="res://Screens/MainMenu/Map_wo_Separators_Color_Filters_Blank.png" id="2_m10p3"]
 [ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="3_5pumf"]
 [ext_resource type="Script" path="res://Screens/MainMenu/SaveLoad.gd" id="5_glb18"]
 [ext_resource type="Theme" uid="uid://psiyd7sreioo" path="res://Screens/Dialogue/Theme.tres" id="6_dn453"]

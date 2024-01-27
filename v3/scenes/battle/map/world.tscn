@@ -17,7 +17,7 @@ texture = ExtResource("2_4ee3k")
 centered = false
 
 [node name="MapGrid" type="Node2D" parent="."]
-self_modulate = Color(0.651, 0.318, 0.067, 0.376)
+self_modulate = Color(0.65098, 0.317647, 0.0666667, 0.376471)
 position = Vector2(1011.46, 209.215)
 rotation = 0.524835
 scale = Vector2(0.81708, 0.81708)

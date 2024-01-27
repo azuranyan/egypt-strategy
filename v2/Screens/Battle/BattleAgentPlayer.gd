@@ -611,7 +611,7 @@ func _on_battle_cell_selected(cell: Vector2i):
 	# set ui elements
 	var show_portrait: bool = active_unit or unit != null
 	var show_actions: bool = not active_attack and active_unit and battle.is_owned(active_unit) and battle.can_attack(active_unit)
-	var show_undo_end: bool = battle.context.on_turn == Globals.empires["Lysandra"]
+	var show_undo_end: bool = battle.context.on_turn == Game.empires["Lysandra"]
 	
 	if show_portrait:
 		battle.update_portrait(unit if unit else active_unit)

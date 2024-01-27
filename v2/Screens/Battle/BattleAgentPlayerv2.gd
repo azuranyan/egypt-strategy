@@ -260,7 +260,7 @@ func interact_pass():
 
 
 func interact_cancel():
-	if _state == STATE_PREP:
+	if _agent_state == State.PREPARE_UNITS:
 		pop_undo_action() # TODO unify interact_cancel and pop to one function
 		return
 		

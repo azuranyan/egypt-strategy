@@ -39,8 +39,8 @@ func add_unit(unit: String):
 		return
 		
 	var cb := load("res://Screens/Battle/CharacterButton.tscn").instantiate() as CharacterButton
-	cb.portrait = Globals.unit_type[unit].chara.portrait
-	cb.display_name = Globals.unit_type[unit].name
+	cb.portrait = Game.unit_type[unit].chara.portrait
+	cb.display_name = Game.unit_type[unit].name
 	cb.set_meta("unit", unit)
 	
 	cb.selected.connect(func(pos: Vector2): _on_selected(cb, pos))

@@ -116,7 +116,7 @@ static func player_battle_result_message(is_attacker: bool, result: Result) -> S
 	
 	
 func _ready():
-	Globals.battle = self
+	Game.battle = self
 
 	if not Engine.is_editor_hint():
 		_test.call_deferred()
@@ -162,7 +162,7 @@ func _start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, 
 	
 	# start battle
 	battle_started.emit(attacker, defender, territory)
-	await Globals.play_queued_scenes()
+	await Game.play_queued_scenes()
 	
 	# do battle
 	var should_do_quick: bool = _do_quick if _do_quick != null else not (attacker.is_player_owned() or defender.is_player_owned())
@@ -174,7 +174,7 @@ func _start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, 
 		
 	# end battle
 	battle_ended.emit(battle_result)
-	await Globals.play_queued_scenes()
+	await Game.play_queued_scenes()
 	
 	
 ## Returns true if the attacker can initiate the attack to territory.
@@ -288,7 +288,7 @@ func check_for_turn_end(empire: Empire) -> bool:
 			
 			
 func _should_auto_end_turn(empire: Empire) -> bool:
-	if not Globals.prefs.auto_end_turn:
+	if not Game.prefs.auto_end_turn:
 		return false
 	for u in get_owned_units(empire):
 		if u.can_act():
@@ -618,8 +618,8 @@ func _quick_battle():
 
 func _real_battle():
 	print("Entering real battle.")
-	Globals.push_screen(self)
-	await Globals.screen_ready
+	Game.push_screen(self)
+	await Game.screen_ready
 	
 	create_agent(attacker)
 	create_agent(defender)
@@ -632,7 +632,7 @@ func _real_battle():
 	# ai preparation is done before transition
 	on_turn = ai
 	await get_agent(ai).prepare_units()
-	await Globals.transition_finished
+	await Game.transition_finished
 	
 	on_turn = player
 	await get_agent(player).prepare_units()
@@ -653,8 +653,8 @@ func _real_battle():
 	# post-battle setup
 	delete_agent(get_agent(attacker))
 	delete_agent(get_agent(defender))
-	Globals.pop_screen()
-	await Globals.transition_finished
+	Game.pop_screen()
+	await Game.transition_finished
 	_unload_map()
 
 
@@ -704,7 +704,7 @@ func _do_battle():
 	while not should_end:
 		print("Turn '%s'" % turns)
 		turn_cycle_started.emit()
-		await Globals.play_queued_scenes()
+		await Game.play_queued_scenes()
 		
 		for empire in [attacker, defender]:
 			print("On turn ", empire)
@@ -726,13 +726,13 @@ func _do_battle():
 			set_camera_follow(cursor)
 			
 			empire_turn_started.emit()
-			await Globals.play_queued_scenes()
+			await Game.play_queued_scenes()
 			
 			if not check_for_turn_end(empire):
 				await get_agent(empire).do_turn()
 			
 			empire_turn_ended.emit()
-			await Globals.play_queued_scenes()
+			await Game.play_queued_scenes()
 			
 			# post-turn
 			for u in get_owned_units(empire):
@@ -745,7 +745,7 @@ func _do_battle():
 			await wait_for_death_animations()
 				
 		turn_cycle_ended.emit()
-		await Globals.play_queued_scenes()
+		await Game.play_queued_scenes()
 		
 		turns += 1
 	

@@ -105,7 +105,7 @@ func get_agent(unit: Unit) -> Agent:
 		match unit.behavior:
 			## Always advances towards nearest target and attacks.
 			Unit.Behavior.NormalMelee:
-				agents[unit] = NormalMeleeAgent.new(Globals.battle, unit)
+				agents[unit] = NormalMeleeAgent.new(Game.battle, unit)
 				
 			## Always attacks nearest target, flees adjacent attackers.
 			Unit.Behavior.NormalRanged:
