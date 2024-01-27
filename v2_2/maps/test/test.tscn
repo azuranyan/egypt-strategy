@@ -1,0 +1,35 @@
+[gd_scene load_steps=7 format=3 uid="uid://tswv0jrmndgy"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_fyf4x"]
+[ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_1pxfs"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="3_qtici"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_object.gd" id="4_ntffg"]
+[ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="5_hmgmv"]
+[ext_resource type="Texture2D" uid="uid://dap4jyfjlxnbe" path="res://scenes/battle/data/detector.png" id="6_uma0q"]
+
+[node name="Test" type="Node2D" node_paths=PackedStringArray("world")]
+y_sort_enabled = true
+script = ExtResource("1_fyf4x")
+world = NodePath("World")
+
+[node name="World" parent="." instance=ExtResource("2_1pxfs")]
+
+[node name="MapObjectContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("3_qtici")
+
+[node name="MapObject" type="Node2D" parent="MapObjectContainer"]
+script = ExtResource("4_ntffg")
+map_position = Vector2(4, 2)
+
+[node name="Transformable" type="Node2D" parent="MapObjectContainer" node_paths=PackedStringArray("world")]
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.434074, 0.434074)
+skew = 0.521126
+script = ExtResource("5_hmgmv")
+world = NodePath("../../World")
+transform_flags = 7
+
+[node name="Detector" type="Sprite2D" parent="MapObjectContainer/Transformable"]
+texture = ExtResource("6_uma0q")
