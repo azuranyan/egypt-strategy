@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgiub7m8fawlq"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit.gd" id="1_glms6"]
+[ext_resource type="Script" path="res://scenes/battle/pathable_component.gd" id="2_qksjx"]
+
+[node name="Unit" type="Node2D"]
+script = ExtResource("1_glms6")
+metadata/pathable_component = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":ExtResource("2_qksjx"),"pathing_group":0,"conditions":Array[Resource("res://scenes/battle/pathing_condition.gd")]([]),"enabled":true,"map_object":null)
+
+
+[node name="Node" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("2_qksjx")
+map_object = NodePath("..")
