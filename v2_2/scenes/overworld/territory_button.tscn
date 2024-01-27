@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://vo0h66hnj2jc"]
+
+[ext_resource type="Script" path="res://scenes/overworld/territory_button.gd" id="1_0gogs"]
+
+[sub_resource type="Gradient" id="Gradient_kukut"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_klesb"]
+gradient = SubResource("Gradient_kukut")
+
+[node name="TerritoryButton" type="Node2D"]
+script = ExtResource("1_0gogs")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_klesb")

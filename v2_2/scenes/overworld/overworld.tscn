@@ -1,0 +1,62 @@
+[gd_scene load_steps=9 format=3 uid="uid://dw0pqub4o2o82"]
+
+[ext_resource type="Script" path="res://scenes/overworld/overworld.gd" id="1_cx0e7"]
+[ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_27pdc"]
+[ext_resource type="PackedScene" uid="uid://vo0h66hnj2jc" path="res://scenes/overworld/territory_button.tscn" id="2_gak2j"]
+[ext_resource type="Script" path="res://scenes/overworld/empire.gd" id="3_vu5m3"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="4_dd4no"]
+[ext_resource type="Script" path="res://scenes/overworld/territory.gd" id="6_q5swp"]
+
+[sub_resource type="Resource" id="Resource_noi3l"]
+script = ExtResource("4_dd4no")
+name = "Lysandra Placeholder"
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Resource" id="Resource_td17e"]
+script = ExtResource("4_dd4no")
+name = "Sitri placeholder"
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0, 0, 1)
+
+[node name="Overworld" type="CanvasLayer"]
+script = ExtResource("1_cx0e7")
+
+[node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+scale = Vector2(0.96, 0.940767)
+texture = ExtResource("2_27pdc")
+
+[node name="Empires" type="Node" parent="."]
+
+[node name="Player" type="Node" parent="Empires" node_paths=PackedStringArray("territories", "home_territory")]
+script = ExtResource("3_vu5m3")
+leader = SubResource("Resource_noi3l")
+territories = [NodePath("../../TerritoryButton/Territory")]
+home_territory = NodePath("../../TerritoryButton/Territory")
+metadata/player_owned = true
+
+[node name="Sitri" type="Node" parent="Empires" node_paths=PackedStringArray("territories", "home_territory")]
+script = ExtResource("3_vu5m3")
+leader = SubResource("Resource_td17e")
+territories = [NodePath("../../TerritoryButton2/Territory")]
+home_territory = NodePath("../../TerritoryButton2/Territory")
+metadata/boss = true
+
+[node name="TerritoryButton" parent="." instance=ExtResource("2_gak2j")]
+position = Vector2(1475, 801)
+
+[node name="Territory" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("empire")]
+script = ExtResource("6_q5swp")
+empire = NodePath("../../Empires/Player")
+
+[node name="TerritoryButton2" parent="." instance=ExtResource("2_gak2j")]
+position = Vector2(273, 201)
+
+[node name="Territory" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("empire")]
+script = ExtResource("6_q5swp")
+empire = NodePath("../../Empires/Sitri")

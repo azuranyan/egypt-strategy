@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://w7hhmqts5i7o"]
+
+[ext_resource type="Script" path="res://scenes/overworld/territory.gd" id="1_h10pe"]
+[ext_resource type="Script" path="res://scenes/overworld/empire.gd" id="2_05kkr"]
+[ext_resource type="Resource" uid="uid://dbi41kshumras" path="res://scenes/battle/unit/data/placeholder_character_info.tres" id="3_nf2ia"]
+
+[node name="NullTerritory" type="Node" node_paths=PackedStringArray("empire")]
+script = ExtResource("1_h10pe")
+empire = NodePath("Empire")
+
+[node name="Empire" type="Node" parent="." node_paths=PackedStringArray("territories", "home_territory")]
+script = ExtResource("2_05kkr")
+leader = ExtResource("3_nf2ia")
+territories = [NodePath("")]
+home_territory = NodePath("..")
