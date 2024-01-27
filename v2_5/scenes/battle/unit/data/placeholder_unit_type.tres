@@ -1,0 +1,83 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=12 format=3 uid="uid://jf5at64m12vv"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_jptlc"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/debug_print_effect.gd" id="1_ru6wp"]
+[ext_resource type="SpriteFrames" uid="uid://bbqk160npdimw" path="res://scenes/battle/unit/data/placeholder_sprite_frames.tres" id="2_8f4dp"]
+[ext_resource type="Script" path="res://scenes/battle/unit/attack.gd" id="2_qq6b2"]
+[ext_resource type="Texture2D" uid="uid://c4p0uvei3haxj" path="res://scenes/battle/unit/data/placeholder.webp" id="3_gshgk"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="4_a87rq"]
+
+[sub_resource type="Resource" id="Resource_or3ir"]
+script = ExtResource("1_ru6wp")
+format = ""
+
+[sub_resource type="Resource" id="Resource_8arh3"]
+script = ExtResource("2_qq6b2")
+name = "Placeholder"
+description = "Placeholder basic"
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([SubResource("Resource_or3ir")])
+ally_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0
+
+[sub_resource type="Resource" id="Resource_lvtgr"]
+script = ExtResource("4_a87rq")
+name = "Placeholder"
+gender = "F"
+avatar = "Placeholder"
+title = "Placeholder"
+map_color = Color(0, 1, 0, 1)
+portrait = ExtResource("3_gshgk")
+
+[sub_resource type="Resource" id="Resource_lxqmk"]
+script = ExtResource("1_ru6wp")
+format = ""
+
+[sub_resource type="Resource" id="Resource_5yhbi"]
+script = ExtResource("2_qq6b2")
+name = "Placeholder"
+description = "Placeholder special"
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([SubResource("Resource_lxqmk")])
+ally_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0
+
+[resource]
+script = ExtResource("1_jptlc")
+character_info = SubResource("Resource_lvtgr")
+sprite_frames = ExtResource("2_8f4dp")
+behavior = 1
+stats = {
+"dmg": 2,
+"maxhp": 5,
+"mov": 3,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 1,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 1,
+"mov": 0,
+"rng": 0
+}
+basic_attack = SubResource("Resource_8arh3")
+special_attack = SubResource("Resource_5yhbi")

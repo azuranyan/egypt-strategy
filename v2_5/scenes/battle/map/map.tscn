@@ -1,6 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://biywp36yd8p3n"]
+[gd_scene load_steps=4 format=3 uid="uid://biywp36yd8p3n"]
 
 [ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_t0m4i"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit.gd" id="2_gsa62"]
+[ext_resource type="PackedScene" uid="uid://bwl3c6bkwwod8" path="res://scenes/battle/map/world.tscn" id="3_rrv1r"]
 
-[node name="Map" type="Node2D"]
+[node name="Map" type="Node2D" node_paths=PackedStringArray("world", "evaluators")]
+y_sort_enabled = true
 script = ExtResource("1_t0m4i")
+world = NodePath("World")
+evaluators = []
+
+[node name="World" parent="." instance=ExtResource("3_rrv1r")]
+
+[node name="Unit" type="Node2D" parent="."]
+script = ExtResource("2_gsa62")

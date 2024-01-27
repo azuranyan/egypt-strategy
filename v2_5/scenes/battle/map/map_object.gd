@@ -17,8 +17,6 @@ const TILE_COLORS := {
 	Map.PathingGroup.IMPASSABLE: Color(1, 0, 0, 0.3),
 }
 
-@export var type: String
-
 @export var map_position: Vector2 = Map.OUT_OF_BOUNDS:
 	set(value):
 		map_position = value

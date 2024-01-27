@@ -54,10 +54,10 @@ const OUT_OF_BOUNDS := Vector2(69, 69)
 
 @export var triggers: Array[Trigger]
 
-@export var evaluators: Array[BattleResultEvaluator] = [ConquerEvaluator.new()]
+@export var evaluators: Array[BattleResultEvaluator] = [DefaultEvaluator.new()]
 
 var world_sprite: Sprite2D
-var grid: MapGrid
+
 var world_transform: Transform2D
 var uniform_transform: Transform2D
 
@@ -162,12 +162,3 @@ func _remove_object(obj: MapObject):
 	obj.remove_from_group("MapObjects")
 	obj._world_changed(null)
 	object_removed.emit(obj)
-
-
-func _unhandled_input(event):
-	if event is InputEventKey and event.keycode == KEY_A and event.pressed:
-		var unit := $Unit as Unit
-		unit.set_stat('hp', $Unit.state.stats.hp - 1)
-	if event is InputEventKey and event.keycode == KEY_D and event.pressed:
-		var unit := $Unit as Unit
-		unit.set_stat('hp', $Unit.state.stats.hp + 1)
