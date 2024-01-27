@@ -40,7 +40,7 @@ func _remove_object(node: Node):
 	
 	
 func _get_configuration_warnings() -> PackedStringArray:
-	if not (get_parent() is Map or get_parent() is MapObjectContainer):
+	if not get_parent().has_method("_is_map_object_container"):
 		return ['not assigned to Map or MapObjectContainer']
 	return []
 			
