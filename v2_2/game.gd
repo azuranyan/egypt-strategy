@@ -10,8 +10,49 @@ var test_individual_scenes := true
 
 
 var overworld: Overworld
-var empires: Array[Empire]
-var territories: Array[Territory]
+
+
+#region Overworld API
+func get_all_empires() -> Array[Empire]:
+	return overworld.get_all_empires()
+	
+	
+func get_empires(include_defeated := false) -> Array[Empire]:
+	return overworld.get_empires(include_defeated)
+	
+	
+func get_defeated_empires() -> Array[Empire]:
+	return overworld.get_defeated_empires()
+	
+	
+func get_empire_by_id(id: int) -> Empire:
+	return overworld.get_empire_by_id(id)
+	
+
+func get_empire_by_leader(leader_name: String) -> Empire:
+	return overworld.get_empire_by_leader(leader_name)
+	
+
+func player_empire() -> Empire:
+	return overworld.player_empire()
+	
+	
+func boss_empire() -> Empire:
+	return overworld.boss_empire()
+	
+	
+func get_territories() -> Array[Territory]:
+	return overworld.get_territories()
+	
+	
+func get_territory_by_id(id: int) -> Territory:
+	return overworld.get_territory_by_id(id)
+	
+	
+func get_territory_by_name(territory_name: String) -> Territory:
+	return overworld.get_territory_by_name(territory_name)
+#endregion Overworld API
+
 
 
 ## Returns the viewport size.
@@ -41,7 +82,6 @@ func create_new_state() -> State:
 	print('[Game] Creating new save.')
 	var state := State.new()
 	state.overworld = OVERWORLD_SCENE
-	# TODO
 	return state
 	
 	
@@ -51,7 +91,6 @@ func save_state() -> State:
 	var state := State.new()
 	state.overworld = PackedScene.new()
 	state.overworld.pack(overworld)
-	# TODO
 	return state
 	
 	
@@ -62,9 +101,6 @@ func load_state(state: State):
 		overworld.queue_free()
 	overworld = state.overworld.instantiate()
 	add_child(overworld)
-	empires = overworld.empires
-	territories = overworld.territories
-	# TODO
 	
 	
 class State extends Resource:

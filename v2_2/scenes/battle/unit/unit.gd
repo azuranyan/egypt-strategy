@@ -68,10 +68,110 @@ enum Behavior {
 @export var heading: Map.Heading
 @export var owner_name: String
 
-var _state: UnitState
+var _state: UnitState:
+	set(value):
+		_state = value
+		if not is_node_ready():
+			await ready
+		# TOD
+
 
 func _to_string() -> String:
 	return display_name
 	
 	
+func _update_position():
+	super._update_position()
+	if _state:
+		_state.map_position = map_position
+	
+	
+func get_state() -> UnitState:
+	return _state
+	
+	
+func load_from_map():
+	var empire := Game.get_empire_by_leader(owner_name)
+	_state = UnitState.new(unit_type, {
+		display_name = self.display_name,
+		display_icon = self.display_icon,
+		heading = self.heading,
+		owner_id = empire.id if empire else -1,
+	})
+	
 
+#region UnitState functions
+## Returns true if special is unlocked.
+func is_special_unlocked() -> bool:
+	return _state.is_special_unlocked()
+	
+	
+## Returns true if this unit is player owned.
+func is_player_owned() -> bool:
+	return _state.is_player_owned()
+	
+
+## Returns true if the other unit is an ally.
+func is_ally(other: Unit) -> bool:
+	return _state.is_ally(other.state)
+	
+
+## Returns true if the other unit is an enemy.
+func is_enemy(other: Unit) -> bool:
+	return _state.is_enemy(other.state)
+
+	
+## Returns true if this unit can move.
+func can_move() -> bool:
+	return _state.can_move()
+
+	
+## Returns true if this unit can attack.
+func can_attack() -> bool:
+	return _state.can_attack()
+
+
+## Returns true if this unit can act.
+func can_act() -> bool:
+	return _state.can_act()
+
+
+## Returns true if this unit has taken any actions.
+func has_taken_action() -> bool:
+	return _state.has_taken_action()
+
+
+## Returns true if alive.
+func is_alive() -> bool:
+	return _state.is_alive()
+
+
+## Returns true if dead.
+func is_dead() -> bool:
+	return _state.is_dead()
+
+
+## Returns true if unit is on standby.
+func is_standby() -> bool:
+	return _state.is_standby()
+
+
+## Returns the path to reach target cell.
+func pathfind_cell(context: BattleContext, target: Vector2) -> PackedVector2Array:
+	return _state.pathfind_cell(context, target)
+	
+	
+## Returns an array of cells this unit can path through.
+func get_pathable_cells(context: BattleContext, use_mov_stat := false) -> PackedVector2Array:
+	return _state.get_pathable_cells(context, use_mov_stat)
+
+
+## Returns true if cell is pathable.
+func is_pathable(context: BattleContext, which_cell: Vector2) -> bool:
+	return _state.is_pathable(context, which_cell)
+
+
+## Returns true if cell is placeable.
+func is_placeable(context: BattleContext, which_cell: Vector2) -> bool:
+	return _state.is_placeable(context, which_cell)
+#endregion UnitState functions

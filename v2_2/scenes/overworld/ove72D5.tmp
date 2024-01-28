@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=14 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld.gd" id="1_cx0e7"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_27pdc"]
@@ -27,26 +27,7 @@ avatar = ""
 title = ""
 map_color = Color(0, 0, 0, 1)
 
-[sub_resource type="Resource" id="Resource_xxoyi"]
-resource_local_to_scene = true
-script = ExtResource("4_dd4no")
-name = "Tali placeholder"
-gender = "F"
-avatar = ""
-title = ""
-map_color = Color(0, 0, 0, 1)
-
-[sub_resource type="Resource" id="Resource_ueq3h"]
-resource_local_to_scene = true
-script = ExtResource("4_dd4no")
-name = "Maia Placeholder"
-gender = "F"
-avatar = ""
-title = ""
-map_color = Color(0, 0, 0, 1)
-
 [sub_resource type="Resource" id="Resource_uavj6"]
-resource_local_to_scene = true
 script = ExtResource("4_dd4no")
 name = "Zahra placeholder"
 gender = "F"
@@ -92,11 +73,11 @@ metadata/boss = true
 
 [node name="Tali" type="Node" parent="SpareEmpireSelection"]
 script = ExtResource("3_vu5m3")
-leader = SubResource("Resource_xxoyi")
+leader = SubResource("Resource_uavj6")
 
 [node name="Maia" type="Node" parent="SpareEmpireSelection"]
 script = ExtResource("3_vu5m3")
-leader = SubResource("Resource_ueq3h")
+leader = SubResource("Resource_uavj6")
 
 [node name="Zahra" type="Node" parent="SpareEmpireSelection"]
 script = ExtResource("3_vu5m3")

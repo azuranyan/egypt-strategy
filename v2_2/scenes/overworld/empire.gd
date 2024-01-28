@@ -9,8 +9,8 @@ extends Node
 @export var aggression: float
 @export var hp_multiplier: float = 1
 @export var home_territory: Territory
-
-var id: int
+@export var defeated: bool
+@export var id: int
 
 
 ## Returns true if empire is player owned.
@@ -46,6 +46,14 @@ func is_adjacent_territory(territory: Territory) -> bool:
 	return false
 
 
-## Returns true if the empire is beaten.
-func is_beaten() -> bool:
+## Returns true if the empire is is_defeated.
+func is_defeated() -> bool:
 	return territories.is_empty()
+
+
+## Returns the entries of empire.
+func get_unit_entries() -> Array[UnitTypeEntry]:
+	var arr: Array[UnitTypeEntry] = []
+	for t in territories:
+		arr.append_array(t.units)
+	return arr

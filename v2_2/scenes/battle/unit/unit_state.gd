@@ -73,7 +73,7 @@ extends Resource
 ## Initializer
 func _init(_unit_type: UnitType = null, prop := {}):
 	if not _unit_type:
-		_unit_type = preload("res://scenes/battle/unit/data/placeholder_unit_type.tres")
+		_unit_type = UnitType.PLACEHOLDER
 
 	unit_type = _unit_type
 	display_name = prop.get('display_name', unit_type.character_info.name)
@@ -124,8 +124,8 @@ func is_player_owned() -> bool:
 	
 ## Returns the empire this unit belongs to.
 func get_empire() -> Empire:
-	assert(empire_id >= 0 and empire_id < Game.empires.size())
-	return Game.empires[empire_id]
+	assert(empire_id >= -1 and empire_id < Game.empires.size())
+	return Game.empires[empire_id] if empire_id != -1 else null
 
 
 ## Returns true if the other unit is an ally.

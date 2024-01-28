@@ -35,3 +35,5 @@ extends Resource
 @export var special_attack: Attack
 
 
+func _to_string() -> String:
+	return '<UnitType#%s>' % self.get_instance_id()
