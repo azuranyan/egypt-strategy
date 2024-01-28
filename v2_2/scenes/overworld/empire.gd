@@ -46,6 +46,15 @@ func is_adjacent_territory(territory: Territory) -> bool:
 	return false
 
 
+## Returns a new array of adjacent territories.
+func get_adjacent() -> Array[Territory]:
+	var re: Array[Territory] = []
+	for t in Game.get_territories():
+		if (t not in re) and is_adjacent_territory(t):
+			re.append(t)
+	return re
+
+
 ## Returns true if the empire is is_defeated.
 func is_defeated() -> bool:
 	return territories.is_empty()

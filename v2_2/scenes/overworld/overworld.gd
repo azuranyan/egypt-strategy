@@ -25,7 +25,7 @@ enum State {
 @export var turn_done: bool
 @export var turn_index: int
 @export var state := State.CYCLE_START
-
+@export var action_history: Array[Resource]
 
 var _is_running: bool
 var _should_end: bool
@@ -234,7 +234,6 @@ func _cont_cycle_start():
 	
 func _cont_turn_start():
 	state = State.TURN_START
-	
 	# allow for interruption and shutdown
 	Game.overworld_turn_started.emit(on_turn())
 	await Game.wait_for_resume()
@@ -243,8 +242,10 @@ func _cont_turn_start():
 	
 func _cont_turn_do():
 	state = State.TURN_ONGOING
-	await get_tree().create_timer(2).timeout
-	# TODO
+	var timer := get_tree().create_timer(1)
+	await do_turn(on_turn())
+	if timer.time_left > 0:
+		await timer.timeout
 	return next_continuation(State.TURN_END)
 	
 	
@@ -284,14 +285,97 @@ func _cont_cycle_end():
 	return next_continuation(State.CYCLE_START)
 
 
+signal _turn_finished
+signal _player_choose_action
 
+
+class EmpireAction extends Resource:
+	var empire: Empire
+	var description: String
+	var cycle: int
+	var turn_index: int
+	
+	func _init(_empire: Empire, _description: String):
+		empire = _empire
+		description = _description
+		cycle = Game.overworld.cycle_count
+		turn_index = Game.overworld.turn_index
+		
+	func _to_string() -> String:
+		return '<[%s:%s] id=%s leader="%s" action="%s">' % [cycle, turn_index, empire.id, empire.leader_name(), description]
+	
+	
+class AttackAction extends EmpireAction:
+	var target_empire: Empire
+	var target: Territory
+	var map_id: int
+	
+	func _init(_empire: Empire, _target_empire: Empire, _target: Territory, _map_id := 0):
+		super(_empire, 'Attack')
+		target_empire = _target_empire
+		target = _target
+		map_id = _map_id
+	
+	
+class RestAction extends EmpireAction:
+	
+	func _init(_empire: Empire):
+		super(_empire, 'Rest')
+		
+	
+class TrainingAction extends EmpireAction:
+	
+	func _init(_empire: Empire):
+		super(_empire, 'Train')
+	
+	
+func do_turn(empire: Empire):
+	var action: Variant = await get_action(empire)
+	print(action)
+	action_history.append(action)
+	if action is RestAction:
+		if empire.is_player_owned():
+			print("%s rests. HP recovered." % empire.leader_name())
+		else:
+			print("%s rests. HP recovered. Aggression %.2f" % [empire.leader_name(), empire.aggression])
+		empire.hp_multiplier = 1.0
+	elif action is TrainingAction:
+		print('%s trains units (TODO does nothing)' % empire.leader_name())
+	elif action is AttackAction:
+		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
+
+
+func get_action(empire: Empire) -> Variant:
+	if empire.is_player_owned():
+		return await _player_choose_action
+	else:
+		# if hurt, rest
+		if empire.hp_multiplier < 0.8:
+			return RestAction.new(empire)
+			
+		# increase aggression
+		empire.aggression += empire.base_aggression + randf()
+		
+		if empire.aggression >= 1:
+			empire.aggression = 0
+			var adjacent := empire.get_adjacent()
+			
+			# basic sanity check
+			if adjacent.is_empty():
+				push_warning('empire "%s" has no adjacent territories' % empire.leader_name())
+				return RestAction.new(empire)
+			
+			# attack
+			var target: Territory = adjacent.pick_random()
+			return AttackAction.new(empire, target.empire, target, 0)
+		
+		# rest
+		return RestAction.new(empire)
+		
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept"):
-		stop_overworld_cycle()
-		await Game.overworld_ended
-		var _state := Game.save_state()
-		var err := _state.save_to_file('user://save_file2.tres')
-		if err != Error.OK:
-			print('save failed! err: %s' % err)
+		_player_choose_action.emit(RestAction.new(on_turn()))
 	
+	if event is InputEventKey and event.pressed and event.keycode == KEY_S:
+		Game.save_state().save_to_file('user://save_file3.tres')

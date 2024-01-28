@@ -23,14 +23,15 @@ var test_individual_scenes := true
 
 
 var overworld: Overworld
+var save_locked: bool
 var suspended: bool
 
 
 func _ready():
 	if OS.is_debug_build():
 		print("[Game] Loading default overworld (debug).")
-		overworld = OVERWORLD_SCENE.instantiate()
-		add_child(overworld)
+		#overworld = OVERWORLD_SCENE.instantiate()
+		#add_child(overworld)
 
 
 #region Overworld API
@@ -109,7 +110,7 @@ func start_game(args := {}):
 	
 func _main(_args := {}):
 	#var state := create_new_state()
-	var state := SaveState.load_from_file('user://save_file2.tres')
+	var state := SaveState.load_from_file('user://save_file3.tres')
 	load_state(state)
 	await overworld.start_overworld_cycle()
 

@@ -3,6 +3,7 @@ extends Resource
 
 
 @export var overworld: PackedScene
+@export var locked: bool
 
 
 static func load_from_file(path: String) -> SaveState:

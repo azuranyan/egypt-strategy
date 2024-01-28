@@ -111,8 +111,9 @@ leader = SubResource("Resource_uavj6")
 [node name="TerritoryButton" parent="." instance=ExtResource("2_gak2j")]
 position = Vector2(1475, 801)
 
-[node name="Player" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("empire")]
+[node name="Player" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("adjacent", "empire")]
 script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton3/Random"), NodePath("../../TerritoryButton4/Random")]
 empire = NodePath("../../Empires/Player")
 units = Array[ExtResource("7_cj6qd")]([SubResource("Resource_ydvbq"), SubResource("Resource_t141g")])
 
@@ -121,17 +122,19 @@ position = Vector2(273, 201)
 
 [node name="Boss" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent", "empire")]
 script = ExtResource("6_q5swp")
-adjacent = [null]
+adjacent = [NodePath("../../TerritoryButton3/Random"), NodePath("../../TerritoryButton4/Random")]
 empire = NodePath("../../Empires/Sitri")
 
 [node name="TerritoryButton3" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(273, 201)
+position = Vector2(467, 638)
 
-[node name="Random" type="Node" parent="TerritoryButton3"]
+[node name="Random" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton4/Random")]
 
 [node name="TerritoryButton4" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(273, 201)
+position = Vector2(826, 212)
 
-[node name="Random" type="Node" parent="TerritoryButton4"]
+[node name="Random" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random")]
