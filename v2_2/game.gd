@@ -108,28 +108,29 @@ func start_game(args := {}):
 	
 	
 func _main(_args := {}):
-	var state := create_new_state()
+	#var state := create_new_state()
+	var state := SaveState.load_from_file('user://save_file2.tres')
 	load_state(state)
 	await overworld.start_overworld_cycle()
 
 
-func create_new_state() -> State:
+func create_new_state() -> SaveState:
 	print('[Game] Creating new save.')
-	var state := State.new()
+	var state := SaveState.new()
 	state.overworld = OVERWORLD_SCENE
 	return state
 	
 	
-func save_state() -> State:
+func save_state() -> SaveState:
 	print('[Game] Saving...')
 	assert(is_instance_valid(overworld), 'tried to save without a valid Overworld!')
-	var state := State.new()
+	var state := SaveState.new()
 	state.overworld = PackedScene.new()
 	state.overworld.pack(overworld)
 	return state
 	
 	
-func load_state(state: State):
+func load_state(state: SaveState):
 	print('[Game] Loading...')
 	if is_instance_valid(overworld):
 		remove_child(overworld)
@@ -137,6 +138,3 @@ func load_state(state: State):
 	overworld = state.overworld.instantiate()
 	add_child(overworld)
 	
-	
-class State extends Resource:
-	@export var overworld: PackedScene

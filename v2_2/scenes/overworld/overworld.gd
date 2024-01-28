@@ -127,6 +127,7 @@ func _init_distribute_empires():
 		territory.empire = empire
 		
 	
+#region Basic API
 func get_all_empires() -> Array[Empire]:
 	return get_empires(true)
 	
@@ -177,14 +178,11 @@ func get_territory_by_name(territory_name: String) -> Territory:
 		if t.territory_name == territory_name:
 			return t
 	return null
+#endregion Basic API
 	
 	
 func on_turn() -> Empire:
 	return _active_empires[turn_index]
-	
-	
-func is_cycle_finished() -> bool:
-	return turn_index >= _active_empires.size()
 	
 	
 func stop_overworld_cycle():
@@ -198,6 +196,7 @@ func start_overworld_cycle():
 	_is_running = true
 	_should_end = false
 	
+	Game.overworld_started.emit()
 	# trampoline
 	var cont = get_continuation(state)
 	while not _should_end:
@@ -205,6 +204,7 @@ func start_overworld_cycle():
 		cont = await cont.call()
 		
 	_is_running = false
+	Game.overworld_ended.emit()
 	
 
 func get_continuation(st: State):
@@ -243,27 +243,28 @@ func _cont_turn_start():
 	
 func _cont_turn_do():
 	state = State.TURN_ONGOING
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(2).timeout
 	# TODO
 	return next_continuation(State.TURN_END)
 	
 	
 func _cont_turn_end():
 	state = State.TURN_END
-	var end_cycle := false
+	var old_turn := on_turn()
+	var end_turn_cycle := false
 	while true:
 		turn_index += 1
 		if turn_index >= _active_empires.size():
 			turn_index = 0
-			end_cycle = true
+			end_turn_cycle = true
 			break
 		if _active_empires[turn_index] not in _defeated_empires:
 			break
 			
 	# allow for interruption and shutdown
-	Game.overworld_turn_ended.emit(on_turn())
+	Game.overworld_turn_ended.emit(old_turn)
 	await Game.wait_for_resume()
-	if end_cycle:
+	if end_turn_cycle:
 		return next_continuation(State.CYCLE_END)
 	else:
 		return next_continuation(State.TURN_START)
@@ -277,13 +278,20 @@ func _cont_cycle_end():
 		if defeated in _active_empires:
 			_active_empires.erase(defeated)
 	cycle_count += 1
-	
 	# allow for interruption and shutdown
 	Game.overworld_cycle_ended.emit(cycle_count)
 	await Game.wait_for_resume()
 	return next_continuation(State.CYCLE_START)
 
 
+
+
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept"):
 		stop_overworld_cycle()
+		await Game.overworld_ended
+		var _state := Game.save_state()
+		var err := _state.save_to_file('user://save_file2.tres')
+		if err != Error.OK:
+			print('save failed! err: %s' % err)
+	
