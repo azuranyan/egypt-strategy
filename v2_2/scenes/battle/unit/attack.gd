@@ -59,8 +59,8 @@ func is_multicast() -> bool:
 	
 ## Returns the cells in range.
 func get_cells_in_range(origin: Vector2, unit_range: int) -> PackedVector2Array:
-	var range := max_range if max_range != -1 else unit_range
-	return Util.flood_fill(origin, range, Util.bounds(Vector2(12, 12)))
+	var _range := max_range if max_range != -1 else unit_range
+	return Util.flood_fill(origin, _range, Util.bounds(Vector2(12, 12)))
 
 
 ## Returns an array of cells in the target aoe.

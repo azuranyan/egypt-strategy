@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://dxi1gfo7ucwfk"]
+[gd_scene load_steps=3 format=3 uid="uid://dxi1gfo7ucwfk"]
 
 [ext_resource type="Script" path="res://bootstrap.gd" id="1_ooyf5"]
+[ext_resource type="Script" path="res://game_printer.gd" id="2_7gvge"]
 
 [node name="Bootstrap" type="Node2D"]
 script = ExtResource("1_ooyf5")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("2_7gvge")

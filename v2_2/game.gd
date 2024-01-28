@@ -1,8 +1,21 @@
 @tool
 extends Node
 
+# signals sent here can be interrupted so should be waited with wait_for_resume
+
 signal game_started
 signal game_ended
+
+signal overworld_started
+signal overworld_ended
+
+signal overworld_cycle_started(cycle: int)
+signal overworld_cycle_ended(cycle: int)
+
+signal overworld_turn_started(empire: Empire)
+signal overworld_turn_ended(empire: Empire)
+
+signal resumed
 
 
 const OVERWORLD_SCENE := preload("res://scenes/overworld/overworld.tscn")
@@ -10,6 +23,14 @@ var test_individual_scenes := true
 
 
 var overworld: Overworld
+var suspended: bool
+
+
+func _ready():
+	if OS.is_debug_build():
+		print("[Game] Loading default overworld (debug).")
+		overworld = OVERWORLD_SCENE.instantiate()
+		add_child(overworld)
 
 
 #region Overworld API
@@ -54,7 +75,6 @@ func get_territory_by_name(territory_name: String) -> Territory:
 #endregion Overworld API
 
 
-
 ## Returns the viewport size.
 func get_viewport_size() -> Vector2:
 	# TODO get_viewport().size doesn't work, even with stretch mode set to
@@ -64,18 +84,33 @@ func get_viewport_size() -> Vector2:
 	return Vector2(1920, 1080)
 	
 	
+func suspend():
+	suspended = true
+	
+	
+func resume():
+	if suspended:
+		suspended = false
+		resumed.emit()
+	
+	
+func wait_for_resume():
+	if suspended:
+		await resumed
+	
+	
 func start_game(args := {}):
 	test_individual_scenes = false
 	game_started.emit()
-	_main(args)
+	await _main(args)
 	game_ended.emit()
+	get_tree().quit()
 	
 	
 func _main(_args := {}):
 	var state := create_new_state()
 	load_state(state)
-	state = save_state()
-	load_state(state)
+	await overworld.start_overworld_cycle()
 
 
 func create_new_state() -> State:

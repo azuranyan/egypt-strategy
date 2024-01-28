@@ -1,0 +1,16 @@
+extends Node
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	Game.game_started.connect(func(): print('Game started!'))
+	Game.game_ended.connect(func(): print('Game ended!'))
+	
+	Game.overworld_started.connect(func(): print('Game started!'))
+	Game.overworld_ended.connect(func(): print('Game ended!'))
+	
+	Game.overworld_cycle_started.connect(func(count): print('Cycle %s' % count))
+	Game.overworld_cycle_ended.connect(func(count): print('Cycle %s' % count))
+	
+	Game.overworld_turn_started.connect(func(empire): print('%s turn started' % empire.leader_name()))
+	Game.overworld_turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_name()))

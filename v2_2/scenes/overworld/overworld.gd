@@ -2,7 +2,16 @@ class_name Overworld
 extends CanvasLayer
 
 
-@export_subgroup("Internal")
+enum State {
+	CYCLE_START,
+	TURN_START,
+	TURN_ONGOING,
+	TURN_END,
+	CYCLE_END,
+}
+
+@export_group("Internal")
+@export_subgroup("State")
 @export var _initial_setup_done: bool
 @export var _all_territories: Array[Territory]
 @export var _all_empires: Array[Empire]
@@ -10,6 +19,16 @@ extends CanvasLayer
 @export var _boss_empire: Empire
 @export var _active_empires: Array[Empire]
 @export var _defeated_empires: Array[Empire]
+
+@export_subgroup("Turn cycle")
+@export var cycle_count: int
+@export var turn_done: bool
+@export var turn_index: int
+@export var state := State.CYCLE_START
+
+
+var _is_running: bool
+var _should_end: bool
 
 
 func _ready():
@@ -22,8 +41,13 @@ func _initial_setup():
 	_init_territories()
 	_init_empires()
 	_init_distribute_empires()
+	
+	_active_empires = _all_empires.duplicate()
+	_defeated_empires = []
+	
 	_all_territories.make_read_only()
 	_all_empires.make_read_only()
+	
 	_initial_setup_done = true
 	print('[Overworld] Initial setup done.')
 	
@@ -153,3 +177,113 @@ func get_territory_by_name(territory_name: String) -> Territory:
 		if t.territory_name == territory_name:
 			return t
 	return null
+	
+	
+func on_turn() -> Empire:
+	return _active_empires[turn_index]
+	
+	
+func is_cycle_finished() -> bool:
+	return turn_index >= _active_empires.size()
+	
+	
+func stop_overworld_cycle():
+	_should_end = true
+
+
+func start_overworld_cycle():
+	if _is_running:
+		push_error('overworld is already running.')
+		return
+	_is_running = true
+	_should_end = false
+	
+	# trampoline
+	var cont = get_continuation(state)
+	while not _should_end:
+		assert(cont != null)
+		cont = await cont.call()
+		
+	_is_running = false
+	
+
+func get_continuation(st: State):
+	match st:
+		State.CYCLE_START: return _cont_cycle_start
+		State.TURN_START: return _cont_turn_start
+		State.TURN_ONGOING: return _cont_turn_do
+		State.TURN_END: return _cont_turn_end
+		State.CYCLE_END: return _cont_cycle_end
+	return null # never
+
+
+func next_continuation(st: State):
+	if _should_end:
+		return null
+	return get_continuation(st)
+	
+	
+func _cont_cycle_start():
+	state = State.CYCLE_START
+	
+	# allow for interruption and shutdown
+	Game.overworld_cycle_started.emit(cycle_count)
+	await Game.wait_for_resume()
+	return next_continuation(State.TURN_START)
+	
+	
+func _cont_turn_start():
+	state = State.TURN_START
+	
+	# allow for interruption and shutdown
+	Game.overworld_turn_started.emit(on_turn())
+	await Game.wait_for_resume()
+	return next_continuation(State.TURN_ONGOING)
+	
+	
+func _cont_turn_do():
+	state = State.TURN_ONGOING
+	await get_tree().create_timer(1).timeout
+	# TODO
+	return next_continuation(State.TURN_END)
+	
+	
+func _cont_turn_end():
+	state = State.TURN_END
+	var end_cycle := false
+	while true:
+		turn_index += 1
+		if turn_index >= _active_empires.size():
+			turn_index = 0
+			end_cycle = true
+			break
+		if _active_empires[turn_index] not in _defeated_empires:
+			break
+			
+	# allow for interruption and shutdown
+	Game.overworld_turn_ended.emit(on_turn())
+	await Game.wait_for_resume()
+	if end_cycle:
+		return next_continuation(State.CYCLE_END)
+	else:
+		return next_continuation(State.TURN_START)
+	
+
+func _cont_cycle_end():
+	state = State.CYCLE_END
+	# maybe we want a defeated queue but that's just adds another variable
+	# to keep track of, this works fine cos we dont have many anyways.
+	for defeated in _defeated_empires:
+		if defeated in _active_empires:
+			_active_empires.erase(defeated)
+	cycle_count += 1
+	
+	# allow for interruption and shutdown
+	Game.overworld_cycle_ended.emit(cycle_count)
+	await Game.wait_for_resume()
+	return next_continuation(State.CYCLE_START)
+
+
+func _unhandled_input(event):
+	if event.is_action_pressed("ui_accept"):
+		stop_overworld_cycle()
