@@ -2,6 +2,11 @@ class_name Overworld
 extends CanvasLayer
 
 
+signal territory_transfer_ownership(old_owner: Empire, new_owner: Empire, territory: Territory)
+signal _turn_finished
+signal _player_choose_action
+
+
 enum State {
 	CYCLE_START,
 	TURN_START,
@@ -25,7 +30,6 @@ enum State {
 @export var turn_done: bool
 @export var turn_index: int
 @export var state := State.CYCLE_START
-@export var action_history: Array[Resource]
 
 var _is_running: bool
 var _should_end: bool
@@ -116,15 +120,13 @@ func _init_distribute_empires():
 		_all_empires.append(empire)
 		var territory: Territory = grabs.pick_random()
 		grabs.erase(territory)
-		empire.territories.append(territory)
 		empire.home_territory = territory
-		territory.empire = empire
+		set_territory_owner(null, empire, territory)
 		
 	# the rest will be distributed randomly
 	for territory in grabs:
 		var empire: Empire = selection.pick_random()
-		empire.territories.append(territory)
-		territory.empire = empire
+		set_territory_owner(null, empire, territory)
 		
 	
 #region Basic API
@@ -181,14 +183,12 @@ func get_territory_by_name(territory_name: String) -> Territory:
 #endregion Basic API
 	
 	
+## Returns the empire on turn.
 func on_turn() -> Empire:
 	return _active_empires[turn_index]
 	
-	
-func stop_overworld_cycle():
-	_should_end = true
 
-
+## Starts the overworld cycle.
 func start_overworld_cycle():
 	if _is_running:
 		push_error('overworld is already running.')
@@ -197,6 +197,7 @@ func start_overworld_cycle():
 	_should_end = false
 	
 	Game.overworld_started.emit()
+	
 	# trampoline
 	var cont = get_continuation(state)
 	while not _should_end:
@@ -206,7 +207,13 @@ func start_overworld_cycle():
 	_is_running = false
 	Game.overworld_ended.emit()
 	
+	
+## Stops the overworld cycle.
+func stop_overworld_cycle():
+	_should_end = true
 
+
+## Returns the continuation function based on the state
 func get_continuation(st: State):
 	match st:
 		State.CYCLE_START: return _cont_cycle_start
@@ -217,12 +224,14 @@ func get_continuation(st: State):
 	return null # never
 
 
+## Returns the continuation for state if should_end flag is not set.
 func next_continuation(st: State):
 	if _should_end:
 		return null
 	return get_continuation(st)
 	
 	
+## Starts the cycle and emits the signal.
 func _cont_cycle_start():
 	state = State.CYCLE_START
 	
@@ -232,6 +241,7 @@ func _cont_cycle_start():
 	return next_continuation(State.TURN_START)
 	
 	
+## Starts the empire's turn and emits the signal.
 func _cont_turn_start():
 	state = State.TURN_START
 	# allow for interruption and shutdown
@@ -240,114 +250,67 @@ func _cont_turn_start():
 	return next_continuation(State.TURN_ONGOING)
 	
 	
+## Does the action for the empire.
 func _cont_turn_do():
 	state = State.TURN_ONGOING
 	var timer := get_tree().create_timer(1)
-	await do_turn(on_turn())
-	if timer.time_left > 0:
-		await timer.timeout
-	return next_continuation(State.TURN_END)
 	
+	var action: Variant = await get_action(on_turn())
 	
-func _cont_turn_end():
-	state = State.TURN_END
-	var old_turn := on_turn()
-	var end_turn_cycle := false
-	while true:
-		turn_index += 1
-		if turn_index >= _active_empires.size():
-			turn_index = 0
-			end_turn_cycle = true
-			break
-		if _active_empires[turn_index] not in _defeated_empires:
-			break
-			
-	# allow for interruption and shutdown
-	Game.overworld_turn_ended.emit(old_turn)
-	await Game.wait_for_resume()
-	if end_turn_cycle:
-		return next_continuation(State.CYCLE_END)
-	else:
-		return next_continuation(State.TURN_START)
-	
-
-func _cont_cycle_end():
-	state = State.CYCLE_END
-	# maybe we want a defeated queue but that's just adds another variable
-	# to keep track of, this works fine cos we dont have many anyways.
-	for defeated in _defeated_empires:
-		if defeated in _active_empires:
-			_active_empires.erase(defeated)
-	cycle_count += 1
-	# allow for interruption and shutdown
-	Game.overworld_cycle_ended.emit(cycle_count)
-	await Game.wait_for_resume()
-	return next_continuation(State.CYCLE_START)
-
-
-signal _turn_finished
-signal _player_choose_action
-
-
-class EmpireAction extends Resource:
-	var empire: Empire
-	var description: String
-	var cycle: int
-	var turn_index: int
-	
-	func _init(_empire: Empire, _description: String):
-		empire = _empire
-		description = _description
-		cycle = Game.overworld.cycle_count
-		turn_index = Game.overworld.turn_index
-		
-	func _to_string() -> String:
-		return '<[%s:%s] id=%s leader="%s" action="%s">' % [cycle, turn_index, empire.id, empire.leader_name(), description]
-	
-	
-class AttackAction extends EmpireAction:
-	var target_empire: Empire
-	var target: Territory
-	var map_id: int
-	
-	func _init(_empire: Empire, _target_empire: Empire, _target: Territory, _map_id := 0):
-		super(_empire, 'Attack')
-		target_empire = _target_empire
-		target = _target
-		map_id = _map_id
-	
-	
-class RestAction extends EmpireAction:
-	
-	func _init(_empire: Empire):
-		super(_empire, 'Rest')
-		
-	
-class TrainingAction extends EmpireAction:
-	
-	func _init(_empire: Empire):
-		super(_empire, 'Train')
-	
-	
-func do_turn(empire: Empire):
-	var action: Variant = await get_action(empire)
-	print(action)
-	action_history.append(action)
+	var cancelled := false
 	if action is RestAction:
-		if empire.is_player_owned():
-			print("%s rests. HP recovered." % empire.leader_name())
-		else:
-			print("%s rests. HP recovered. Aggression %.2f" % [empire.leader_name(), empire.aggression])
-		empire.hp_multiplier = 1.0
+		print("%s rests. HP recovered." % on_turn().leader_name())
+		on_turn().hp_multiplier = 1.0
+		
 	elif action is TrainingAction:
-		print('%s trains units (TODO does nothing)' % empire.leader_name())
+		print('%s trains units (TODO does nothing)' % on_turn().leader_name())
+		
 	elif action is AttackAction:
 		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
+		Game.start_battle.call_deferred(action.empire, action.target_empire, action.target, action.map_id)
+		var result: BattleResult = await Game.battle_ended
+		
+		# TODO show result banner
+		
+		match result.value:
+			BattleResult.CANCELLED:
+				cancelled = true
+				
+			BattleResult.NONE:
+				push_error('result == BattleResult.NONE')
+				
+			BattleResult.ATTACKER_VICTORY:
+				transfer_territory(result.defender, result.attacker, result.territory)
+				result.defender.hp_multiplier = 0.1 # TODO
+				
+			BattleResult.DEFENDER_VICTORY:
+				result.attacker.hp_multiplier = 0.1 # TODO
+				
+			BattleResult.ATTACKER_WITHDRAW:
+				pass
+				
+			BattleResult.DEFENDER_WITHDRAW:
+				transfer_territory(result.defender, result.attacker, result.territory)
+		if not result.defender.is_defeated():
+			print('  territories left: %s' % result.defender.territories.size())
+			
+	if timer.time_left > 0:
+		await timer.timeout
+	if cancelled:
+		return next_continuation(State.TURN_ONGOING)
+	else:
+		return next_continuation(State.TURN_END)
+	
 
-
+## Requests an action from the empire.
 func get_action(empire: Empire) -> Variant:
 	if empire.is_player_owned():
-		return await _player_choose_action
+		print('waiting for player action...')
+		var node := $InputBlocker
+		remove_child(node)
+		var action: Variant = await _player_choose_action
+		add_child(node)
+		return action
 	else:
 		# if hurt, rest
 		if empire.hp_multiplier < 0.8:
@@ -372,10 +335,134 @@ func get_action(empire: Empire) -> Variant:
 		# rest
 		return RestAction.new(empire)
 		
+		
+## Ends the turn and emits the signal.
+func _cont_turn_end():
+	state = State.TURN_END
+	var old_turn := on_turn()
+	var end_turn_cycle := false
+	while true:
+		turn_index += 1
+		if turn_index >= _active_empires.size():
+			turn_index = 0
+			end_turn_cycle = true
+			break
+		if _active_empires[turn_index] not in _defeated_empires:
+			break
+			
+	# allow for interruption and shutdown
+	Game.overworld_turn_ended.emit(old_turn)
+	await Game.wait_for_resume()
+	if end_turn_cycle:
+		return next_continuation(State.CYCLE_END)
+	else:
+		return next_continuation(State.TURN_START)
+	
+		
+## Ends the cycle and emits the signal.
+func _cont_cycle_end():
+	state = State.CYCLE_END
+	# maybe we want a defeated queue but that's just adds another variable
+	# to keep track of, this works fine cos we dont have many anyways.
+	for defeated in _defeated_empires:
+		if defeated in _active_empires:
+			_active_empires.erase(defeated)
+	cycle_count += 1
+	# allow for interruption and shutdown
+	Game.overworld_cycle_ended.emit(cycle_count)
+	await Game.wait_for_resume()
+	return next_continuation(State.CYCLE_START)
 
+
+func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
+	# TODO weird bug where Alara can be defeated 3x (i may have been wrong and she took player's territory)
+	#print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name(), new_owner.leader_name()])
+	if old_owner == new_owner:
+		return
+	set_territory_owner(old_owner, new_owner, territory)
+	
+	if territory == old_owner.home_territory:
+		if Game.prefs['defeat_if_home_territory_captured']:
+			while not old_owner.territories.is_empty():
+				var t: Territory = old_owner.territories.pop_back()
+				set_territory_owner(old_owner, new_owner, t)
+		else:
+			pass # no action taken for losing home territory yet
+			
+	if old_owner.is_defeated():
+		_defeated_empires.append(old_owner)
+		if old_owner.is_player_owned():
+			Game.player_defeated.emit()
+		elif old_owner.is_boss():
+			Game.boss_defeated.emit()
+		else:
+			Game.empire_defeated.emit(old_owner)
+		await Game.wait_for_resume()
+	
+	
+func set_territory_owner(old_owner: Empire, new_owner: Empire, territory: Territory):
+	assert(new_owner != null, "new_owner can't be null")
+	if old_owner:
+		old_owner.territories.erase(territory)
+	new_owner.territories.append(territory)
+	territory.empire = new_owner
+	territory_transfer_ownership.emit(old_owner, new_owner, territory)
+	
+	
+func choose_action(action: EmpireAction):
+	if on_turn().is_player_owned():
+		_player_choose_action.emit(action)
+	
+	
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept"):
 		_player_choose_action.emit(RestAction.new(on_turn()))
 	
 	if event is InputEventKey and event.pressed and event.keycode == KEY_S:
 		Game.save_state().save_to_file('user://save_file3.tres')
+
+	
+## Base class for actions
+class EmpireAction extends Resource:
+	var empire: Empire
+	var description: String
+	var cycle: int
+	var turn_index: int
+	
+	func _init(_empire: Empire, _description: String):
+		empire = _empire
+		description = _description
+		cycle = Game.overworld.cycle_count
+		turn_index = Game.overworld.turn_index
+		
+	func _to_string() -> String:
+		return '<[%s:%s] id=%s leader="%s" action="%s">' % [cycle, turn_index, empire.id, empire.leader_name(), description]
+	
+	
+## Attack action
+class AttackAction extends EmpireAction:
+	var target_empire: Empire
+	var target: Territory
+	var map_id: int
+	
+	func _init(_empire: Empire, _target_empire: Empire, _target: Territory, _map_id := 0):
+		super(_empire, 'Attack')
+		target_empire = _target_empire
+		target = _target
+		map_id = _map_id
+	
+	
+## Rest action
+class RestAction extends EmpireAction:
+	
+	func _init(_empire: Empire):
+		super(_empire, 'Rest')
+		
+	
+## Training action
+class TrainingAction extends EmpireAction:
+	
+	func _init(_empire: Empire):
+		super(_empire, 'Train')
+	
+		

@@ -32,4 +32,9 @@ func is_boss() -> bool:
 ## Returns the name of the leader.
 func leader_name() -> String:
 	return empire.leader_name()
+	
+	
+## Returns true if this is the home territory of the owner.
+func is_home_territory() -> bool:
+	return empire and (empire.home_territory == self)
 

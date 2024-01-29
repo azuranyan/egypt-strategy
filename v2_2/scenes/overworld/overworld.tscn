@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=17 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld.gd" id="1_cx0e7"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_27pdc"]
@@ -54,6 +54,14 @@ avatar = ""
 title = ""
 map_color = Color(0, 0, 0, 1)
 
+[sub_resource type="Resource" id="Resource_efjpd"]
+script = ExtResource("4_dd4no")
+name = "Alara placeholder"
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0, 0, 1)
+
 [sub_resource type="Resource" id="Resource_ydvbq"]
 script = ExtResource("7_cj6qd")
 unit_type = ExtResource("8_nlan1")
@@ -68,6 +76,7 @@ count = 1
 script = ExtResource("1_cx0e7")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
+z_index = -10
 position = Vector2(960, 540)
 scale = Vector2(0.96, 0.940767)
 texture = ExtResource("2_27pdc")
@@ -85,6 +94,7 @@ metadata/player_owned = true
 script = ExtResource("3_vu5m3")
 leader = SubResource("Resource_td17e")
 territories = [NodePath("../../TerritoryButton2/Boss")]
+base_aggression = 0.8
 home_territory = NodePath("../../TerritoryButton2/Boss")
 metadata/boss = true
 
@@ -106,35 +116,125 @@ leader = SubResource("Resource_uavj6")
 
 [node name="Alara" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_vu5m3")
-leader = SubResource("Resource_uavj6")
+leader = SubResource("Resource_efjpd")
 
-[node name="TerritoryButton" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(1475, 801)
+[node name="TerritoryButton" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 1475.0
+offset_top = 801.0
+offset_right = 1475.0
+offset_bottom = 801.0
+overworld = NodePath("..")
 
 [node name="Player" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("adjacent", "empire")]
 script = ExtResource("6_q5swp")
-adjacent = [NodePath("../../TerritoryButton3/Random"), NodePath("../../TerritoryButton4/Random")]
+adjacent = [NodePath("../../TerritoryButton3/Random1"), NodePath("../../TerritoryButton4/Random2")]
 empire = NodePath("../../Empires/Player")
 units = Array[ExtResource("7_cj6qd")]([SubResource("Resource_ydvbq"), SubResource("Resource_t141g")])
 
-[node name="TerritoryButton2" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(273, 201)
+[node name="TerritoryButton2" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 273.0
+offset_top = 201.0
+offset_right = 273.0
+offset_bottom = 201.0
+overworld = NodePath("..")
 
 [node name="Boss" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent", "empire")]
 script = ExtResource("6_q5swp")
-adjacent = [NodePath("../../TerritoryButton3/Random"), NodePath("../../TerritoryButton4/Random")]
+adjacent = [NodePath("../../TerritoryButton3/Random1"), NodePath("../../TerritoryButton4/Random2")]
 empire = NodePath("../../Empires/Sitri")
 
-[node name="TerritoryButton3" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(467, 638)
+[node name="TerritoryButton3" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 467.0
+offset_top = 638.0
+offset_right = 467.0
+offset_bottom = 638.0
+overworld = NodePath("..")
 
-[node name="Random" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
+[node name="Random1" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("6_q5swp")
-adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton4/Random")]
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton4/Random2")]
 
-[node name="TerritoryButton4" parent="." instance=ExtResource("2_gak2j")]
-position = Vector2(826, 212)
+[node name="TerritoryButton4" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 826.0
+offset_top = 212.0
+offset_right = 826.0
+offset_bottom = 212.0
+overworld = NodePath("..")
 
-[node name="Random" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
+[node name="Random2" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("6_q5swp")
-adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random")]
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton5" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 1313.0
+offset_top = 163.0
+offset_right = 1313.0
+offset_bottom = 163.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton5" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton6" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 1638.0
+offset_top = 244.0
+offset_right = 1638.0
+offset_bottom = 244.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton6" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton7" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 1594.0
+offset_top = 519.0
+offset_right = 1594.0
+offset_bottom = 519.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton8" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 1088.0
+offset_top = 463.0
+offset_right = 1088.0
+offset_bottom = 463.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton8" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton9" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 948.0
+offset_top = 712.0
+offset_right = 948.0
+offset_bottom = 712.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton9" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="TerritoryButton10" parent="." node_paths=PackedStringArray("overworld") instance=ExtResource("2_gak2j")]
+offset_left = 702.0
+offset_top = 456.0
+offset_right = 702.0
+offset_bottom = 456.0
+overworld = NodePath("..")
+
+[node name="Random2" type="Node" parent="TerritoryButton10" node_paths=PackedStringArray("adjacent")]
+script = ExtResource("6_q5swp")
+adjacent = [NodePath("../../TerritoryButton/Player"), NodePath("../../TerritoryButton2/Boss"), NodePath("../../TerritoryButton3/Random1")]
+
+[node name="InputBlocker" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

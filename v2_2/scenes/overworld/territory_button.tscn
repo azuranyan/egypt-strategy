@@ -1,16 +1,256 @@
-[gd_scene load_steps=4 format=3 uid="uid://vo0h66hnj2jc"]
+[gd_scene load_steps=8 format=3 uid="uid://vo0h66hnj2jc"]
 
 [ext_resource type="Script" path="res://scenes/overworld/territory_button.gd" id="1_0gogs"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_pr4cx"]
+[ext_resource type="Texture2D" uid="uid://cdgvpj8fkkc7b" path="res://scenes/overworld/data/Base.png" id="2_yjkpc"]
+[ext_resource type="Texture2D" uid="uid://dqje6a80f34s0" path="res://scenes/overworld/data/Alara.png" id="3_sc68v"]
+[ext_resource type="Texture2D" uid="uid://dwgewwhdqcnge" path="res://scenes/overworld/data/home.png" id="5_qhtby"]
 
-[sub_resource type="Gradient" id="Gradient_kukut"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 1, 0, 1)
+[sub_resource type="Gradient" id="Gradient_gy3up"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.214286, 0.694805)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_klesb"]
-gradient = SubResource("Gradient_kukut")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_lglkw"]
+gradient = SubResource("Gradient_gy3up")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
 
-[node name="TerritoryButton" type="Node2D"]
+[node name="TerritoryButton" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+theme = ExtResource("1_pr4cx")
 script = ExtResource("1_0gogs")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("GradientTexture2D_klesb")
+[node name="Connections" type="Node2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.203922)
+z_index = -1
+
+[node name="Detector" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -76.0
+offset_right = 60.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+
+[node name="Glow" type="TextureRect" parent="."]
+visible = false
+self_modulate = Color(1, 0.745098, 0.309804, 0.878431)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -55.0
+offset_right = 64.0
+offset_bottom = 73.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_lglkw")
+
+[node name="EnemyPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = 55.0
+offset_right = 216.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EnemyPanel"]
+layout_mode = 2
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 430.0
+offset_bottom = 113.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="EnemyPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Enemy Leaders: %s, %s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="EnemyPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Force Strength: %s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackButton" type="Button" parent="EnemyPanel"]
+layout_mode = 2
+offset_left = 115.0
+offset_top = 96.0
+offset_right = 317.0
+offset_bottom = 137.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.521569, 0.0784314, 0.164706, 1)
+theme_override_colors/font_pressed_color = Color(0.521569, 0.0784314, 0.164706, 1)
+theme_override_colors/font_hover_color = Color(0.521569, 0.0784314, 0.164706, 1)
+theme_override_colors/font_focus_color = Color(0.521569, 0.0784314, 0.164706, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.521569, 0.0784314, 0.164706, 1)
+theme_override_font_sizes/font_size = 24
+text = "ATTACK!"
+
+[node name="PlayerPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = 55.0
+offset_right = 216.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlayerPanel"]
+layout_mode = 2
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 430.0
+offset_bottom = 113.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="PlayerPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Avatars Present: %s, %s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="PlayerPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Force Strength: %s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestButton" type="Button" parent="PlayerPanel"]
+layout_mode = 2
+offset_left = 115.0
+offset_top = 96.0
+offset_right = 317.0
+offset_bottom = 137.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.294118, 0.6, 0.160784, 1)
+theme_override_colors/font_pressed_color = Color(0.294118, 0.6, 0.160784, 1)
+theme_override_colors/font_hover_color = Color(0.294118, 0.6, 0.160784, 1)
+theme_override_colors/font_focus_color = Color(0.294118, 0.6, 0.160784, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.294118, 0.6, 0.160784, 1)
+theme_override_font_sizes/font_size = 24
+text = "REST"
+
+[node name="Control2" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+scale = Vector2(0.06, 0.06)
+mouse_filter = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2157.0
+offset_top = -1246.0
+offset_right = 2157.0
+offset_bottom = 1246.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_yjkpc")
+
+[node name="Control" type="Control" parent="Control2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1326.0
+offset_top = -1538.0
+offset_right = 1286.0
+offset_bottom = 630.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Portrait" type="TextureRect" parent="Control2/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_sc68v")
+stretch_mode = 5
+
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+modulate = Color(0.52549, 0.329412, 0.294118, 1)
+layout_mode = 0
+offset_left = -135.0
+offset_top = 37.0
+offset_right = -79.0
+offset_bottom = 73.0
+texture = ExtResource("5_qhtby")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="NameLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = -127.0
+offset_top = 35.0
+offset_right = 127.0
+offset_bottom = 84.0
+mouse_filter = 2
+bbcode_enabled = true
+text = "[center][font_size=26
+]Z[/font_size]ETENNU[/center]"
+fit_content = true
+scroll_active = false
+
+[connection signal="focus_entered" from="Detector" to="." method="_on_detector_focus_entered"]
+[connection signal="focus_exited" from="Detector" to="." method="_on_detector_focus_exited"]
+[connection signal="gui_input" from="Detector" to="." method="_on_detector_gui_input"]
+[connection signal="mouse_entered" from="Detector" to="." method="_on_detector_mouse_entered"]
+[connection signal="mouse_exited" from="Detector" to="." method="_on_detector_mouse_exited"]
+[connection signal="pressed" from="EnemyPanel/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="PlayerPanel/RestButton" to="." method="_on_rest_button_pressed"]

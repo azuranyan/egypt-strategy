@@ -15,6 +15,13 @@ signal overworld_cycle_ended(cycle: int)
 signal overworld_turn_started(empire: Empire)
 signal overworld_turn_ended(empire: Empire)
 
+signal battle_started
+signal battle_ended(result: BattleResult)
+
+signal empire_defeated(empire: Empire)
+signal player_defeated
+signal boss_defeated
+
 signal resumed
 
 
@@ -26,6 +33,9 @@ var overworld: Overworld
 var save_locked: bool
 var suspended: bool
 
+var prefs := {
+	'defeat_if_home_territory_captured': true,
+}
 
 func _ready():
 	if OS.is_debug_build():
@@ -85,6 +95,17 @@ func get_viewport_size() -> Vector2:
 	return Vector2(1920, 1080)
 	
 	
+func start_overworld_cycle():
+	await overworld.start_overworld_cycle()
+	
+
+func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id := 0):
+	# TODO
+	battle_started.emit()
+	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, attacker, defender, territory, map_id)
+	battle_ended.emit(result)
+	
+	
 func suspend():
 	suspended = true
 	
@@ -109,8 +130,8 @@ func start_game(args := {}):
 	
 	
 func _main(_args := {}):
-	#var state := create_new_state()
-	var state := SaveState.load_from_file('user://save_file3.tres')
+	var state := create_new_state()
+	#var state := SaveState.load_from_file('user://save_file3.tres')
 	load_state(state)
 	await overworld.start_overworld_cycle()
 

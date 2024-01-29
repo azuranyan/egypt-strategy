@@ -12,5 +12,9 @@ func _ready():
 	Game.overworld_cycle_started.connect(func(count): print('Cycle %s' % count))
 	Game.overworld_cycle_ended.connect(func(count): print('Cycle %s' % count))
 	
-	Game.overworld_turn_started.connect(func(empire): print('%s turn started' % empire.leader_name()))
-	Game.overworld_turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_name()))
+	#Game.overworld_turn_started.connect(func(empire): print('%s turn started' % empire.leader_name()))
+	#Game.overworld_turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_name()))
+
+	Game.empire_defeated.connect(func(empire): print('%s defeated' % empire.leader_name()))
+	Game.boss_defeated.connect(func(): print('boss defeated, yay!'))
+	Game.player_defeated.connect(func(): print('player defeated, ohno..'))

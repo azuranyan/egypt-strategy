@@ -1,0 +1,39 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://cegg3xuaofnvx"]
+
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="1_r6hf5"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="1_st4hi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i7xay"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_as7ec"]
+bg_color = Color(0.678431, 0.870588, 0.741176, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[resource]
+default_font = ExtResource("1_st4hi")
+Button/styles/disabled = SubResource("StyleBoxFlat_i7xay")
+Button/styles/focus = SubResource("StyleBoxFlat_i7xay")
+Button/styles/hover = SubResource("StyleBoxFlat_as7ec")
+Button/styles/normal = SubResource("StyleBoxFlat_i7xay")
+Button/styles/pressed = SubResource("StyleBoxFlat_i7xay")
+Label/colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
+Label/fonts/font = ExtResource("1_r6hf5")
+Panel/styles/panel = SubResource("StyleBoxFlat_i7xay")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_i7xay")
+RichTextLabel/colors/default_color = Color(0.360784, 0.254902, 0.113725, 1)
+RichTextLabel/colors/font_outline_color = Color(0, 0, 0, 1)
+RichTextLabel/constants/outline_size = 0
