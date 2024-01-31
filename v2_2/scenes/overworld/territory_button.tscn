@@ -29,7 +29,7 @@ script = ExtResource("1_0gogs")
 [node name="Connections" type="Node2D" parent="."]
 visible = false
 modulate = Color(1, 1, 1, 0.203922)
-z_index = -1
+z_index = -10
 
 [node name="Detector" type="Control" parent="."]
 layout_mode = 1
@@ -65,6 +65,7 @@ mouse_filter = 2
 texture = SubResource("GradientTexture2D_lglkw")
 
 [node name="EnemyPanel" type="Panel" parent="."]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -89,14 +90,16 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="EnemyPanel/VBoxContainer"]
+[node name="EnemyLeadersLabel" type="Label" parent="EnemyPanel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Enemy Leaders: %s, %s"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label2" type="Label" parent="EnemyPanel/VBoxContainer"]
+[node name="EnemyForceStrengthLabel" type="Label" parent="EnemyPanel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Force Strength: %s"
@@ -104,6 +107,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AttackButton" type="Button" parent="EnemyPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 offset_left = 115.0
 offset_top = 96.0
@@ -120,6 +124,7 @@ theme_override_font_sizes/font_size = 24
 text = "ATTACK!"
 
 [node name="PlayerPanel" type="Panel" parent="."]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -144,14 +149,16 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="PlayerPanel/VBoxContainer"]
+[node name="AvatarsPresentLabel" type="Label" parent="PlayerPanel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Avatars Present: %s, %s"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label2" type="Label" parent="PlayerPanel/VBoxContainer"]
+[node name="PlayerForceStrengthLabel" type="Label" parent="PlayerPanel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Force Strength: %s"
@@ -159,6 +166,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="RestButton" type="Button" parent="PlayerPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 offset_left = 115.0
 offset_top = 96.0
@@ -212,6 +220,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Portrait" type="TextureRect" parent="Control2/Control"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -222,7 +231,8 @@ mouse_filter = 2
 texture = ExtResource("3_sc68v")
 stretch_mode = 5
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="HomeIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
 visible = false
 modulate = Color(0.52549, 0.329412, 0.294118, 1)
 layout_mode = 0
@@ -235,6 +245,7 @@ expand_mode = 3
 stretch_mode = 5
 
 [node name="NameLabel" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = -127.0
 offset_top = 35.0
@@ -242,8 +253,6 @@ offset_right = 127.0
 offset_bottom = 84.0
 mouse_filter = 2
 bbcode_enabled = true
-text = "[center][font_size=26
-]Z[/font_size]ETENNU[/center]"
 fit_content = true
 scroll_active = false
 

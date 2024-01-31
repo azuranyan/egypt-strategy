@@ -3,8 +3,13 @@ extends Resource
 
 
 enum {
+	## Allows the user to target itself.
 	TARGET_SELF = 1 << 0,
+	
+	## Allows the user to target an ally.
 	TARGET_ALLY = 1 << 1,
+	
+	## Allows the user to target an enemy.
 	TARGET_ENEMY = 1 << 2,
 }
 
@@ -60,7 +65,7 @@ func is_multicast() -> bool:
 ## Returns the cells in range.
 func get_cells_in_range(origin: Vector2, unit_range: int) -> PackedVector2Array:
 	var _range := max_range if max_range != -1 else unit_range
-	return Util.flood_fill(origin, _range, Util.bounds(Vector2(12, 12)))
+	return Util.flood_fill(origin, _range , Util.bounds(Vector2(12, 12)))
 
 
 ## Returns an array of cells in the target aoe.

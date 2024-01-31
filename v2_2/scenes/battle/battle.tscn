@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2wdgl38ld0i6"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="1_wn6kf"]
+[ext_resource type="Script" path="res://scenes/battle/attack/debug_print_effect.gd" id="2_h4vmv"]
+
+[node name="Battle" type="Node2D"]
+
+[node name="AttackSystem" type="Node" parent="."]
+script = ExtResource("1_wn6kf")
+minimum_attack_time = 2.0
+
+[node name="DebugPrintEffect" type="Node" parent="AttackSystem"]
+script = ExtResource("2_h4vmv")

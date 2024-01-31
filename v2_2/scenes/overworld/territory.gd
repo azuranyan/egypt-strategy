@@ -1,40 +1,22 @@
-@tool
 class_name Territory
-extends Node
+extends Resource
 
 
-signal state_loaded
+## The name of this territory.
+@export var name: String
 
+## Names of adjacent territories.
+@export var adjacent: Array[String] = []
 
-@export var adjacent: Array[Territory] = []
+## List of [Map] to load in-battle.
 @export var maps: Array[PackedScene] = []
-@export var empire: Empire:
-	set(value):
-		empire = value
-		if empire and Engine.is_editor_hint():
-			empire.territories.clear()
-			empire.territories.append(self)
-			empire.home_territory = self
-@export var units: Array[UnitTypeEntry]
-@export var id: int
+
+## Dictionary of unit names and count.
+@export var units: Dictionary
 
 
-## Returns true if empire is player owned.
-func is_player_owned() -> bool:
-	return empire.is_player_owned()
-
-
-## Returns true if empire is boss.
-func is_boss() -> bool:
-	return empire.is_boss()
+## Returns true if another territory is adjacent.
+func is_adjacent(other: Territory) -> bool:
+	return other.name in adjacent
 	
 	
-## Returns the name of the leader.
-func leader_name() -> String:
-	return empire.leader_name()
-	
-	
-## Returns true if this is the home territory of the owner.
-func is_home_territory() -> bool:
-	return empire and (empire.home_territory == self)
-

@@ -36,12 +36,12 @@ func is_pathable(context: BattleContext, unit: Unit) -> bool:
 	return default_pathable(context, unit) and conditionally_pathable(context, unit)
 	
 
-func default_pathable(_context: BattleContext, unit: Unit) -> bool:
+func default_pathable(context: BattleContext, unit: Unit) -> bool:
 	if (not enabled) or (unit.phase & Unit.PHASE_NO_CLIP != 0):
 		return true
 	match pathing_group:
 		Map.PathingGroup.UNIT:
-			if (map_object is Unit) and unit.is_enemy(map_object.unit):
+			if (map_object is UnitNode) and context.are_enemies(map_object.unit, unit):
 				return unit.phase & Unit.PHASE_ENEMIES != 0
 		Map.PathingGroup.DOODAD:
 			return unit.phase & Unit.PHASE_DOODADS != 0

@@ -2,10 +2,7 @@ class_name UnitType
 extends Resource
 
 
-@export var character_info: CharacterInfo
-
-@export var sprite_frames: SpriteFrames
-
+@export var unit_model: PackedScene
 
 @export_group("Unit Stats")
 
@@ -37,3 +34,4 @@ extends Resource
 
 func _to_string() -> String:
 	return '<UnitType#%s>' % self.get_instance_id()
+ 

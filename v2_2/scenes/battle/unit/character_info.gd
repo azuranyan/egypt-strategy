@@ -16,7 +16,7 @@ extends Resource
 ## Will be set to actual colors later.
 @export var map_color: Color
 
-## The image portrait.
+## The image portrait. 
 @export var portrait: Texture2D
 
 

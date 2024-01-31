@@ -7,205 +7,229 @@ signal _turn_finished
 signal _player_choose_action
 
 
-enum State {
-	CYCLE_START,
-	TURN_START,
-	TURN_ONGOING,
-	TURN_END,
-	CYCLE_END,
-}
-
-@export_group("Internal")
-@export_subgroup("State")
-@export var _initial_setup_done: bool
-@export var _all_territories: Array[Territory]
-@export var _all_empires: Array[Empire]
-@export var _player_empire: Empire
-@export var _boss_empire: Empire
-@export var _active_empires: Array[Empire]
-@export var _defeated_empires: Array[Empire]
-
-@export_subgroup("Turn cycle")
-@export var cycle_count: int
-@export var turn_done: bool
-@export var turn_index: int
-@export var state := State.CYCLE_START
-
-var _is_running: bool
+var _context: OverworldContext
 var _should_end: bool
+
+var territory_buttons: Array[TerritoryButton]
 
 
 func _ready():
-	if not _initial_setup_done:
-		_initial_setup()
-	
-	
-func _initial_setup():
-	print('[Overworld] Doing initial setup.')
-	_init_territories()
-	_init_empires()
-	_init_distribute_empires()
-	
-	_active_empires = _all_empires.duplicate()
-	_defeated_empires = []
-	
-	_all_territories.make_read_only()
-	_all_empires.make_read_only()
-	
-	_initial_setup_done = true
-	print('[Overworld] Initial setup done.')
-	
-	
-func _init_territories():
-	print('[Overworld] Setup: loading territories.')
+	if not Engine.is_editor_hint():
+		hide()
+	territory_buttons.clear()
 	for i in get_child_count():
 		var button := get_child(i) as TerritoryButton
-		if button == null:
+		if not button:
 			continue
-		if not button.territory:
-			push_warning('TerritoryButton node has no Territory')
-			continue
-		button.territory.id = _all_territories.size()
-		_all_territories.append(button.territory)
+		territory_buttons.append(button)
+		button.attack_pressed.connect(_on_territory_button_attack_pressed)
+		button.rest_pressed.connect(_on_territory_button_rest_pressed)
+		button.train_pressed.connect(_on_territory_button_train_pressed)
 
-func _init_empires(): 
-	print('[Overworld] Setup: loading empires.')
+
+
+## Returns the empire nodes.
+func get_empire_nodes() -> Array[EmpireNode]:
+	var arr: Array[EmpireNode] = []
 	for child in $Empires.get_children():
-		var empire := child as Empire
-		if empire == null:
-			push_warning('non-empire node found in empires list, ignoring')
-			continue
-		if empire.is_player_owned():
-			_player_empire = empire
-		if empire.is_boss():
-			_boss_empire = empire
-		empire.id = _all_empires.size()
-		_all_empires.append(empire)
-	assert(_player_empire != null, 'player empire not found')
-	assert(_boss_empire != null, 'boss empire not found')
-	assert(_player_empire != _boss_empire, 'player empire is boss empire')
-	
-	
-func _init_distribute_empires():
-	print('[Overworld] Setup: distributing empires.')
-	var selection: Array[Empire] = []
+		if child is EmpireNode:
+			arr.append(child)
+	return arr
+
+
+## Returns the random empire nodes.
+func get_random_empire_nodes() -> Array[EmpireNode]:
+	var arr:Array[EmpireNode] = []
 	for child in $RandomEmpireSelection.get_children():
-		var empire := child as Empire
-		if empire == null:
-			push_warning('non-empire node found in random empires list, ignoring')
+		if child is EmpireNode:
+			arr.append(child)
+	return arr
+	
+
+## Returns the territory node for the empire.
+func find_territory_button(territory: Territory) -> TerritoryButton:
+	for t in territory_buttons:
+		if t.get_territory(_context) == territory:
+			return t
+	return null
+	
+	
+## Returns a new context.
+func create_new_context() -> OverworldContext:
+	if not is_node_ready():
+		push_error('create_new_context() requires Overworld to be in the tree')
+		return
+	var ctx := OverworldContext.new()
+	ctx.overworld_scene = PackedScene.new()
+	ctx.overworld_scene.pack(self)
+	
+	_save_territories(ctx)
+	_save_empires(ctx)
+	
+	if not ctx.player_empire:
+		push_error('player_empire not found %s' % self)
+	if not ctx.boss_empire:
+		push_error('boss_empire not found in %s' % self)
+	
+	ctx.active_empires.append(ctx.player_empire)
+	for e in ctx.empires:
+		if e.is_random():
+			ctx.active_empires.append(e)
+			
+	ctx.state = OverworldContext.State.READY
+	return ctx
+
+
+## Saves the territories to ctx.
+func _save_territories(ctx: OverworldContext):
+	ctx.territories.clear()
+	# copy data from territory nodes
+	for button in territory_buttons:
+		var node: TerritoryNode = button.territory_node
+		var territory := Territory.new()
+		territory.name = node.name
+		# empires, adjacent will be done later
+		territory.maps = node.maps.duplicate()
+		territory.units = node.units.duplicate()
+		ctx.territories.append(territory)
+		
+	# assign adjacency
+	for i in territory_buttons.size():
+		var node: TerritoryNode = territory_buttons[i].territory_node
+		for adj in node.adjacent:
+			if not adj:
+				push_error('"%s": null territory assigned as adjacent' % [node.name])
+			# kinda voodoo knowledge but it is what it is
+			var adj_idx := territory_buttons.find(adj.get_parent())
+			ctx.territories[i].adjacent.append(ctx.territories[adj_idx])
+	
+
+## Saves the empire to ctx.
+func _save_empires(ctx: OverworldContext):
+	_create_empires(ctx)
+	_distribute_empires(ctx)
+	
+
+## Creates the empires.
+func _create_empires(ctx: OverworldContext):
+	ctx.empires.clear()
+	for node in get_empire_nodes():
+		if not node.home_territory_node:
+			push_error('"%s" included in Empires, but has no home territory set' % node.name)
 			continue
-		selection.append(empire)
-	selection.shuffle()
+		var empire := _create_empire_from_node(ctx, node)
+		var home_territory := node.home_territory_node.get_territory(ctx)
+		_set_empire_territory(ctx, empire, home_territory, true)
+		_add_empire_to_context(ctx, empire)
 	
+	
+## Creates the empire from node.
+func _create_empire_from_node(_ctx: OverworldContext, node: EmpireNode) -> Empire:
+	var empire := Empire.new()
+	empire.type = node.type
+	empire.leader = node.leader
+	empire.hero_unit = node.hero_unit
+	empire.base_aggression = node.base_aggression
+	empire.aggression = node.base_aggression
+	return empire
+	
+	
+## Adds territory to empire.
+func _set_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory, home: bool):
+	territory.empire_id = _ctx.empires.find(empire)
+	if home:
+		empire.home_territory = territory
+	if territory not in empire.territories:
+		empire.territories.insert(0, territory)
+	empire.cache_territory_units()
+	
+	
+## Removes territory from empire.
+func _unset_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory):
+	territory.empire = null
+	empire.territories.erase(territory)
+	empire.cache_territory_units()
+	
+	
+## Adds the empire to context.
+func _add_empire_to_context(ctx: OverworldContext, empire: Empire):
+	if empire not in ctx.empires:
+		ctx.empires.append(empire)
+	
+	if empire.is_player_owned():
+		ctx.player_empire = empire
+	if empire.is_boss():
+		ctx.boss_empire = empire
+	
+	
+## Distributes the empires to territories.
+func _distribute_empires(ctx: OverworldContext):
+	# take territories with no empires assigned yet
 	var grabs: Array[Territory] = []
-	for t in _all_territories:
-		if t.empire == null:
+	for t in ctx.territories:
+		if t.get_empire(ctx) == null:
 			grabs.append(t)
-	
-	# do sanity check
 	if grabs.is_empty():
 		return
 		
-	if selection.is_empty():
-		push_error('no empires to distribute!')
-		return
+	# create the selection of random empires
+	var selection: Array[Empire] = []
+	for node in get_random_empire_nodes():
+		var empire := _create_empire_from_node(ctx, node)
+		selection.append(empire)
+		if selection.size() > grabs.size():
+			break
+	selection.shuffle()
 	
-	# remove excess empires
-	while selection.size() > grabs.size():
-		selection.erase(selection.pick_random())
-	
-	# every empire gets at least one
+	# every empire gets their home territory
 	for empire in selection:
-		empire.id = _all_empires.size()
-		_all_empires.append(empire)
-		var territory: Territory = grabs.pick_random()
-		grabs.erase(territory)
-		empire.home_territory = territory
-		set_territory_owner(null, empire, territory)
+		var random_territory: Territory = grabs.pop_at(randi_range(0, grabs.size() - 1))
+		_set_empire_territory(ctx, empire, random_territory, true)
+		_add_empire_to_context(ctx, empire)
 		
 	# the rest will be distributed randomly
 	for territory in grabs:
 		var empire: Empire = selection.pick_random()
-		set_territory_owner(null, empire, territory)
+		_set_empire_territory(ctx, empire, territory, false)
 		
-	
-#region Basic API
-func get_all_empires() -> Array[Empire]:
-	return get_empires(true)
-	
-	
-func get_empires(include_defeated := false) -> Array[Empire]:
-	return _all_empires if include_defeated else _active_empires
-	
-	
-func get_defeated_empires() -> Array[Empire]:
-	return _defeated_empires
+		
+## Connects territories a and b.
+func connect_territories(_ctx: OverworldContext, a: Territory, b: Territory):
+	if b not in a.adjacent:
+		a.adjacent.append(b)
+	if a not in b.adjacent:
+		b.adjacent.append(a)
 	
 	
-func get_empire_by_id(id: int) -> Empire:
-	if id == -1:
-		return null
-	assert(id >= 0 and id < get_all_empires().size())
-	return get_empires(true)[id]
-	
-
-func get_empire_by_leader(leader_name: String) -> Empire:
-	for e in get_all_empires():
-		if e.leader_name() == leader_name:
-			return e
-	return null
-	
-
-func player_empire() -> Empire:
-	return _player_empire
+## Returns true if the overworld is running.
+func is_running() -> bool:
+	return _context != null
 	
 	
-func boss_empire() -> Empire:
-	return _boss_empire
-	
-	
-func get_territories() -> Array[Territory]:
-	return _all_territories
-	
-	
-func get_territory_by_id(id: int) -> Territory:
-	if id == -1:
-		return null
-	assert(id >= 0 and id < get_territories().size())
-	return get_territories()[id]
-	
-	
-func get_territory_by_name(territory_name: String) -> Territory:
-	for t in get_territories():
-		if t.territory_name == territory_name:
-			return t
-	return null
-#endregion Basic API
-	
-	
-## Returns the empire on turn.
-func on_turn() -> Empire:
-	return _active_empires[turn_index]
-	
-
 ## Starts the overworld cycle.
-func start_overworld_cycle():
-	if _is_running:
+func start_overworld_cycle(ctx: OverworldContext):
+	if is_running():
 		push_error('overworld is already running.')
 		return
-	_is_running = true
+	_context = ctx
 	_should_end = false
+	
+	for btn in territory_buttons:
+		btn.initialize(_context, btn.get_territory(_context))
+		if btn.get_territory(_context).is_boss(_context):
+			btn.visible = btn.get_territory(_context).get_empire(_context) in _context.active_empires
+	show()
 	
 	Game.overworld_started.emit()
 	
 	# trampoline
-	var cont = get_continuation(state)
+	var cont = get_continuation(_context.state)
 	while not _should_end:
 		assert(cont != null)
 		cont = await cont.call()
 		
-	_is_running = false
-	Game.overworld_ended.emit()
+	_context = null
+	Game.emit_signal.call_deferred('overworld_ended')
 	
 	
 ## Stops the overworld cycle.
@@ -214,18 +238,19 @@ func stop_overworld_cycle():
 
 
 ## Returns the continuation function based on the state
-func get_continuation(st: State):
+func get_continuation(st: OverworldContext.State):
 	match st:
-		State.CYCLE_START: return _cont_cycle_start
-		State.TURN_START: return _cont_turn_start
-		State.TURN_ONGOING: return _cont_turn_do
-		State.TURN_END: return _cont_turn_end
-		State.CYCLE_END: return _cont_cycle_end
+		OverworldContext.State.READY: return _cont_cycle_start
+		OverworldContext.State.CYCLE_START: return _cont_cycle_start
+		OverworldContext.State.TURN_START: return _cont_turn_start
+		OverworldContext.State.TURN_ONGOING: return _cont_turn_do
+		OverworldContext.State.TURN_END: return _cont_turn_end
+		OverworldContext.State.CYCLE_END: return _cont_cycle_end
 	return null # never
 
 
 ## Returns the continuation for state if should_end flag is not set.
-func next_continuation(st: State):
+func next_continuation(st: OverworldContext.State):
 	if _should_end:
 		return null
 	return get_continuation(st)
@@ -233,37 +258,37 @@ func next_continuation(st: State):
 	
 ## Starts the cycle and emits the signal.
 func _cont_cycle_start():
-	state = State.CYCLE_START
+	_context.state = OverworldContext.State.CYCLE_START
 	
 	# allow for interruption and shutdown
-	Game.overworld_cycle_started.emit(cycle_count)
+	Game.overworld_cycle_started.emit(_context.cycle_count)
 	await Game.wait_for_resume()
-	return next_continuation(State.TURN_START)
+	return next_continuation(OverworldContext.State.TURN_START)
 	
 	
 ## Starts the empire's turn and emits the signal.
 func _cont_turn_start():
-	state = State.TURN_START
+	_context.state = OverworldContext.State.TURN_START
 	# allow for interruption and shutdown
-	Game.overworld_turn_started.emit(on_turn())
+	Game.overworld_turn_started.emit(_context.on_turn())
 	await Game.wait_for_resume()
-	return next_continuation(State.TURN_ONGOING)
+	return next_continuation(OverworldContext.State.TURN_ONGOING)
 	
 	
 ## Does the action for the empire.
 func _cont_turn_do():
-	state = State.TURN_ONGOING
+	_context.state = OverworldContext.State.TURN_ONGOING
 	var timer := get_tree().create_timer(1)
 	
-	var action: Variant = await get_action(on_turn())
+	var action: Variant = await get_action(_context.on_turn())
 	
 	var cancelled := false
 	if action is RestAction:
-		print("%s rests. HP recovered." % on_turn().leader_name())
-		on_turn().hp_multiplier = 1.0
+		print("%s rests. HP recovered." % _context.on_turn().leader_name())
+		_context.on_turn().hp_multiplier = 1.0
 		
 	elif action is TrainingAction:
-		print('%s trains units (TODO does nothing)' % on_turn().leader_name())
+		print('%s trains units (TODO does nothing)' % _context.on_turn().leader_name())
 		
 	elif action is AttackAction:
 		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
@@ -297,9 +322,9 @@ func _cont_turn_do():
 	if timer.time_left > 0:
 		await timer.timeout
 	if cancelled:
-		return next_continuation(State.TURN_ONGOING)
+		return next_continuation(OverworldContext.State.TURN_ONGOING)
 	else:
-		return next_continuation(State.TURN_END)
+		return next_continuation(OverworldContext.State.TURN_END)
 	
 
 ## Requests an action from the empire.
@@ -314,83 +339,81 @@ func get_action(empire: Empire) -> Variant:
 	else:
 		# if hurt, rest
 		if empire.hp_multiplier < 0.8:
-			return RestAction.new(empire)
+			return RestAction.new(_context, empire)
 			
 		# increase aggression
 		empire.aggression += empire.base_aggression + randf()
 		
 		if empire.aggression >= 1:
 			empire.aggression = 0
-			var adjacent := empire.get_adjacent()
+			var adjacent := empire.get_adjacent(_context.territories)
 			
 			# basic sanity check
 			if adjacent.is_empty():
 				push_warning('empire "%s" has no adjacent territories' % empire.leader_name())
-				return RestAction.new(empire)
+				return RestAction.new(_context, empire)
 			
 			# attack
 			var target: Territory = adjacent.pick_random()
-			return AttackAction.new(empire, target.empire, target, 0)
+			return AttackAction.new(_context, empire, target.empire, target, 0)
 		
 		# rest
-		return RestAction.new(empire)
+		return RestAction.new(_context, empire)
 		
 		
 ## Ends the turn and emits the signal.
 func _cont_turn_end():
-	state = State.TURN_END
-	var old_turn := on_turn()
+	_context.state = OverworldContext.State.TURN_END
+	var old_turn := _context.on_turn()
 	var end_turn_cycle := false
 	while true:
-		turn_index += 1
-		if turn_index >= _active_empires.size():
-			turn_index = 0
+		_context.turn_index += 1
+		if _context.turn_index >= _context.active_empires.size():
+			_context.turn_index = 0
 			end_turn_cycle = true
 			break
-		if _active_empires[turn_index] not in _defeated_empires:
+		if _context.on_turn() not in _context.defeated_empires:
 			break
 			
 	# allow for interruption and shutdown
 	Game.overworld_turn_ended.emit(old_turn)
 	await Game.wait_for_resume()
 	if end_turn_cycle:
-		return next_continuation(State.CYCLE_END)
+		return next_continuation(OverworldContext.State.CYCLE_END)
 	else:
-		return next_continuation(State.TURN_START)
+		return next_continuation(OverworldContext.State.TURN_START)
 	
 		
 ## Ends the cycle and emits the signal.
 func _cont_cycle_end():
-	state = State.CYCLE_END
+	_context.state = OverworldContext.State.CYCLE_END
 	# maybe we want a defeated queue but that's just adds another variable
 	# to keep track of, this works fine cos we dont have many anyways.
-	for defeated in _defeated_empires:
-		if defeated in _active_empires:
-			_active_empires.erase(defeated)
-	cycle_count += 1
+	for defeated in _context.defeated_empires:
+		_context.active_empires.erase(defeated)
+	_context.cycle_count += 1
 	# allow for interruption and shutdown
-	Game.overworld_cycle_ended.emit(cycle_count)
+	Game.overworld_cycle_ended.emit(_context.cycle_count)
 	await Game.wait_for_resume()
-	return next_continuation(State.CYCLE_START)
+	return next_continuation(OverworldContext.State.CYCLE_START)
 
 
+## Called by actions to transfer territory.
 func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
-	# TODO weird bug where Alara can be defeated 3x (i may have been wrong and she took player's territory)
-	#print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name(), new_owner.leader_name()])
 	if old_owner == new_owner:
 		return
-	set_territory_owner(old_owner, new_owner, territory)
+	_transfer_territory(old_owner, new_owner, territory)
 	
 	if territory == old_owner.home_territory:
 		if Game.prefs['defeat_if_home_territory_captured']:
 			while not old_owner.territories.is_empty():
 				var t: Territory = old_owner.territories.pop_back()
-				set_territory_owner(old_owner, new_owner, t)
+				_transfer_territory(old_owner, new_owner, t)
 		else:
 			pass # no action taken for losing home territory yet
 			
 	if old_owner.is_defeated():
-		_defeated_empires.append(old_owner)
+		_context.defeated_empires.append(old_owner)
 		if old_owner.is_player_owned():
 			Game.player_defeated.emit()
 		elif old_owner.is_boss():
@@ -398,42 +421,65 @@ func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territo
 		else:
 			Game.empire_defeated.emit(old_owner)
 		await Game.wait_for_resume()
+		
 	
-	
-func set_territory_owner(old_owner: Empire, new_owner: Empire, territory: Territory):
-	assert(new_owner != null, "new_owner can't be null")
+func _transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
+	print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name() if old_owner else '(null)', new_owner.leader_name()])
 	if old_owner:
-		old_owner.territories.erase(territory)
-	new_owner.territories.append(territory)
-	territory.empire = new_owner
+		_unset_empire_territory(_context, old_owner, territory)
+	_set_empire_territory(_context, new_owner, territory, false)
+	for btn in territory_buttons:
+		if btn.get_territory(_context) == territory:
+			btn.initialize(_context, territory)
 	territory_transfer_ownership.emit(old_owner, new_owner, territory)
 	
 	
-func choose_action(action: EmpireAction):
-	if on_turn().is_player_owned():
-		_player_choose_action.emit(action)
+func _on_territory_button_attack_pressed(button: TerritoryButton):
+	if not _context.on_turn().is_player_owned():
+		push_warning('attack button pressed when not on turn!')
+		return
+	var territory := button.get_territory(_context)
+	var attacker := _context.on_turn()
+	var defender := territory.get_empire(_context)
+	_player_choose_action.emit(AttackAction.new(_context, attacker, defender, territory))
+	
+	
+func _on_territory_button_rest_pressed(_button: TerritoryButton):
+	if not _context.on_turn().is_player_owned():
+		push_warning('rest button pressed when not on turn!')
+		return
+	_player_choose_action.emit(RestAction.new(_context, _context.on_turn()))
+	
+	
+func _on_territory_button_train_pressed(_button: TerritoryButton):
+	if not _context.on_turn().is_player_owned():
+		push_warning('train button pressed when not on turn!')
+		return
+	_player_choose_action.emit(TrainingAction.new(_context, _context.on_turn()))
 	
 	
 func _unhandled_input(event):
-	if event.is_action_pressed("ui_accept"):
-		_player_choose_action.emit(RestAction.new(on_turn()))
+	#if event.is_action_pressed("ui_accept"):
+		#_player_choose_action.emit(RestAction.new(on_turn()))
 	
 	if event is InputEventKey and event.pressed and event.keycode == KEY_S:
-		Game.save_state().save_to_file('user://save_file3.tres')
+		Game.save_state().save_to_file('user://save_file4.res')
 
 	
 ## Base class for actions
 class EmpireAction extends Resource:
+	var context: OverworldContext
 	var empire: Empire
 	var description: String
 	var cycle: int
 	var turn_index: int
 	
-	func _init(_empire: Empire, _description: String):
+	func _init(_context: OverworldContext, _empire: Empire, _description: String):
+		context = _context
 		empire = _empire
 		description = _description
-		cycle = Game.overworld.cycle_count
-		turn_index = Game.overworld.turn_index
+		cycle = _context.cycle_count
+		turn_index = _context.turn_index
 		
 	func _to_string() -> String:
 		return '<[%s:%s] id=%s leader="%s" action="%s">' % [cycle, turn_index, empire.id, empire.leader_name(), description]
@@ -445,8 +491,8 @@ class AttackAction extends EmpireAction:
 	var target: Territory
 	var map_id: int
 	
-	func _init(_empire: Empire, _target_empire: Empire, _target: Territory, _map_id := 0):
-		super(_empire, 'Attack')
+	func _init(_context: OverworldContext, _empire: Empire, _target_empire: Empire, _target: Territory, _map_id := 0):
+		super(_context, _empire, 'Attack')
 		target_empire = _target_empire
 		target = _target
 		map_id = _map_id
@@ -455,14 +501,14 @@ class AttackAction extends EmpireAction:
 ## Rest action
 class RestAction extends EmpireAction:
 	
-	func _init(_empire: Empire):
-		super(_empire, 'Rest')
+	func _init(_context: OverworldContext, _empire: Empire):
+		super(_context, _empire, 'Rest')
 		
 	
 ## Training action
 class TrainingAction extends EmpireAction:
 	
-	func _init(_empire: Empire):
-		super(_empire, 'Train')
+	func _init(_context: OverworldContext, _empire: Empire):
+		super(_context, _empire, 'Train')
 	
 		

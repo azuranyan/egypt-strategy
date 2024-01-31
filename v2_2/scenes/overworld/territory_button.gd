@@ -1,12 +1,17 @@
+@tool
 class_name TerritoryButton
 extends Control
 
+signal attack_pressed(button)
+signal rest_pressed(button)
+signal train_pressed(button)
 
-@export var overworld: Overworld
 
-var territory: Territory
+@onready var connections = $Connections
+
+
+var territory_node: TerritoryNode
 var locked: bool
-
 var highlight: bool:
 	set(value):
 		highlight = value
@@ -15,35 +20,77 @@ var highlight: bool:
 		scale = Vector2.ONE * 1.08 if highlight else Vector2.ONE
 		
 
+var _context: OverworldContext
+var _territory: Territory
+
+
+## Returns the territory this node refers to.
+func get_territory(ctx: OverworldContext) -> Territory:
+	if _context:
+		return _territory
+	return ctx.get_territory_by_name(territory_node.name)
+	
+	
+## Initializes this button with territory.
+func initialize(ctx: OverworldContext, t: Territory):
+	_context = ctx
+	_territory = t
+	close_panel(t)
+	_create_connections()
+	set_territory_name(t.name)
+	%Portrait.texture = t.get_empire(_context).leader.portrait
+	%HomeIcon.visible = t.is_home_territory(ctx)
+	
+	var heroes: Array[String] = []
+	for u in t.get_empire(_context).units:
+		if _is_hero_unit(u):
+			if t.is_player_owned(ctx):
+				heroes.append(_get_avatar_name(u))
+				%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
+			else:
+				heroes.append(_get_hero_name(u))
+				%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ','.join(heroes)
+				
+	var force_strength := 'Force Strength: %s' % _get_force_strength(t.get_empire(_context))
+	%EnemyForceStrengthLabel.text = force_strength
+	%PlayerForceStrengthLabel.text = force_strength
+	
+	
 func _ready():
 	_remove_null_territory()
 	for child in get_children():
-		if child is Territory:
-			territory = child
-	if not territory:
-		territory = preload("res://scenes/overworld/null_territory.tscn").instantiate() as Territory
-		territory.set_meta('NullTerritory', true)
-		add_child(territory)
+		if child is TerritoryNode:
+			territory_node = child
+	if not territory_node:
+		territory_node = preload("res://scenes/overworld/null_territory.tscn").instantiate() as TerritoryNode
+		territory_node.set_meta('NullTerritory', true)
+		add_child(territory_node)
 		push_error('"%s" (%s) using NullTerritory (not assigned)' % [name, self])
-	funky_text($NameLabel, territory.name)
-	_create_connections()
-	_update_home_icon()
-	overworld.territory_transfer_ownership.connect(_on_territory_transfer_ownership)
+	set_territory_name(territory_node.name)
 
 
 func _exit_tree():
 	request_ready()
 	# TODO if connections show funky duplicating behaviour, just remove them here
 	_remove_null_territory()
-	territory = null
+	territory_node = null
 
 
-func funky_text(label: RichTextLabel, text: String, caps_size := 24):
+func _remove_null_territory():
+	for child in get_children():
+		if child.has_meta('NullTerritory'):
+			child.queue_free()
+	
+
+func set_territory_name(territory_name: String):
+	_funky_text(%NameLabel, territory_name, 26)
+
+
+# TODO put this function somewhere else
+func _funky_text(label: RichTextLabel, text: String, caps_size := 26):
 	label.clear()
 	label.text = ''
-	
 	label.append_text('[center]')
-	
 	var caps: Array[String] = []
 	var insert_caps := func():
 		if not caps.is_empty():
@@ -61,47 +108,61 @@ func funky_text(label: RichTextLabel, text: String, caps_size := 24):
 			insert_caps.call()
 			label.append_text(upper)
 	insert_caps.call()
-	
 	#label.append_text('[/center]')
 
 
-func _remove_null_territory():
-	for child in get_children():
-		if child.has_meta('NullTerritory'):
-			child.queue_free()
+func _get_avatar_name(u: UnitTypeEntry) -> String:
+	return u.unit_type.character_info.avatar.split(' ')[-1]
+	
+	
+func _get_hero_name(u: UnitTypeEntry) -> String:
+	return u.unit_type.character_info.name
 	
 
-func open_panel():
-	if territory.is_player_owned():
-		$PlayerPanel.visible = true
-	else:
-		$EnemyPanel.visible = true
-		$EnemyPanel/AttackButton.visible = Game.player_empire().is_adjacent_territory(territory)
+func _is_hero_unit(u: UnitTypeEntry) -> bool:
+	for e in _context.empires:
+		if e.hero_unit == u.unit_type:
+			return true
+	return false
+	
+	
+func _get_force_strength(e: Empire) -> String: # TODO update force strength
+	if e.hp_multiplier >= 1:
+		return 'Full'
+	if e.hp_multiplier >= 0.7:
+		return 'Hurt'
+	if e.hp_multiplier >= 0.3:
+		return 'Low'
+	return 'Critical'
+	
 
+func open_panel(t: Territory):
+	%PlayerPanel.visible = t.is_player_owned(_context)
+	%EnemyPanel.visible = not t.is_player_owned(_context)
+	%AttackButton.visible = _context.player_empire.is_adjacent_territory(t)
+	z_index = 1
+	
 
-func close_panel():
-	if territory.is_player_owned():
-		$PlayerPanel.visible = false
-	else:
-		$EnemyPanel.visible = false
+func close_panel(_t: Territory):
+	%PlayerPanel.hide()
+	%EnemyPanel.hide()
+	z_index = 0
 	
 	
 func _create_connections():
-	for adj in territory.adjacent:
+	_remove_connections()
+	for adj in territory_node.adjacent:
 		var conn := preload("res://scenes/overworld/connection.tscn").instantiate() as TerritoryConnection
 		conn.point_a = global_position
 		conn.point_b = adj.get_parent().global_position
-		$Connections.add_child(conn)
-	
-	
-func _update_home_icon():
-	$TextureRect.visible = territory.is_home_territory()
+		connections.add_child(conn)
 		
 	
-func _on_territory_transfer_ownership(_old_owner: Empire, new_owner: Empire, _territory: Territory):
-	if _territory != territory:
-		return
-	_update_home_icon()
+func _remove_connections():
+	while connections.get_child_count() > 0:
+		# not ideal but meh
+		var child := connections.get_child(0)
+		connections.remove_child(child)
 	
 
 func _on_detector_mouse_entered():
@@ -117,31 +178,33 @@ func _on_detector_mouse_exited():
 		highlight = false
 
 
-func _on_detector_gui_input(event):
+func _on_detector_gui_input(_event):
+	# TODO
 	pass # Replace with function body.
 
 
 func _on_detector_focus_entered():
-	highlight = true
 	locked = true
-	open_panel()
+	highlight = true
+	open_panel(_territory)
 
 
 func _on_detector_focus_exited():
-	highlight = false
 	locked = false
-	if not ($EnemyPanel/AttackButton.is_hovered() or $PlayerPanel/RestButton.is_hovered()):
-		close_panel()
+	# has to be done this way because pressing the button takes the
+	# focus from the detector and if we close the panel during that
+	# the button won't actually be pressed
+	if not (%AttackButton.is_hovered() or %RestButton.is_hovered()):
+		highlight = false
+		close_panel(_territory)
 
 
 func _on_attack_button_pressed():
-	print('attack')
-	overworld.choose_action(Overworld.AttackAction.new(Game.player_empire(), territory.empire, territory))
-	close_panel()
+	close_panel(_territory)
+	attack_pressed.emit(self)
 
 
 func _on_rest_button_pressed():
-	print('rest')
-	overworld.choose_action(Overworld.RestAction.new(Game.player_empire()))
-	close_panel()
+	close_panel(_territory)
+	rest_pressed.emit(self)
 
