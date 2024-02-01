@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=2 format=3 uid="uid://dlf5k23euetkb"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_j75gf"]
+
+[resource]
+script = ExtResource("1_j75gf")
+stats = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}

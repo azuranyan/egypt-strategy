@@ -24,38 +24,6 @@ var _context: OverworldContext
 var _territory: Territory
 
 
-## Returns the territory this node refers to.
-func get_territory(ctx: OverworldContext) -> Territory:
-	if _context:
-		return _territory
-	return ctx.get_territory_by_name(territory_node.name)
-	
-	
-## Initializes this button with territory.
-func initialize(ctx: OverworldContext, t: Territory):
-	_context = ctx
-	_territory = t
-	close_panel(t)
-	_create_connections()
-	set_territory_name(t.name)
-	%Portrait.texture = t.get_empire(_context).leader.portrait
-	%HomeIcon.visible = t.is_home_territory(ctx)
-	
-	var heroes: Array[String] = []
-	for u in t.get_empire(_context).units:
-		if _is_hero_unit(u):
-			if t.is_player_owned(ctx):
-				heroes.append(_get_avatar_name(u))
-				%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
-			else:
-				heroes.append(_get_hero_name(u))
-				%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ','.join(heroes)
-				
-	var force_strength := 'Force Strength: %s' % _get_force_strength(t.get_empire(_context))
-	%EnemyForceStrengthLabel.text = force_strength
-	%PlayerForceStrengthLabel.text = force_strength
-	
-	
 func _ready():
 	_remove_null_territory()
 	for child in get_children():
@@ -81,6 +49,39 @@ func _remove_null_territory():
 		if child.has_meta('NullTerritory'):
 			child.queue_free()
 	
+
+## Returns the territory this node refers to.
+func get_territory(ctx: OverworldContext) -> Territory:
+	if _context:
+		return _territory
+	return territory_node.get_territory(ctx)
+	
+	
+## Initializes this button with territory.
+func initialize(ctx: OverworldContext, t: Territory):
+	_context = ctx
+	_territory = t
+	close_panel(t)
+	_create_connections()
+	set_territory_name(t.name)
+	%Portrait.texture = ctx.get_territory_owner(t).leader.portrait
+	%HomeIcon.visible = _is_home_territory(t)
+	
+	var heroes: Array[String] = []
+	for u in _context.get_territory_owner(t).units:
+		if not _context.is_hero_unit(u):
+			continue
+		if t.is_player_owned(ctx):
+			heroes.append(u)
+			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
+		else:
+			heroes.append(u.display_name)
+			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ','.join(heroes)
+				
+	var force_strength := 'Force Strength: %s' % _get_force_strength(ctx.get_territory_owner(t))
+	%EnemyForceStrengthLabel.text = force_strength
+	%PlayerForceStrengthLabel.text = force_strength
+
 
 func set_territory_name(territory_name: String):
 	_funky_text(%NameLabel, territory_name, 26)
@@ -109,19 +110,11 @@ func _funky_text(label: RichTextLabel, text: String, caps_size := 26):
 			label.append_text(upper)
 	insert_caps.call()
 	#label.append_text('[/center]')
-
-
-func _get_avatar_name(u: UnitTypeEntry) -> String:
-	return u.unit_type.character_info.avatar.split(' ')[-1]
-	
-	
-func _get_hero_name(u: UnitTypeEntry) -> String:
-	return u.unit_type.character_info.name
 	
 
-func _is_hero_unit(u: UnitTypeEntry) -> bool:
+func _is_home_territory(t: Territory) -> bool:
 	for e in _context.empires:
-		if e.hero_unit == u.unit_type:
+		if e.home_territory == t:
 			return true
 	return false
 	
@@ -135,10 +128,11 @@ func _get_force_strength(e: Empire) -> String: # TODO update force strength
 		return 'Low'
 	return 'Critical'
 	
-
+	
 func open_panel(t: Territory):
-	%PlayerPanel.visible = t.is_player_owned(_context)
-	%EnemyPanel.visible = not t.is_player_owned(_context)
+	var player := _context.get_territory_owner(t).is_player_owned()
+	%PlayerPanel.visible = player
+	%EnemyPanel.visible = not player
 	%AttackButton.visible = _context.player_empire.is_adjacent_territory(t)
 	z_index = 1
 	

@@ -25,6 +25,7 @@ enum State {
 @export var state: State
 
 	
+## Returns the empire with the given id.
 func get_empire_by_id(id: int) -> Empire:
 	if id == -1:
 		return null
@@ -32,6 +33,7 @@ func get_empire_by_id(id: int) -> Empire:
 	return empires[id]
 	
 	
+## Returns the empire with the given leader.
 func get_empire_by_leader(leader: CharacterInfo) -> Empire:
 	for e in empires:
 		if e.leader == leader:
@@ -39,13 +41,7 @@ func get_empire_by_leader(leader: CharacterInfo) -> Empire:
 	return null
 	
 	
-func get_empire_by_leader_name(leader_name: String) -> Empire:
-	for e in empires:
-		if e.leader_name() == leader_name:
-			return e
-	return null
-	
-	
+## Returns the territory with the given id.
 func get_territory_by_id(id: int) -> Territory:
 	if id == -1:
 		return null
@@ -53,6 +49,7 @@ func get_territory_by_id(id: int) -> Territory:
 	return territories[id]
 	
 	
+## Returns the territory with the given name.
 func get_territory_by_name(territory_name: String) -> Territory:
 	for t in territories:
 		if t.name == territory_name:
@@ -60,9 +57,35 @@ func get_territory_by_name(territory_name: String) -> Territory:
 	return null
 	
 	
+## Returns the owner of the territory.
+func get_territory_owner(territory: Territory) -> Empire:
+	for e in empires:
+		if territory in e.territories:
+			return e
+	return null
+	
+
+## Returns the owner of the unit.
+func get_unit_owner(unit: Unit) -> Empire:
+	for e in empires:
+		if unit in e.units:
+			return e
+	return null
+
+
+## Returns true if unit is a hero unit.
+func is_hero_unit(unit: Unit) -> bool:
+	for e in empires:
+		if e.hero_unit == unit.unit_type:
+			return true
+	return false
+
+
+## Returns the empire currently on turn.
 func on_turn() -> Empire:
 	return active_empires[turn_index]
 	
 
+## Returns true if the boss is active.
 func is_boss_active() -> bool:
 	return boss_empire in active_empires

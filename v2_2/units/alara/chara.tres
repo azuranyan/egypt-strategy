@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://tt2seal55q21"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_ukfks"]
+[ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="1_v40mf"]
+
+[resource]
+script = ExtResource("1_ukfks")
+name = "Alara"
+gender = "F"
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+portrait = ExtResource("1_v40mf")

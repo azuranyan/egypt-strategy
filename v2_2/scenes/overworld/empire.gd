@@ -39,10 +39,6 @@ enum Type {
 @export var hp_multiplier: float = 1
 
 
-## Kind of a hack to make everything simpler.
-var _territories: WeakRef
-
-
 ## Returns true if empire is player owned.
 func is_player_owned() -> bool:
 	return type == Type.PLAYER
@@ -80,8 +76,8 @@ func is_adjacent_territory(territory: Territory) -> bool:
 
 
 ## Returns an array of adjacent territories.
-func get_adjacent() -> Array[Territory]:
-	return _territories.filter(is_adjacent_territory)
+func get_adjacent(territory_list: Array[Territory]) -> Array[Territory]:
+	return territory_list.filter(is_adjacent_territory)
 
 
 ## Returns true if the empire is is_defeated.

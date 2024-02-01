@@ -52,7 +52,7 @@ func find_territory_button(territory: Territory) -> TerritoryButton:
 		if t.get_territory(_context) == territory:
 			return t
 	return null
-	
+
 	
 ## Returns a new context.
 func create_new_context() -> OverworldContext:
@@ -83,79 +83,79 @@ func create_new_context() -> OverworldContext:
 ## Saves the territories to ctx.
 func _save_territories(ctx: OverworldContext):
 	ctx.territories.clear()
-	# copy data from territory nodes
 	for button in territory_buttons:
 		var node: TerritoryNode = button.territory_node
-		var territory := Territory.new()
-		territory.name = node.name
-		# empires, adjacent will be done later
-		territory.maps = node.maps.duplicate()
-		territory.units = node.units.duplicate()
-		ctx.territories.append(territory)
-		
-	# assign adjacency
-	for i in territory_buttons.size():
-		var node: TerritoryNode = territory_buttons[i].territory_node
+		var t := Territory.new()
+		t.name = node.name
 		for adj in node.adjacent:
-			if not adj:
-				push_error('"%s": null territory assigned as adjacent' % [node.name])
-			# kinda voodoo knowledge but it is what it is
-			var adj_idx := territory_buttons.find(adj.get_parent())
-			ctx.territories[i].adjacent.append(ctx.territories[adj_idx])
+			t.adjacent.append(adj.name)
+		t.maps = node.maps.duplicate()
+		t.units = node.get_unit_entries()
+		ctx.territories.append(t)
 	
 
 ## Saves the empire to ctx.
 func _save_empires(ctx: OverworldContext):
-	_create_empires(ctx)
-	_distribute_empires(ctx)
-	
-
-## Creates the empires.
-func _create_empires(ctx: OverworldContext):
 	ctx.empires.clear()
 	for node in get_empire_nodes():
 		if not node.home_territory_node:
 			push_error('"%s" included in Empires, but has no home territory set' % node.name)
 			continue
-		var empire := _create_empire_from_node(ctx, node)
+		var e := _create_empire_from_node(ctx, node)
 		var home_territory := node.home_territory_node.get_territory(ctx)
-		_set_empire_territory(ctx, empire, home_territory, true)
-		_add_empire_to_context(ctx, empire)
+		_set_empire_territory(ctx, e, home_territory, true)
+		_add_empire_to_context(ctx, e)
+	
+	_distribute_empires(ctx)
 	
 	
-## Creates the empire from node.
+## Creates the empire from node. Note that this doesn't set the territories or units.
 func _create_empire_from_node(_ctx: OverworldContext, node: EmpireNode) -> Empire:
-	var empire := Empire.new()
-	empire.type = node.type
-	empire.leader = node.leader
-	empire.hero_unit = node.hero_unit
-	empire.base_aggression = node.base_aggression
-	empire.aggression = node.base_aggression
-	return empire
+	var e := Empire.new()
+	e.type = node.type
+	e.leader = node.leader
+	e.hero_unit = node.hero_unit
+	e.base_aggression = node.base_aggression
+	# units and territory will be set later
+	e.aggression = node.base_aggression
+	return e
 	
 	
 ## Adds territory to empire.
 func _set_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory, home: bool):
-	territory.empire_id = _ctx.empires.find(empire)
 	if home:
 		empire.home_territory = territory
 	if territory not in empire.territories:
-		empire.territories.insert(0, territory)
-	empire.cache_territory_units()
+		empire.territories.insert(0 if home else empire.territories.size(), territory)
+	_cache_territory_units(empire)
 	
 	
 ## Removes territory from empire.
 func _unset_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory):
-	territory.empire = null
 	empire.territories.erase(territory)
-	empire.cache_territory_units()
-	
+	_cache_territory_units(empire)
+
+
+## Creates the list of units in empire.
+func _cache_territory_units(empire: Empire):
+	for t in empire.territories:
+		for unit_name in t.units:
+			var count: int = t.units[unit_name]
+			for i in count:
+				var tag := _generate_unit_tag(unit_name, t, i)
+				var u := Game.load_unit(unit_name, tag)
+				empire.units.append(u)
+
+
+## Generates wrangled name for units from territory.
+func _generate_unit_tag(unit_name: String, territory: Territory, id: int) -> String:
+	return '_'.join([unit_name, territory, id])
+
 	
 ## Adds the empire to context.
 func _add_empire_to_context(ctx: OverworldContext, empire: Empire):
 	if empire not in ctx.empires:
 		ctx.empires.append(empire)
-	
 	if empire.is_player_owned():
 		ctx.player_empire = empire
 	if empire.is_boss():
@@ -167,7 +167,7 @@ func _distribute_empires(ctx: OverworldContext):
 	# take territories with no empires assigned yet
 	var grabs: Array[Territory] = []
 	for t in ctx.territories:
-		if t.get_empire(ctx) == null:
+		if ctx.get_territory_owner(t) == null:
 			grabs.append(t)
 	if grabs.is_empty():
 		return
@@ -216,8 +216,8 @@ func start_overworld_cycle(ctx: OverworldContext):
 	
 	for btn in territory_buttons:
 		btn.initialize(_context, btn.get_territory(_context))
-		if btn.get_territory(_context).is_boss(_context):
-			btn.visible = btn.get_territory(_context).get_empire(_context) in _context.active_empires
+		if btn.get_territory(_context) == _context.boss_empire.home_territory:
+			btn.visible = _context.is_boss_active()
 	show()
 	
 	Game.overworld_started.emit()
@@ -440,7 +440,7 @@ func _on_territory_button_attack_pressed(button: TerritoryButton):
 		return
 	var territory := button.get_territory(_context)
 	var attacker := _context.on_turn()
-	var defender := territory.get_empire(_context)
+	var defender := _context.get_territory_owner(territory)
 	_player_choose_action.emit(AttackAction.new(_context, attacker, defender, territory))
 	
 	
@@ -511,4 +511,10 @@ class TrainingAction extends EmpireAction:
 	func _init(_context: OverworldContext, _empire: Empire):
 		super(_context, _empire, 'Train')
 	
-		
+
+func _on_load_button_pressed():
+	pass
+
+
+func _on_save_button_pressed():
+	pass # Replace with function body.

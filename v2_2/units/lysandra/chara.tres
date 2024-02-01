@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://bq47arkapu6hu"]
+
+[ext_resource type="Texture2D" uid="uid://cplexleqmf751" path="res://units/lysandra/Player.png" id="1_uf1k3"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="2_j7dco"]
+
+[resource]
+script = ExtResource("2_j7dco")
+name = "Lysandra"
+gender = "F"
+avatar = "Avatar of Ra"
+title = "Supreme Sun God"
+map_color = Color(0.666667, 0.352941, 0.2, 1)
+portrait = ExtResource("1_uf1k3")

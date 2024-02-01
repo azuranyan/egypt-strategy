@@ -22,7 +22,6 @@ extends Node
 			home_territory_node.empire_node = self
 		notify_property_list_changed()
 
-@export var unit: Unit
 
 ## Returns the empire this node refers to.
 func get_empire(ctx: OverworldContext) -> Empire:

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=2 format=3 uid="uid://chk071akm05it"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_muxxo"]
+
+[resource]
+script = ExtResource("1_muxxo")
+name = "Eirene"
+gender = "F"
+avatar = "Avatar of Hathor"
+title = "Caring Cow Goddess"
+map_color = Color(0.886275, 0.313726, 0.596078, 1)

@@ -23,6 +23,11 @@ extends Node
 		notify_property_list_changed()
 
 
+## Returns the territory this node refers to.
+func get_territory(ctx: OverworldContext) -> Territory:
+	return ctx.get_territory_by_name(name)
+	
+	
 ## Returns the unit entries.
 func get_unit_entries() -> Dictionary:
 	var arr := {}
@@ -32,16 +37,3 @@ func get_unit_entries() -> Dictionary:
 		var unit_count := split[1].to_int() if split.size() > 1 else 1
 		arr[unit_name] = unit_count
 	return arr
-
-
-## Returns a new [Territory] object represented by this node.
-func new_territory() -> Territory:
-	var t := Territory.new()
-	t.name = name
-	for adj in adjacent:
-		t.adjacent.append(adj.name)
-	t.maps = maps.duplicate()
-	t.units = get_unit_entries()
-	return t
-
-

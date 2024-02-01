@@ -70,7 +70,7 @@ enum State {INVALID, IDLE, WALKING, ATTACKING, HURT, DYING, DEAD}
 @export_group("Character")
 
 ## The character representing this unit.
-@export var character_info: CharacterInfo
+@export var chara: CharacterInfo
 
 ## The blueprint unit type of this unit.
 @export var unit_type: UnitType
@@ -137,11 +137,11 @@ func _to_string() -> String:
 	return '<Unit#%s>' % self.get_instance_id()
  
 
-func _init(_character_info: CharacterInfo = null, _unit_type: UnitType = null, prop := {}):
-	character_info = _character_info
+func _init(_chara: CharacterInfo = null, _unit_type: UnitType = null, prop := {}):
+	chara = _chara
 	unit_type = _unit_type
-	display_name = prop.get('display_name', character_info.name if display_name == "" and character_info else display_name)
-	display_icon = prop.get('display_icon', character_info.portrait if display_icon == null and character_info else display_icon)
+	display_name = prop.get('display_name', chara.name if display_name == "" and chara else display_name)
+	display_icon = prop.get('display_icon', chara.portrait if display_icon == null and chara else display_icon)
 	model_scale = prop.get('model_scale', Vector2.ONE)
 	behavior = prop.get('behavior', Behavior.PLAYER_CONTROLLED)
 	

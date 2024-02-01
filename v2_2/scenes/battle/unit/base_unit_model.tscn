@@ -4,5 +4,3 @@
 
 [node name="BaseUnitModel" type="Node2D"]
 script = ExtResource("1_1tpnb")
-heading = null
-animation = ""
