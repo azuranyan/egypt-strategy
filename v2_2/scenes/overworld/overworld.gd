@@ -235,6 +235,8 @@ func start_overworld_cycle(ctx: OverworldContext):
 ## Stops the overworld cycle.
 func stop_overworld_cycle():
 	_should_end = true
+	# TODO add check for player wait action state
+	_player_choose_action.emit(null)
 
 
 ## Returns the continuation function based on the state
@@ -510,7 +512,7 @@ class TrainingAction extends EmpireAction:
 	
 	func _init(_context: OverworldContext, _empire: Empire):
 		super(_context, _empire, 'Train')
-	
+		
 
 func _on_load_button_pressed():
 	pass

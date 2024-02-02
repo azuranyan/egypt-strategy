@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=2 format=3 uid="uid://jehd7a1drfwu"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_qg367"]
+
+[resource]
+script = ExtResource("1_qg367")
+name = ""
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0, 0, 1)

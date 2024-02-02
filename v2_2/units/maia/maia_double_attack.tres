@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=2 format=3 uid="uid://nnjogl2645yd"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/attack.gd" id="1_umq5o"]
+
+[resource]
+script = ExtResource("1_umq5o")
+name = "Double Attack"
+description = "Attacks twice."
+user_animation = "attack"
+multicast = 1
+self_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+ally_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0

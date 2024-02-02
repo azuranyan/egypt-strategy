@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://be1oij41g24v5"]
+
+[ext_resource type="Texture2D" uid="uid://cc13grdk0wqhf" path="res://units/maia/Maia.png" id="1_05sod"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_txr78"]
+
+[resource]
+script = ExtResource("1_txr78")
+name = "Maia"
+gender = "F"
+avatar = "Avatar of Osiris"
+title = "Dualistic Death God"
+map_color = Color(0.313726, 0.784314, 0.470588, 1)
+portrait = ExtResource("1_05sod")

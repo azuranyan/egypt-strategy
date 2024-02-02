@@ -1,0 +1,96 @@
+[gd_scene load_steps=6 format=3 uid="uid://dxsegbop5pwxa"]
+
+[ext_resource type="Script" path="res://tools/character_info_panel.gd" id="1_btduk"]
+[ext_resource type="Texture2D" uid="uid://d021dp3ps0dcs" path="res://tools/female-icon.png" id="1_ntgel"]
+[ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="2_u52hf"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_o5gwn"]
+font_size = 22
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_prf43"]
+content_margin_left = 0.0
+content_margin_right = 0.0
+color = Color(0.47451, 0.47451, 0.47451, 1)
+grow_begin = 0.0
+grow_end = 0.0
+thickness = 2
+
+[node name="CharacterInfoPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 369.0
+offset_bottom = 87.0
+script = ExtResource("1_btduk")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12549, 0.12549, 0.12549, 1)
+
+[node name="GenderIcon" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 348.0
+offset_top = 2.0
+offset_right = 368.0
+offset_bottom = 22.0
+texture = ExtResource("1_ntgel")
+expand_mode = 1
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.25
+anchor_bottom = 1.0
+
+[node name="TextureRect" type="TextureRect" parent="AspectRatioContainer"]
+layout_mode = 2
+texture = ExtResource("2_u52hf")
+expand_mode = 1
+
+[node name="MapColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+offset_left = 92.0
+offset_right = 97.0
+offset_bottom = 87.0
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 2
+offset_left = 106.0
+offset_right = 369.0
+offset_bottom = 31.0
+text = "Alara"
+label_settings = SubResource("LabelSettings_o5gwn")
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 97.0
+offset_top = -58.0
+offset_bottom = -54.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/separator = SubResource("StyleBoxLine_prf43")
+
+[node name="AvatarLabel" type="Label" parent="."]
+layout_mode = 2
+offset_left = 117.0
+offset_top = 33.0
+offset_right = 369.0
+offset_bottom = 56.0
+text = "Avatar of Horus"
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 2
+offset_left = 117.0
+offset_top = 56.0
+offset_right = 369.0
+offset_bottom = 79.0
+text = "Boastful Bird God"

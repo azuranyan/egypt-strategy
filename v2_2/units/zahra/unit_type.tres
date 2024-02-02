@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://b8b8l1glgxpp6"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_ocb3k"]
+[ext_resource type="Resource" uid="uid://k63jwv3p3wwb" path="res://units/zahra/zahra_cleave.tres" id="1_ojcll"]
+[ext_resource type="Resource" uid="uid://drguw71wlrtcu" path="res://units/zahra/zahra_vul_debuff.tres" id="3_5soe7"]
+
+[resource]
+script = ExtResource("1_ocb3k")
+stats = {
+"dmg": 2,
+"maxhp": 4,
+"mov": 2,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 1,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 1,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_ojcll")
+special_attack = ExtResource("3_5soe7")

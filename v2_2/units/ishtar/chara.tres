@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://c8j8oc6v24lw0"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_b6tan"]
+[ext_resource type="Texture2D" uid="uid://do2hdupoy1ivh" path="res://units/ishtar/IshtarF.png" id="1_mincb"]
+
+[resource]
+script = ExtResource("1_b6tan")
+name = "Ishtar"
+gender = "F"
+avatar = "Avatar of Isis"
+title = "Selfless Scorpion Goddess"
+map_color = Color(0.74902, 0.25098, 0.74902, 1)
+portrait = ExtResource("1_mincb")

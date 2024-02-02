@@ -4,12 +4,9 @@
 [ext_resource type="Script" path="res://scenes/overworld/empire_node.gd" id="2_05kkr"]
 [ext_resource type="Resource" uid="uid://dbi41kshumras" path="res://scenes/battle/unit/data/placeholder_character_info.tres" id="3_nf2ia"]
 
-[node name="NullTerritory" type="Node" node_paths=PackedStringArray("empire")]
+[node name="NullTerritory" type="Node"]
 script = ExtResource("1_h10pe")
-empire = NodePath("Empire")
 
-[node name="Empire" type="Node" parent="." node_paths=PackedStringArray("territories", "home_territory")]
+[node name="Empire" type="Node" parent="."]
 script = ExtResource("2_05kkr")
 leader = ExtResource("3_nf2ia")
-territories = [NodePath("")]
-home_territory = NodePath("..")

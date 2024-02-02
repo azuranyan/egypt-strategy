@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://cw2mvcntu38p2"]
+
+[ext_resource type="Script" path="res://scenes/test/overlay.gd" id="1_3d83f"]
+[ext_resource type="PackedScene" uid="uid://djs5r2dgf3cj3" path="res://tools/unit_viewer.tscn" id="2_117x8"]
+
+[node name="Overlay" type="CanvasLayer"]
+layer = 50
+script = ExtResource("1_3d83f")
+
+[node name="QuitButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_top = 13.0
+offset_right = -12.0
+offset_bottom = 77.0
+grow_horizontal = 0
+focus_mode = 0
+text = "Quit"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -202.0
+offset_top = -128.0
+offset_right = 202.0
+offset_bottom = -68.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 25
+
+[node name="LoadButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+focus_mode = 0
+text = "Save"
+
+[node name="SaveButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+focus_mode = 0
+text = "Load"
+
+[node name="UnitViewer" parent="." instance=ExtResource("2_117x8")]
+
+[connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]

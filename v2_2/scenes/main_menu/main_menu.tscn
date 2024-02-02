@@ -1,0 +1,219 @@
+[gd_scene load_steps=9 format=3 uid="uid://dlcfb7plorapm"]
+
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="1_0k5ue"]
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_n5g87"]
+[ext_resource type="Texture2D" uid="uid://bxip65cj4b43o" path="res://scenes/main_menu/Map_wo_Separators_Color_Filters_Blank.png" id="2_1hkau"]
+
+[sub_resource type="Gradient" id="Gradient_ehfxr"]
+offsets = PackedFloat32Array(0.557604, 0.852535, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_biafn"]
+gradient = SubResource("Gradient_ehfxr")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_qvq30"]
+font = ExtResource("1_0k5ue")
+font_size = 128
+font_color = Color(0.290196, 0.176471, 0.14902, 1)
+outline_size = 60
+outline_color = Color(1, 1, 1, 0.964706)
+
+[sub_resource type="Gradient" id="Gradient_o03fu"]
+offsets = PackedFloat32Array(0, 0.705069)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_uk8m4"]
+gradient = SubResource("Gradient_o03fu")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
+
+[node name="MainMenu" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_n5g87")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG" type="TextureRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1276.0
+offset_top = -702.0
+offset_right = 644.0
+offset_bottom = 378.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.58, 1.58)
+pivot_offset = Vector2(960, 540)
+texture = ExtResource("2_1hkau")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.129412)
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+modulate = Color(0.231373, 0.160784, 0.0901961, 0.509804)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_biafn")
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -797.0
+offset_top = -371.0
+offset_right = -175.0
+offset_bottom = -180.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Egypt Game"
+label_settings = SubResource("LabelSettings_qvq30")
+
+[node name="TextureRect2" type="TextureRect" parent="Control/Label"]
+modulate = Color(0.894118, 0.792157, 0.576471, 1)
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -204.0
+offset_top = -32.0
+offset_right = 174.0
+offset_bottom = 77.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(500, 150)
+texture = SubResource("GradientTexture2D_uk8m4")
+
+[node name="HBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 179.0
+offset_top = -80.0
+offset_right = -1465.0
+offset_bottom = 259.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button1" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Start"
+alignment = 0
+
+[node name="Button2" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Continue"
+alignment = 0
+
+[node name="Button3" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Load"
+alignment = 0
+
+[node name="Button4" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Settings"
+alignment = 0
+
+[node name="Button5" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Extras"
+alignment = 0
+
+[node name="Button6" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Credits"
+alignment = 0
+
+[node name="Button7" type="Button" parent="Control/HBoxContainer"]
+custom_minimum_size = Vector2(128, 42)
+layout_mode = 2
+theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_focus_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
+theme_override_fonts/font = ExtResource("1_0k5ue")
+theme_override_font_sizes/font_size = 24
+text = "Exit"
+alignment = 0
+
+[connection signal="pressed" from="Control/HBoxContainer/Button1" to="." method="_on_button_1_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button2" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button3" to="." method="_on_button_3_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button4" to="." method="_on_button_4_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button5" to="." method="_on_button_5_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button6" to="." method="_on_button_6_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/Button7" to="." method="_on_button_7_pressed"]

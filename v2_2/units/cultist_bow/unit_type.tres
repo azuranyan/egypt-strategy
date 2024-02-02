@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=3 format=3 uid="uid://bjne5xlsbfvpr"]
+
+[ext_resource type="Resource" uid="uid://b17ojfspfspve" path="res://units/placeholder/basic_ranged.tres" id="1_u0juk"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_xh16b"]
+
+[resource]
+script = ExtResource("1_xh16b")
+stats = {
+"dmg": 1,
+"maxhp": 2,
+"mov": 2,
+"rng": 3
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_u0juk")

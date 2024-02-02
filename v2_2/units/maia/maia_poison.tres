@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=2 format=3 uid="uid://cegk3w3phtg8e"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/attack.gd" id="1_akrge"]
+
+[resource]
+script = ExtResource("1_akrge")
+name = "Poison"
+description = "Damages and inflicts poison."
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+ally_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = 1
+min_range = 0

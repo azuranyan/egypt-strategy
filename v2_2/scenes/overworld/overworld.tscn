@@ -108,6 +108,7 @@ offset_bottom = 801.0
 [node name="Zetennu" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("adjacent", "empire_node")]
 script = ExtResource("6_c77fe")
 adjacent = [NodePath("../../TerritoryButton7/Neru-Khisi")]
+_unit_list = PackedStringArray("cultist_axe")
 empire_node = NodePath("../../Empires/Player")
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("2_gak2j")]
@@ -207,30 +208,3 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -202.0
-offset_top = -128.0
-offset_right = 202.0
-offset_bottom = -68.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 25
-
-[node name="LoadButton" type="Button" parent="HBoxContainer"]
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-text = "Save"
-
-[node name="SaveButton" type="Button" parent="HBoxContainer"]
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-text = "Load"
-
-[connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]

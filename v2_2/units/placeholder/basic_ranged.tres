@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://b17ojfspfspve"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/debug_print_effect.gd" id="1_2ogfb"]
+[ext_resource type="Script" path="res://scenes/battle/unit/attack.gd" id="2_gawqu"]
+
+[sub_resource type="Resource" id="Resource_mcn6d"]
+script = ExtResource("1_2ogfb")
+format = "{user} effect {target}"
+
+[resource]
+script = ExtResource("2_gawqu")
+name = "Basic Attack"
+description = "Description"
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([SubResource("Resource_mcn6d")])
+ally_effects = Array[Resource("res://scenes/battle/unit/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0

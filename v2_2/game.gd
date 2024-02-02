@@ -5,6 +5,11 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+signal quit_requested
+
+signal saving(save: SaveState)
+signal loading(save: SaveState)
+
 signal overworld_started
 signal overworld_ended
 
@@ -24,18 +29,26 @@ signal overworld_turn_started(empire: Empire)
 signal overworld_turn_ended(empire: Empire)
 
 
-
-
 const OverworldScene := preload("res://scenes/overworld/overworld.tscn")
+const BattleScene := preload("res://scenes/battle/battle.tscn")
+const MainMenuScene := preload("res://scenes/main_menu/main_menu.tscn")
 
-var test_individual_scenes := true
-
-
-## Preferences.
-var prefs := {
-	defeat_if_home_territory_captured = true,
+enum {
+	SCENE_NONE,
+	SCENE_INTRO,
+	SCENE_MAIN_MENU, 
+	SCENE_OVERWORLD,
+	SCENE_BATTLE,
+	SCENE_SAVELOAD,
+	SCENE_EXTRAS,
+	SCENE_CREDITS,
 }
 
+## Preferences.
+var prefs: Preferences
+
+## Persistent data.
+var persistent: Persistent
 
 ## The array of all units in the game.
 var units: Array[Unit]
@@ -43,12 +56,27 @@ var units: Array[Unit]
 ## Record of units by tag.
 var _units_by_tag := {}
 
+## Data pending to be loaded at the next checkpoint.
+var _pending_data: SaveState
+
+var _last_battle_result: BattleResult
+
+var _scene: int
+
 var suspended: bool
 
-
+var _should_end: bool
 
 var _overworld: Overworld
-var _state: SaveState
+var _overworld_context: OverworldContext
+
+var _battle: Battle
+var _battle_context: BattleContext
+
+var _event
+var _event_context
+
+var is_saveable_context: bool
 
 
 func _ready():
@@ -56,8 +84,125 @@ func _ready():
 		print("[Game] Loading default overworld (debug).")
 		#overworld = OverworldScene.instantiate()
 		#add_child(overworld)
+		
+	# default handler for quit. should be overridden for custom quit behavior
+	quit_requested.connect(func(): _should_end = true)
 
 
+func _main(args := {}):
+	# allows the game to launch a save file immediately
+	if args.has('quickload'):
+		_pending_data = args.get('quickload')
+
+	# debug overlay
+	var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
+	debug_overlay.quit_button_pressed.connect(quit_game)
+	#debug_overlay.save_button_pressed.connect(save_state)
+	#debug_overlay.load_button_pressed.connect(load_state)
+	add_child(debug_overlay)
+	
+	game_started.emit()
+	await _start_intro()
+
+	await _start_main_menu()
+
+	while not _should_end:
+		if not _pending_data:
+			print('no data to load')
+			quit_game()
+			break
+			
+		# load the pending data
+		_load_state(_pending_data)
+		var start_point := _pending_data.paused_event as String
+		var start_data := _pending_data.paused_data as Dictionary
+		_pending_data = null
+
+		# launch the appropriate subsystem for the paused event
+		match start_point:
+			'overworld':
+				await _start_overworld()
+			'battle':
+				await _start_battle()
+			'':
+				await _start_main_menu()
+			_:
+				await _start_event()
+	game_ended.emit()
+		
+		
+func _start_overworld():
+	if is_instance_valid(_overworld):
+		push_error('Overworld already running.')
+		return
+	assert(_overworld_context)
+
+	# create the overworld
+	print('[Game] Starting Overworld.')
+	_overworld = OverworldScene.instantiate()
+	add_child(_overworld)
+	
+	# start the overworld
+	is_saveable_context = true
+	_overworld.start_overworld_cycle(_overworld_context)
+	
+	# wait for the overworld to end
+	_last_battle_result = await overworld_ended
+
+	# end the overworld
+	print('[Game] Exiting Overworld.')
+	is_saveable_context = false
+	remove_child(_overworld)
+	_overworld.queue_free()
+ 
+
+func _start_battle():
+	if is_instance_valid(_battle):
+		push_error('Battle already running.')
+		return
+	assert(_battle_context)
+	
+	# create the battle
+	print('[Game] Starting Battle.')
+	#_battle = BattleScene.instantiate()
+	#add_child(_battle)
+	SceneManager.load_new_scene(BattleScene.resource_path, 'fade_to_black')
+	_battle = await SceneManager.transition_finished
+	
+	
+	# start the battle
+	is_saveable_context = true
+	_battle.start_battle(_battle_context)
+
+	# wait for the battle to finish
+	await battle_ended
+
+	# end the battle
+	print('[Game] Exiting Battle.')
+	is_saveable_context = false
+	
+	SceneManager.load_new_scene(OverworldScene.resource_path, 'fade_to_black')
+	_overworld = await SceneManager.transition_finished
+	#remove_child(_battle)
+	#_battle.queue_free()
+ 
+
+func _start_main_menu():
+	var main_menu := MainMenuScene.instantiate()
+	add_child(main_menu)
+	await main_menu.show_main_menu()
+	remove_child(main_menu)
+	main_menu.queue_free()
+
+
+func _start_event():
+	pass
+
+
+func _start_intro():
+	pass
+	
+		
 ## Returns the viewport size.
 func get_viewport_size() -> Vector2:
 	# TODO get_viewport().size doesn't work, even with stretch mode set to
@@ -115,48 +260,55 @@ func destroy_unit(unit: Unit):
 ## Returns the character info for given unit name.
 func get_character_info(unit_name: String) -> CharacterInfo:
 	var dirname := unit_name.to_snake_case()
-	var c := load('res://units/%s/chara.tres' % dirname)
-	if not c:
+	var path := 'res://units/%s/chara.tres' % dirname
+	if FileAccess.file_exists(path):
+		return load(path)
+	else:
 		push_warning('%s: "res://units/%s/chara.tres" not found' % [unit_name, dirname])
 		return preload('res://units/placeholder/chara.tres')
-	return c
 
 
 ## Returns the unit type for given unit name.
 func get_unit_type(unit_name: String) -> UnitType:
 	var dirname := unit_name.to_snake_case()
-	var ut := load('res://units/%s/unit_type.tres' % dirname)
-	if not ut:
+	var path := 'res://units/%s/unit_type.tres' % dirname
+	if FileAccess.file_exists(path):
+		return load(path)
+	else:
 		push_warning('%s: "res://units/%s/unit_type.tres" not found' % [unit_name, dirname])
 		return preload('res://units/placeholder/unit_type.tres')
-	return ut
-
-	
 
 
-	
+func start_new_game():
+	_pending_data = create_new_data()
+
+
 func start_overworld_cycle():
-	if is_instance_valid(_overworld):
-		push_error('Overworld already running.')
-		return
-	print('[Game] Starting Overworld.')
-	if not _state:
-		push_error('no state loaded.')
-		return
-	_overworld = OverworldScene.instantiate()
-	add_child(_overworld)
-	_overworld.start_overworld_cycle(_state.overworld_context)
-	await overworld_ended
-	print('[Game] Exiting Overworld.')
-	remove_child(_overworld)
-	_overworld.queue_free()
+	# overworld context is always loaded in data so we just call this
+	await _start_overworld()
 	
+	
+func stop_overworld_cycle():
+	if is_instance_valid(_overworld):
+		_overworld.stop_overworld_cycle()
+		
 
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id := 0):
-	# TODO
-	battle_started.emit()
-	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, attacker, defender, territory, map_id)
-	battle_ended.emit(result)
+	var ctx := BattleContext.new()
+	ctx.attacker = attacker
+	ctx.defender = defender
+	ctx.territory = territory
+	ctx.map_id = map_id
+	ctx.units = units
+	ctx.territories = _overworld_context.territories
+	ctx.empires = _overworld_context.empires
+	_battle_context = ctx
+	await _start_battle()
+	_battle_context = null
+
+
+func stop_battle():
+	pass
 	
 	
 func suspend():
@@ -174,31 +326,57 @@ func wait_for_resume():
 		await game_resumed
 	
 	
-func start_game(args := {}):
-	test_individual_scenes = false
-	game_started.emit()
-	await _main(args)
-	game_ended.emit()
-	get_tree().quit()
+func quit_game():
+	quit_requested.emit()
+	# TODO
 	
+	if is_instance_valid(_battle):
+		_battle.stop_battle()
+	if is_instance_valid(_overworld):
+		_overworld.stop_overworld_cycle()
 	
-func _main(_args := {}):
-	#var custom_state := create_new_state()
+
+func restart_game():
+	_overworld.queue_free()
+	if _battle:
+		_battle.queue_free()
 	
-	var custom_state := SaveState.load_from_file('user://save_file4.res')
-	load_state(custom_state)
-	await start_overworld_cycle()
-	_state = null
+		
+		
+func show_main_menu() -> int:
+	var main_menu := MainMenuScene.instantiate()
+	add_child(main_menu)
+	#main_menu.start_selected
+	#main_menu.continue_selected
+	#main_menu.load_selected
+	#main_menu.settings_selected
+	#main_menu.extras_selected
+	#main_menu.credits_selected
+	#main_menu.exit_selected.connect(emit_signal.bind('_main_menu_choice', 1))
+	#var re := await _main_menu_choice
+	#main_menu.queue_free()
+	return 1
+		
+	
+func _initiate_load():
+	# if we're still running
+	pass
 
 
-func create_new_state() -> SaveState:
+## Creates a new save data.
+func create_new_data() -> SaveState:
 	print('[Game] Creating new save.')
 	var state := SaveState.new()
-	state.overworld_context = create_new_overworld_context()
+	state.paused_event = 'overworld'
+	state.paused_data.dummy = 'dummy'
+	state.prefs = Preferences.new()
+	state.overworld_context = _create_new_overworld_context()
+	state.battle_context = null
+	state.units = []
 	return state
 	
 	
-func create_new_overworld_context() -> OverworldContext:
+func _create_new_overworld_context() -> OverworldContext:
 	var overworld := OverworldScene.instantiate() as Overworld
 	overworld.hide()
 	add_child(overworld)
@@ -207,14 +385,44 @@ func create_new_overworld_context() -> OverworldContext:
 	overworld.queue_free()
 	return ctx
 	
+
+## Saves game data to file.
+func save_data(path: String) -> Error:
+	print('[Game] Saving data to "%s".' % path)
+	if not is_saveable_context:
+		return Error.FAILED
+	# TODO show saving dialog
+	return _save_state().save_to_file(path)
+
 	
-func save_state() -> SaveState:
-	print('[Game] Saving...')
+func _save_state() -> SaveState:
 	assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
-	return _state.duplicate(false)
+	var save := SaveState.new()
 	
+	save.prefs = prefs.duplicate()
+	save.overworld_context = _overworld_context.duplicate()
+	if _battle:
+		save.battle_context = _battle_context.duplicate()
+	save.units = units.duplicate()
+	return save
 	
-func load_state(state: SaveState):
-	print('[Game] Loading...')
-	_state = state
+
+## Loads game data from file.
+func load_data(path: String):
+	print('[Game] Loading data from "%s".' % path)
+	# TODO show loading dialog
+	var save := SaveState.load_from_file(path)
+	if not save:
+		push_error('Cannot load save file "%s"' % path)
+		return
+	_load_state(save)
+	restart_game()
+
 	
+func _load_state(save: SaveState):
+	var dup := save.duplicate()
+	loading.emit(dup)
+	prefs = dup.prefs
+	_overworld_context = dup.overworld_context
+	_battle_context = dup.battle_context
+	units = dup.units

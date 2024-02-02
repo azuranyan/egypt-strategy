@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://dtmi5xkob1tpd"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_bikor"]
+[ext_resource type="Texture2D" uid="uid://sbhfv2y2eu2r" path="res://units/zahra/ZahraF.png" id="1_mgsvh"]
+
+[resource]
+script = ExtResource("1_bikor")
+name = "Zahra"
+gender = "F"
+avatar = "Avatar of Sobek"
+title = "Cruel Crocodile God"
+map_color = Color(0, 0.501961, 0.501961, 1)
+portrait = ExtResource("1_mgsvh")

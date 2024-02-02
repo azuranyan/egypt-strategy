@@ -33,7 +33,9 @@ func _ready():
 		territory_node = preload("res://scenes/overworld/null_territory.tscn").instantiate() as TerritoryNode
 		territory_node.set_meta('NullTerritory', true)
 		add_child(territory_node)
-		push_error('"%s" (%s) using NullTerritory (not assigned)' % [name, self])
+		# this avoids pushing the error when it's the og scene in the editor
+		if not Util.is_scene_root(self):
+			push_error('"%s" (%s) using NullTerritory (not assigned)' % [name, self])
 	set_territory_name(territory_node.name)
 
 

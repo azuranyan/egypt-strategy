@@ -132,7 +132,7 @@ enum State {INVALID, IDLE, WALKING, ATTACKING, HURT, DYING, DEAD}
 ## Objects this unit can phase through.
 @export_flags('Enemies:1', 'Doodads:2', 'Terrain:4') var phase_flags: int
 			
-
+			
 func _to_string() -> String:
 	return '<Unit#%s>' % self.get_instance_id()
  
@@ -176,7 +176,7 @@ func cell() -> Vector2:
 
 ## Returns true if special is unlocked.
 func is_special_unlocked() -> bool:
-	return _special_unlocked or bond >= 2
+	return (_special_unlocked or bond >= 2) and (unit_type.special_attack != null)
 	
 
 ## Returns true if this unit can move.
@@ -186,7 +186,8 @@ func can_move() -> bool:
 	
 ## Returns true if this unit can attack.
 func can_attack() -> bool:
-	return turn_flags & (Unit.TURN_DONE | Unit.TURN_ATTACKED) == 0
+	var has_attack := ((unit_type.basic_attack != null) or (unit_type.special_attack != null))
+	return (turn_flags & (Unit.TURN_DONE | Unit.TURN_ATTACKED) == 0) and has_attack
 
 
 ## Returns true if this unit can act.

@@ -18,3 +18,6 @@ func _ready():
 	Game.empire_defeated.connect(func(empire): print('%s defeated' % empire.leader_name()))
 	Game.boss_defeated.connect(func(): print('boss defeated, yay!'))
 	Game.player_defeated.connect(func(): print('player defeated, ohno..'))
+
+	SceneManager.transition_started.connect(func(a, b): print('transition from "%s" to "%s"' % [a, b]))
+	SceneManager.transition_finished.connect(func(errmsg): print('transition finished %s' % errmsg))

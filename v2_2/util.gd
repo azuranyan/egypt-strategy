@@ -7,6 +7,19 @@ static func do_nothing():
 	pass
 
 
+## Returns true if the scene is root.
+static func is_scene_root(node: Node) -> bool:
+	if Engine.is_editor_hint():
+		return node == node.get_tree().edited_scene_root
+	else:
+		return node.get_parent() == node.get_tree().root
+
+
+## Returns true if the game is ran in f6 mode. Doesn't work if F6 is used on the main scene though.
+static func is_f6(node: Node) -> bool:
+	return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
+	
+	
 ## Simple flood fill algorithm.
 static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var dest = PackedVector2Array()

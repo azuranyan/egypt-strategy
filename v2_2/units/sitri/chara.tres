@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://ceufx8acegtc1"]
+
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_64lft"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_gjj1n"]
+
+[resource]
+script = ExtResource("1_gjj1n")
+name = "Sitri"
+gender = "F"
+avatar = "Dark Serpent"
+title = "Vainglorious Viper Goddess"
+map_color = Color(0.470588, 0.317647, 0.662745, 1)
+portrait = ExtResource("1_64lft")
