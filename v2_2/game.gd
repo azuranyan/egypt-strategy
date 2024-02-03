@@ -113,6 +113,7 @@ func _load_persistent_data():
 		userdir.make_dir('saves')
 	
 		
+		
 func _start_overworld():
 	if is_instance_valid(_overworld):
 		push_error('Overworld already running.')
@@ -424,3 +425,12 @@ func _load_state(save: SaveState):
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
 	units = dup.units
+
+
+## Loads a default game for f6 testing.
+func create_testing_context():
+	if not OS.is_debug_build():
+		return
+		
+	_load_persistent_data()
+	

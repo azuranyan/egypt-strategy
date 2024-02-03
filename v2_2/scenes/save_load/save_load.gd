@@ -46,12 +46,7 @@ func _ready():
 		slot.close_pressed.connect(_slot_closed_pressed.bind(slot))
 		
 	if Util.is_f6(self):
-		var save := Game.create_new_data()
-		var err := ResourceSaver.save(save, slot_filename(1))
-		if err:
-			printerr('cannot save file: ', err)
-		Game.persistent = Persistent.new()
-		Game.persistent.newest_save_slot = 1
+		Game.create_testing_context()
 		scene_enter.call_deferred()
 
 
@@ -99,10 +94,11 @@ func get_save_slot(slot: int) -> SaveSlot:
 
 
 func load_slot_page(slot: int):
-	load_page((slot - 1)/10)
+	load_page((clampi(slot, 1, max_pages*10 + 1) - 1)/10)
 	
 	
 func load_page(page: int):
+	assert(page >= 0 and page < max_pages)
 	for i in range(page*10 + 1, page*10 + 11):
 		# update the slot
 		var slot := get_save_slot(i)

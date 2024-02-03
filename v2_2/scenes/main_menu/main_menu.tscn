@@ -126,7 +126,7 @@ offset_bottom = 259.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Button1" type="Button" parent="Control/HBoxContainer"]
+[node name="StartButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -138,7 +138,7 @@ theme_override_font_sizes/font_size = 24
 text = "Start"
 alignment = 0
 
-[node name="Button2" type="Button" parent="Control/HBoxContainer"]
+[node name="ContinueButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -150,7 +150,7 @@ theme_override_font_sizes/font_size = 24
 text = "Continue"
 alignment = 0
 
-[node name="Button3" type="Button" parent="Control/HBoxContainer"]
+[node name="LoadButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -162,7 +162,7 @@ theme_override_font_sizes/font_size = 24
 text = "Load"
 alignment = 0
 
-[node name="Button4" type="Button" parent="Control/HBoxContainer"]
+[node name="SettingsButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -174,7 +174,7 @@ theme_override_font_sizes/font_size = 24
 text = "Settings"
 alignment = 0
 
-[node name="Button5" type="Button" parent="Control/HBoxContainer"]
+[node name="ExtrasButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -186,7 +186,7 @@ theme_override_font_sizes/font_size = 24
 text = "Extras"
 alignment = 0
 
-[node name="Button6" type="Button" parent="Control/HBoxContainer"]
+[node name="CreditsButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -198,7 +198,7 @@ theme_override_font_sizes/font_size = 24
 text = "Credits"
 alignment = 0
 
-[node name="Button7" type="Button" parent="Control/HBoxContainer"]
+[node name="ExitButton" type="Button" parent="Control/HBoxContainer"]
 custom_minimum_size = Vector2(128, 42)
 layout_mode = 2
 theme_override_colors/font_pressed_color = Color(0.596078, 0.596078, 0.596078, 1)
@@ -210,10 +210,10 @@ theme_override_font_sizes/font_size = 24
 text = "Exit"
 alignment = 0
 
-[connection signal="pressed" from="Control/HBoxContainer/Button1" to="." method="_on_button_1_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button2" to="." method="_on_button_2_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button3" to="." method="_on_button_3_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button4" to="." method="_on_button_4_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button5" to="." method="_on_button_5_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button6" to="." method="_on_button_6_pressed"]
-[connection signal="pressed" from="Control/HBoxContainer/Button7" to="." method="_on_button_7_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/ExtrasButton" to="." method="_on_extras_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
+[connection signal="pressed" from="Control/HBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]
