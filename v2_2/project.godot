@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="Radiant Ambition"
-run/main_scene="res://bootstrap.tscn"
+run/main_scene="res://main/bootstrap.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Game="*res://game.gd"
-SceneManager="*res://scenes/common/scene_manager.gd"
+SceneManager="*res://scene_manager.gd"
 
 [display]
 

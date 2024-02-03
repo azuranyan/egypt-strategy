@@ -30,8 +30,9 @@ func show_main_menu():
 
 
 func _on_button_1_pressed():
-	Game.start_new_game()
 	_close.emit()
+	Game._load_state(Game.create_new_data())
+	SceneManager.call_scene('overworld')
 
 
 func _on_button_2_pressed():

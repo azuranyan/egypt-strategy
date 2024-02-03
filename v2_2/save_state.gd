@@ -8,6 +8,9 @@ extends Resource
 ## Paused data storage.
 @export var paused_data: Dictionary
 
+## The current active game context.
+@export_enum('none', 'overworld', 'battle', 'event') var active_context: String = 'none'
+
 ## Preferences.
 @export var prefs: Preferences
 
@@ -20,6 +23,8 @@ extends Resource
 ## The record of spawned units.
 @export var units: Array[Unit]
 
+## Scene stack.
+@export var scene_stack: Array[SceneStackFrame]
 
 
 static func load_from_file(path: String) -> SaveState:

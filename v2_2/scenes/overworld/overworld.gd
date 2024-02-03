@@ -27,6 +27,15 @@ func _ready():
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 
 
+func enter_scene():
+	print('enter overworld')
+	# TODO currently a hack
+	start_overworld_cycle(Game._overworld_context)
+
+
+func exit_scene():
+	print('exit overworld')
+
 
 ## Returns the empire nodes.
 func get_empire_nodes() -> Array[EmpireNode]:

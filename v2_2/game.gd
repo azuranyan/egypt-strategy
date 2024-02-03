@@ -7,9 +7,6 @@ signal game_resumed
 
 signal quit_requested
 
-signal saving(save: SaveState)
-signal loading(save: SaveState)
-
 signal overworld_started
 signal overworld_ended
 
@@ -80,56 +77,68 @@ var is_saveable_context: bool
 
 
 func _ready():
-	if OS.is_debug_build():
-		print("[Game] Loading default overworld (debug).")
-		#overworld = OverworldScene.instantiate()
-		#add_child(overworld)
-		
-	# default handler for quit. should be overridden for custom quit behavior
+	# default handler for quit. this can be overridden by connecting to
+	# the request and rejecting quit.
 	quit_requested.connect(func(): _should_end = true)
 
 
 func _main(args := {}):
 	# allows the game to launch a save file immediately
-	if args.has('quickload'):
-		_pending_data = args.get('quickload')
+	_pending_data = args.get('quickload')
 
-	# debug overlay
-	var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
-	debug_overlay.quit_button_pressed.connect(quit_game)
-	#debug_overlay.save_button_pressed.connect(save_state)
-	#debug_overlay.load_button_pressed.connect(load_state)
-	add_child(debug_overlay)
+	# debug tools
+	if OS.is_debug_build() or args.get('activate_debug_tools', false):
+		var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
+		debug_overlay.quit_button_pressed.connect(quit_game)
+		#debug_overlay.save_button_pressed.connect(save_state)
+		#debug_overlay.load_button_pressed.connect(load_state)
+		add_child(debug_overlay)
 	
+	# load persitent data and start game
+	_load_persistent_data()
 	game_started.emit()
-	await _start_intro()
-
-	await _start_main_menu()
-
-	while not _should_end:
-		if not _pending_data:
-			print('no data to load')
-			quit_game()
-			break
-			
-		# load the pending data
-		_load_state(_pending_data)
-		var start_point := _pending_data.paused_event as String
-		var start_data := _pending_data.paused_data as Dictionary
-		_pending_data = null
-
-		# launch the appropriate subsystem for the paused event
-		match start_point:
-			'overworld':
-				await _start_overworld()
-			'battle':
-				await _start_battle()
-			'':
-				await _start_main_menu()
-			_:
-				await _start_event()
+	
+	SceneManager.call_scene('main_menu')
+	#await _start_intro()
+	#
+	## show main menu
+	#await _start_main_menu()
+#
+	## 
+	#while not _should_end:
+		#if not _pending_data:
+			#print('no data to load')
+			#quit_game()
+			#break
+			#
+		## load the pending data
+		#_load_state(_pending_data) 
+		#var start_point := _pending_data.paused_event as String
+		#var start_data := _pending_data.paused_data as Dictionary
+		#_pending_data = null
+#
+		## launch the appropriate subsystem for the paused event
+		#match start_point:
+			#'overworld':
+				#await _start_overworld()
+			#'battle':
+				#await _start_battle()
+			#'':
+				#await _start_main_menu()
+			#_:
+				#await _start_event()
 	game_ended.emit()
 		
+		
+func _load_persistent_data():
+	var persistent_path := "user://persistent.tres"
+	if FileAccess.file_exists(persistent_path):
+		persistent = load(persistent_path)
+		
+	if not persistent:
+		persistent = Persistent.new()
+		ResourceSaver.save(persistent, persistent_path)
+	
 		
 func _start_overworld():
 	if is_instance_valid(_overworld):
@@ -334,6 +343,10 @@ func quit_game():
 		_battle.stop_battle()
 	if is_instance_valid(_overworld):
 		_overworld.stop_overworld_cycle()
+		
+		
+func dont_quit():
+	_should_end = false
 	
 
 func restart_game():
@@ -398,7 +411,7 @@ func save_data(path: String) -> Error:
 func _save_state() -> SaveState:
 	assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
 	var save := SaveState.new()
-	
+	get_tree().call_group('game_event_listeners', 'on_save', save)
 	save.prefs = prefs.duplicate()
 	save.overworld_context = _overworld_context.duplicate()
 	if _battle:
@@ -421,7 +434,7 @@ func load_data(path: String):
 	
 func _load_state(save: SaveState):
 	var dup := save.duplicate()
-	loading.emit(dup)
+	get_tree().call_group('game_event_listeners', 'on_load', dup)
 	prefs = dup.prefs
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
