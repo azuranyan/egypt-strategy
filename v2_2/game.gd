@@ -96,38 +96,7 @@ func _main(args := {}):
 	
 	# load persitent data and start game
 	_load_persistent_data()
-	game_started.emit()
-	
-	SceneManager.call_scene('main_menu')
-	#await _start_intro()
-	#
-	## show main menu
-	#await _start_main_menu()
-#
-	## 
-	#while not _should_end:
-		#if not _pending_data:
-			#print('no data to load')
-			#quit_game()
-			#break
-			#
-		## load the pending data
-		#_load_state(_pending_data) 
-		#var start_point := _pending_data.paused_event as String
-		#var start_data := _pending_data.paused_data as Dictionary
-		#_pending_data = null
-#
-		## launch the appropriate subsystem for the paused event
-		#match start_point:
-			#'overworld':
-				#await _start_overworld()
-			#'battle':
-				#await _start_battle()
-			#'':
-				#await _start_main_menu()
-			#_:
-				#await _start_event()
-	game_ended.emit()
+	SceneManager.call_scene(args.start_scene_path, 'fade_to_black')
 		
 		
 func _load_persistent_data():
@@ -379,14 +348,19 @@ func _initiate_load():
 ## Creates a new save data.
 func create_new_data() -> SaveState:
 	print('[Game] Creating new save.')
-	var state := SaveState.new()
-	state.paused_event = 'overworld'
-	state.paused_data.dummy = 'dummy'
-	state.prefs = Preferences.new()
-	state.overworld_context = _create_new_overworld_context()
-	state.battle_context = null
-	state.units = []
-	return state
+	var save := SaveState.new()
+	save.paused_event = 'overworld'
+	save.paused_data.dummy = 'dummy'
+	save.prefs = Preferences.new()
+	save.overworld_context = _create_new_overworld_context()
+	save.battle_context = null
+	save.units = []
+	# TODO currently a hack
+	var fr := SceneStackFrame.new()
+	fr.scene_path = "res://scenes/overworld/overworld.tscn" # TODO main event
+	fr.scene = null # this will be loaded in later (hopefully)
+	save.scene_stack = [fr]
+	return save
 	
 	
 func _create_new_overworld_context() -> OverworldContext:

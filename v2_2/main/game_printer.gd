@@ -3,11 +3,11 @@ extends Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Game.game_started.connect(func(): print('Game started!'))
-	Game.game_ended.connect(func(): print('Game ended!'))
+	#Game.game_started.connect(func(): print('Game started!'))
+	#Game.game_ended.connect(func(): print('Game ended!'))
 	
-	Game.overworld_started.connect(func(): print('Game started!'))
-	Game.overworld_ended.connect(func(): print('Game ended!'))
+	Game.overworld_started.connect(func(): print('Overworld started!'))
+	Game.overworld_ended.connect(func(): print('Overworld ended!'))
 	
 	Game.overworld_cycle_started.connect(func(count): print('Cycle %s' % count))
 	Game.overworld_cycle_ended.connect(func(count): print('Cycle %s' % count))
@@ -19,5 +19,5 @@ func _ready():
 	Game.boss_defeated.connect(func(): print('boss defeated, yay!'))
 	Game.player_defeated.connect(func(): print('player defeated, ohno..'))
 
-	SceneManager.transition_started.connect(func(a, b): print('transition from "%s" to "%s"' % [a, b]))
-	SceneManager.transition_finished.connect(func(errmsg): print('transition finished %s' % errmsg))
+	#SceneManager.transition_started.connect(func(a, b): print('transition from "%s" to "%s"' % [a, b]))
+	#SceneManager.transition_finished.connect(func(errmsg): print('transition finished %s' % errmsg))

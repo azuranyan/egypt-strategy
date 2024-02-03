@@ -14,8 +14,6 @@ var territory_buttons: Array[TerritoryButton]
 
 
 func _ready():
-	if not Engine.is_editor_hint():
-		hide()
 	territory_buttons.clear()
 	for i in get_child_count():
 		var button := get_child(i) as TerritoryButton
@@ -227,7 +225,6 @@ func start_overworld_cycle(ctx: OverworldContext):
 		btn.initialize(_context, btn.get_territory(_context))
 		if btn.get_territory(_context) == _context.boss_empire.home_territory:
 			btn.visible = _context.is_boss_active()
-	show()
 	
 	Game.overworld_started.emit()
 	

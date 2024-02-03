@@ -17,7 +17,9 @@ static func is_scene_root(node: Node) -> bool:
 
 ## Returns true if the game is ran in f6 mode. Doesn't work if F6 is used on the main scene though.
 static func is_f6(node: Node) -> bool:
-	return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
+	if node and node.is_inside_tree() and node.get_tree().current_scene:
+		return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
+	return false
 	
 	
 ## Simple flood fill algorithm.

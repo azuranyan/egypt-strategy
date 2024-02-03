@@ -17,7 +17,7 @@ func is_active() -> bool:
 	
 	
 ## Pops off this scene and pushes the new scene to the stack.
-func call_scene(scene_name: StringName, transition := 'fade_to_black', continuation_method: StringName = '', continuation_data := {}) -> Error:
+func call_scene(scene_name: StringName, transition := 'fade_to_black', continuation_method: StringName = &'', continuation_data := {}) -> Error:
 	if not is_active():
 		push_warning('%s: attempt to call another scene from non active scene' % self)
 		return OK
@@ -30,11 +30,8 @@ func call_scene(scene_name: StringName, transition := 'fade_to_black', continuat
 	
 	
 ## Ends current scene and returns to the previous scene.
-func scene_return(value: Variant = null):
+func scene_return(transition := 'fade_to_black'):
 	if not is_active():
 		push_warning('%s: attempt to return from non active scene' % self)
 		return
-	# TODO
-	Game.call_scene('battle', 'fade_to_black')
-	Game.scene_return({})
-	
+	SceneManager.scene_return(transition)

@@ -1,6 +1,9 @@
 extends Node
 
 
+@export_file("*.tscn") var start_scene_path: String
+
+
 func _ready():
 	launch_game.call_deferred()
 
@@ -11,15 +14,8 @@ func launch_game():
 	# initialize run args here
 	var args := {
 		test_string = 'Hello World!',
+		start_scene_path = start_scene_path,
 	}
-	
-	var scenes := {
-		battle = "res://scenes/battle/battle.tscn",
-		overworld = "res://scenes/overworld/overworld.tscn",
-		main_menu = "res://scenes/main_menu/main_menu.tscn",
-	}
-	
-	SceneManager.scenes = scenes
 	
 	# start the game
 	Game._main(args)

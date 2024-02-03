@@ -12,9 +12,6 @@ signal transition_finished(node: Node)
 
 const LoadingScreenScene: PackedScene = preload("res://scenes/common/loading_screen.tscn")
 
-## A record of all known scenes.
-var scenes := {}
-
 var _loading_screen: LoadingScreen
 var _transition: String
 var _content_path: String
@@ -27,16 +24,13 @@ func _ready():
 	
 	
 ## Loads a new scene and pushes it to the stack.
-func call_scene(scene_name: String, transition: String, continuation_method: StringName, continuation_data: Dictionary) -> void:
-	if scene_name not in scenes:
-		push_error('scene_name not recognized: "%s"', scene_name)
-		return
+func call_scene(content_path: String, transition: String, continuation_method: StringName = &'', continuation_data: Dictionary = {}) -> void:
 	var frame := SceneStackFrame.new()
-	frame.scene_path = scenes[scene_name]
+	frame.scene_path = content_path
 	frame.scene = null
 	frame.continuation_method = continuation_method
 	frame.continuation_data = continuation_data
-	_load_scene(scenes[scene_name], transition, frame)
+	_load_scene(content_path, transition, frame)
 	
 	
 ## Pops the current scene from the stack and restores the previous scene.
@@ -134,12 +128,12 @@ func _update_load_progress() -> void:
 
 
 func _invalid_resource() -> void:
-	printerr("unable to load: invalid resource.")
+	printerr('unable to load "%s": invalid resource.' % current_frame().scene_path)
 	_transition_done(null)
 	
 	
 func _loading_failed() -> void:
-	printerr("unable to load: loading failed.")
+	printerr('unable to load "%s": loading failed.' % current_frame().scene_path)
 	_transition_done(null)
 
 
@@ -155,20 +149,24 @@ func _loading_finished(new_scene: Node) -> void:
 	
 	
 func _replace_current_scene(new_scene: Node):
-	get_tree().root.add_child.call_deferred(new_scene)
-	get_tree().set_deferred('current_scene', new_scene)
-	
-	var old_scene := get_tree().current_scene
-	if old_scene.has_method('exit_scene'):
-		old_scene.exit_scene()
-	old_scene.queue_free()
-	
+	_exit_scene.call_deferred(get_tree().current_scene)
+	_enter_current_scene.call_deferred(new_scene)
 	if is_loading():
 		_loading_screen.finish_transition()
 		await _loading_screen.transition_finished
-		
+	
+	
+func _enter_current_scene(new_scene: Node):
+	get_tree().root.add_child(new_scene)
+	get_tree().current_scene = new_scene
 	if new_scene.has_method('enter_scene'):
 		new_scene.enter_scene()
+	
+	
+func _exit_scene(old_scene: Node):
+	if old_scene.has_method('exit_scene'):
+		old_scene.exit_scene()
+	old_scene.free()
 	
 	
 func _transition_done(node: Node) -> void:

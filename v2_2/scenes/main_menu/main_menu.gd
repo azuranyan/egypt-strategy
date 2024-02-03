@@ -32,7 +32,7 @@ func show_main_menu():
 func _on_button_1_pressed():
 	_close.emit()
 	Game._load_state(Game.create_new_data())
-	SceneManager.call_scene('overworld')
+	#SceneManager.call_scene('overworld', 'fade_to_black')
 
 
 func _on_button_2_pressed():
