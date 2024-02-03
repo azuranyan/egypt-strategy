@@ -3,6 +3,8 @@ extends Node
 
 @export_file("*.tscn") var start_scene_path: String
 
+@export var scene_registry: Array[SceneRegistryEntry]
+
 
 func _ready():
 	launch_game.call_deferred()
@@ -17,5 +19,10 @@ func launch_game():
 		start_scene_path = start_scene_path,
 	}
 	
+	for entry in scene_registry:
+		SceneManager.scenes[entry.scene_name] = entry.scene_path
+	
 	# start the game
 	Game._main(args)
+
+

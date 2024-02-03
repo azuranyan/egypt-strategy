@@ -19,8 +19,8 @@ func is_active() -> bool:
 ## Pops off this scene and pushes the new scene to the stack.
 func call_scene(scene_name: StringName, transition := 'fade_to_black', continuation_method: StringName = &'', continuation_data := {}) -> Error:
 	if not is_active():
-		push_warning('%s: attempt to call another scene from non active scene' % self)
-		return OK
+		push_error('%s: attempt to call another scene from non active scene' % self)
+		return ERR_SCRIPT_FAILED
 	
 	if scene_name not in SceneManager.scenes:
 		return ERR_DOES_NOT_EXIST

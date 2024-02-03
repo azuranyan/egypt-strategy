@@ -12,6 +12,9 @@ signal transition_finished(node: Node)
 
 const LoadingScreenScene: PackedScene = preload("res://scenes/common/loading_screen.tscn")
 
+## Contains the mapping of scene names to scene paths.
+var scenes: Dictionary
+
 var _loading_screen: LoadingScreen
 var _transition: String
 var _content_path: String
