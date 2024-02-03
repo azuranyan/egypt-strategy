@@ -25,7 +25,7 @@ func _ready():
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 
 
-func scene_enter():
+func scene_enter(_kwargs := {}):
 	print('enter overworld')
 	# TODO currently a hack
 	Game._overworld = self

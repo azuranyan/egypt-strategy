@@ -46,3 +46,11 @@ func _on_gui_input(event):
 		accept_event()
 		pressed.emit()
 		
+
+
+func _on_mouse_entered():
+	$Highlight.show()
+
+
+func _on_mouse_exited():
+	$Highlight.visible = has_focus()

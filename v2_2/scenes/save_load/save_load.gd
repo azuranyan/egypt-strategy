@@ -5,8 +5,7 @@ const SAVE_PATH := 'user://saves/'
 
 @export var max_pages: int = 20
 
-@export var save_mode: bool = true
-
+var _save_data: SaveState
 var _current_page: int
 var _saves_cache: Dictionary
 
@@ -35,7 +34,7 @@ func _ready():
 	var sample_button := $Control/VBoxContainer/SampleButton
 	for i in max_pages:
 		var btn := sample_button.duplicate()
-		btn.text = str(i + 1)
+		btn.text = str((i + 1))
 		btn.pressed.connect(_page_button_pressed.bind(i))
 		$Control/VBoxContainer.add_child(btn)
 	$Control/VBoxContainer.remove_child(sample_button)
@@ -47,20 +46,26 @@ func _ready():
 		
 	if Util.is_f6(self):
 		Game.create_testing_context()
-		scene_enter.call_deferred()
+		scene_enter.call_deferred({save_data=Game.create_new_data()})
 
 
-func scene_enter():
+func scene_enter(kwargs := {}):
 	update_saves_cache()
 	load_slot_page(Game.persistent.newest_save_slot)
 	
-	if save_mode:
+	_save_data = kwargs.get('save_data')
+	
+	if is_save_mode():
 		$Control/SaveLoadLabel.text = 'Save'
 		$Control/SaveInfoPanel.show()
-		#$Control/SaveInfoPanel/TextureRect.texture = 
+		$Control/SaveInfoPanel/TextureRect.texture = _save_data.preview
 	else:
 		$Control/SaveLoadLabel.text = 'Load'
 		$Control/SaveInfoPanel.hide()
+		
+	
+func is_save_mode() -> bool:
+	return _save_data != null
 		
 	
 func update_saves_cache():
@@ -120,27 +125,24 @@ func load_page(page: int):
 	
 	
 func interact_load_from_slot(slot: int):
-	pass
+	var save := ResourceLoader.load(_saves_cache[slot])
+	assert(save, 'save should have been verified to work at page load, bug?')
+	Game._load_state(save)
 	
 	
 func interact_save_to_slot(slot: int):
 	# TODO if occupied, ask if overwrite
 	
-	# TODO this should be a scene_enter argument 
-	var save := Game._save_state()
-	save.slot = slot
-	
-	var err := ResourceSaver.save(save, state_filename(save), ResourceSaver.SaverFlags.FLAG_COMPRESS)
+	_save_data.slot = slot
+	var err := ResourceSaver.save(_save_data, state_filename(_save_data), ResourceSaver.SaverFlags.FLAG_COMPRESS)
 	if err:
-		printerr('unable to save data: %s (code %s)' % [state_filename(save), err])
+		printerr('unable to save data: %s (code %s)' % [state_filename(_save_data), err])
 		return
 		
 	Game.persistent.newest_save_slot = slot
 	
 	update_saves_cache()
 	load_slot_page(slot)
-	# TODO return scene
-	
 	
 	
 func interact_delete_slot(slot: int):
@@ -155,7 +157,7 @@ func interact_delete_slot(slot: int):
 
 
 func _slot_pressed(slot: SaveSlot):
-	if save_mode:
+	if is_save_mode():
 		interact_save_to_slot(slot.slot)
 	else:
 		interact_load_from_slot(slot.slot)
@@ -167,3 +169,8 @@ func _slot_closed_pressed(slot: SaveSlot):
 	
 func _page_button_pressed(page: int):
 	load_page(page)
+
+
+func _on_close_button_pressed():
+	scene_return()
+	

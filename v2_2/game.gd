@@ -30,6 +30,10 @@ const OverworldScene := preload("res://scenes/overworld/overworld.tscn")
 const BattleScene := preload("res://scenes/battle/battle.tscn")
 const MainMenuScene := preload("res://scenes/main_menu/main_menu.tscn")
 
+const PERSISTENT_PATH := "user://persistent.tres"
+const PREFERENCES_PATH := "user://preferences.tres"
+	
+	
 enum {
 	SCENE_NONE,
 	SCENE_INTRO,
@@ -79,9 +83,15 @@ func _ready():
 	quit_requested.connect(func(): _should_end = true)
 
 
-func _main(args := {}):
+func _exit_tree():
+	# TODO find appropriate place to save persistent data
+	ResourceSaver.save(persistent, PERSISTENT_PATH)
+	ResourceSaver.save(preferences, PREFERENCES_PATH)
+	
+
+func _main(kwargs := {}):
 	# debug tools
-	if OS.is_debug_build() or args.get('activate_debug_tools', false):
+	if OS.is_debug_build() or kwargs.get('activate_debug_tools', false):
 		var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
 		debug_overlay.quit_button_pressed.connect(quit_game)
 		debug_overlay.save_button_pressed.connect(save_game)
@@ -90,29 +100,24 @@ func _main(args := {}):
 	
 	# load persitent data and start game
 	_load_persistent_data()
-	SceneManager.call_scene(args.start_scene_path, 'fade_to_black')
+	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
 		
 		
 func _load_persistent_data():
-	var persistent_path := "user://persistent.tres"
-	if FileAccess.file_exists(persistent_path):
-		persistent = load(persistent_path)
+	if FileAccess.file_exists(PERSISTENT_PATH):
+		persistent = load(PERSISTENT_PATH)
 	else:
 		persistent = Persistent.new()
-		ResourceSaver.save(persistent, persistent_path)
 		
-	var preferences_path := "user://preferences.tres"
-	if FileAccess.file_exists(preferences_path):
-		preferences = load(preferences_path)
+	if FileAccess.file_exists(PREFERENCES_PATH):
+		preferences = load(PREFERENCES_PATH)
 	else:
 		preferences = Preferences.new()
-		ResourceSaver.save(preferences, preferences_path)
 		
 	var userdir := DirAccess.open('user://')
 	if not userdir.dir_exists('saves'):
 		userdir.make_dir('saves')
 	
-		
 		
 func _start_overworld():
 	if is_instance_valid(_overworld):

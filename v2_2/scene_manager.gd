@@ -20,6 +20,7 @@ var _transition: String
 var _content_path: String
 var _load_progress_timer: Timer
 var _scene_stack: Array[SceneStackFrame]
+var _kwargs: Dictionary
 
 
 func _ready():
@@ -27,7 +28,8 @@ func _ready():
 	
 	
 ## Loads a new scene and pushes it to the stack.
-func call_scene(content_path: String, transition: String, continuation_method: StringName = &'', continuation_data: Dictionary = {}) -> void:
+func call_scene(content_path: String, transition: String, kwargs := {}, continuation_method: StringName = &'', continuation_data: Dictionary = {}) -> void:
+	_kwargs = kwargs
 	var frame := SceneStackFrame.new()
 	frame.scene_path = content_path
 	frame.scene = null
@@ -168,7 +170,8 @@ func _enter_current_scene(new_scene: Node):
 	get_tree().root.add_child(new_scene)
 	get_tree().current_scene = new_scene
 	if new_scene.has_method('scene_enter'):
-		new_scene.scene_enter()
+		new_scene.scene_enter(_kwargs)
+		_kwargs.clear()
 	
 	
 func _exit_scene(old_scene: Node):

@@ -17,11 +17,11 @@ func launch_game():
 		SceneManager.scenes[entry.scene_name] = entry.scene_path
 	
 	# initialize run args here
-	var args := {
+	var kwargs := {
 		start_scene_path = SceneManager.scenes[start_scene_name],
 	}
 	
 	# start the game
-	Game._main(args)
+	Game._main(kwargs)
 
 
