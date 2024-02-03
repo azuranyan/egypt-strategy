@@ -167,12 +167,12 @@ func _replace_current_scene(new_scene: Node):
 func _enter_current_scene(new_scene: Node):
 	get_tree().root.add_child(new_scene)
 	get_tree().current_scene = new_scene
-	if new_scene.has_method('enter_scene'):
+	if new_scene.has_method('scene_enter'):
 		new_scene.enter_scene()
 	
 	
 func _exit_scene(old_scene: Node):
-	if old_scene.has_method('exit_scene'):
+	if old_scene.has_method('scene_exit'):
 		old_scene.exit_scene()
 	old_scene.free()
 	

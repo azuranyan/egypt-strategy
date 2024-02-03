@@ -25,14 +25,14 @@ func _ready():
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 
 
-func enter_scene():
+func scene_enter():
 	print('enter overworld')
 	# TODO currently a hack
 	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
 
 
-func exit_scene():
+func scene_exit():
 	print('exit overworld')
 
 

@@ -1,0 +1,222 @@
+[gd_scene load_steps=11 format=3 uid="uid://bhl2tm6isca22"]
+
+[ext_resource type="Texture2D" uid="uid://bxip65cj4b43o" path="res://scenes/main_menu/Map_wo_Separators_Color_Filters_Blank.png" id="1_667cv"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_xygmo"]
+[ext_resource type="Script" path="res://scenes/save_load/save_slot.gd" id="2_l6cqn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ph6iq"]
+bg_color = Color(0.211765, 0.211765, 0.211765, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+shadow_size = 4
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="LabelSettings" id="LabelSettings_vff7a"]
+font_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7wfh8"]
+bg_color = Color(0.211765, 0.211765, 0.211765, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hkvjw"]
+font_size = 64
+
+[sub_resource type="LabelSettings" id="LabelSettings_kssmi"]
+font_size = 20
+outline_size = 12
+outline_color = Color(0.85098, 0.584314, 0.0509804, 0.552941)
+shadow_size = 14
+shadow_color = Color(0.0666667, 0.0588235, 0.00784314, 1)
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="Gradient" id="Gradient_qbnjh"]
+colors = PackedColorArray(1, 1, 1, 0.25098, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_env5o"]
+gradient = SubResource("Gradient_qbnjh")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.876068, 0.196581)
+
+[node name="SaveSlot" type="Control"]
+custom_minimum_size = Vector2(587, 145)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 587.0
+offset_bottom = 145.0
+focus_mode = 2
+theme = ExtResource("1_xygmo")
+script = ExtResource("2_l6cqn")
+
+[node name="Occupied" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="Panel" parent="Occupied"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ph6iq")
+
+[node name="ChapterLabel" type="Label" parent="Occupied"]
+layout_mode = 0
+offset_left = 264.0
+offset_right = 376.0
+offset_bottom = 34.0
+text = "Chapter 1"
+label_settings = SubResource("LabelSettings_vff7a")
+
+[node name="EventLabel" type="Label" parent="Occupied"]
+layout_mode = 0
+offset_left = 274.0
+offset_top = 37.0
+offset_right = 528.0
+offset_bottom = 71.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "The man who can't be moved."
+
+[node name="TimestampLabel" type="Label" parent="Occupied"]
+modulate = Color(1, 1, 1, 0.392157)
+layout_mode = 0
+offset_left = 264.0
+offset_top = 116.0
+offset_right = 422.0
+offset_bottom = 139.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "02/03/2024 00:34:24"
+
+[node name="PreviewRect" type="TextureRect" parent="Occupied"]
+custom_minimum_size = Vector2(240, 135)
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.45
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -1.14999
+offset_bottom = -2.0
+mouse_filter = 2
+texture = ExtResource("1_667cv")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Button" type="Button" parent="Occupied"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -27.0
+offset_top = -7.0
+offset_right = 5.0
+offset_bottom = 25.0
+grow_horizontal = 0
+focus_mode = 0
+text = "x"
+flat = true
+
+[node name="TurnLabel" type="Label" parent="Occupied"]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 4.0
+offset_right = 540.0
+offset_bottom = 27.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Turn 6"
+
+[node name="Empty" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="Empty"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7wfh8")
+
+[node name="NumberLabel" type="Label" parent="."]
+modulate = Color(1, 1, 1, 0.392157)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -44.0
+offset_top = -83.0
+offset_right = -3.0
+offset_bottom = 12.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "5"
+label_settings = SubResource("LabelSettings_hkvjw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NewLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = -5.0
+offset_top = -11.0
+offset_right = 39.0
+offset_bottom = 14.0
+text = "New"
+label_settings = SubResource("LabelSettings_kssmi")
+
+[node name="Highlight" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Highlight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.145098)
+
+[node name="TextureRect" type="TextureRect" parent="Highlight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -49.0
+offset_top = -25.0
+offset_right = 49.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_env5o")
+
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="focus_exited" from="." to="." method="_on_focus_exited"]
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="pressed" from="Occupied/Button" to="." method="_on_button_pressed"]

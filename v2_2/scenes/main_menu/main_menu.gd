@@ -1,19 +1,6 @@
-extends CanvasLayer
-
-signal start_selected
-signal continue_selected
-signal load_selected
-signal settings_selected
-signal extras_selected
-signal credits_selected
-signal exit_selected
+extends GameScene
 
 signal _close
-
-
-func _ready():
-	if Util.is_f6(self):
-		show_main_menu.call_deferred()
 
 
 func show_main_menu():
@@ -25,14 +12,19 @@ func show_main_menu():
 	$Control/HBoxContainer/Button6.release_focus()
 	$Control/HBoxContainer/Button7.release_focus()
 	# TODO do title screen animation, wait for input to skip
-	
 	await _close
 
 
+func scene_enter():
+	pass
+	
+	
+func scene_exit():
+	pass
+
+
 func _on_button_1_pressed():
-	_close.emit()
 	Game._load_state(Game.create_new_data())
-	#SceneManager.call_scene('overworld', 'fade_to_black')
 
 
 func _on_button_2_pressed():

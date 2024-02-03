@@ -17,21 +17,33 @@ func is_active() -> bool:
 	
 	
 ## Pops off this scene and pushes the new scene to the stack.
-func call_scene(scene_name: StringName, transition := 'fade_to_black', continuation_method: StringName = &'', continuation_data := {}) -> Error:
+func scene_call(scene_name: StringName, transition := 'fade_to_black', continuation_method: StringName = &'', continuation_data := {}) -> void:
 	if not is_active():
 		push_error('%s: attempt to call another scene from non active scene' % self)
-		return ERR_SCRIPT_FAILED
-	
+		return
 	if scene_name not in SceneManager.scenes:
-		return ERR_DOES_NOT_EXIST
+		push_error('%s: "%s" not found' % [self, scene_name])
+		return
 		
-	SceneManager.call_scene(scene_name, transition, continuation_method, continuation_data)
-	return OK
+	SceneManager.call_scene(SceneManager.scenes[scene_name], transition, continuation_method, continuation_data)
+	return
 	
 	
 ## Ends current scene and returns to the previous scene.
-func scene_return(transition := 'fade_to_black'):
+func scene_return(transition := 'fade_to_black') -> void:
 	if not is_active():
 		push_warning('%s: attempt to return from non active scene' % self)
 		return
+	# TODO what happens if this fails, do we just stay or we get popped?
 	SceneManager.scene_return(transition)
+
+
+## Replaces the current scene with a new scene.
+func scene_load(scene_name: StringName, transition := 'fade_to_black') -> void:
+	if not is_active():
+		push_warning('%s: attempt to load another scene from non active scene' % self)
+		return
+	if scene_name not in SceneManager.scenes:
+		push_error('%s: "%s" not found' % [self, scene_name])
+		return
+	SceneManager.load_new_scene(SceneManager.scenes[scene_name], transition)

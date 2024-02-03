@@ -107,6 +107,10 @@ func _load_persistent_data():
 	else:
 		preferences = Preferences.new()
 		ResourceSaver.save(preferences, preferences_path)
+		
+	var userdir := DirAccess.open('user://')
+	if not userdir.dir_exists('saves'):
+		userdir.make_dir('saves')
 	
 		
 func _start_overworld():
@@ -337,9 +341,9 @@ func _initiate_load():
 func create_new_data() -> SaveState:
 	print('[Game] Creating new save.')
 	var save := SaveState.new()
+	save.timestamp = Time.get_datetime_dict_from_system()
 	save.paused_event = 'overworld'
 	save.paused_data.dummy = 'dummy'
-	save.preferences = Preferences.new()
 	save.overworld_context = _create_new_overworld_context()
 	save.battle_context = null
 	save.units = []
@@ -384,7 +388,17 @@ func _save_state() -> SaveState:
 	#assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
 	var save := SaveState.new()
 	get_tree().call_group('game_event_listeners', 'on_save', save)
-	save.preferences = preferences.duplicate()
+	
+	# create header
+	save.slot = 0
+	save.timestamp = Time.get_datetime_dict_from_system()
+	
+	var img := get_viewport().get_texture().get_image()
+	var thumb_size := Vector2i(get_viewport_size() * 0.2)
+	img.resize(thumb_size.x, thumb_size.y, Image.INTERPOLATE_BILINEAR)
+	save.preview = ImageTexture.create_from_image(img)
+	
+	# create data
 	if _overworld:
 		save.overworld_context = _overworld_context.duplicate()
 	if _battle:
@@ -407,7 +421,6 @@ func load_data(path: String):
 func _load_state(save: SaveState):
 	var dup := save.duplicate()
 	get_tree().call_group('game_event_listeners', 'on_load', dup)
-	preferences = dup.preferences
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
 	units = dup.units

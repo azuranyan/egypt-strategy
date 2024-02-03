@@ -9,6 +9,7 @@ font_size = 24
 layer = 20
 script = ExtResource("1_5gbcc")
 next_scene_path = "res://scenes/main_menu/main_menu.tscn"
+next_scene = &"main_menu"
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 1.7
