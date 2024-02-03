@@ -12,7 +12,7 @@ extends Resource
 @export_enum('none', 'overworld', 'battle', 'event') var active_context: String = 'none'
 
 ## Preferences.
-@export var prefs: Preferences
+@export var preferences: Preferences
 
 ## The overworld data.
 @export var overworld_context: OverworldContext

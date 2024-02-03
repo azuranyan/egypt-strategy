@@ -28,6 +28,7 @@ func _ready():
 func enter_scene():
 	print('enter overworld')
 	# TODO currently a hack
+	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
 
 

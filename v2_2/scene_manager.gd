@@ -30,6 +30,7 @@ func call_scene(content_path: String, transition: String, continuation_method: S
 	frame.scene = null
 	frame.continuation_method = continuation_method
 	frame.continuation_data = continuation_data
+	_scene_stack.push_back(null) # this will get replaced by the true value
 	_load_scene(content_path, transition, frame)
 	
 	
@@ -43,6 +44,10 @@ func scene_return(transition: String):
 	
 	# restore previous scene
 	var restore := _scene_stack.pop_back() as SceneStackFrame
+	_scene_stack.push_back(null) # this will get replaced by the true value
+	
+	# TODO we already have the scene packed. we just need to transition.
+	# doing it this way means nodes are not actually restored yet.
 	_load_scene(restore.scene_path, transition, restore)
 	
 	if restore.continuation_method:

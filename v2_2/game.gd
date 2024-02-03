@@ -42,7 +42,7 @@ enum {
 }
 
 ## Preferences.
-var prefs: Preferences
+var preferences: Preferences
 
 ## Persistent data.
 var persistent: Persistent
@@ -53,12 +53,9 @@ var units: Array[Unit]
 ## Record of units by tag.
 var _units_by_tag := {}
 
-## Data pending to be loaded at the next checkpoint.
-var _pending_data: SaveState
 
 var _last_battle_result: BattleResult
 
-var _scene: int
 
 var suspended: bool
 
@@ -83,15 +80,12 @@ func _ready():
 
 
 func _main(args := {}):
-	# allows the game to launch a save file immediately
-	_pending_data = args.get('quickload')
-
 	# debug tools
 	if OS.is_debug_build() or args.get('activate_debug_tools', false):
 		var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
 		debug_overlay.quit_button_pressed.connect(quit_game)
-		#debug_overlay.save_button_pressed.connect(save_state)
-		#debug_overlay.load_button_pressed.connect(load_state)
+		debug_overlay.save_button_pressed.connect(save_game)
+		debug_overlay.load_button_pressed.connect(load_game)
 		add_child(debug_overlay)
 	
 	# load persitent data and start game
@@ -103,10 +97,16 @@ func _load_persistent_data():
 	var persistent_path := "user://persistent.tres"
 	if FileAccess.file_exists(persistent_path):
 		persistent = load(persistent_path)
-		
-	if not persistent:
+	else:
 		persistent = Persistent.new()
 		ResourceSaver.save(persistent, persistent_path)
+		
+	var preferences_path := "user://preferences.tres"
+	if FileAccess.file_exists(preferences_path):
+		preferences = load(preferences_path)
+	else:
+		preferences = Preferences.new()
+		ResourceSaver.save(preferences, preferences_path)
 	
 		
 func _start_overworld():
@@ -257,10 +257,6 @@ func get_unit_type(unit_name: String) -> UnitType:
 		return preload('res://units/placeholder/unit_type.tres')
 
 
-func start_new_game():
-	_pending_data = create_new_data()
-
-
 func start_overworld_cycle():
 	# overworld context is always loaded in data so we just call this
 	await _start_overworld()
@@ -307,7 +303,6 @@ func wait_for_resume():
 func quit_game():
 	quit_requested.emit()
 	# TODO
-	
 	if is_instance_valid(_battle):
 		_battle.stop_battle()
 	if is_instance_valid(_overworld):
@@ -318,13 +313,6 @@ func dont_quit():
 	_should_end = false
 	
 
-func restart_game():
-	_overworld.queue_free()
-	if _battle:
-		_battle.queue_free()
-	
-		
-		
 func show_main_menu() -> int:
 	var main_menu := MainMenuScene.instantiate()
 	add_child(main_menu)
@@ -351,7 +339,7 @@ func create_new_data() -> SaveState:
 	var save := SaveState.new()
 	save.paused_event = 'overworld'
 	save.paused_data.dummy = 'dummy'
-	save.prefs = Preferences.new()
+	save.preferences = Preferences.new()
 	save.overworld_context = _create_new_overworld_context()
 	save.battle_context = null
 	save.units = []
@@ -373,21 +361,32 @@ func _create_new_overworld_context() -> OverworldContext:
 	return ctx
 	
 
+func save_game() -> Error:
+	# TODO _current_save_path
+	return save_data('user://save_1.tres')
+
+
+func load_game():
+	# TODO _current_save_path
+	load_data('user://save_1.tres')
+	
+
 ## Saves game data to file.
 func save_data(path: String) -> Error:
 	print('[Game] Saving data to "%s".' % path)
-	if not is_saveable_context:
-		return Error.FAILED
+	#if not is_saveable_context:
+	#	return Error.FAILED
 	# TODO show saving dialog
 	return _save_state().save_to_file(path)
 
 	
 func _save_state() -> SaveState:
-	assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
+	#assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
 	var save := SaveState.new()
 	get_tree().call_group('game_event_listeners', 'on_save', save)
-	save.prefs = prefs.duplicate()
-	save.overworld_context = _overworld_context.duplicate()
+	save.preferences = preferences.duplicate()
+	if _overworld:
+		save.overworld_context = _overworld_context.duplicate()
 	if _battle:
 		save.battle_context = _battle_context.duplicate()
 	save.units = units.duplicate()
@@ -403,13 +402,12 @@ func load_data(path: String):
 		push_error('Cannot load save file "%s"' % path)
 		return
 	_load_state(save)
-	restart_game()
 
-	
+
 func _load_state(save: SaveState):
 	var dup := save.duplicate()
 	get_tree().call_group('game_event_listeners', 'on_load', dup)
-	prefs = dup.prefs
+	preferences = dup.preferences
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
 	units = dup.units

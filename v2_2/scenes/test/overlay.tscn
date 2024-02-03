@@ -33,13 +33,13 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 25
 
-[node name="LoadButton" type="Button" parent="HBoxContainer"]
+[node name="SaveButton" type="Button" parent="HBoxContainer"]
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 focus_mode = 0
 text = "Save"
 
-[node name="SaveButton" type="Button" parent="HBoxContainer"]
+[node name="LoadButton" type="Button" parent="HBoxContainer"]
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 focus_mode = 0
@@ -48,5 +48,5 @@ text = "Load"
 [node name="UnitViewer" parent="." instance=ExtResource("2_117x8")]
 
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
