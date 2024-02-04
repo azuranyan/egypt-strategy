@@ -43,6 +43,7 @@ func call_scene(content_path: String, transition: String, kwargs := {}, continua
 func scene_return(transition: String):
 	if _scene_stack.is_empty():
 		push_error('scene_return(): scene stack empty!')
+		get_tree().quit()
 		return
 	# pop current scene
 	_scene_stack.pop_back()

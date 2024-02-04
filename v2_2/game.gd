@@ -5,8 +5,6 @@ signal game_started
 signal game_ended
 signal game_resumed
 
-signal quit_requested
-
 signal overworld_started
 signal overworld_ended
 
@@ -45,11 +43,6 @@ enum {
 	SCENE_CREDITS,
 }
 
-## Preferences.
-var preferences: Preferences
-
-## Persistent data.
-var persistent: Persistent
 
 ## The array of all units in the game.
 var units: Array[Unit]
@@ -63,7 +56,6 @@ var _last_battle_result: BattleResult
 
 var suspended: bool
 
-var _should_end: bool
 
 var _overworld: Overworld
 var _overworld_context: OverworldContext
@@ -75,49 +67,26 @@ var _event
 var _event_context
 
 var is_saveable_context: bool
-
-
-func _ready():
-	# default handler for quit. this can be overridden by connecting to
-	# the request and rejecting quit.
-	quit_requested.connect(func(): _should_end = true)
-
-
-func _exit_tree():
-	# TODO find appropriate place to save persistent data
-	ResourceSaver.save(persistent, PERSISTENT_PATH)
-	ResourceSaver.save(preferences, PREFERENCES_PATH)
 	
+
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit_game()
+		
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		# TODO should check if in main menu, then quit else go back
+		quit_game()
+
 
 func _main(kwargs := {}):
 	# debug tools
 	if OS.is_debug_build() or kwargs.get('activate_debug_tools', false):
-		var debug_overlay := load("res://scenes/test/overlay.tscn").instantiate() as TestOverlay
-		debug_overlay.quit_button_pressed.connect(quit_game)
-		debug_overlay.save_button_pressed.connect(save_game)
-		debug_overlay.load_button_pressed.connect(load_game)
+		var debug_overlay := load("res://scenes/debug/overlay.tscn").instantiate() as TestOverlay
 		add_child(debug_overlay)
 	
-	# load persitent data and start game
-	_load_persistent_data()
+	get_tree().set_auto_accept_quit(false)
 	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
 		
-		
-func _load_persistent_data():
-	if FileAccess.file_exists(PERSISTENT_PATH):
-		persistent = load(PERSISTENT_PATH)
-	else:
-		persistent = Persistent.new()
-		
-	if FileAccess.file_exists(PREFERENCES_PATH):
-		preferences = load(PREFERENCES_PATH)
-	else:
-		preferences = Preferences.new()
-		
-	var userdir := DirAccess.open('user://')
-	if not userdir.dir_exists('saves'):
-		userdir.make_dir('saves')
-	
 		
 func _start_overworld():
 	if is_instance_valid(_overworld):
@@ -311,18 +280,29 @@ func wait_for_resume():
 	
 	
 func quit_game():
-	quit_requested.emit()
-	# TODO
-	if is_instance_valid(_battle):
-		_battle.stop_battle()
-	if is_instance_valid(_overworld):
-		_overworld.stop_overworld_cycle()
-		
-		
-func dont_quit():
-	_should_end = false
+	var should_end := [true]
+	# NOTIFICATION_WM_QUIT_REQUEST is not used, instead on_quit will be called
+	get_tree().call_group('game_event_listeners', 'on_quit', should_end)
 	
+	if not should_end[0]:
+		return
+	
+	get_tree().quit()
+	
+	# TODO
+	#if is_instance_valid(_battle):
+		#_battle.stop_battle()
+	#if is_instance_valid(_overworld):
+		#_overworld.stop_overworld_cycle()
+		
 
+## Returns a texture of game's screenshot.
+func capture_screenshot(size: Vector2i) -> Texture:
+	var img := get_viewport().get_texture().get_image()
+	img.resize(size.x, size.y, Image.INTERPOLATE_BILINEAR)
+	return ImageTexture.create_from_image(img)
+	
+	
 func show_main_menu() -> int:
 	var main_menu := MainMenuScene.instantiate()
 	add_child(main_menu)
@@ -370,18 +350,8 @@ func _create_new_overworld_context() -> OverworldContext:
 	overworld.queue_free()
 	return ctx
 	
-
-func save_game() -> Error:
-	# TODO _current_save_path
-	return save_data('user://save_1.tres')
-
-
-func load_game():
-	# TODO _current_save_path
-	load_data('user://save_1.tres')
 	
-
-## Saves game data to file.
+## Saves game data to file. TODO put into SaveManager
 func save_data(path: String) -> Error:
 	print('[Game] Saving data to "%s".' % path)
 	#if not is_saveable_context:
@@ -390,29 +360,6 @@ func save_data(path: String) -> Error:
 	return _save_state().save_to_file(path)
 
 	
-func _save_state() -> SaveState:
-	#assert(is_instance_valid(_overworld), 'tried to save without a valid Overworld!')
-	var save := SaveState.new()
-	get_tree().call_group('game_event_listeners', 'on_save', save)
-	
-	# create header
-	save.slot = 0
-	save.timestamp = Time.get_datetime_dict_from_system()
-	
-	var img := get_viewport().get_texture().get_image()
-	var thumb_size := Vector2i(get_viewport_size() * 0.2)
-	img.resize(thumb_size.x, thumb_size.y, Image.INTERPOLATE_BILINEAR)
-	save.preview = ImageTexture.create_from_image(img)
-	
-	# create data
-	if _overworld:
-		save.overworld_context = _overworld_context.duplicate()
-	if _battle:
-		save.battle_context = _battle_context.duplicate()
-	save.units = units.duplicate()
-	return save
-	
-
 ## Loads game data from file.
 func load_data(path: String):
 	print('[Game] Loading data from "%s".' % path)
@@ -424,12 +371,37 @@ func load_data(path: String):
 	_load_state(save)
 
 
+## Returns a copy of the game's current state.
+func _save_state() -> SaveState:
+	# create header
+	var save := SaveState.new()
+	save.slot = 0
+	save.timestamp = Time.get_datetime_dict_from_system()
+	save.preview = capture_screenshot(get_viewport_size() * 0.2)
+	
+	# dispatch event
+	get_tree().call_group('game_event_listeners', 'on_save', save)
+	
+	# create data
+	if _overworld:
+		save.overworld_context = _overworld_context.duplicate()
+	if _battle:
+		save.battle_context = _battle_context.duplicate()
+	save.units = units.duplicate()
+	return save
+	
+
+## Changes the game state.
 func _load_state(save: SaveState):
 	var dup := save.duplicate()
-	get_tree().call_group('game_event_listeners', 'on_load', dup)
+	
+	# load data
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
 	units = dup.units
+	
+	# dispatch event
+	get_tree().call_group('game_event_listeners', 'on_load', dup)
 
 
 ## Loads a default game for f6 testing.
@@ -437,5 +409,4 @@ func create_testing_context():
 	if not OS.is_debug_build():
 		return
 		
-	_load_persistent_data()
 	

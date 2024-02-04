@@ -19,8 +19,8 @@ func _ready():
 
 
 func scene_enter(_kwargs := {}):
-	extras_button.disabled = Game.persistent.extras_unlocked
-	continue_button.disabled = Game.persistent.newest_save_slot == -1
+	extras_button.disabled = Persistent.extras_unlocked
+	continue_button.disabled = Persistent.newest_save_slot == -1
 	# TODO hack, put into SaveManager
 	var savedir := DirAccess.open('user://saves')
 	var count := 0
@@ -42,8 +42,8 @@ func _on_start_button_pressed():
 	Game._load_state(Game.create_new_data())
 
 
-func _on_continue_button_pressed(): # TODO i really need savemanager now
-	scene_call('save_load', 'fade_to_black', {save_data=Game.load_data('user://saves/%s.res' % Game.persistent.newest_save_slot)})
+func _on_continue_button_pressed():
+	Game._load_state(SaveManager.load_from_slot(Persistent.newest_save_slot))
 
 
 func _on_load_button_pressed():

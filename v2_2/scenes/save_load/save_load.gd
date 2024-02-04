@@ -7,7 +7,6 @@ const SAVE_PATH := 'user://saves/'
 
 var _save_data: SaveState
 var _current_page: int
-var _saves_cache: Dictionary
 
 	
 ## Returns the save filename for a given save.
@@ -50,8 +49,8 @@ func _ready():
 
 
 func scene_enter(kwargs := {}):
-	update_saves_cache()
-	load_slot_page(Game.persistent.newest_save_slot)
+	SaveManager.scan_for_changes()
+	load_slot_page(Persistent.newest_save_slot)
 	
 	_save_data = kwargs.get('save_data')
 	
@@ -62,33 +61,11 @@ func scene_enter(kwargs := {}):
 	else:
 		$Control/SaveLoadLabel.text = 'Load'
 		$Control/SaveInfoPanel.hide()
+	set_process_input(true)
 		
 	
 func is_save_mode() -> bool:
 	return _save_data != null
-		
-	
-func update_saves_cache():
-	_saves_cache.clear()
-	var savedir := DirAccess.open(SAVE_PATH)
-	savedir.list_dir_begin()
-	
-	var filename := savedir.get_next()
-	while filename != '':
-		var index := filename_slot(filename)
-		if index == -1:
-			printerr('savefile not recognized: %s' % filename)
-		else:
-			_saves_cache[index] = SAVE_PATH + filename
-		filename = savedir.get_next()
-		
-	savedir.list_dir_end()
-	
-	
-func scene_exit():
-	# not necessary because we're getting freed anyway but it's better
-	# to cleanup ourselves just in case the strategy changes
-	_saves_cache.clear()
 	
 	
 func get_save_slot(slot: int) -> SaveSlot:
@@ -98,50 +75,45 @@ func get_save_slot(slot: int) -> SaveSlot:
 	return $GridContainer.get_child(reindex[index])
 
 
+@warning_ignore("integer_division")
 func load_slot_page(slot: int):
 	load_page((clampi(slot, 1, max_pages*10 + 1) - 1)/10)
 	
 	
 func load_page(page: int):
+	var button := $Control/VBoxContainer.get_child(page) as Button
+	if not button.button_pressed:
+		button.button_pressed = true
+	
 	assert(page >= 0 and page < max_pages)
 	for i in range(page*10 + 1, page*10 + 11):
-		# update the slot
 		var slot := get_save_slot(i)
 		slot.slot = i
 		slot.release_focus()
 		
-		# try loading save info
-		if _saves_cache.has(i):
-			var save := ResourceLoader.load(_saves_cache[i])
+		if SaveManager.slot_in_use(i):
+			var save := SaveManager.load_from_slot(i)
 			if save:
-				slot.initialize(save, Game.persistent.newest_save_slot == i)
+				slot.initialize(save, Persistent.newest_save_slot == i)
 				continue
-			else:
-				printerr('failed to load save %s' % _saves_cache[i])
 		
-		# load null
 		slot.initialize(null, false)
 	_current_page = page
 	
 	
 func interact_load_from_slot(slot: int):
-	var save := ResourceLoader.load(_saves_cache[slot])
-	assert(save, 'save should have been verified to work at page load, bug?')
+	if not SaveManager.slot_in_use(slot):
+		return
+		
+	var save := SaveManager.load_from_slot(slot)
+	assert(save, 'save should have been verified to work at load_page, bug?')
 	Game._load_state(save)
 	
 	
 func interact_save_to_slot(slot: int):
 	# TODO if occupied, ask if overwrite
-	
-	_save_data.slot = slot
-	var err := ResourceSaver.save(_save_data, state_filename(_save_data), ResourceSaver.SaverFlags.FLAG_COMPRESS)
-	if err:
-		printerr('unable to save data: %s (code %s)' % [state_filename(_save_data), err])
-		return
-		
-	Game.persistent.newest_save_slot = slot
-	
-	update_saves_cache()
+	SaveManager.save_to_slot(_save_data, slot)
+	SaveManager.scan_for_changes()
 	load_slot_page(slot)
 	
 	
@@ -152,7 +124,7 @@ func interact_delete_slot(slot: int):
 	if FileAccess.file_exists(slot_filename(slot)):
 		savedir.remove(slot_filename(slot))
 		
-	update_saves_cache()
+	SaveManager.scan_for_changes()
 	load_slot_page(slot)
 
 
@@ -174,3 +146,8 @@ func _page_button_pressed(page: int):
 func _on_close_button_pressed():
 	scene_return()
 	
+
+func _input(event):
+	if event.is_action_pressed('ui_cancel') or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		set_process_input(false)
+		scene_return()

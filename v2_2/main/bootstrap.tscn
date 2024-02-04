@@ -37,7 +37,7 @@ scene_path = "res://scenes/save_load/save_load.tscn"
 
 [node name="Bootstrap" type="Node"]
 script = ExtResource("1_ooyf5")
-scene_registry = Array[Resource]([SubResource("Resource_4afpp"), SubResource("Resource_jte05"), SubResource("Resource_xk2vm"), SubResource("Resource_0v3gg"), SubResource("Resource_wd4y4"), SubResource("Resource_2xqyi")])
+scene_registry = Array[ExtResource("2_ltpw3")]([SubResource("Resource_4afpp"), SubResource("Resource_jte05"), SubResource("Resource_xk2vm"), SubResource("Resource_0v3gg"), SubResource("Resource_wd4y4"), SubResource("Resource_2xqyi")])
 
 [node name="Node" type="Node" parent="."]
 script = ExtResource("2_7gvge")

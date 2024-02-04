@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cw2mvcntu38p2"]
 
-[ext_resource type="Script" path="res://scenes/test/overlay.gd" id="1_3d83f"]
+[ext_resource type="Script" path="res://scenes/debug/overlay.gd" id="1_3d83f"]
 [ext_resource type="PackedScene" uid="uid://djs5r2dgf3cj3" path="res://tools/unit_viewer.tscn" id="2_117x8"]
 
 [node name="Overlay" type="CanvasLayer"]
@@ -8,6 +8,7 @@ layer = 50
 script = ExtResource("1_3d83f")
 
 [node name="QuitButton" type="Button" parent="."]
+visible = false
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -20,6 +21,7 @@ focus_mode = 0
 text = "Quit"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0

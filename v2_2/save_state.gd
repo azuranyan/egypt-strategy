@@ -2,6 +2,11 @@ class_name SaveState
 extends Resource
 
 
+@export_group('Header')
+
+## Save version.
+@export var version: String
+
 ## Save slot.
 @export var slot: int
 
@@ -10,6 +15,8 @@ extends Resource
 
 ## Dictionary timestamp.
 @export var timestamp: Dictionary
+
+@export_group('Game Data')
 
 ## A descriptor for where we stopped in-game.
 @export var paused_event: String
