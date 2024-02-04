@@ -47,7 +47,7 @@ func _on_continue_button_pressed():
 
 
 func _on_load_button_pressed():
-	scene_call('save_load', 'fade_to_black')
+	scene_call('save_load')
 
 
 func _on_settings_button_pressed():
@@ -59,7 +59,7 @@ func _on_extras_button_pressed():
 
 
 func _on_credits_button_pressed():
-	pass # Replace with function body.
+	scene_call('credits')
 
 
 func _on_exit_button_pressed():

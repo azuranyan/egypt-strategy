@@ -30,12 +30,12 @@ func scene_call(scene_name: StringName, transition := 'fade_to_black', kwargs :=
 	
 	
 ## Ends current scene and returns to the previous scene.
-func scene_return(transition := 'fade_to_black') -> void:
+func scene_return(transition := 'fade_to_black', kwargs := {}) -> void:
 	if not is_active():
 		push_warning('%s: attempt to return from non active scene' % self)
 		return
 	# TODO what happens if this fails, do we just stay or we get popped?
-	SceneManager.scene_return(transition)
+	SceneManager.scene_return(transition, kwargs)
 
 
 ## Replaces the current scene with a new scene.
