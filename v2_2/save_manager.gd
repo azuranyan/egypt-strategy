@@ -17,12 +17,13 @@ func _ready():
 	
 	
 ## Returns true if save slot is in use.
-func slot_in_use(slot: int) -> bool:
+func is_slot_in_use(slot: int) -> bool:
 	return _save_exists(_slot_filename(slot))
 	
 	
 ## Scans for changes.
 func scan_for_changes():
+	
 	var savedir := DirAccess.open(SAVE_DIRECTORY)
 	savedir.list_dir_begin()
 	# naive update
@@ -40,11 +41,6 @@ func get_save_count() -> int:
 	return _saves_cache.size()
 	
 	
-## Returns the newest save slot.
-func get_newest_save_slot() -> int:
-	return Persistent.newest_save_slot
-	
-	
 ## Saves data to slot.
 func save_to_slot(save: SaveState, slot: int):
 	save.slot = slot
@@ -52,6 +48,7 @@ func save_to_slot(save: SaveState, slot: int):
 		return
 		
 	Persistent.newest_save_slot = slot
+	_saves_cache[slot] = _slot_filename(slot)
 	
 	
 ## Saves data.
@@ -61,8 +58,22 @@ func load_from_slot(slot: int) -> SaveState:
 	
 ## Deletes data.
 func clear_slot(slot: int):
-	var path := SAVE_DIRECTORY.path_join(_slot_filename(slot))
-	OS.move_to_trash(ProjectSettings.globalize_path(path))
+	if not is_slot_in_use(slot):
+		return
+	var savedir := DirAccess.open(SAVE_DIRECTORY)
+	savedir.remove(_slot_filename(slot))
+	if slot == Persistent.newest_save_slot:
+		Persistent.newest_save_slot = -1
+	_saves_cache.erase(slot)
+	
+	
+## Deletes all data.
+func clear_saves():
+	var savedir := DirAccess.open(SAVE_DIRECTORY)
+	for slot in _saves_cache:
+		savedir.remove(_slot_filename(slot))
+	Persistent.newest_save_slot = -1
+	_saves_cache.clear()
 	
 	
 ## Saves game data to file.

@@ -16,14 +16,6 @@ func _enter_tree():
 	add_to_group('game_event_listeners')
 		
 		
-func on_save(_save: SaveState):
-	save_data()
-		
-		
-func on_load(_save: SaveState):
-	reload()
-		
-		
 func on_quit(_should_end: Array):
 	save_data()
 		

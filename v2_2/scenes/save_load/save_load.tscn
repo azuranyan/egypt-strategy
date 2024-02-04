@@ -125,6 +125,13 @@ offset_right = 1817.0
 offset_bottom = 66.0
 text = "Return"
 
+[node name="WipeDataButton" type="Button" parent="Control"]
+offset_left = 1451.0
+offset_top = 24.0
+offset_right = 1601.0
+offset_bottom = 66.0
+text = "Wipe Data"
+
 [node name="GridContainer" type="GridContainer" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
@@ -172,3 +179,4 @@ layout_mode = 2
 layout_mode = 2
 
 [connection signal="pressed" from="Control/CloseButton" to="." method="_on_close_button_pressed"]
+[connection signal="pressed" from="Control/WipeDataButton" to="." method="_on_wipe_data_button_pressed"]

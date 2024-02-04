@@ -8,26 +8,6 @@ const SAVE_PATH := 'user://saves/'
 var _save_data: SaveState
 var _current_page: int
 
-	
-## Returns the save filename for a given save.
-static func state_filename(save: SaveState) -> String:
-	return slot_filename(save.slot)
-	
-	
-## Returns the save filename for a given slot.
-static func slot_filename(slot: int) -> String:
-	return SAVE_PATH + str(slot) + '.res'
-
-
-## Returns the encoded slot in the filename.
-static func filename_slot(filename: String) -> int:
-	if not filename.ends_with('.res'):
-		return -1
-	var slot := filename.rsplit('.')
-	if slot.size() > 1 and slot[0].is_valid_int():
-		return int(slot[0]) 
-	return -1
-
 
 func _ready():
 	var sample_button := $Control/VBoxContainer/SampleButton
@@ -46,6 +26,12 @@ func _ready():
 	if Util.is_f6(self):
 		Game.create_testing_context()
 		scene_enter.call_deferred({save_data=Game.create_new_data()})
+
+
+func _input(event):
+	if event.is_action_pressed('ui_cancel') or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		set_process_input(false)
+		scene_return()
 
 
 func scene_enter(kwargs := {}):
@@ -91,7 +77,7 @@ func load_page(page: int):
 		slot.slot = i
 		slot.release_focus()
 		
-		if SaveManager.slot_in_use(i):
+		if SaveManager.is_slot_in_use(i):
 			var save := SaveManager.load_from_slot(i)
 			if save:
 				slot.initialize(save, Persistent.newest_save_slot == i)
@@ -102,7 +88,7 @@ func load_page(page: int):
 	
 	
 func interact_load_from_slot(slot: int):
-	if not SaveManager.slot_in_use(slot):
+	if not SaveManager.is_slot_in_use(slot):
 		return
 		
 	var save := SaveManager.load_from_slot(slot)
@@ -113,7 +99,6 @@ func interact_load_from_slot(slot: int):
 func interact_save_to_slot(slot: int):
 	# TODO if occupied, ask if overwrite
 	SaveManager.save_to_slot(_save_data, slot)
-	SaveManager.scan_for_changes()
 	load_slot_page(slot)
 	
 	
@@ -121,10 +106,7 @@ func interact_delete_slot(slot: int):
 	# TODO confirm delete
 	# TODO if newest save, update newest
 	var savedir := DirAccess.open(SAVE_PATH)
-	if FileAccess.file_exists(slot_filename(slot)):
-		savedir.remove(slot_filename(slot))
-		
-	SaveManager.scan_for_changes()
+	SaveManager.clear_slot(slot)
 	load_slot_page(slot)
 
 
@@ -147,7 +129,7 @@ func _on_close_button_pressed():
 	scene_return()
 	
 
-func _input(event):
-	if event.is_action_pressed('ui_cancel') or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		set_process_input(false)
-		scene_return()
+func _on_wipe_data_button_pressed():
+	SaveManager.clear_saves()
+	load_page(_current_page)
+	
