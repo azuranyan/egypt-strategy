@@ -1,18 +1,19 @@
 class_name TestOverlay
 extends CanvasLayer
 
-signal save_button_pressed
-signal load_button_pressed
-signal quit_button_pressed
 
 
 func _on_load_button_pressed():
-	load_button_pressed.emit()
+	Game._load_state(SaveManager.load_data('user://saves/0.res'))
 
 
 func _on_save_button_pressed():
-	save_button_pressed.emit()
+	SaveManager.save_data(Game._save_state(), 'user://saves/0.res')
 
 
 func _on_quit_button_pressed():
-	quit_button_pressed.emit()
+	Game.quit_game()
+
+
+func _on_button_pressed():
+	print_orphan_nodes()

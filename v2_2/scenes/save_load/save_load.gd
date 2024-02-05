@@ -30,6 +30,8 @@ func _ready():
 
 
 func _input(event):
+	if not is_active():
+		return
 	if event.is_action_pressed('ui_cancel') or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		set_process_input(false)
 		scene_return()

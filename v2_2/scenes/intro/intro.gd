@@ -14,6 +14,8 @@ func _on_timer_timeout():
 	
 
 func _unhandled_input(event):
+	if not is_active():
+		return
 	if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
 		_next_scene()
 

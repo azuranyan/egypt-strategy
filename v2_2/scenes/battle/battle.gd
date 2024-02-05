@@ -5,23 +5,7 @@ extends GameScene
 var _context: BattleContext
 
 
-signal _ctc
-
-
-func start_battle(ctx: BattleContext):
-	_context = ctx
-	await _ctc
-
-	scene_return('fade_to_black', {
-		result = BattleResult.new(BattleResult.ATTACKER_VICTORY, ctx.attacker, ctx.defender, ctx.territory, 0),
-		message = 'you are kakkoi',
-	})
-
-
 func scene_enter(kwargs := {}):
-	await _ctc
-	scene_return('fade_to_black')
-	# TODO hacks just to make it work
 	if not Game._battle_context:
 		Game._battle_context = BattleContext.new()
 	Game._battle_context.attacker = kwargs.attacker
@@ -38,7 +22,9 @@ func scene_exit():
 	Game.battle_ended.emit(result)
 
 
-func _input(event):
+func _input(event) -> void:
+	if not is_active():
+		return
 	if event.is_action_pressed('ui_accept') or event is InputEventMouseButton and event.is_pressed():
-		_ctc.emit()
 		set_process_input(false)
+		return scene_return('fade_to_black')

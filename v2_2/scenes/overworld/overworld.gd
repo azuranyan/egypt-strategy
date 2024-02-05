@@ -28,7 +28,6 @@ func _ready():
 
 
 func scene_enter(kwargs := {}):
-	pass
 	# TODO currently a hack
 	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
@@ -459,6 +458,8 @@ func _on_territory_button_train_pressed(_button: TerritoryButton):
 	
 	
 func _unhandled_input(event) -> void:
+	if not is_active():
+		return
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		return scene_call('pause')

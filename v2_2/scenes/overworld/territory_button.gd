@@ -41,7 +41,7 @@ func _ready():
 
 func _exit_tree():
 	request_ready()
-	# TODO if connections show funky duplicating behaviour, just remove them here
+	_remove_connections()
 	_remove_null_territory()
 	territory_node = null
 
@@ -158,7 +158,7 @@ func _remove_connections():
 	while connections.get_child_count() > 0:
 		# not ideal but meh
 		var child := connections.get_child(0)
-		connections.remove_child(child)
+		child.queue_free()
 	
 
 func _on_detector_mouse_entered():
