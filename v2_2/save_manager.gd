@@ -29,7 +29,7 @@ func save_to_slot(save: SaveState, slot: int):
 	
 ## Saves data.
 func load_from_slot(slot: int) -> SaveState:
-	return ResourceLoader.load(_slot_filename(slot))
+	return ResourceLoader.load(_slot_filename(slot), '', ResourceLoader.CACHE_MODE_REPLACE)
 	
 	
 ## Deletes data.
@@ -56,7 +56,7 @@ func clear_saves():
 func get_last_save() -> SaveState:
 	if Persistent.newest_save_slot == -1:
 		return null
-	return load_data(_saves_cache[Persistent.newest_save_slot])
+	return load_from_slot(Persistent.newest_save_slot)
 	
 	
 ## Takes a dictionary of slots and fills it in with saves.
@@ -91,16 +91,6 @@ func scan_for_changes():
 			_saves_cache[slot] = SAVE_DIRECTORY.path_join(filename)
 		filename = savedir.get_next()
 	savedir.list_dir_end()
-	
-	
-## Saves game data to file.
-func save_data(save: SaveState, path: String) -> Error:
-	return ResourceSaver.save(save, path)
-
-	
-## Loads game data from file.
-func load_data(path: String) -> SaveState:
-	return ResourceLoader.load(path) as SaveState
 
 
 ## Returns the save filename for a given save.

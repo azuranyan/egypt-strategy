@@ -309,11 +309,13 @@ func _save_state() -> SaveState:
 ## Changes the game state.
 func _load_state(save: SaveState):
 	var dup := save.duplicate()
-	
+	print(save.overworld_context.cycle_count)
+		
 	# load data
 	_overworld_context = dup.overworld_context
 	_battle_context = dup.battle_context
 	units = dup.units
+	notify_property_list_changed()
 	
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_load', dup)
