@@ -1,10 +1,12 @@
 class_name Overworld
-extends CanvasLayer
+extends GameScene
 
 
 signal territory_transfer_ownership(old_owner: Empire, new_owner: Empire, territory: Territory)
 signal _turn_finished
 signal _player_choose_action
+
+signal _done_waiting
 
 
 var _context: OverworldContext
@@ -25,8 +27,10 @@ func _ready():
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 
 
-func scene_enter(_kwargs := {}):
+func scene_enter(kwargs := {}):
 	print('enter overworld')
+	#_battle_result = kwargs.get('result')
+	#_message = kwargs.get('message', '')
 	# TODO currently a hack
 	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
@@ -84,7 +88,7 @@ func create_new_context() -> OverworldContext:
 		if e.is_random():
 			ctx.active_empires.append(e)
 			
-	ctx.state = OverworldContext.State.READY
+	#ctx.state = OverworldContext.State.READY
 	return ctx
 
 
@@ -215,7 +219,7 @@ func is_running() -> bool:
 	
 	
 ## Starts the overworld cycle.
-func start_overworld_cycle(ctx: OverworldContext):
+func start_overworld_cycle(ctx: OverworldContext) -> void:
 	if is_running():
 		push_error('overworld is already running.')
 		return
@@ -228,15 +232,13 @@ func start_overworld_cycle(ctx: OverworldContext):
 			btn.visible = _context.is_boss_active()
 	
 	Game.overworld_started.emit()
+	# TODO
+	if not ctx.state:
+		ctx.state = _cont_cycle_start.get_method()
 	
-	# trampoline
-	var cont = get_continuation(_context.state)
-	while not _should_end:
-		assert(cont != null)
-		cont = await cont.call()
-		
-	_context = null
-	Game.emit_signal.call_deferred('overworld_ended')
+	# fix: next is needed for cps, but here we need to directly call the function
+	get_continuation(ctx.state).call()
+	#return next(get_continuation(ctx.state))
 	
 	
 ## Stops the overworld cycle.
@@ -246,135 +248,113 @@ func stop_overworld_cycle():
 	_player_choose_action.emit(null)
 
 
-## Returns the continuation function based on the state
-func get_continuation(st: OverworldContext.State):
-	match st:
-		OverworldContext.State.READY: return _cont_cycle_start
-		OverworldContext.State.CYCLE_START: return _cont_cycle_start
-		OverworldContext.State.TURN_START: return _cont_turn_start
-		OverworldContext.State.TURN_ONGOING: return _cont_turn_do
-		OverworldContext.State.TURN_END: return _cont_turn_end
-		OverworldContext.State.CYCLE_END: return _cont_cycle_end
-	return null # never
+####################################################################################################
+#region Continuations
+####################################################################################################
 
-
-## Returns the continuation for state if should_end flag is not set.
-func next_continuation(st: OverworldContext.State):
+## Returns the matching continuation from state.
+func get_continuation(state: StringName) -> Callable:
+	assert(has_method(state))
+	return Callable(self, state)
+	
+	
+## Calls the next continuation.
+func next(cont: Callable) -> void:
 	if _should_end:
-		return null
-	return get_continuation(st)
+		return
+	_context.state = cont.get_method()
+	print('^^^^', _context.state)
+	cont.call_deferred()
 	
 	
-## Starts the cycle and emits the signal.
-func _cont_cycle_start():
-	_context.state = OverworldContext.State.CYCLE_START
-	
-	# allow for interruption and shutdown
+## The start of a new turn cycle.
+func _cont_cycle_start() -> void:
 	Game.overworld_cycle_started.emit(_context.cycle_count)
 	await Game.wait_for_resume()
-	return next_continuation(OverworldContext.State.TURN_START)
+	return next(_cont_turn_start)
 	
 	
-## Starts the empire's turn and emits the signal.
-func _cont_turn_start():
-	_context.state = OverworldContext.State.TURN_START
-	# allow for interruption and shutdown
+## The start of an empire's turn.
+func _cont_turn_start() -> void:
 	Game.overworld_turn_started.emit(_context.on_turn())
 	await Game.wait_for_resume()
-	return next_continuation(OverworldContext.State.TURN_ONGOING)
+	return next(_cont_take_action)
 	
-	
-## Does the action for the empire.
-func _cont_turn_do():
-	_context.state = OverworldContext.State.TURN_ONGOING
-	var timer := get_tree().create_timer(1)
-	
-	var action: Variant = await get_action(_context.on_turn())
-	
-	var cancelled := false
+
+## Lets the empire on turn do their action.
+func _cont_take_action() -> void:
+	print('ACTION: %s' % _context.on_turn().leader_name())
+	# wait for action
+	var action: EmpireAction
+	if _context.on_turn().is_player_owned():
+		print('waiting for player action...')
+		$InputBlocker.mouse_filter = 2
+		action = await _player_choose_action
+		$InputBlocker.mouse_filter = 0
+	else:
+		action = await Game.delay_function(get_ai_action, 2, [_context.on_turn()])
+		
+	# execute action
+	if action is AttackAction:
+		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
+		scene_call('battle', 'fade_to_black', {
+			attacker = action.empire,
+			defender = action.target_empire,
+			territory = action.target,
+			map_id = action.map_id,
+		})
+		return next(_cont_wait_for_battle_result)
+		
 	if action is RestAction:
 		print("%s rests. HP recovered." % _context.on_turn().leader_name())
 		_context.on_turn().hp_multiplier = 1.0
+		return next(_cont_turn_end)
 		
-	elif action is TrainingAction:
+	if action is TrainingAction:
 		print('%s trains units (TODO does nothing)' % _context.on_turn().leader_name())
+		return next(_cont_turn_end)
 		
-	elif action is AttackAction:
-		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
-		Game.start_battle.call_deferred(action.empire, action.target_empire, action.target, action.map_id)
-		var result: BattleResult = await Game.battle_ended
 		
-		# TODO show result banner
-		
-		match result.value:
-			BattleResult.CANCELLED:
-				cancelled = true
-				
-			BattleResult.NONE:
-				push_error('result == BattleResult.NONE')
-				
-			BattleResult.ATTACKER_VICTORY:
-				transfer_territory(result.defender, result.attacker, result.territory)
-				result.defender.hp_multiplier = 0.1 # TODO
-				
-			BattleResult.DEFENDER_VICTORY:
-				result.attacker.hp_multiplier = 0.1 # TODO
-				
-			BattleResult.ATTACKER_WITHDRAW:
-				pass
-				
-			BattleResult.DEFENDER_WITHDRAW:
-				transfer_territory(result.defender, result.attacker, result.territory)
-		if not result.defender.is_defeated():
-			print('  territories left: %s' % result.defender.territories.size())
+## Waits for the battle to finish.
+func _cont_wait_for_battle_result() -> void:
+	var result: BattleResult = await Game.battle_ended
+	#var result: BattleResult = await Game.battle_ended
+	# TODO we have this data, we called battle. why are we doing this again?
+	#var attacker := Game._battle_context.attacker
+	#var defender := Game._battle_context.defender
+	#var territory := Game._battle_context.territory
+	#print('battle finished! got %s' % Game._battle_context.result)
+	match result.value:
+	#match Game._battle_context.result:
+		BattleResult.CANCELLED:
+			return next(_cont_take_action)
 			
-	if timer.time_left > 0:
-		await timer.timeout
-	if cancelled:
-		return next_continuation(OverworldContext.State.TURN_ONGOING)
-	else:
-		return next_continuation(OverworldContext.State.TURN_END)
+		BattleResult.NONE:
+			push_warning('result == BattleResult.NONE')
+			
+		BattleResult.ATTACKER_VICTORY:
+			transfer_territory(result.defender, result.attacker, result.territory)
+			result.defender.hp_multiplier = 0.1
+			
+		BattleResult.DEFENDER_VICTORY:
+			result.attacker.hp_multiplier = 0.1
+			
+		BattleResult.ATTACKER_WITHDRAW:
+			pass
+			
+		BattleResult.DEFENDER_WITHDRAW:
+			transfer_territory(result.defender, result.attacker, result.territory)
+			
+	return next(_cont_turn_end)
 	
-
-## Requests an action from the empire.
-func get_action(empire: Empire) -> Variant:
-	if empire.is_player_owned():
-		print('waiting for player action...')
-		var node := $InputBlocker
-		remove_child(node)
-		var action: Variant = await _player_choose_action
-		add_child(node)
-		return action
-	else:
-		# if hurt, rest
-		if empire.hp_multiplier < 0.8:
-			return RestAction.new(_context, empire)
-			
-		# increase aggression
-		empire.aggression += empire.base_aggression + randf()
-		
-		if empire.aggression >= 1:
-			empire.aggression = 0
-			var adjacent := empire.get_adjacent(_context.territories)
-			
-			# basic sanity check
-			if adjacent.is_empty():
-				push_warning('empire "%s" has no adjacent territories' % empire.leader_name())
-				return RestAction.new(_context, empire)
-			
-			# attack
-			var target: Territory = adjacent.pick_random()
-			return AttackAction.new(_context, empire, target.empire, target, 0)
-		
-		# rest
-		return RestAction.new(_context, empire)
-		
-		
-## Ends the turn and emits the signal.
-func _cont_turn_end():
-	_context.state = OverworldContext.State.TURN_END
-	var old_turn := _context.on_turn()
-	var end_turn_cycle := false
+	
+## Ends the turn and emits the signal
+func _cont_turn_end() -> void:
+	Game.overworld_turn_ended.emit(_context.on_turn())
+	await Game.wait_for_resume()
+	
+	# finds the first valid and active empire
+	var end_turn_cycle = false
 	while true:
 		_context.turn_index += 1
 		if _context.turn_index >= _context.active_empires.size():
@@ -383,29 +363,52 @@ func _cont_turn_end():
 			break
 		if _context.on_turn() not in _context.defeated_empires:
 			break
-			
-	# allow for interruption and shutdown
-	Game.overworld_turn_ended.emit(old_turn)
-	await Game.wait_for_resume()
-	if end_turn_cycle:
-		return next_continuation(OverworldContext.State.CYCLE_END)
-	else:
-		return next_continuation(OverworldContext.State.TURN_START)
 	
+	if end_turn_cycle:
+		return next(_cont_cycle_end)
+	else:
+		return next(_cont_turn_start)
 		
-## Ends the cycle and emits the signal.
-func _cont_cycle_end():
-	_context.state = OverworldContext.State.CYCLE_END
-	# maybe we want a defeated queue but that's just adds another variable
-	# to keep track of, this works fine cos we dont have many anyways.
+		
+## Ends the current cycle and starts a new one.
+func _cont_cycle_end() -> void:
+	Game.overworld_cycle_ended.emit(_context.cycle_count)
+	await Game.wait_for_resume()
 	for defeated in _context.defeated_empires:
 		_context.active_empires.erase(defeated)
 	_context.cycle_count += 1
-	# allow for interruption and shutdown
-	Game.overworld_cycle_ended.emit(_context.cycle_count)
-	await Game.wait_for_resume()
-	return next_continuation(OverworldContext.State.CYCLE_START)
+	return next(_cont_cycle_start)
 
+
+####################################################################################################
+#endregion Continuations
+####################################################################################################
+	
+	
+func get_ai_action(empire: Empire) -> EmpireAction:
+	# if hurt, rest
+	if empire.hp_multiplier < 0.8:
+		return RestAction.new(_context, empire)
+		
+	# increase aggression
+	empire.aggression += empire.base_aggression + randf()
+	
+	if empire.aggression >= 1:
+		empire.aggression = 0
+		var adjacent := empire.get_adjacent(_context.territories)
+		
+		# basic sanity check
+		if adjacent.is_empty():
+			push_warning('empire "%s" has no adjacent territories' % empire.leader_name())
+			return RestAction.new(_context, empire)
+		
+		# attack
+		var target: Territory = adjacent.pick_random()
+		return AttackAction.new(_context, empire, target.empire, target, 0)
+	
+	# rest
+	return RestAction.new(_context, empire)
+	
 
 ## Called by actions to transfer territory.
 func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
@@ -414,7 +417,7 @@ func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territo
 	_transfer_territory(old_owner, new_owner, territory)
 	
 	if territory == old_owner.home_territory:
-		if Game.prefs['defeat_if_home_territory_captured']:
+		if Preferences.defeat_if_home_territory_captured:
 			while not old_owner.territories.is_empty():
 				var t: Territory = old_owner.territories.pop_back()
 				_transfer_territory(old_owner, new_owner, t)

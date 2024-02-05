@@ -16,31 +16,6 @@ func _ready():
 		userdir.make_dir(SAVE_DIRECTORY)
 	
 	
-## Returns true if save slot is in use.
-func is_slot_in_use(slot: int) -> bool:
-	return _save_exists(_slot_filename(slot))
-	
-	
-## Scans for changes.
-func scan_for_changes():
-	
-	var savedir := DirAccess.open(SAVE_DIRECTORY)
-	savedir.list_dir_begin()
-	# naive update
-	var filename := savedir.get_next()
-	while filename != '':
-		var slot := _filename_slot(filename)
-		if slot != -1:
-			_saves_cache[slot] = SAVE_DIRECTORY.path_join(filename)
-		filename = savedir.get_next()
-	savedir.list_dir_end()
-	
-	
-## Returns the number of save files.
-func get_save_count() -> int:
-	return _saves_cache.size()
-	
-	
 ## Saves data to slot.
 func save_to_slot(save: SaveState, slot: int):
 	save.slot = slot
@@ -74,6 +49,47 @@ func clear_saves():
 		savedir.remove(_slot_filename(slot))
 	Persistent.newest_save_slot = -1
 	_saves_cache.clear()
+	
+	
+## Returns the last saved data.
+func get_last_save() -> SaveState:
+	if Persistent.newest_save_slot == -1:
+		return null
+	return load_data(_saves_cache[Persistent.newest_save_slot])
+	
+	
+## Takes a dictionary of slots and fills it in with saves.
+func get_saves(dict: Dictionary):
+	for slot in dict:
+		if is_slot_in_use(slot):
+			dict[slot] = load_from_slot(slot)
+		else:
+			dict[slot] = null
+	
+	
+## Returns the number of save files.
+func get_save_count() -> int:
+	return _saves_cache.size()
+	
+	
+## Returns true if save slot is in use.
+func is_slot_in_use(slot: int) -> bool:
+	return _save_exists(_slot_filename(slot))
+	
+	
+## Scans for changes.[br]
+## This should be called when the save directory changes.
+func scan_for_changes():
+	var savedir := DirAccess.open(SAVE_DIRECTORY)
+	savedir.list_dir_begin()
+	# naive update
+	var filename := savedir.get_next()
+	while filename != '':
+		var slot := _filename_slot(filename)
+		if slot != -1:
+			_saves_cache[slot] = SAVE_DIRECTORY.path_join(filename)
+		filename = savedir.get_next()
+	savedir.list_dir_end()
 	
 	
 ## Saves game data to file.

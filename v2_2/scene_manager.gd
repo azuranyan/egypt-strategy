@@ -29,6 +29,7 @@ func _ready():
 	
 ## Loads a new scene and pushes it to the stack.
 func call_scene(content_path: String, transition: String, kwargs := {}, continuation_method: StringName = &'', continuation_data: Dictionary = {}) -> void:
+	await _wait_for_transition_finish()
 	_kwargs = kwargs
 	var frame := SceneStackFrame.new()
 	frame.scene_path = content_path
@@ -41,6 +42,7 @@ func call_scene(content_path: String, transition: String, kwargs := {}, continua
 	
 ## Pops the current scene from the stack and restores the previous scene.
 func scene_return(transition: String, kwargs := {}):
+	await _wait_for_transition_finish()
 	if _scene_stack.is_empty():
 		push_error('scene_return(): scene stack empty!')
 		get_tree().quit()
@@ -65,11 +67,17 @@ func scene_return(transition: String, kwargs := {}):
 	
 ## Replaces the current scene with a new scene.
 func load_new_scene(content_path: String, transition: String) -> void:
+	await _wait_for_transition_finish()
 	var frame := SceneStackFrame.new()
 	frame.scene_path = content_path
 	frame.scene = null # will be populated later
 	_load_scene(content_path, transition, frame)
 	
+	
+func _wait_for_transition_finish() -> void:
+	if is_loading():
+		await transition_finished
+		
 	
 func _load_scene(content_path: String, transition: String, frame: SceneStackFrame) -> void:
 	# initialize transition data
@@ -161,8 +169,12 @@ func _loading_finished(new_scene: Node) -> void:
 	
 	
 func _replace_current_scene(new_scene: Node):
-	_exit_scene.call_deferred(get_tree().current_scene)
+	# allow new scene to enter first before old scene exits:
+	# this lets the old scene to send a signal as it exits and this still
+	# be listened to from the entering scene.
+	var old_scene := get_tree().current_scene
 	_enter_current_scene.call_deferred(new_scene)
+	_exit_scene.call_deferred(old_scene)
 	if is_loading():
 		_loading_screen.finish_transition()
 		await _loading_screen.transition_finished

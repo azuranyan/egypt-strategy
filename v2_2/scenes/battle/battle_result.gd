@@ -9,6 +9,7 @@ enum {
 	DEFENDER_WITHDRAW,
 }
 
+# TODO this should just take a weakref to context?
 var value: int
 var attacker: Empire
 var defender: Empire

@@ -23,14 +23,6 @@ signal overworld_cycle_ended(cycle: int)
 signal overworld_turn_started(empire: Empire)
 signal overworld_turn_ended(empire: Empire)
 
-
-const OverworldScene := preload("res://scenes/overworld/overworld.tscn")
-const BattleScene := preload("res://scenes/battle/battle.tscn")
-const MainMenuScene := preload("res://scenes/main_menu/main_menu.tscn")
-
-const PERSISTENT_PATH := "user://persistent.tres"
-const PREFERENCES_PATH := "user://preferences.tres"
-	
 	
 enum {
 	SCENE_NONE,
@@ -51,11 +43,7 @@ var units: Array[Unit]
 var _units_by_tag := {}
 
 
-var _last_battle_result: BattleResult
-
-
-var suspended: bool
-
+var _suspended: bool
 
 var _overworld: Overworld
 var _overworld_context: OverworldContext
@@ -68,6 +56,7 @@ var _event_context
 
 var is_saveable_context: bool
 	
+var _start_scene_path: String
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -85,81 +74,33 @@ func _main(kwargs := {}):
 		add_child(debug_overlay)
 	
 	get_tree().set_auto_accept_quit(false)
+	_start_scene_path = kwargs.start_scene_path
+	
+	# TODO due to the way this works, Bootstrap is the current scene (as it's
+	# set as the scene to launch on main) and will be replaced with whatever
+	# it set as the main frame. Literal bootstrap.
 	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
 		
-		
-func _start_overworld():
-	if is_instance_valid(_overworld):
-		push_error('Overworld already running.')
-		return
-	assert(_overworld_context)
 
-	# create the overworld
-	print('[Game] Starting Overworld.')
-	_overworld = OverworldScene.instantiate()
-	add_child(_overworld)
+## Calls a function with minimum delay time.
+func delay_function(callable: Callable, delay: float, argv := []) -> Variant:
+	if delay <= 0:
+		return callable.callv(argv)
 	
-	# start the overworld
-	is_saveable_context = true
-	_overworld.start_overworld_cycle(_overworld_context)
+	var timer := Timer.new()
+	timer.one_shot = true
+	timer.autostart = true
+	timer.wait_time = delay
+	add_child(timer)
 	
-	# wait for the overworld to end
-	_last_battle_result = await overworld_ended
-
-	# end the overworld
-	print('[Game] Exiting Overworld.')
-	is_saveable_context = false
-	remove_child(_overworld)
-	_overworld.queue_free()
- 
-
-func _start_battle():
-	if is_instance_valid(_battle):
-		push_error('Battle already running.')
-		return
-	assert(_battle_context)
+	var rv = await callable.callv(argv)
 	
-	# create the battle
-	print('[Game] Starting Battle.')
-	#_battle = BattleScene.instantiate()
-	#add_child(_battle)
-	SceneManager.load_new_scene(BattleScene.resource_path, 'fade_to_black')
-	_battle = await SceneManager.transition_finished
+	if timer.time_left > 0:
+		await timer.timeout
+	timer.queue_free()
+	return rv
 	
 	
-	# start the battle
-	is_saveable_context = true
-	_battle.start_battle(_battle_context)
-
-	# wait for the battle to finish
-	await battle_ended
-
-	# end the battle
-	print('[Game] Exiting Battle.')
-	is_saveable_context = false
-	
-	SceneManager.load_new_scene(OverworldScene.resource_path, 'fade_to_black')
-	_overworld = await SceneManager.transition_finished
-	#remove_child(_battle)
-	#_battle.queue_free()
- 
-
-func _start_main_menu():
-	var main_menu := MainMenuScene.instantiate()
-	add_child(main_menu)
-	await main_menu.show_main_menu()
-	remove_child(main_menu)
-	main_menu.queue_free()
-
-
-func _start_event():
-	pass
-
-
-func _start_intro():
-	pass
-	
-		
 ## Returns the viewport size.
 func get_viewport_size() -> Vector2:
 	# TODO get_viewport().size doesn't work, even with stretch mode set to
@@ -236,16 +177,6 @@ func get_unit_type(unit_name: String) -> UnitType:
 		return preload('res://units/placeholder/unit_type.tres')
 
 
-func start_overworld_cycle():
-	# overworld context is always loaded in data so we just call this
-	await _start_overworld()
-	
-	
-func stop_overworld_cycle():
-	if is_instance_valid(_overworld):
-		_overworld.stop_overworld_cycle()
-		
-
 func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id := 0):
 	var ctx := BattleContext.new()
 	ctx.attacker = attacker
@@ -255,27 +186,29 @@ func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_
 	ctx.units = units
 	ctx.territories = _overworld_context.territories
 	ctx.empires = _overworld_context.empires
-	_battle_context = ctx
-	await _start_battle()
-	_battle_context = null
+	#_battle_context = ctx
+	#await _start_battle()
+	#_battle_context = null
 
-
-func stop_battle():
-	pass
+	
+## Suspends the game execution.[br]
+##
+## This is different from pause that completely stops execution and processing.
+## This lets systems powered by coroutines to be suspended and resumed later.
+func suspend() -> void:
+	_suspended = true
 	
 	
-func suspend():
-	suspended = true
-	
-	
-func resume():
-	if suspended:
-		suspended = false
+## Resumes the game execution.
+func resume() -> void:
+	if _suspended:
+		_suspended = false
 		game_resumed.emit()
 	
 	
-func wait_for_resume():
-	if suspended:
+## Awaits for resume if suspended.
+func wait_for_resume() -> void:
+	if _suspended:
 		await game_resumed
 	
 	
@@ -302,26 +235,6 @@ func capture_screenshot(size: Vector2i) -> Texture:
 	img.resize(size.x, size.y, Image.INTERPOLATE_BILINEAR)
 	return ImageTexture.create_from_image(img)
 	
-	
-func show_main_menu() -> int:
-	var main_menu := MainMenuScene.instantiate()
-	add_child(main_menu)
-	#main_menu.start_selected
-	#main_menu.continue_selected
-	#main_menu.load_selected
-	#main_menu.settings_selected
-	#main_menu.extras_selected
-	#main_menu.credits_selected
-	#main_menu.exit_selected.connect(emit_signal.bind('_main_menu_choice', 1))
-	#var re := await _main_menu_choice
-	#main_menu.queue_free()
-	return 1
-		
-	
-func _initiate_load():
-	# if we're still running
-	pass
-
 
 ## Creates a new save data.
 func create_new_data() -> SaveState:
@@ -342,10 +255,12 @@ func create_new_data() -> SaveState:
 	
 	
 func _create_new_overworld_context() -> OverworldContext:
-	var overworld := OverworldScene.instantiate() as Overworld
+	# TODO circular dependency with overworld and lack of forward
+	# declaration forces us to do this
+	var overworld = load("res://scenes/overworld/overworld.tscn").instantiate()
 	overworld.hide()
 	add_child(overworld)
-	var ctx := overworld.create_new_context()
+	var ctx = overworld.create_new_context()
 	remove_child(overworld)
 	overworld.queue_free()
 	return ctx
