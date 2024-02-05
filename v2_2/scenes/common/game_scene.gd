@@ -34,7 +34,6 @@ func scene_return(transition := 'fade_to_black', kwargs := {}) -> void:
 	if not is_active():
 		push_warning('%s: attempt to return from non active scene' % self)
 		return
-	# TODO what happens if this fails, do we just stay or we get popped?
 	SceneManager.scene_return(transition, kwargs)
 
 

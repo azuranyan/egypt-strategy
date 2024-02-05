@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://djs5r2dgf3cj3" path="res://tools/unit_viewer.tscn" id="2_117x8"]
 
 [node name="Overlay" type="CanvasLayer"]
+process_mode = 3
 layer = 50
 script = ExtResource("1_3d83f")
 

@@ -41,7 +41,7 @@ func call_scene(content_path: String, transition: String, kwargs := {}, continua
 	
 	
 ## Pops the current scene from the stack and restores the previous scene.
-func scene_return(transition: String, kwargs := {}):
+func scene_return(transition: String, kwargs := {}) -> void:
 	await _wait_for_transition_finish()
 	if _scene_stack.is_empty():
 		push_error('scene_return(): scene stack empty!')

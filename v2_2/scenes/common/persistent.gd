@@ -60,5 +60,6 @@ func load_from_file(path: String) -> Error:
 	# TODO there should be an automated way to do this with property list
 	extras_unlocked = node.extras_unlocked
 	newest_save_slot = node.newest_save_slot
+	node.queue_free()
 	return OK
 	

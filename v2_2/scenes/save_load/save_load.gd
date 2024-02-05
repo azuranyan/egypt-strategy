@@ -24,6 +24,7 @@ func _ready():
 		slot.close_pressed.connect(_slot_closed_pressed.bind(slot))
 		
 	if Util.is_f6(self):
+		print('its f6')
 		Game.create_testing_context()
 		scene_enter.call_deferred({save_data=Game.create_new_data()})
 
@@ -39,7 +40,6 @@ func scene_enter(kwargs := {}):
 	load_slot_page(Persistent.newest_save_slot)
 	
 	_save_data = kwargs.get('save_data')
-	
 	if is_save_mode():
 		$Control/SaveLoadLabel.text = 'Save'
 		$Control/SaveInfoPanel.show()

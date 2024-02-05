@@ -458,13 +458,11 @@ func _on_territory_button_train_pressed(_button: TerritoryButton):
 	_player_choose_action.emit(TrainingAction.new(_context, _context.on_turn()))
 	
 	
-func _unhandled_input(event):
-	#if event.is_action_pressed("ui_accept"):
-		#_player_choose_action.emit(RestAction.new(on_turn()))
+func _unhandled_input(event) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		return scene_call('pause')
 	
-	if event is InputEventKey and event.pressed and event.keycode == KEY_S:
-		Game.save_state().save_to_file('user://save_file4.res')
-
 	
 ## Base class for actions
 class EmpireAction extends Resource:

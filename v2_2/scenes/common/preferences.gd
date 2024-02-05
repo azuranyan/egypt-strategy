@@ -60,6 +60,7 @@ func load_from_file(path: String) -> Error:
 	# TODO there should be an automated way to do this with property list
 	defeat_if_home_territory_captured = node.defeat_if_home_territory_captured
 	show_intro = node.show_intro
+	node.queue_free()
 	return OK
 	
 
