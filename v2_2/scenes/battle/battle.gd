@@ -39,6 +39,8 @@ func scene_exit():
 
 
 func _input(event):
+	if not is_active():
+		return
 	if event.is_action_pressed('ui_accept') or event is InputEventMouseButton and event.is_pressed():
 		_ctc.emit()
 		set_process_input(false)
