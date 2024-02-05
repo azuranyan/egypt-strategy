@@ -14,6 +14,7 @@ func _ready():
 	var userdir := DirAccess.open('user://')
 	if not userdir.dir_exists(SAVE_DIRECTORY):
 		userdir.make_dir(SAVE_DIRECTORY)
+	scan_for_changes()
 	
 	
 ## Saves data to slot.

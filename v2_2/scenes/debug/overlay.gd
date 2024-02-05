@@ -1,18 +1,23 @@
 class_name TestOverlay
 extends CanvasLayer
 
-signal save_button_pressed
-signal load_button_pressed
-signal quit_button_pressed
+
+func _ready():
+	$HBoxContainer/LoadButton.disabled = not SaveManager.is_slot_in_use(0)
 
 
 func _on_load_button_pressed():
-	load_button_pressed.emit()
-
+	Game._load_state(SaveManager.load_from_slot(0))
+	
 
 func _on_save_button_pressed():
-	save_button_pressed.emit()
-
+	SaveManager.save_to_slot(Game._save_state(), 0)
+	$HBoxContainer/LoadButton.disabled = not SaveManager.is_slot_in_use(0)
+	
 
 func _on_quit_button_pressed():
-	quit_button_pressed.emit()
+	Game.quit_game()
+
+
+func _on_button_pressed():
+	print_orphan_nodes()

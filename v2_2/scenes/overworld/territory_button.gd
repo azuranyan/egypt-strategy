@@ -159,6 +159,7 @@ func _remove_connections():
 		# not ideal but meh
 		var child := connections.get_child(0)
 		connections.remove_child(child)
+		child.queue_free()
 	
 
 func _on_detector_mouse_entered():

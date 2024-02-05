@@ -16,7 +16,7 @@ func _ready():
 		btn.text = str((i + 1))
 		btn.pressed.connect(_page_button_pressed.bind(i))
 		$Control/VBoxContainer.add_child(btn)
-	$Control/VBoxContainer.remove_child(sample_button)
+	sample_button.queue_free()
 	
 	for i in range(1, 11):
 		var slot := get_save_slot(i)

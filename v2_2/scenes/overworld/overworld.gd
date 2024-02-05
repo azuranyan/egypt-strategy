@@ -511,10 +511,3 @@ class TrainingAction extends EmpireAction:
 	func _init(_context: OverworldContext, _empire: Empire):
 		super(_context, _empire, 'Train')
 		
-
-func _on_load_button_pressed():
-	pass
-
-
-func _on_save_button_pressed():
-	pass # Replace with function body.

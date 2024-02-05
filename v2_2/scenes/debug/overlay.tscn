@@ -22,7 +22,6 @@ focus_mode = 0
 text = "Quit"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -50,6 +49,14 @@ text = "Load"
 
 [node name="UnitViewer" parent="." instance=ExtResource("2_117x8")]
 
+[node name="Button" type="Button" parent="."]
+offset_left = 12.0
+offset_top = 988.0
+offset_right = 170.0
+offset_bottom = 1019.0
+text = "Print orphan nodes"
+
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
