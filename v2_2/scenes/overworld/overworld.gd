@@ -28,16 +28,14 @@ func _ready():
 
 
 func scene_enter(kwargs := {}):
-	print('enter overworld')
-	#_battle_result = kwargs.get('result')
-	#_message = kwargs.get('message', '')
+	pass
 	# TODO currently a hack
 	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
 
 
 func scene_exit():
-	print('exit overworld')
+	pass
 
 
 ## Returns the empire nodes.
@@ -236,9 +234,8 @@ func start_overworld_cycle(ctx: OverworldContext) -> void:
 	if not ctx.state:
 		ctx.state = _cont_cycle_start.get_method()
 	
-	# fix: next is needed for cps, but here we need to directly call the function
+	# next is needed for cps, but here we need to directly call the function
 	get_continuation(ctx.state).call()
-	#return next(get_continuation(ctx.state))
 	
 	
 ## Stops the overworld cycle.
@@ -263,7 +260,6 @@ func next(cont: Callable) -> void:
 	if _should_end:
 		return
 	_context.state = cont.get_method()
-	print('^^^^', _context.state)
 	cont.call_deferred()
 	
 	
@@ -283,7 +279,6 @@ func _cont_turn_start() -> void:
 
 ## Lets the empire on turn do their action.
 func _cont_take_action() -> void:
-	print('ACTION: %s' % _context.on_turn().leader_name())
 	# wait for action
 	var action: EmpireAction
 	if _context.on_turn().is_player_owned():
@@ -318,14 +313,7 @@ func _cont_take_action() -> void:
 ## Waits for the battle to finish.
 func _cont_wait_for_battle_result() -> void:
 	var result: BattleResult = await Game.battle_ended
-	#var result: BattleResult = await Game.battle_ended
-	# TODO we have this data, we called battle. why are we doing this again?
-	#var attacker := Game._battle_context.attacker
-	#var defender := Game._battle_context.defender
-	#var territory := Game._battle_context.territory
-	#print('battle finished! got %s' % Game._battle_context.result)
 	match result.value:
-	#match Game._battle_context.result:
 		BattleResult.CANCELLED:
 			return next(_cont_take_action)
 			
@@ -404,7 +392,7 @@ func get_ai_action(empire: Empire) -> EmpireAction:
 		
 		# attack
 		var target: Territory = adjacent.pick_random()
-		return AttackAction.new(_context, empire, target.empire, target, 0)
+		return AttackAction.new(_context, empire, _context.get_territory_owner(target), target, 0)
 	
 	# rest
 	return RestAction.new(_context, empire)

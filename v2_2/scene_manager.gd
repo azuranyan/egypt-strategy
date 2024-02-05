@@ -184,8 +184,7 @@ func _enter_current_scene(new_scene: Node):
 	get_tree().root.add_child(new_scene)
 	get_tree().current_scene = new_scene
 	if new_scene.has_method('scene_enter'):
-		new_scene.scene_enter(_kwargs)
-		_kwargs.clear()
+		new_scene.scene_enter(_kwargs.duplicate())
 	
 	
 func _exit_scene(old_scene: Node):
@@ -196,6 +195,7 @@ func _exit_scene(old_scene: Node):
 	
 func _transition_done(node: Node) -> void:
 	# cleanup
+	_kwargs.clear()
 	_loading_screen = null # should queue_free() itself
 	_transition = ''
 	_content_path = ''

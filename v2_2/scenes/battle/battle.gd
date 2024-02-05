@@ -18,33 +18,23 @@ func start_battle(ctx: BattleContext):
 	})
 
 
-var _kwargs: Dictionary
 func scene_enter(kwargs := {}):
-	_kwargs = kwargs.duplicate()
-	
 	await _ctc
 	scene_return('fade_to_black')
 	# TODO hacks just to make it work
 	if not Game._battle_context:
-		var ctx := BattleContext.new()
-		ctx.attacker = _kwargs.attacker
-		ctx.defender = _kwargs.defender
-		ctx.territory = _kwargs.territory
-		ctx.map_id = _kwargs.map_id
-		ctx.units = Game.units
-		ctx.territories = Game._overworld_context.territories
-		ctx.empires = Game._overworld_context.empires
-		Game._battle_context = ctx
-	#{
-		#result = BattleResult.new(BattleResult.ATTACKER_VICTORY, attacker, defender, territory, map_id),
-		#message = 'you are kakkoi',
-	#})
+		Game._battle_context = BattleContext.new()
+	Game._battle_context.attacker = kwargs.attacker
+	Game._battle_context.defender = kwargs.defender
+	Game._battle_context.territory = kwargs.territory
+	Game._battle_context.map_id = kwargs.map_id
+	Game._battle_context.units = Game.units
+	Game._battle_context.territories = Game._overworld_context.territories
+	Game._battle_context.empires = Game._overworld_context.empires
 	
 	
 func scene_exit():
-	print('battle scene exit')
-	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, _kwargs.attacker, _kwargs.defender, _kwargs.territory, _kwargs.map_id)
-	#Game._battle_context.result = BattleResult.ATTACKER_VICTORY
+	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, Game._battle_context.attacker, Game._battle_context.defender, Game._battle_context.territory, Game._battle_context.map_id)
 	Game.battle_ended.emit(result)
 
 
