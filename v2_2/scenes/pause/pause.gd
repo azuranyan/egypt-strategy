@@ -15,8 +15,6 @@ func scene_exit():
 
 
 func _unhandled_input(event) -> void:
-	if not is_active():
-		return
 	if event.is_action_pressed("ui_cancel") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT):
 		get_tree().paused = false
 		get_viewport().set_input_as_handled()

@@ -3,9 +3,6 @@ extends CanvasLayer
 ## An abstraction for simplifying controls of [Game] and [SceneManager].
 
 
-var _active := false
-
-
 func _enter_tree():
 	add_to_group('game_event_listeners')
 	
@@ -16,8 +13,7 @@ func _exit_tree():
 
 ## Returns true if this scene is current and active.
 func is_active() -> bool:
-	# these are a lot of checks..
-	return _active and is_inside_tree() and (get_tree().current_scene == self) and (not SceneManager.is_loading())
+	return is_inside_tree() and get_tree().current_scene == self
 	
 	
 ## Pops off this scene and pushes the new scene to the stack.
@@ -28,8 +24,9 @@ func scene_call(scene_name: StringName, transition := 'fade_to_black', kwargs :=
 	if scene_name not in SceneManager.scenes:
 		push_error('%s: "%s" not found' % [self, scene_name])
 		return
-	set_active(false)
+		
 	SceneManager.call_scene(SceneManager.scenes[scene_name], transition, kwargs, continuation_method, continuation_data)
+	return
 	
 	
 ## Ends current scene and returns to the previous scene.
@@ -37,7 +34,6 @@ func scene_return(transition := 'fade_to_black', kwargs := {}) -> void:
 	if not is_active():
 		push_warning('%s: attempt to return from non active scene' % self)
 		return
-	set_active(false)
 	SceneManager.scene_return(transition, kwargs)
 
 
@@ -49,9 +45,4 @@ func scene_load(scene_name: StringName, transition := 'fade_to_black') -> void:
 	if scene_name not in SceneManager.scenes:
 		push_error('%s: "%s" not found' % [self, scene_name])
 		return
-	set_active(false)
 	SceneManager.load_new_scene(SceneManager.scenes[scene_name], transition)
-
-
-func set_active(active: bool):
-	_active = active
