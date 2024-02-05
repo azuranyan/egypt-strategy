@@ -39,11 +39,11 @@ func scene_exit():
 
 
 func _on_start_button_pressed():
-	Game._load_state(Game.create_new_data())
+	Game.load_state(Game.create_new_data())
 
 
 func _on_continue_button_pressed():
-	Game._load_state(SaveManager.load_from_slot(Persistent.newest_save_slot))
+	Game.load_state(SaveManager.load_from_slot(Persistent.newest_save_slot))
 
 
 func _on_load_button_pressed():
@@ -55,7 +55,7 @@ func _on_settings_button_pressed():
 
 
 func _on_extras_button_pressed():
-	scene_call('save_load', 'fade_to_black', {save_data=Game._save_state()})
+	scene_call('save_load', 'fade_to_black', {save_data=Game.save_state()})
 
 
 func _on_credits_button_pressed():

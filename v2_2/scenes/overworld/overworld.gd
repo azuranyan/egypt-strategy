@@ -2,11 +2,7 @@ class_name Overworld
 extends GameScene
 
 
-signal territory_transfer_ownership(old_owner: Empire, new_owner: Empire, territory: Territory)
-signal _turn_finished
 signal _player_choose_action
-
-signal _done_waiting
 
 
 var _context: OverworldContext
@@ -431,7 +427,6 @@ func _transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territ
 	for btn in territory_buttons:
 		if btn.get_territory(_context) == territory:
 			btn.initialize(_context, territory)
-	territory_transfer_ownership.emit(old_owner, new_owner, territory)
 	
 	
 func _on_territory_button_attack_pressed(button: TerritoryButton):

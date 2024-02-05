@@ -29,7 +29,7 @@ func _on_main_menu_button_pressed():
 
 func _on_save_button_pressed():
 	get_tree().paused = false
-	scene_call('save_load', 'fade_to_black', {save_data = Game._save_state()})
+	scene_call('save_load', 'fade_to_black', {save_data = Game.save_state()})
 
 
 func _on_load_button_pressed():

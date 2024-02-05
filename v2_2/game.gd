@@ -272,7 +272,7 @@ func save_data(path: String) -> Error:
 	#if not is_saveable_context:
 	#	return Error.FAILED
 	# TODO show saving dialog
-	return _save_state().save_to_file(path)
+	return save_state().save_to_file(path)
 
 	
 ## Loads game data from file.
@@ -283,11 +283,11 @@ func load_data(path: String):
 	if not save:
 		push_error('Cannot load save file "%s"' % path)
 		return
-	_load_state(save)
+	load_state(save)
 
 
 ## Returns a copy of the game's current state.
-func _save_state() -> SaveState:
+func save_state() -> SaveState:
 	# create header
 	var save := SaveState.new()
 	save.slot = 0
@@ -307,9 +307,8 @@ func _save_state() -> SaveState:
 	
 
 ## Changes the game state.
-func _load_state(save: SaveState):
+func load_state(save: SaveState):
 	var dup := save.duplicate()
-	print(save.overworld_context.cycle_count)
 		
 	# load data
 	_overworld_context = dup.overworld_context

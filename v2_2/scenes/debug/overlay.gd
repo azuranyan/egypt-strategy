@@ -7,11 +7,11 @@ func _ready():
 
 
 func _on_load_button_pressed():
-	Game._load_state(SaveManager.load_from_slot(0))
+	Game.load_state(SaveManager.load_from_slot(0))
 	
 
 func _on_save_button_pressed():
-	SaveManager.save_to_slot(Game._save_state(), 0)
+	SaveManager.save_to_slot(Game.save_state(), 0)
 	$HBoxContainer/LoadButton.disabled = not SaveManager.is_slot_in_use(0)
 	
 

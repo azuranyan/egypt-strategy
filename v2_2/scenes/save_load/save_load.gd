@@ -95,7 +95,7 @@ func interact_load_from_slot(slot: int):
 		
 	var save := SaveManager.load_from_slot(slot)
 	assert(save, 'save should have been verified to work at load_page, bug?')
-	Game._load_state(save)
+	Game.load_state(save)
 	
 	
 func interact_save_to_slot(slot: int):
