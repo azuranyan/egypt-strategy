@@ -23,25 +23,12 @@ signal overworld_cycle_ended(cycle: int)
 signal overworld_turn_started(empire: Empire)
 signal overworld_turn_ended(empire: Empire)
 
-	
-enum {
-	SCENE_NONE,
-	SCENE_INTRO,
-	SCENE_MAIN_MENU, 
-	SCENE_OVERWORLD,
-	SCENE_BATTLE,
-	SCENE_SAVELOAD,
-	SCENE_EXTRAS,
-	SCENE_CREDITS,
-}
-
 
 ## The array of all units in the game.
 var units: Array[Unit]
 
 ## Record of units by tag.
 var _units_by_tag := {}
-
 
 var _suspended: bool
 
@@ -54,9 +41,6 @@ var _battle_context: BattleContext
 var _event
 var _event_context
 
-var is_saveable_context: bool
-	
-var _start_scene_path: String
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -74,11 +58,9 @@ func _main(kwargs := {}):
 		add_child(debug_overlay)
 	
 	get_tree().set_auto_accept_quit(false)
-	_start_scene_path = kwargs.start_scene_path
 	
-	# TODO due to the way this works, Bootstrap is the current scene (as it's
-	# set as the scene to launch on main) and will be replaced with whatever
-	# it set as the main frame. Literal bootstrap.
+	# due to the way this works, Bootstrap is the current scene, as set as
+	# the scene to launch on main and will be replaced by the start scene.
 	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
 		
 
@@ -110,6 +92,7 @@ func get_viewport_size() -> Vector2:
 	return Vector2(1920, 1080)
 
 
+#region Unit
 ## Loads a unit by name for empire.
 func load_unit(unit_name: String, tag: StringName, prop := {}) -> Unit:
 	if is_tag_used(tag):
@@ -175,25 +158,12 @@ func get_unit_type(unit_name: String) -> UnitType:
 	else:
 		push_warning('%s: "res://units/%s/unit_type.tres" not found' % [unit_name, dirname])
 		return preload('res://units/placeholder/unit_type.tres')
-
-
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id := 0):
-	var ctx := BattleContext.new()
-	ctx.attacker = attacker
-	ctx.defender = defender
-	ctx.territory = territory
-	ctx.map_id = map_id
-	ctx.units = units
-	ctx.territories = _overworld_context.territories
-	ctx.empires = _overworld_context.empires
-	#_battle_context = ctx
-	#await _start_battle()
-	#_battle_context = null
+#endregion Unit
 
 	
 ## Suspends the game execution.[br]
 ##
-## This is different from pause that completely stops execution and processing.
+## This is different from pause that stops game execution and processing.
 ## This lets systems powered by coroutines to be suspended and resumed later.
 func suspend() -> void:
 	_suspended = true
@@ -212,6 +182,7 @@ func wait_for_resume() -> void:
 		await game_resumed
 	
 	
+## Quits the game. Broadcasts [code]on_quit[/code] event.
 func quit_game():
 	var should_end := [true]
 	# NOTIFICATION_WM_QUIT_REQUEST is not used, instead on_quit will be called
@@ -219,16 +190,9 @@ func quit_game():
 	
 	if not should_end[0]:
 		return
-	
 	get_tree().quit()
-	
-	# TODO
-	#if is_instance_valid(_battle):
-		#_battle.stop_battle()
-	#if is_instance_valid(_overworld):
-		#_overworld.stop_overworld_cycle()
 		
-
+		
 ## Returns a texture of game's screenshot.
 func capture_screenshot(size: Vector2i) -> Texture:
 	var img := get_viewport().get_texture().get_image()
@@ -239,14 +203,16 @@ func capture_screenshot(size: Vector2i) -> Texture:
 ## Creates a new save data.
 func create_new_data() -> SaveState:
 	print('[Game] Creating new save.')
-	var save := SaveState.new()
-	save.timestamp = Time.get_datetime_dict_from_system()
-	save.paused_event = 'overworld'
-	save.paused_data.dummy = 'dummy'
+	var save := _create_save()
+	
 	save.overworld_context = _create_new_overworld_context()
 	save.battle_context = null
 	save.units = []
-	# TODO currently a hack
+	
+	# dispatch event
+	get_tree().call_group('game_event_listeners', 'on_new_save', save)
+	
+	# TODO currently a hack, change this to the real start point later
 	var fr := SceneStackFrame.new()
 	fr.scene_path = "res://scenes/overworld/overworld.tscn" # TODO main event
 	fr.scene = null # this will be loaded in later (hopefully)
@@ -255,8 +221,7 @@ func create_new_data() -> SaveState:
 	
 	
 func _create_new_overworld_context() -> OverworldContext:
-	# TODO circular dependency with overworld and lack of forward
-	# declaration forces us to do this
+	# can't preload or declare type (circular dependency)
 	var overworld = load("res://scenes/overworld/overworld.tscn").instantiate()
 	overworld.hide()
 	add_child(overworld)
@@ -266,33 +231,19 @@ func _create_new_overworld_context() -> OverworldContext:
 	return ctx
 	
 	
-## Saves game data to file. TODO put into SaveManager
-func save_data(path: String) -> Error:
-	print('[Game] Saving data to "%s".' % path)
-	#if not is_saveable_context:
-	#	return Error.FAILED
-	# TODO show saving dialog
-	return save_state().save_to_file(path)
-
+func _create_save() -> SaveState:
+	var save := SaveState.new()
+	save.version = '0.1'
+	save.slot = 0
+	save.preview = capture_screenshot(get_viewport_size() * 0.2)
+	save.timestamp = Time.get_datetime_dict_from_system()
+	return save
 	
-## Loads game data from file.
-func load_data(path: String):
-	print('[Game] Loading data from "%s".' % path)
-	# TODO show loading dialog
-	var save := SaveState.load_from_file(path)
-	if not save:
-		push_error('Cannot load save file "%s"' % path)
-		return
-	load_state(save)
-
-
+	
 ## Returns a copy of the game's current state.
 func save_state() -> SaveState:
-	# create header
-	var save := SaveState.new()
-	save.slot = 0
-	save.timestamp = Time.get_datetime_dict_from_system()
-	save.preview = capture_screenshot(get_viewport_size() * 0.2)
+	print('[Game] Saving state.')
+	var save := _create_save()
 	
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_save', save)
@@ -308,21 +259,14 @@ func save_state() -> SaveState:
 
 ## Changes the game state.
 func load_state(save: SaveState):
-	var dup := save.duplicate()
-		
+	print('[Game] Loading state.')
 	# load data
-	_overworld_context = dup.overworld_context
-	_battle_context = dup.battle_context
-	units = dup.units
+	_overworld_context = save.overworld_context
+	_battle_context = save.battle_context
+	units = save.units
 	notify_property_list_changed()
 	
 	# dispatch event
-	get_tree().call_group('game_event_listeners', 'on_load', dup)
+	get_tree().call_group('game_event_listeners', 'on_load', save)
 
 
-## Loads a default game for f6 testing.
-func create_testing_context():
-	if not OS.is_debug_build():
-		return
-		
-	
