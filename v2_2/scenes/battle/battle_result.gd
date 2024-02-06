@@ -33,6 +33,14 @@ func defender_won() -> bool:
 	return value == DEFENDER_VICTORY or value == ATTACKER_WITHDRAW
 	
 	
+func winner() -> Empire:
+	return attacker if attacker_won() else defender
+	
+	
+func loser() -> Empire:
+	return attacker if defender_won() else defender
+	
+	
 func player_won() -> bool:
 	if attacker.is_player_owned():
 		return attacker_won()

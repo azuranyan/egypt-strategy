@@ -24,6 +24,59 @@ static func is_f6(node: Node) -> bool:
 	return false
 	
 	
+## Makes big caps for [RichTextLabel].
+static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
+	# "setting text to an empty string also clears the stack" is a fucking lie
+	rt.clear()
+	rt.text = ''
+	
+	# does not support centering and no push_center either
+	if props.get('center', true):
+		rt.append_text('[center]')
+	
+	# font
+	var font: Font = props.get('font', rt.get_theme_default_font())
+	var font_size: int = props.get('font_size', rt.get_theme_default_font_size())
+	rt.push_font(font, font_size)
+	
+	# misc props
+	if props.has('font_color'): rt.push_color(props.font_color)
+	if props.has('outline_color'): rt.push_outline_color(props.outline_color)
+	if props.has('outline_size'):  rt.push_outline_size(props.outline_size)
+	
+	var big_font_size: int = 1.5 * font_size
+	if props.has('ratio'):
+		big_font_size = props.ratio * font_size
+	if props.has('big_font_size'):
+		big_font_size = props.big_font_size
+	
+	# capitalize
+	var caps: Array[String]
+	var insert_caps := func():
+		if caps.is_empty():
+			return
+		rt.push_font_size(big_font_size)
+		rt.add_text(''.join(caps))
+		rt.pop()
+		caps.clear()
+	
+	var first_letter_only: bool = props.get('first_letter_only', true)
+	var all_caps: bool = props.get('all_caps', true)
+	var prev := ''
+	for c in text:
+		if not c.is_valid_identifier() or c.to_upper() == c and (prev == '' or prev == ' ' or (not first_letter_only and prev in caps)):
+			caps.append(c)
+		else:
+			insert_caps.call()
+			rt.add_text(c.to_upper() if all_caps else c)
+		prev = c
+	insert_caps.call()
+	
+	if props.has('outline_color'): rt.pop()
+	if props.has('outline_color'): rt.pop()
+	if props.has('outline_size'):  rt.pop()
+	
+	
 ## Simple flood fill algorithm.
 static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
 	var dest = PackedVector2Array()

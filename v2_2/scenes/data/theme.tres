@@ -25,6 +25,7 @@ border_color = Color(0, 0, 0, 1)
 
 [resource]
 default_font = ExtResource("1_st4hi")
+Button/colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
 Button/styles/disabled = SubResource("StyleBoxFlat_i7xay")
 Button/styles/focus = SubResource("StyleBoxFlat_i7xay")
 Button/styles/hover = SubResource("StyleBoxFlat_as7ec")
