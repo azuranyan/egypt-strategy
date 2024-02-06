@@ -2,11 +2,14 @@ extends GameScene
 
 signal closed
 
+
+var _save_data: SaveState
 	
-func scene_enter(_kwargs := {}):
+	
+func scene_enter(kwargs := {}):
 	get_tree().paused = true 
-	# TODO Game.is_saveable_context()
-	%SaveButton.disabled = false
+	_save_data = kwargs.get('save_data')
+	%SaveButton.disabled = _save_data == null
 	
 
 func scene_exit():
@@ -29,7 +32,7 @@ func _on_main_menu_button_pressed():
 
 func _on_save_button_pressed():
 	get_tree().paused = false
-	scene_call('save_load', 'fade_to_black', {save_data = Game.save_state()})
+	scene_call('save_load', {save_data = _save_data})
 
 
 func _on_load_button_pressed():
