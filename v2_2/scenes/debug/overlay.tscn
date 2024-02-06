@@ -22,6 +22,18 @@ grow_horizontal = 0
 focus_mode = 0
 text = "Quit"
 
+[node name="OptionButton" type="OptionButton" parent="."]
+offset_left = 631.0
+offset_top = 952.0
+offset_right = 735.0
+offset_bottom = 983.0
+item_count = 2
+selected = 0
+popup/item_0/text = "Slot 0"
+popup/item_0/id = 0
+popup/item_1/text = "Newest"
+popup/item_1/id = 1
+
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 7
 anchor_left = 0.5
