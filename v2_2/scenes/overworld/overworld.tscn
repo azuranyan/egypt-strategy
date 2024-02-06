@@ -1,14 +1,15 @@
-[gd_scene load_steps=20 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=19 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld.gd" id="1_cx0e7"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_27pdc"]
 [ext_resource type="PackedScene" uid="uid://vo0h66hnj2jc" path="res://scenes/overworld/territory_button.tscn" id="2_gak2j"]
 [ext_resource type="Script" path="res://scenes/overworld/empire_node.gd" id="3_k77ht"]
 [ext_resource type="Resource" uid="uid://bq47arkapu6hu" path="res://units/lysandra/chara.tres" id="4_r4cu8"]
+[ext_resource type="Resource" uid="uid://4vhw74hddihj" path="res://units/lysandra/unit_type.tres" id="5_ow72q"]
 [ext_resource type="Script" path="res://scenes/overworld/territory_node.gd" id="6_c77fe"]
-[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="6_gs6a8"]
 [ext_resource type="Resource" uid="uid://ceufx8acegtc1" path="res://units/sitri/chara.tres" id="6_wk2xg"]
 [ext_resource type="Resource" uid="uid://deby84sa6u6sq" path="res://units/tali/chara.tres" id="7_61qbw"]
+[ext_resource type="Resource" uid="uid://bnvl35k6vwirj" path="res://units/sitri/unit_type.tres" id="7_pidlj"]
 [ext_resource type="Resource" uid="uid://bv34ypmo75lcr" path="res://units/tali/unit_type.tres" id="8_a8050"]
 [ext_resource type="Resource" uid="uid://be1oij41g24v5" path="res://units/maia/chara.tres" id="9_qx1r3"]
 [ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="10_58rur"]
@@ -17,18 +18,6 @@
 [ext_resource type="Resource" uid="uid://b8b8l1glgxpp6" path="res://units/zahra/unit_type.tres" id="12_ipfjj"]
 [ext_resource type="Resource" uid="uid://tt2seal55q21" path="res://units/alara/chara.tres" id="13_80stb"]
 [ext_resource type="Resource" uid="uid://m278p32g20ar" path="res://units/alara/unit_type.tres" id="14_o08oa"]
-
-[sub_resource type="Resource" id="Resource_4x1pn"]
-script = ExtResource("6_gs6a8")
-stats = null
-stat_growth_1 = null
-stat_growth_2 = null
-
-[sub_resource type="Resource" id="Resource_n1qs4"]
-script = ExtResource("6_gs6a8")
-stats = null
-stat_growth_1 = null
-stat_growth_2 = null
 
 [node name="Overworld" type="CanvasLayer"]
 script = ExtResource("1_cx0e7")
@@ -45,35 +34,35 @@ texture = ExtResource("2_27pdc")
 script = ExtResource("3_k77ht")
 type = 1
 leader = ExtResource("4_r4cu8")
-hero_unit = SubResource("Resource_4x1pn")
+hero_unit = ExtResource("5_ow72q")
 home_territory_node = NodePath("../../TerritoryButton/Zetennu")
 
 [node name="Boss" type="Node" parent="Empires" node_paths=PackedStringArray("home_territory_node")]
 script = ExtResource("3_k77ht")
 type = 2
 leader = ExtResource("6_wk2xg")
-hero_unit = SubResource("Resource_n1qs4")
+hero_unit = ExtResource("7_pidlj")
 base_aggression = 0.9
 home_territory_node = NodePath("../../TerritoryButton2/Cursed Stronghold")
 
 [node name="SpareEmpireSelection" type="Node" parent="."]
 
-[node name="Tali" type="Node" parent="SpareEmpireSelection"]
+[node name="RandomEmpireSelection" type="Node" parent="."]
+
+[node name="Tali" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
 leader = ExtResource("7_61qbw")
 hero_unit = ExtResource("8_a8050")
 
-[node name="Maia" type="Node" parent="SpareEmpireSelection"]
+[node name="Maia" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
 leader = ExtResource("9_qx1r3")
 hero_unit = ExtResource("10_k8tqk")
 
-[node name="Zahra" type="Node" parent="SpareEmpireSelection"]
+[node name="Zahra" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
 leader = ExtResource("11_btcu2")
 hero_unit = ExtResource("12_ipfjj")
-
-[node name="RandomEmpireSelection" type="Node" parent="."]
 
 [node name="Alara" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
@@ -192,3 +181,4 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="BattleResultBanner" parent="." instance=ExtResource("10_58rur")]
+visible = false

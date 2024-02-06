@@ -144,6 +144,8 @@ func _unset_empire_territory(_ctx: OverworldContext, empire: Empire, territory: 
 
 ## Creates the list of units in empire.
 func _cache_territory_units(empire: Empire):
+	var hero_unit_name := empire.leader_name().to_snake_case()
+	empire.units.append(Game.load_unit(hero_unit_name, _generate_unit_tag(hero_unit_name, empire.home_territory, 0)))
 	for t in empire.territories:
 		for unit_name in t.units:
 			var count: int = t.units[unit_name]
@@ -155,7 +157,7 @@ func _cache_territory_units(empire: Empire):
 
 ## Generates wrangled name for units from territory.
 func _generate_unit_tag(unit_name: String, territory: Territory, id: int) -> String:
-	return '_'.join([unit_name, territory, id])
+	return '_'.join([unit_name, territory.name, id])
 
 	
 ## Adds the empire to context.

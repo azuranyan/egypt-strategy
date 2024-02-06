@@ -71,10 +71,10 @@ func initialize(ctx: OverworldContext, t: Territory):
 	
 	var heroes: Array[String] = []
 	for u in _context.get_territory_owner(t).units:
-		if not _context.is_hero_unit(u):
+		if not (_context.is_hero_unit(u) and u.display_name not in heroes):
 			continue
-		if t.is_player_owned(ctx):
-			heroes.append(u)
+		if _context.get_territory_owner(t).is_player_owned():
+			heroes.append(u.display_name)
 			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
 		else:
 			heroes.append(u.display_name)

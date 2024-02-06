@@ -34,7 +34,9 @@ signal battle_ended(result: BattleResult)
 
 
 ## The array of all units in the game.
-var units: Array[Unit]
+var units: Array[Unit]:
+	set(value):
+		units = value
 
 ## Record of units by tag.
 var _units_by_tag := {}
@@ -218,9 +220,9 @@ func create_new_data() -> SaveState:
 	save.battle_context = BattleContext.new()
 	save.battle_context.territories = save.overworld_context.territories
 	save.battle_context.empires = save.overworld_context.empires
-	save.units = []
+	save.units = units.duplicate() # TODO this feels REALLY weird
 	
-	# dispatch event
+	# TODO this is useless, check trello
 	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
 	# TODO currently a hack, change this to the real start point later

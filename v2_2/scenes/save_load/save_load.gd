@@ -23,11 +23,6 @@ func _ready():
 		slot.pressed.connect(_slot_pressed.bind(slot))
 		slot.close_pressed.connect(_slot_closed_pressed.bind(slot))
 		
-	if Util.is_f6(self):
-		print('its f6')
-		Game.create_testing_context()
-		scene_enter.call_deferred({save_data=Game.create_new_data()})
-
 
 func _input(event):
 	if not is_active():
