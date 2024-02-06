@@ -4,6 +4,7 @@ extends CanvasLayer
 
 func _ready():
 	$HBoxContainer/LoadButton.disabled = not SaveManager.is_slot_in_use(0)
+	
 
 
 func _on_load_button_pressed():
