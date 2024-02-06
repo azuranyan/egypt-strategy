@@ -48,10 +48,14 @@ func _on_return_button_pressed():
 
 
 func _on_return_to_button_pressed():
+	if SceneManager.scenes[get_input_scene_name()] == SceneManager._scene_stack.back().scene_path:
+		return
 	top_scene().scene_return_to(get_input_scene_name())
 
 
 func _on_item_list_item_activated(index):
+	if index == SceneManager._scene_stack.size() - 1:
+		return
 	top_scene().scene_return_to($ItemList.get_item_text(index))
 
 
