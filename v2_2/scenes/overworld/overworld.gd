@@ -288,7 +288,7 @@ func _cont_take_action() -> void:
 	# execute action
 	if action is AttackAction:
 		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
-		scene_call('battle', 'fade_to_black', {
+		scene_call('battle', {
 			attacker = action.empire,
 			defender = action.target_empire,
 			territory = action.target,

@@ -55,7 +55,7 @@ func _on_settings_button_pressed():
 
 
 func _on_extras_button_pressed():
-	scene_call('save_load', 'fade_to_black', {save_data=Game.save_state()})
+	scene_call('save_load', {save_data=Game.save_state()})
 
 
 func _on_credits_button_pressed():
