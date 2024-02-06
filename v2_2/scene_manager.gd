@@ -15,12 +15,13 @@ const LoadingScreenScene: PackedScene = preload("res://scenes/common/loading_scr
 ## Contains the mapping of scene names to scene paths.
 var scenes: Dictionary
 
-var _loading_screen: LoadingScreen
-var _transition: String
 var _content_path: String
-var _load_progress_timer: Timer
-var _scene_stack: Array[SceneStackFrame]
+var _transition: String
 var _kwargs: Dictionary
+var _scene_stack: Array[SceneStackFrame]
+
+var _load_progress_timer: Timer
+var _loading_screen: LoadingScreen
 
 
 func _ready():
@@ -43,7 +44,7 @@ func call_scene(content_path: String, transition: String, kwargs := {}, continua
 ## Pops the current scene from the stack and restores the previous scene.
 func scene_return(transition: String, kwargs := {}) -> void:
 	await _wait_for_transition_finish()
-	if _scene_stack.is_empty():
+	if _scene_stack.size() <= 1:
 		push_error('scene_return(): scene stack empty!')
 		get_tree().quit()
 		return
