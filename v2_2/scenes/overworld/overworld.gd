@@ -458,7 +458,7 @@ func _unhandled_input(event) -> void:
 		return
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
-		return scene_call('pause')
+		return scene_call('pause', {save_data = Game.save_state()})
 	
 	
 ## Base class for actions

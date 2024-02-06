@@ -107,7 +107,6 @@ func interact_save_to_slot(slot: int):
 func interact_delete_slot(slot: int):
 	# TODO confirm delete
 	# TODO if newest save, update newest
-	var savedir := DirAccess.open(SAVE_PATH)
 	SaveManager.clear_slot(slot)
 	load_slot_page(slot)
 
