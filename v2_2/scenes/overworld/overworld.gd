@@ -5,10 +5,13 @@ extends GameScene
 signal _player_choose_action
 
 
+var last_battle_result: BattleResult
+var territory_buttons: Array[TerritoryButton]
+
 var _context: OverworldContext
 var _should_end: bool
 
-var territory_buttons: Array[TerritoryButton]
+@onready var battle_result_banner = $BattleResultBanner
 
 
 func _ready():
@@ -21,7 +24,7 @@ func _ready():
 		button.attack_pressed.connect(_on_territory_button_attack_pressed)
 		button.rest_pressed.connect(_on_territory_button_rest_pressed)
 		button.train_pressed.connect(_on_territory_button_train_pressed)
-
+	
 
 func scene_enter(kwargs := {}):
 	Game._overworld = self
@@ -80,7 +83,6 @@ func create_new_context() -> OverworldContext:
 		if e.is_random():
 			ctx.active_empires.append(e)
 			
-	#ctx.state = OverworldContext.State.READY
 	return ctx
 
 
@@ -199,10 +201,10 @@ func _distribute_empires(ctx: OverworldContext):
 		
 ## Connects territories a and b.
 func connect_territories(_ctx: OverworldContext, a: Territory, b: Territory):
-	if b not in a.adjacent:
-		a.adjacent.append(b)
-	if a not in b.adjacent:
-		b.adjacent.append(a)
+	if b.name not in a.adjacent:
+		a.adjacent.append(b.name)
+	if a.name not in b.adjacent:
+		b.adjacent.append(a.name)
 	
 	
 ## Returns true if the overworld is running.
@@ -212,9 +214,6 @@ func is_running() -> bool:
 	
 ## Starts the overworld cycle.
 func start_overworld_cycle(ctx: OverworldContext) -> void:
-	if is_running():
-		push_error('overworld is already running.')
-		return
 	_context = ctx
 	_should_end = false
 	
@@ -224,7 +223,7 @@ func start_overworld_cycle(ctx: OverworldContext) -> void:
 			btn.visible = _context.is_boss_active()
 	
 	Game.overworld_started.emit()
-	# TODO
+	
 	if not ctx.state:
 		ctx.state = _cont_cycle_start.get_method()
 	
@@ -243,6 +242,7 @@ func stop_overworld_cycle():
 #region Continuations
 ####################################################################################################
 
+	
 ## Returns the matching continuation from state.
 func get_continuation(state: StringName) -> Callable:
 	assert(has_method(state))
@@ -326,7 +326,24 @@ func _cont_wait_for_battle_result() -> void:
 			
 		BattleResult.DEFENDER_WITHDRAW:
 			transfer_territory(result.defender, result.attacker, result.territory)
-			
+	last_battle_result = result
+	
+	var banner := battle_result_banner.duplicate()
+	add_child(banner)
+	await banner.show_parsed_result(last_battle_result)
+	
+	if result.loser().is_defeated():
+		_context.defeated_empires.append(result.loser())
+		return next(_cont_wait_for_defeat_events)
+	else:
+		return next(_cont_turn_end)
+	
+	
+## Waits for defeat events fo finish.
+func _cont_wait_for_defeat_events() -> void:
+	# kind of a hack, just cos we can't be arsed to pass the result here
+	Game.empire_defeated.emit(_context.defeated_empires.back())
+	await Game.wait_for_resume()
 	return next(_cont_turn_end)
 	
 	
@@ -406,19 +423,9 @@ func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territo
 		else:
 			pass # no action taken for losing home territory yet
 			
-	if old_owner.is_defeated():
-		_context.defeated_empires.append(old_owner)
-		if old_owner.is_player_owned():
-			Game.player_defeated.emit()
-		elif old_owner.is_boss():
-			Game.boss_defeated.emit()
-		else:
-			Game.empire_defeated.emit(old_owner)
-		await Game.wait_for_resume()
-		
 	
 func _transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
-	print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name() if old_owner else '(null)', new_owner.leader_name()])
+	#print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name() if old_owner else '(null)', new_owner.leader_name()])
 	if old_owner:
 		_unset_empire_territory(_context, old_owner, territory)
 	_set_empire_territory(_context, new_owner, territory, false)

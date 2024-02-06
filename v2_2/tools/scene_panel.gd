@@ -39,8 +39,9 @@ func _on_call_button_pressed():
 
 
 func _on_load_button_pressed():
-	top_scene().scene_load(get_input_scene_name())
-
+	# TODO GameScene doesn't have scene_load
+	SceneManager.load_new_scene(SceneManager.scenes[get_input_scene_name()], 'fade_to_black')
+		
 
 func _on_return_button_pressed():
 	top_scene().scene_return()

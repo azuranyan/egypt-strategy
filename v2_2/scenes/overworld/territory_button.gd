@@ -64,7 +64,7 @@ func initialize(ctx: OverworldContext, t: Territory):
 	_context = ctx
 	_territory = t
 	close_panel(t)
-	_create_connections()
+	create_connections()
 	set_territory_name(t.name)
 	%Portrait.texture = ctx.get_territory_owner(t).leader.portrait
 	%HomeIcon.visible = _is_home_territory(t)
@@ -145,8 +145,8 @@ func close_panel(_t: Territory):
 	z_index = 0
 	
 	
-func _create_connections():
-	_remove_connections()
+func create_connections():
+	remove_connections()
 	for adj in territory_node.adjacent:
 		var conn := preload("res://scenes/overworld/connection.tscn").instantiate() as TerritoryConnection
 		conn.point_a = global_position
@@ -154,7 +154,7 @@ func _create_connections():
 		connections.add_child(conn)
 		
 	
-func _remove_connections():
+func remove_connections():
 	while connections.get_child_count() > 0:
 		# not ideal but meh
 		var child := connections.get_child(0)

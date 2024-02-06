@@ -5,23 +5,32 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+## Emitted when the overworld enters scene.
 signal overworld_started
-signal overworld_ended
 
-signal battle_started
-signal battle_ended(result: BattleResult)
+## Emitted when the overworld exits. [b]Cannot be suspended.[/b]
+signal overworld_ended # TODO FIX: never emitted
 
-signal empire_defeated(empire: Empire)
-signal player_defeated
-signal boss_defeated
-
-# signals sent here can be interrupted so should be waited with wait_for_resume
-
+## Emitted when a new cycle starts. Can be suspended.
 signal overworld_cycle_started(cycle: int)
+
+## Emitted when a cycle ends. Can be suspended.
 signal overworld_cycle_ended(cycle: int)
 
+## Emitted an empire's turn starts. Can be suspended.
 signal overworld_turn_started(empire: Empire)
+
+## Emitted an empire's turn ends. Can be suspended.
 signal overworld_turn_ended(empire: Empire)
+
+## Emitted when an empire is defeated. Can be suspended.
+signal empire_defeated(empire: Empire)
+
+## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
+signal battle_started
+
+## Emitted when the battle exits scene. [b]Cannot be suspended.[/b]
+signal battle_ended(result: BattleResult)
 
 
 ## The array of all units in the game.

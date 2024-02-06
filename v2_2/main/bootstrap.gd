@@ -21,7 +21,12 @@ func launch_game():
 		start_scene_path = SceneManager.scenes[start_scene_name],
 	}
 	
+	var game_logic := preload("res://main/game_logic.gd").new()
+	game_logic.name = 'GameLogic'
+	Game.add_child(game_logic)
+	
 	# start the game
 	Game._main(kwargs)
+	
 
 
