@@ -17,16 +17,11 @@ func start_battle(ctx: BattleContext):
 
 
 func scene_enter(kwargs := {}):
-	# TODO hacks just to make it work
-	if not Game._battle_context:
-		Game._battle_context = BattleContext.new()
+	Game._battle = self
 	Game._battle_context.attacker = kwargs.attacker
 	Game._battle_context.defender = kwargs.defender
 	Game._battle_context.territory = kwargs.territory
 	Game._battle_context.map_id = kwargs.map_id
-	Game._battle_context.units = Game.units
-	Game._battle_context.territories = Game._overworld_context.territories
-	Game._battle_context.empires = Game._overworld_context.empires
 	
 	
 func scene_exit():

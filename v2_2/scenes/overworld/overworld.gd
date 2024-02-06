@@ -24,8 +24,6 @@ func _ready():
 
 
 func scene_enter(kwargs := {}):
-	pass
-	# TODO currently a hack
 	Game._overworld = self
 	start_overworld_cycle(Game._overworld_context)
 

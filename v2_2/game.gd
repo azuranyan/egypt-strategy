@@ -206,7 +206,9 @@ func create_new_data() -> SaveState:
 	var save := _create_save()
 	
 	save.overworld_context = _create_new_overworld_context()
-	save.battle_context = null
+	save.battle_context = BattleContext.new()
+	save.battle_context.territories = save.overworld_context.territories
+	save.battle_context.empires = save.overworld_context.empires
 	save.units = []
 	
 	# dispatch event
