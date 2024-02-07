@@ -10,11 +10,8 @@ enum Type {
 ## The type of empire.
 @export var type: Type = Type.RANDOM
 
-## The leader character.
-@export var leader: CharacterInfo
-
-## The type of unit spawned as this empire's unique unit.
-@export var hero_unit: UnitType
+## The id of the leader.
+@export var leader_id: StringName
 
 @export_group("Territory")
 
@@ -26,8 +23,14 @@ enum Type {
 
 @export_group("State")
 
+## The leader character.
+@export var leader: CharacterInfo
+
 ## The list of territories owned by this empire.
 @export var territories: Array[Territory]
+
+## List of hero units this empire owns. Slot 0 is the empire's own unique unit.
+@export var hero_units: Array[Unit]
 
 ## The list of units this empire owns.
 @export var units: Array[Unit]

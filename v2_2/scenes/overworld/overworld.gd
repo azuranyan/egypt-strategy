@@ -83,6 +83,15 @@ func create_new_context() -> OverworldContext:
 		if e.is_random():
 			ctx.active_empires.append(e)
 			
+	# TODO this is extremely stupid but it'll work
+	for e in ctx.empires:
+		if not e.home_territory:
+			continue
+		e.hero_units = [_load_unit(e.leader_id, e.home_territory, 0)]
+		# you cached this already, then you discard and cache it again because
+		# you added the hero units last..
+		_cache_territory_units(e)
+	
 	return ctx
 
 
@@ -119,8 +128,9 @@ func _save_empires(ctx: OverworldContext):
 func _create_empire_from_node(_ctx: OverworldContext, node: EmpireNode) -> Empire:
 	var e := Empire.new()
 	e.type = node.type
+	e.leader_id = node.leader_id
 	e.leader = node.leader
-	e.hero_unit = node.hero_unit
+	e.hero_units = []
 	e.base_aggression = node.base_aggression
 	# units and territory will be set later
 	e.aggression = node.base_aggression
@@ -144,21 +154,30 @@ func _unset_empire_territory(_ctx: OverworldContext, empire: Empire, territory: 
 
 ## Creates the list of units in empire.
 func _cache_territory_units(empire: Empire):
-	var hero_unit_name := empire.leader_name().to_snake_case()
-	empire.units.append(Game.load_unit(hero_unit_name, _generate_unit_tag(hero_unit_name, empire.home_territory, 0)))
+	empire.units.clear()
+	
+	# add hero units
+	empire.units.append_array(empire.hero_units)
+		
+	# add normal units
 	for t in empire.territories:
 		for unit_name in t.units:
 			var count: int = t.units[unit_name]
 			for i in count:
-				var tag := _generate_unit_tag(unit_name, t, i)
-				var u := Game.load_unit(unit_name, tag)
+				var u := _load_unit(unit_name, t, i)
+				assert(u not in empire.units)
 				empire.units.append(u)
+
+
+## Loads the unit.
+func _load_unit(unit_name: StringName, territory: Territory, id: int) -> Unit:
+	return Game.load_unit(unit_name, _generate_unit_tag(unit_name, territory, id))
 
 
 ## Generates wrangled name for units from territory.
 func _generate_unit_tag(unit_name: String, territory: Territory, id: int) -> String:
 	return '_'.join([unit_name, territory.name, id])
-
+	
 	
 ## Adds the empire to context.
 func _add_empire_to_context(ctx: OverworldContext, empire: Empire):
@@ -335,6 +354,9 @@ func _cont_wait_for_battle_result() -> void:
 	await banner.show_parsed_result(last_battle_result)
 	
 	if result.loser().is_defeated():
+		result.winner().hero_units.append_array(result.loser().hero_units)
+		_cache_territory_units(result.winner()) # TODO this is extremely stupid. we could have transferred this long ago
+		_cache_territory_units(result.loser())
 		_context.defeated_empires.append(result.loser())
 		return next(_cont_wait_for_defeat_events)
 	else:
@@ -428,9 +450,11 @@ func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territo
 	
 func _transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
 	#print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name() if old_owner else '(null)', new_owner.leader_name()])
-	if old_owner:
-		_unset_empire_territory(_context, old_owner, territory)
+	# transfer territory
+	_unset_empire_territory(_context, old_owner, territory)
 	_set_empire_territory(_context, new_owner, territory, false)
+	
+	# update buttons
 	for btn in territory_buttons:
 		if btn.get_territory(_context) == territory:
 			btn.initialize(_context, territory)

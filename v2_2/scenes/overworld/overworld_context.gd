@@ -67,7 +67,7 @@ func get_unit_owner(unit: Unit) -> Empire:
 ## Returns true if unit is a hero unit.
 func is_hero_unit(unit: Unit) -> bool:
 	for e in empires:
-		if e.hero_unit == unit.unit_type:
+		if unit in e.hero_units:
 			return true
 	return false
 

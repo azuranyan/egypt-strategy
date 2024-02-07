@@ -33,17 +33,19 @@ texture = ExtResource("2_27pdc")
 [node name="Player" type="Node" parent="Empires" node_paths=PackedStringArray("home_territory_node")]
 script = ExtResource("3_k77ht")
 type = 1
+leader_id = &"lysandra"
+home_territory_node = NodePath("../../TerritoryButton/Zetennu")
 leader = ExtResource("4_r4cu8")
 hero_unit = ExtResource("5_ow72q")
-home_territory_node = NodePath("../../TerritoryButton/Zetennu")
 
 [node name="Boss" type="Node" parent="Empires" node_paths=PackedStringArray("home_territory_node")]
 script = ExtResource("3_k77ht")
 type = 2
-leader = ExtResource("6_wk2xg")
-hero_unit = ExtResource("7_pidlj")
+leader_id = &"sitri"
 base_aggression = 0.9
 home_territory_node = NodePath("../../TerritoryButton2/Cursed Stronghold")
+leader = ExtResource("6_wk2xg")
+hero_unit = ExtResource("7_pidlj")
 
 [node name="SpareEmpireSelection" type="Node" parent="."]
 
@@ -51,24 +53,28 @@ home_territory_node = NodePath("../../TerritoryButton2/Cursed Stronghold")
 
 [node name="Tali" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
+leader_id = &"tali"
 leader = ExtResource("7_61qbw")
 hero_unit = ExtResource("8_a8050")
 
 [node name="Maia" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
+leader_id = &"maia"
 leader = ExtResource("9_qx1r3")
 hero_unit = ExtResource("10_k8tqk")
 
 [node name="Zahra" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
+leader_id = &"zahra"
 leader = ExtResource("11_btcu2")
 hero_unit = ExtResource("12_ipfjj")
 
 [node name="Alara" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_k77ht")
+leader_id = &"alara"
+base_aggression = 0.9
 leader = ExtResource("13_80stb")
 hero_unit = ExtResource("14_o08oa")
-base_aggression = 0.9
 
 [node name="TerritoryButton" parent="." instance=ExtResource("2_gak2j")]
 offset_left = 1475.0
