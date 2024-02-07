@@ -6,7 +6,7 @@ var _done := false
 
 
 func _ready():
-	Util.bb_big_caps($Button/VBoxContainer/RichTextLabel, 'Continue', {font_size = 20})
+	Util.bb_big_caps($Control/Button/VBoxContainer/RichTextLabel, 'Continue', {font_size = 20})
 	hide()
 	
 	
@@ -25,8 +25,8 @@ func show_parsed_result(result: BattleResult):
 
 func show_result(header: String, message: String):
 	_done = false
-	Util.bb_big_caps($RichTextLabel, header, {font_size = 40, call_caps = true})
-	$Label.text = message
+	Util.bb_big_caps($Control/RichTextLabel, header, {font_size = 40, call_caps = true})
+	$Control/Label.text = message
 	show()
 	$AnimationPlayer.play('show')
 	await $AnimationPlayer.animation_finished
@@ -43,7 +43,7 @@ func done():
 	advanced.emit()
 	
 	
-func _unhandled_input(event):
+func _gui_input(event):
 	if not visible:
 		return
 	if event.is_pressed():
@@ -52,5 +52,5 @@ func _unhandled_input(event):
 
 
 func _on_button_pressed():
-	$Button.release_focus()
+	$Control/Button.release_focus()
 	done()
