@@ -11,7 +11,7 @@ func _ready():
 	
 	
 func show_parsed_result(result: BattleResult):
-	var header := 'REGION CONQUERED!' if result.player_won() else 'REGION LOST.'
+	var header: String = 'Region Lost.' if result.is_player_participating() and not result.player_won() else 'Region Conquered!' 
 	var message: String
 	if result.territory == result.loser().home_territory:
 		if Preferences.defeat_if_home_territory_captured:
@@ -25,7 +25,7 @@ func show_parsed_result(result: BattleResult):
 
 func show_result(header: String, message: String):
 	_done = false
-	Util.bb_big_caps($RichTextLabel, header, {font_size = 40})
+	Util.bb_big_caps($RichTextLabel, header, {font_size = 40, call_caps = true})
 	$Label.text = message
 	show()
 	$AnimationPlayer.play('show')

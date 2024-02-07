@@ -50,3 +50,7 @@ func player_won() -> bool:
 	
 func enemy_won() -> bool:
 	return not player_won()
+
+
+func is_player_participating() -> bool:
+	return attacker.is_player_owned() or defender.is_player_owned()
