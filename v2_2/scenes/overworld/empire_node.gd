@@ -46,7 +46,7 @@ func get_empire(ctx: OverworldContext) -> Empire:
 	
 
 func _get_configuration_warnings() -> PackedStringArray:
-	var arr: PackedStringArray
+	var arr := PackedStringArray()
 	if not leader:
 		arr.append('cannot find leader chara.tres')
 	if not hero_unit:

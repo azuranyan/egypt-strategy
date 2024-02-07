@@ -262,9 +262,9 @@ func save_state() -> SaveState:
 	get_tree().call_group('game_event_listeners', 'on_save', save)
 	
 	# create data
-	if _overworld:
+	if _overworld_context:
 		save.overworld_context = _overworld_context.duplicate()
-	if _battle:
+	if _battle_context:
 		save.battle_context = _battle_context.duplicate()
 	save.units = units.duplicate()
 	return save

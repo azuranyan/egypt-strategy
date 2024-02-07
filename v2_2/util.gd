@@ -16,9 +16,9 @@ static func is_scene_root(node: Node) -> bool:
 
 
 ## Returns true if the game is ran in f6 mode. Doesn't work if F6 is used on the main scene though.
+@warning_ignore("unreachable_code")
 static func is_f6(node: Node) -> bool:
-	# TODO fix
-	return false
+	return false # TODO fix
 	if node and node.is_inside_tree() and node.get_tree().current_scene:
 		return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
 	return false
@@ -44,14 +44,14 @@ static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
 	if props.has('outline_color'): rt.push_outline_color(props.outline_color)
 	if props.has('outline_size'):  rt.push_outline_size(props.outline_size)
 	
-	var big_font_size: int = 1.5 * font_size
+	var big_font_size := int(1.5 * font_size)
 	if props.has('ratio'):
 		big_font_size = props.ratio * font_size
 	if props.has('big_font_size'):
 		big_font_size = props.big_font_size
 	
 	# capitalize
-	var caps: Array[String]
+	var caps: Array[String] = []
 	var insert_caps := func():
 		if caps.is_empty():
 			return
