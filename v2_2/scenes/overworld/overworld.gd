@@ -238,10 +238,7 @@ func start_overworld_cycle(ctx: OverworldContext) -> void:
 	_context = ctx
 	_should_end = false
 	
-	for btn in territory_buttons:
-		btn.initialize(_context, btn.get_territory(_context))
-		if btn.get_territory(_context) == _context.boss_empire.home_territory:
-			btn.visible = _context.is_boss_active()
+	update_territory_buttons()
 	
 	Game.overworld_started.emit()
 	
@@ -250,6 +247,13 @@ func start_overworld_cycle(ctx: OverworldContext) -> void:
 	
 	# next is needed for cps, but here we need to directly call the function
 	get_continuation(ctx.state).call()
+	
+
+func update_territory_buttons():
+	for btn in territory_buttons:
+		btn.initialize(_context, btn.get_territory(_context))
+		if btn.get_territory(_context) == _context.boss_empire.home_territory:
+			btn.visible = _context.is_boss_active()
 	
 	
 ## Stops the overworld cycle.
@@ -275,6 +279,9 @@ func next(cont: Callable) -> void:
 	if _should_end:
 		return
 	_context.state = cont.get_method()
+	# TODO this is horrible but it'll do just fine. we do worse things
+	# like updating objects every frame lol
+	update_territory_buttons()
 	cont.call_deferred()
 	
 	

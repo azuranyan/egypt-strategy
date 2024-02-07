@@ -117,7 +117,7 @@ func _funky_text(label: RichTextLabel, text: String, caps_size := 26):
 func _is_home_territory(t: Territory) -> bool:
 	for e in _context.empires:
 		if e.home_territory == t:
-			return true
+			return not e.is_defeated()
 	return false
 	
 	
