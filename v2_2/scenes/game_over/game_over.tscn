@@ -1,0 +1,96 @@
+[gd_scene load_steps=5 format=3 uid="uid://dvwlm78vme6rg"]
+
+[ext_resource type="Script" path="res://scenes/game_over/game_over.gd" id="1_cys1l"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_ovbas"]
+
+[sub_resource type="Gradient" id="Gradient_ofeic"]
+colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_y0ppn"]
+gradient = SubResource("Gradient_ofeic")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="GameOver" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_cys1l")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_ovbas")
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.694118)
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+modulate = Color(1, 1, 1, 0.631373)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_y0ppn")
+
+[node name="Panel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -453.0
+offset_top = -165.0
+offset_right = 453.0
+offset_bottom = -41.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_group_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]IT'S BIJOUVER[/center]"
+fit_content = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 855.0
+offset_top = 602.0
+offset_right = 1081.0
+offset_bottom = 718.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="LastCheckpointButton" type="Button" parent="Control/VBoxContainer"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+text = "Load Checkpoint"
+
+[node name="QuitToTitleButton" type="Button" parent="Control/VBoxContainer"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+text = "Main Menu"
+
+[connection signal="pressed" from="Control/VBoxContainer/LastCheckpointButton" to="." method="_on_last_checkpoint_button_pressed"]
+[connection signal="pressed" from="Control/VBoxContainer/QuitToTitleButton" to="." method="_on_quit_to_title_button_pressed"]

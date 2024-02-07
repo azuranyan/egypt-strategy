@@ -1,16 +1,6 @@
 class_name OverworldContext
 extends Resource
 
-enum State {
-	INVALID = 0,
-	READY,
-	CYCLE_START,
-	TURN_START,
-	TURN_ONGOING,
-	TURN_END,
-	CYCLE_END,
-}
-
 @export var overworld_scene: PackedScene
 @export var territories: Array[Territory]
 @export var empires: Array[Empire]
@@ -22,7 +12,8 @@ enum State {
 @export var defeated_empires: Array[Empire]
 @export var cycle_count: int
 @export var turn_index: int
-@export var state: State
+@export var state: StringName
+@export var waiting: bool
 
 	
 ## Returns the empire with the given id.
@@ -76,7 +67,7 @@ func get_unit_owner(unit: Unit) -> Empire:
 ## Returns true if unit is a hero unit.
 func is_hero_unit(unit: Unit) -> bool:
 	for e in empires:
-		if e.hero_unit == unit.unit_type:
+		if unit in e.hero_units:
 			return true
 	return false
 

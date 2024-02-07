@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3 uid="uid://dphluso4iln0n"]
+
+[ext_resource type="Script" path="res://tools/scene_panel.gd" id="1_u8tmk"]
+
+[node name="ScenePanel" type="Panel"]
+offset_left = 17.0
+offset_top = 830.0
+offset_right = 192.0
+offset_bottom = 1057.0
+script = ExtResource("1_u8tmk")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 0
+offset_right = 175.0
+offset_bottom = 31.0
+placeholder_text = "scene_name"
+
+[node name="VBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_top = 33.0
+offset_right = 175.0
+offset_bottom = 64.0
+
+[node name="CallButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "call"
+
+[node name="LoadButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "load"
+
+[node name="ReturnButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ret"
+
+[node name="ReturnToButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ret2"
+
+[node name="ItemList" type="ItemList" parent="."]
+layout_mode = 0
+offset_top = 66.0
+offset_right = 175.0
+offset_bottom = 227.0
+item_count = 3
+item_0/text = "load"
+item_1/text = "main_menu"
+item_2/text = "intro"
+
+[connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]
+[connection signal="pressed" from="VBoxContainer/CallButton" to="." method="_on_call_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ReturnButton" to="." method="_on_return_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ReturnToButton" to="." method="_on_return_to_button_pressed"]
+[connection signal="item_activated" from="ItemList" to="." method="_on_item_list_item_activated"]
+[connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]

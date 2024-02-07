@@ -9,6 +9,7 @@ enum {
 	DEFENDER_WITHDRAW,
 }
 
+# TODO this should just take a weakref to context?
 var value: int
 var attacker: Empire
 var defender: Empire
@@ -32,6 +33,14 @@ func defender_won() -> bool:
 	return value == DEFENDER_VICTORY or value == ATTACKER_WITHDRAW
 	
 	
+func winner() -> Empire:
+	return attacker if attacker_won() else defender
+	
+	
+func loser() -> Empire:
+	return attacker if defender_won() else defender
+	
+	
 func player_won() -> bool:
 	if attacker.is_player_owned():
 		return attacker_won()
@@ -41,3 +50,7 @@ func player_won() -> bool:
 	
 func enemy_won() -> bool:
 	return not player_won()
+
+
+func is_player_participating() -> bool:
+	return attacker.is_player_owned() or defender.is_player_owned()

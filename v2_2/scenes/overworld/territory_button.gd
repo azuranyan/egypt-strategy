@@ -64,21 +64,21 @@ func initialize(ctx: OverworldContext, t: Territory):
 	_context = ctx
 	_territory = t
 	close_panel(t)
-	_create_connections()
+	create_connections()
 	set_territory_name(t.name)
 	%Portrait.texture = ctx.get_territory_owner(t).leader.portrait
 	%HomeIcon.visible = _is_home_territory(t)
 	
 	var heroes: Array[String] = []
 	for u in _context.get_territory_owner(t).units:
-		if not _context.is_hero_unit(u):
+		if not (_context.is_hero_unit(u) and u.display_name not in heroes):
 			continue
-		if t.is_player_owned(ctx):
-			heroes.append(u)
-			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
+		if _context.get_territory_owner(t).is_player_owned():
+			heroes.append(u.display_name)
+			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ', '.join(heroes)
 		else:
 			heroes.append(u.display_name)
-			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ','.join(heroes)
+			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ', '.join(heroes)
 				
 	var force_strength := 'Force Strength: %s' % _get_force_strength(ctx.get_territory_owner(t))
 	%EnemyForceStrengthLabel.text = force_strength
@@ -117,7 +117,7 @@ func _funky_text(label: RichTextLabel, text: String, caps_size := 26):
 func _is_home_territory(t: Territory) -> bool:
 	for e in _context.empires:
 		if e.home_territory == t:
-			return true
+			return not e.is_defeated()
 	return false
 	
 	
@@ -145,8 +145,8 @@ func close_panel(_t: Territory):
 	z_index = 0
 	
 	
-func _create_connections():
-	_remove_connections()
+func create_connections():
+	remove_connections()
 	for adj in territory_node.adjacent:
 		var conn := preload("res://scenes/overworld/connection.tscn").instantiate() as TerritoryConnection
 		conn.point_a = global_position
@@ -154,11 +154,12 @@ func _create_connections():
 		connections.add_child(conn)
 		
 	
-func _remove_connections():
+func remove_connections():
 	while connections.get_child_count() > 0:
 		# not ideal but meh
 		var child := connections.get_child(0)
 		connections.remove_child(child)
+		child.queue_free()
 	
 
 func _on_detector_mouse_entered():
