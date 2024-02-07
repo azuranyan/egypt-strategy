@@ -75,10 +75,10 @@ func initialize(ctx: OverworldContext, t: Territory):
 			continue
 		if _context.get_territory_owner(t).is_player_owned():
 			heroes.append(u.display_name)
-			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ','.join(heroes)
+			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ', '.join(heroes)
 		else:
 			heroes.append(u.display_name)
-			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ','.join(heroes)
+			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ', '.join(heroes)
 				
 	var force_strength := 'Force Strength: %s' % _get_force_strength(ctx.get_territory_owner(t))
 	%EnemyForceStrengthLabel.text = force_strength

@@ -44,7 +44,8 @@ func empire_defeated(empire: Empire):
 			#Game._overworld.add_child(Game._overworld_context.get_territory_by_name())
 		Game._overworld_context.active_empires.append(boss)
 		# force refresh
-		SceneManager.load_new_scene(SceneManager.scenes.overworld, 'fade_to_black')
+		Game._overworld.update_territory_buttons()
+		#SceneManager.load_new_scene(SceneManager.scenes.overworld, 'fade_to_black')
 	else:
 		# show Game Over screen
 		var game_over_inst := preload("res://scenes/game_over/game_over.tscn").instantiate()
