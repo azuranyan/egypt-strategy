@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6x40cgg8o8tb"]
+
+[ext_resource type="Script" path="res://scenes/overworld/overworld_impl.gd" id="1_5b2ib"]
+[ext_resource type="PackedScene" uid="uid://dw0pqub4o2o82" path="res://scenes/overworld/overworld_scene.tscn" id="2_h5rn6"]
+
+[node name="OverworldImpl" type="Node"]
+script = ExtResource("1_5b2ib")
+
+[node name="Overworld" parent="." instance=ExtResource("2_h5rn6")]
+transition_in = null
+transition_out = null

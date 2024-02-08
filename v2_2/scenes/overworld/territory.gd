@@ -3,10 +3,10 @@ extends Resource
 
 
 ## The name of this territory.
-@export var name: String
+@export var name: StringName
 
 ## Names of adjacent territories.
-@export var adjacent: Array[String] = []
+@export var adjacent: Array[StringName] = []
 
 ## List of [Map] to load in-battle.
 @export var maps: Array[PackedScene] = []

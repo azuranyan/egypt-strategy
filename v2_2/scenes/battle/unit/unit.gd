@@ -67,6 +67,8 @@ enum Behavior {
 ## The state of a unit.
 enum State {INVALID, IDLE, WALKING, ATTACKING, HURT, DYING, DEAD}
 
+@export var id: int
+
 @export_group("Character")
 
 ## The character representing this unit.

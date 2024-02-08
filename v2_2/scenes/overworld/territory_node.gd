@@ -24,12 +24,14 @@ extends Node
 
 
 ## Returns the territory this node refers to.
-func get_territory(ctx: OverworldContext) -> Territory:
-	return ctx.get_territory_by_name(name)
+func get_territory() -> Territory:
+	assert(not Engine.is_editor_hint(), "can't use in editor")
+	return Game.overworld.get_territory_by_name(name)
 	
 	
 ## Returns the unit entries.
 func get_unit_entries() -> Dictionary:
+	assert(not Engine.is_editor_hint(), "can't use in editor")
 	var arr := {}
 	for u in _unit_list:
 		var split := u.rsplit(':', true, 1)

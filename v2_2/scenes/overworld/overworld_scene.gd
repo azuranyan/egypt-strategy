@@ -1,14 +1,15 @@
-class_name Overworld
+class_name OverworldScene
 extends GameScene
 
 
 signal _player_choose_action
 
 
+@export var _state: StringName
+
 var last_battle_result: BattleResult
 var territory_buttons: Array[TerritoryButton]
 
-var _context: OverworldContext
 var _should_end: bool
 
 @onready var battle_result_banner = $BattleResultBanner
@@ -25,15 +26,6 @@ func _ready():
 		button.rest_pressed.connect(_on_territory_button_rest_pressed)
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 	
-
-func scene_enter(_kwargs := {}):
-	Game._overworld = self
-	start_overworld_cycle(Game._overworld_context)
-
-
-func scene_exit():
-	pass
-
 
 ## Returns the empire nodes.
 func get_empire_nodes() -> Array[EmpireNode]:
@@ -56,48 +48,42 @@ func get_random_empire_nodes() -> Array[EmpireNode]:
 ## Returns the territory node for the empire.
 func find_territory_button(territory: Territory) -> TerritoryButton:
 	for t in territory_buttons:
-		if t.get_territory(_context) == territory:
+		if t.get_territory() == territory:
 			return t
 	return null
 
+
+func on_save(save: SaveState):
+	save.overworld_data.state = _state
+
+
+func on_load(_save: SaveState):
+	# TODO as of now we don't need an explicit load because
+	# scenes get destroyed and recreated by SceneManager
+	pass
+
 	
 ## Returns a new context.
-func create_new_context() -> OverworldContext:
-	if not is_node_ready():
-		push_error('create_new_context() requires Overworld to be in the tree')
-		return
-	var ctx := OverworldContext.new()
-	ctx.overworld_scene = PackedScene.new()
-	ctx.overworld_scene.pack(self)
-	
-	_save_territories(ctx)
-	_save_empires(ctx)
-	
-	if not ctx.player_empire:
-		push_error('player_empire not found %s' % self)
-	if not ctx.boss_empire:
-		push_error('boss_empire not found in %s' % self)
-	
-	ctx.active_empires.append(ctx.player_empire)
-	for e in ctx.empires:
-		if e.is_random():
-			ctx.active_empires.append(e)
-			
-	# TODO this is extremely stupid but it'll work
-	for e in ctx.empires:
-		if not e.home_territory:
-			continue
-		e.hero_units = [_load_unit(e.leader_id, e.home_territory, 0)]
-		# you cached this already, then you discard and cache it again because
-		# you added the hero units last..
-		_cache_territory_units(e)
-	
-	return ctx
+func create_initial_data() -> Dictionary:
+	assert(is_node_ready(), 'node needs to be ready to save')
+	var data := {
+		territories = [] as Array[Territory],
+		empires = [] as Array[Empire],
+		player_empire = null,
+		boss_empire = null,
+		# these data will be removed later
+		grabs = [] as Array[Territory]
+	}
+
+	_save_territories(data)
+	_save_empires(data)
+	assert(data.grabs.is_empty(), 'territory left ungrabbed')
+	data.erase('grabs')
+	return data
 
 
 ## Saves the territories to ctx.
-func _save_territories(ctx: OverworldContext):
-	ctx.territories.clear()
+func _save_territories(data: Dictionary):
 	for button in territory_buttons:
 		var node: TerritoryNode = button.territory_node
 		var t := Territory.new()
@@ -106,26 +92,29 @@ func _save_territories(ctx: OverworldContext):
 			t.adjacent.append(adj.name)
 		t.maps = node.maps.duplicate()
 		t.units = node.get_unit_entries()
-		ctx.territories.append(t)
-	
+		data.territories.append(t)
+		data.grabs.append(t)
+
 
 ## Saves the empire to ctx.
-func _save_empires(ctx: OverworldContext):
-	ctx.empires.clear()
+func _save_empires(data: Dictionary):
+	# add the preset empires
 	for node in get_empire_nodes():
 		if not node.home_territory_node:
 			push_error('"%s" included in Empires, but has no home territory set' % node.name)
 			continue
-		var e := _create_empire_from_node(ctx, node)
-		var home_territory := node.home_territory_node.get_territory(ctx)
-		_set_empire_territory(ctx, e, home_territory, true)
-		_add_empire_to_context(ctx, e)
+		var e := _create_empire_from_node(node)
+		var home_territory := node.home_territory_node.get_territory()
+		_set_empire_territory(e, home_territory, true)
+		_add_empire_to_data(data, e)
+		data.grabs.erase(home_territory)
 	
-	_distribute_empires(ctx)
+	# add random empires
+	_distribute_empires(data)
 	
 	
 ## Creates the empire from node. Note that this doesn't set the territories or units.
-func _create_empire_from_node(_ctx: OverworldContext, node: EmpireNode) -> Empire:
+func _create_empire_from_node(node: EmpireNode) -> Empire:
 	var e := Empire.new()
 	e.type = node.type
 	e.leader_id = node.leader_id
@@ -138,122 +127,85 @@ func _create_empire_from_node(_ctx: OverworldContext, node: EmpireNode) -> Empir
 	
 	
 ## Adds territory to empire.
-func _set_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory, home: bool):
+func _set_empire_territory(empire: Empire, territory: Territory, home: bool):
 	if home:
 		empire.home_territory = territory
 	if territory not in empire.territories:
 		empire.territories.insert(0 if home else empire.territories.size(), territory)
-	_cache_territory_units(empire)
 	
 	
 ## Removes territory from empire.
-func _unset_empire_territory(_ctx: OverworldContext, empire: Empire, territory: Territory):
+func _unset_empire_territory(empire: Empire, territory: Territory):
 	empire.territories.erase(territory)
-	_cache_territory_units(empire)
 
 
-## Creates the list of units in empire.
-func _cache_territory_units(empire: Empire):
-	empire.units.clear()
-	
-	# add hero units
-	empire.units.append_array(empire.hero_units)
-		
-	# add normal units
-	for t in empire.territories:
-		for unit_name in t.units:
-			var count: int = t.units[unit_name]
-			for i in count:
-				var u := _load_unit(unit_name, t, i)
-				assert(u not in empire.units)
-				empire.units.append(u)
-
-
-## Loads the unit.
-func _load_unit(unit_name: StringName, territory: Territory, id: int) -> Unit:
-	return Game.load_unit(unit_name, _generate_unit_tag(unit_name, territory, id))
-
-
-## Generates wrangled name for units from territory.
-func _generate_unit_tag(unit_name: String, territory: Territory, id: int) -> String:
-	return '_'.join([unit_name, territory.name, id])
-	
-	
 ## Adds the empire to context.
-func _add_empire_to_context(ctx: OverworldContext, empire: Empire):
-	if empire not in ctx.empires:
-		ctx.empires.append(empire)
+func _add_empire_to_data(data: Dictionary, empire: Empire):
+	if empire not in data.empires:
+		data.empires.append(empire)
 	if empire.is_player_owned():
-		ctx.player_empire = empire
+		data.player_empire = empire
 	if empire.is_boss():
-		ctx.boss_empire = empire
-	
+		data.boss_empire = empire
+
 	
 ## Distributes the empires to territories.
-func _distribute_empires(ctx: OverworldContext):
-	# take territories with no empires assigned yet
-	var grabs: Array[Territory] = []
-	for t in ctx.territories:
-		if ctx.get_territory_owner(t) == null:
-			grabs.append(t)
-	if grabs.is_empty():
+func _distribute_empires(data: Dictionary):
+	if data.grabs.is_empty():
 		return
 		
 	# create the selection of random empires
 	var selection: Array[Empire] = []
 	for node in get_random_empire_nodes():
-		var empire := _create_empire_from_node(ctx, node)
+		var empire := _create_empire_from_node(node)
 		selection.append(empire)
-		if selection.size() > grabs.size():
+		if selection.size() > data.grabs.size():
 			break
 	selection.shuffle()
 	
 	# every empire gets their home territory
 	for empire in selection:
-		var random_territory: Territory = grabs.pop_at(randi_range(0, grabs.size() - 1))
-		_set_empire_territory(ctx, empire, random_territory, true)
-		_add_empire_to_context(ctx, empire)
+		var idx := randi_range(0, data.grabs.size() - 1)
+		var random_territory: Territory = data.grabs.pop_at(idx)
+		_set_empire_territory(empire, random_territory, true)
+		_add_empire_to_data(data, empire)
 		
 	# the rest will be distributed randomly
-	for territory in grabs:
-		var empire: Empire = selection.pick_random()
-		_set_empire_territory(ctx, empire, territory, false)
+	for t: Territory in data.grabs:
+		# get potential owners
+		var potential_owner: Array[Empire] = []
+		for e: Empire in data.empires:
+			if e.is_adjacent_territory(t):
+				potential_owner.append(e)
 		
-		
-## Connects territories a and b.
-func connect_territories(_ctx: OverworldContext, a: Territory, b: Territory):
-	if b.name not in a.adjacent:
-		a.adjacent.append(b.name)
-	if a.name not in b.adjacent:
-		b.adjacent.append(a.name)
-	
-	
-## Returns true if the overworld is running.
-func is_running() -> bool:
-	return _context != null
-	
+		# give territory to owner
+		if potential_owner.is_empty():
+			push_error('isolated territory %s' % t.name)
+			_set_empire_territory(data.empires.pick_random(), t, false)
+		else:
+			_set_empire_territory(potential_owner.pick_random(), t, false)
+
 	
 ## Starts the overworld cycle.
-func start_overworld_cycle(ctx: OverworldContext) -> void:
-	_context = ctx
+func start_overworld_cycle() -> void:
 	_should_end = false
 	
 	update_territory_buttons()
 	
 	Game.overworld_started.emit()
 	
-	if not ctx.state:
-		ctx.state = _cont_cycle_start.get_method()
+	if not _state:
+		_state = _cont_cycle_start.get_method()
 	
 	# next is needed for cps, but here we need to directly call the function
-	get_continuation(ctx.state).call()
+	get_continuation(_state).call()
 	
 
 func update_territory_buttons():
 	for btn in territory_buttons:
-		btn.initialize(_context, btn.get_territory(_context))
-		if btn.get_territory(_context) == _context.boss_empire.home_territory:
-			btn.visible = _context.is_boss_active()
+		btn.initialize(btn.get_territory())
+		if btn.get_territory() == Game.overworld.boss_empire().home_territory:
+			btn.visible = Game.overworld.is_boss_active()
 	
 	
 ## Stops the overworld cycle.
@@ -278,7 +230,7 @@ func get_continuation(state: StringName) -> Callable:
 func next(cont: Callable) -> void:
 	if _should_end:
 		return
-	_context.state = cont.get_method()
+	_state = cont.get_method()
 	# TODO this is horrible but it'll do just fine. we do worse things
 	# like updating objects every frame lol
 	update_territory_buttons()
@@ -287,48 +239,53 @@ func next(cont: Callable) -> void:
 	
 ## The start of a new turn cycle.
 func _cont_cycle_start() -> void:
-	Game.overworld_cycle_started.emit(_context.cycle_count)
+	Game.overworld.cycle_started.emit(Game.overworld.cycle())
 	await Game.wait_for_resume()
 	return next(_cont_turn_start)
 	
 	
 ## The start of an empire's turn.
 func _cont_turn_start() -> void:
-	Game.overworld_turn_started.emit(_context.on_turn())
+	Game.overworld.turn_started.emit(Game.overworld.on_turn())
 	await Game.wait_for_resume()
 	return next(_cont_take_action)
 	
 
 ## Lets the empire on turn do their action.
 func _cont_take_action() -> void:
+	var on_turn := Game.overworld.on_turn()
 	# wait for action
 	var action: EmpireAction
-	if _context.on_turn().is_player_owned():
+	if on_turn.is_player_owned():
 		print('waiting for player action...')
 		$InputBlocker.mouse_filter = 2
 		action = await _player_choose_action
 		$InputBlocker.mouse_filter = 0
 	else:
-		action = await Game.delay_function(get_ai_action, 2, [_context.on_turn()])
+		action = await Game.delay_function(get_ai_action, 2, [on_turn])
 		
 	# execute action
 	if action is AttackAction:
-		print("%s attacks %s (%s)!" % [action.empire.leader_name(), action.target.name, action.target_empire.leader_name()])
+		print("%s attacks %s (%s)!" % [action.empire.leader_id, action.target.name, action.target_empire.leader_id])
+		# TODO Game.battle.start_battle
 		scene_call('battle', {
 			attacker = action.empire,
 			defender = action.target_empire,
 			territory = action.target,
 			map_id = action.map_id,
 		})
+		# calling scene_call here actually makes it so this object never
+		# get to wait on this signal but instead, when battle returns, the
+		# new object will be in this state waiting for the battle results.
 		return next(_cont_wait_for_battle_result)
-		
+
 	if action is RestAction:
-		print("%s rests. HP recovered." % _context.on_turn().leader_name())
-		_context.on_turn().hp_multiplier = 1.0
+		print("%s rests. HP recovered." % on_turn.leader_id)
+		on_turn.hp_multiplier = 1.0
 		return next(_cont_turn_end)
 		
 	if action is TrainingAction:
-		print('%s trains units (TODO does nothing)' % _context.on_turn().leader_name())
+		print('%s trains units (TODO does nothing)' % on_turn.leader_id)
 		return next(_cont_turn_end)
 		
 		
@@ -361,10 +318,15 @@ func _cont_wait_for_battle_result() -> void:
 	await banner.show_parsed_result(last_battle_result)
 	
 	if result.loser().is_defeated():
+		# transfer units
 		result.winner().hero_units.append_array(result.loser().hero_units)
-		_cache_territory_units(result.winner()) # TODO this is extremely stupid. we could have transferred this long ago
-		_cache_territory_units(result.loser())
-		_context.defeated_empires.append(result.loser())
+		result.winner().units.append_array(result.loser().units)
+		result.loser().units.clear()
+
+		# TODO should we really be doing these mutations?
+		# i think overworld should do this, or whoever answers that signal
+		# we're gonna send in _cont_wait_for_defeat_events
+		Game.overworld.defeated_empires().append(result.loser())
 		return next(_cont_wait_for_defeat_events)
 	else:
 		return next(_cont_turn_end)
@@ -373,14 +335,14 @@ func _cont_wait_for_battle_result() -> void:
 ## Waits for defeat events fo finish.
 func _cont_wait_for_defeat_events() -> void:
 	# kind of a hack, just cos we can't be arsed to pass the result here
-	Game.empire_defeated.emit(_context.defeated_empires.back())
+	Game.empire_defeated.emit(Game.overworld.defeated_empires().back())
 	await Game.wait_for_resume()
 	return next(_cont_turn_end)
 	
 	
 ## Ends the turn and emits the signal
 func _cont_turn_end() -> void:
-	Game.overworld_turn_ended.emit(_context.on_turn())
+	Game.overworld_turn_ended.emit(Game.overworld.on_turn())
 	await Game.wait_for_resume()
 	
 	# finds the first valid and active empire

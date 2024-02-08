@@ -33,24 +33,33 @@ signal battle_started
 signal battle_ended(result: BattleResult)
 
 
-## The array of all units in the game.
-var units: Array[Unit]:
-	set(value):
-		units = value
+## Reference to the [Overworld] system.
+var overworld: Overworld
 
-## Record of units by tag.
-var _units_by_tag := {}
+
+var unit_registry: Dictionary
+
+## Reference to the [Battle] system.
+var battle: Battle
+
+## Reference to the [Dialog] aka event system.
+var dialog: Variant
+
+
 
 var _suspended: bool
-
-var _overworld: Overworld
-var _overworld_context: OverworldContext
 
 var _battle: Battle
 var _battle_context: BattleContext
 
 var _event
 var _event_context
+
+
+func _ready():
+	overworld = preload("res://scenes/overworld/overworld_impl.gd").new()
+	add_child(overworld)
+
 
 
 func _notification(what):
@@ -104,49 +113,30 @@ func get_viewport_size() -> Vector2:
 
 
 #region Unit
-## Loads a unit by name for empire.
-func load_unit(unit_name: String, tag: StringName, prop := {}) -> Unit:
-	if is_tag_used(tag):
-		return get_unit_by_tag(tag)
-	var chara := get_character_info(unit_name)
-	var unit_type := get_unit_type(unit_name)
+## Creates a new unit.
+func create_unit(save: SaveState, chara_id: StringName) -> Unit:
+	# load unit data
+	var chara := get_character_info(chara_id)
+	var unit_type := get_unit_type(chara_id)
 	assert(chara != null, 'placeholder chara not found')
 	assert(unit_type != null, 'placeholder unit_type expected')
-	return create_unit(chara, unit_type, tag, prop)
 
-
-## Creates a new unit for empire. Returns null if tag already exists.
-func create_unit(chara: CharacterInfo, unit_type: UnitType, tag: StringName, prop := {}) -> Unit:
-	if is_tag_used(tag):
-		return null
-	var unit := Unit.new(chara, unit_type, prop)
-	units.append(unit)
-	unit.set_meta('tag', tag)
-	_units_by_tag[tag] = unit
+	# create new unit
+	var unit := Unit.new(chara, unit_type)
+	unit.id = save.next_unit_id
+	save.units[save.next_unit_id] = unit
+	save.next_unit_id += 1
 	return unit
 
 
-## Returns the unit with the given tag.
-func get_unit_by_tag(tag: String) -> Unit:
-	return _units_by_tag.get(tag)
-
-
-## Returns the unit tag.
-func get_unit_tag(unit: Unit) -> String:
-	if unit.has_meta('tag'):
-		return unit.get_meta('tag')
-	return ''
-
-
-## Returns true if unit with tag exists.
-func is_tag_used(tag: String) -> bool:
-	return tag in _units_by_tag
+## Loads a unit by id.
+func load_unit(unit_id: int) -> Unit:
+	return unit_registry.get(unit_id, null)
 
 
 ## Removes the unit.
 func destroy_unit(unit: Unit):
-	units.erase(unit)
-	_units_by_tag.erase(get_unit_tag(unit))
+	unit_registry.erase(unit)
 	
 
 ## Returns the character info for given unit name.
@@ -215,15 +205,13 @@ func capture_screenshot(size: Vector2i) -> Texture:
 func create_new_data() -> SaveState:
 	print('[Game] Creating new save.')
 	var save := _create_save()
+	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
-	save.overworld_context = _create_new_overworld_context()
 	save.battle_context = BattleContext.new()
 	save.battle_context.territories = save.overworld_context.territories
 	save.battle_context.empires = save.overworld_context.empires
 	save.units = units.duplicate() # TODO this feels REALLY weird
 	
-	# TODO this is useless, check trello
-	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
 	# TODO currently a hack, change this to the real start point later
 	var fr := SceneStackFrame.new()

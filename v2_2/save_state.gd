@@ -28,13 +28,16 @@ extends Resource
 @export_enum('none', 'overworld', 'battle', 'event') var active_context: String = 'none'
 
 ## The overworld data.
-@export var overworld_context: OverworldContext
+@export var overworld_data: Dictionary
 
 ## The battle data.
 @export var battle_context: BattleContext
 
+## For unit id generation.
+@export var next_unit_id: int
+
 ## The record of spawned units.
-@export var units: Array[Unit]
+@export var units: Dictionary
 
 ## Scene stack.
 @export var scene_stack: Array[SceneStackFrame]

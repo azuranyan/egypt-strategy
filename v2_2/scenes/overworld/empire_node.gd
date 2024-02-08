@@ -41,8 +41,9 @@ extends Node
 
 
 ## Returns the empire this node refers to.
-func get_empire(ctx: OverworldContext) -> Empire:
-	return ctx.get_empire_by_leader(leader)
+func get_empire() -> Empire:
+	assert(not Engine.is_editor_hint(), "can't use in editor")
+	return Game.overworld.get_empire_by_leader(leader)
 	
 
 func _get_configuration_warnings() -> PackedStringArray:

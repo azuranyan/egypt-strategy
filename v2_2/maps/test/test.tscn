@@ -29,7 +29,6 @@ layer_0/tile_data = PackedInt32Array(131073, 458752, 0, 65536, 0, 0, 0, 0, 0, 1,
 world = NodePath("../../World")
 
 [node name="MapObject" type="Node2D" parent="MapObjectContainer"]
-position = Vector2(1107.63, 404.096)
 script = ExtResource("4_ntffg")
 map_position = Vector2(4, 2)
 
@@ -46,6 +45,5 @@ transform_flags = 7
 texture = ExtResource("6_uma0q")
 
 [node name="Unit" type="Node2D" parent="MapObjectContainer"]
-position = Vector2(1251.88, 487.617)
 script = ExtResource("8_5jhsw")
 map_position = Vector2(7, 2)
