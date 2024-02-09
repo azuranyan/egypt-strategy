@@ -96,7 +96,6 @@ func _save_empires(data: Dictionary):
 			continue
 		var e := _create_empire_from_node(node)
 		var home_territory: Territory = data.territories.filter(func(t): return t.name == node.home_territory_node.name)[0]
-		node.home_territory_node.name
 		_set_empire_territory(e, home_territory, true)
 		_add_empire_to_data(data, e)
 		data.grabs.erase(home_territory)
@@ -201,18 +200,32 @@ func wait_for_player_action() -> Dictionary:
 
 func initiate_battle(attacker: Empire, defender: Empire, territory: Territory, map_id: int):
 	print("%s attacks %s (%s)!" % [attacker.leader_id, territory.name, defender.leader_id])
-	# TODO Game.battle.start_battle
-	var anim := preload("res://scenes/overworld/marching_animation.tscn").instantiate()
-	anim.global_position = find_territory_button(attacker.home_territory).global_position
-	add_child(anim)
-	anim.march(find_territory_button(territory).global_position)
-	await anim.done
+	await show_marching_animation(attacker, defender, territory)
 	if (attacker.is_player_owned() or defender.is_player_owned()):
 		scene_call('battle', {attacker=attacker, defender=defender, territory=territory, map_id=map_id})
 	else:
 		var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, attacker, defender, territory, map_id)
 		await get_tree().create_timer(0.1).timeout
 		Game.battle_ended.emit(result)
+		
+		
+func show_marching_animation(attacker: Empire, _defender: Empire, target: Territory):
+	# find nearest position
+	var start_pos := find_territory_button(target).global_position
+	var sorted_positions := territory_buttons \
+		.filter(func(btn): return overworld.get_territory_owner(btn._territory) == attacker) \
+		.map(func(btn): return btn.global_position)
+	sorted_positions.sort_custom(Util.is_closer.bind(start_pos))
+	
+	# start and wait for march
+	var anim := preload("res://scenes/overworld/marching_animation.tscn").instantiate()
+	anim.global_position = sorted_positions[0]
+	add_child(anim)
+	anim.march(start_pos)
+	await anim.done
+	
+	
+	
 
 
 func show_battle_result_banner(result: BattleResult):
@@ -221,207 +234,6 @@ func show_battle_result_banner(result: BattleResult):
 	await banner.show_parsed_result(result)
 
 
-# ####################################################################################################
-# #region Continuations
-# ####################################################################################################
-
-	
-# ## Returns the matching continuation from state.
-# func get_continuation(state: StringName) -> Callable:
-# 	assert(has_method(state))
-# 	return Callable(self, state)
-	
-	
-# ## Calls the next continuation.
-# func next(cont: Callable) -> void:
-# 	if _should_end:
-# 		return
-# 	_state = cont.get_method()
-# 	# TODO this is horrible but it'll do just fine. we do worse things
-# 	# like updating objects every frame lol
-# 	update_territory_buttons()
-# 	cont.call_deferred()
-	
-	
-# ## The start of a new turn cycle.
-# func _cont_cycle_start() -> void:
-# 	overworld.cycle_started.emit(overworld.cycle())
-# 	await Game.wait_for_resume()
-# 	return next(_cont_turn_start)
-	
-	
-# ## The start of an empire's turn.
-# func _cont_turn_start() -> void:
-# 	overworld.turn_started.emit(overworld.on_turn())
-# 	await Game.wait_for_resume()
-# 	return next(_cont_take_action)
-	
-
-# ## Lets the empire on turn do their action.
-# func _cont_take_action() -> void:
-# 	var on_turn := overworld.on_turn()
-# 	# wait for action
-# 	var action: EmpireAction
-# 	if on_turn.is_player_owned():
-# 		print('waiting for player action...')
-# 		$InputBlocker.mouse_filter = 2
-# 		action = await _player_choose_action
-# 		$InputBlocker.mouse_filter = 0
-# 	else:
-# 		action = await Game.delay_function(get_ai_action, 2, [on_turn])
-		
-# 	# execute action
-# 	if action is AttackAction:
-# 		print("%s attacks %s (%s)!" % [action.empire.leader_id, action.target.name, action.target_empire.leader_id])
-# 		# TODO Game.battle.start_battle
-# 		scene_call('battle', {
-# 			attacker = action.empire,
-# 			defender = action.target_empire,
-# 			territory = action.target,
-# 			map_id = action.map_id,
-# 		})
-# 		# calling scene_call here actually makes it so this object never
-# 		# get to wait on this signal but instead, when battle returns, the
-# 		# new object will be in this state waiting for the battle results.
-# 		return next(_cont_wait_for_battle_result)
-
-# 	if action is RestAction:
-# 		print("%s rests. HP recovered." % on_turn.leader_id)
-# 		on_turn.hp_multiplier = 1.0
-# 		return next(_cont_turn_end)
-		
-# 	if action is TrainingAction:
-# 		print('%s trains units (TODO does nothing)' % on_turn.leader_id)
-# 		return next(_cont_turn_end)
-		
-		
-# ## Waits for the battle to finish.
-# func _cont_wait_for_battle_result() -> void:
-# 	var result: BattleResult = await Game.battle_ended
-# 	match result.value:
-# 		BattleResult.CANCELLED:
-# 			return next(_cont_take_action)
-			
-# 		BattleResult.NONE:
-# 			push_warning('result == BattleResult.NONE')
-			
-# 		BattleResult.ATTACKER_VICTORY:
-# 			transfer_territory(result.defender, result.attacker, result.territory)
-# 			result.defender.hp_multiplier = 0.1
-			
-# 		BattleResult.DEFENDER_VICTORY:
-# 			result.attacker.hp_multiplier = 0.1
-			
-# 		BattleResult.ATTACKER_WITHDRAW:
-# 			pass
-			
-# 		BattleResult.DEFENDER_WITHDRAW:
-# 			transfer_territory(result.defender, result.attacker, result.territory)
-# 	last_battle_result = result
-	
-# 	var banner := battle_result_banner.duplicate()
-# 	add_child(banner)
-# 	await banner.show_parsed_result(last_battle_result)
-	
-# 	if result.loser().is_defeated():
-# 		# transfer units
-# 		result.winner().hero_units.append_array(result.loser().hero_units)
-# 		result.winner().units.append_array(result.loser().units)
-# 		result.loser().units.clear()
-
-# 		# TODO should we really be doing these mutations?
-# 		# i think overworld should do this, or whoever answers that signal
-# 		# we're gonna send in _cont_wait_for_defeat_events
-# 		overworld.defeated_empires().append(result.loser())
-# 		return next(_cont_wait_for_defeat_events)
-# 	else:
-# 		return next(_cont_turn_end)
-	
-	
-# ## Waits for defeat events fo finish.
-# func _cont_wait_for_defeat_events() -> void:
-# 	# kind of a hack, just cos we can't be arsed to pass the result here
-# 	Game.empire_defeated.emit(overworld.defeated_empires().back())
-# 	await Game.wait_for_resume()
-# 	return next(_cont_turn_end)
-	
-	
-# ## Ends the turn and emits the signal
-# func _cont_turn_end() -> void:
-# 	overworld.turn_ended.emit(overworld.on_turn())
-# 	await Game.wait_for_resume()
-	
-# 	if overworld.next_turn():
-# 		return next(_cont_cycle_end)
-# 	else:
-# 		return next(_cont_turn_start)
-		
-		
-# ## Ends the current cycle and starts a new one.
-# func _cont_cycle_end() -> void:
-# 	overworld.cycle_ended.emit(overworld.cycle())
-# 	await Game.wait_for_resume()
-# 	overworld.end_cycle()
-# 	return next(_cont_cycle_start)
-
-
-# ####################################################################################################
-# #endregion Continuations
-# ####################################################################################################
-	
-	
-# func get_ai_action(empire: Empire) -> EmpireAction:
-# 	# if hurt, rest
-# 	if empire.hp_multiplier < 0.8:
-# 		return RestAction.new(_context, empire)
-		
-# 	# increase aggression
-# 	empire.aggression += empire.base_aggression + randf()
-	
-# 	if empire.aggression >= 1:
-# 		empire.aggression = 0
-# 		var adjacent := empire.get_adjacent(_context.territories)
-		
-# 		# basic sanity check
-# 		if adjacent.is_empty():
-# 			push_warning('empire "%s" has no adjacent territories' % empire.leader_name())
-# 			return RestAction.new(_context, empire)
-		
-# 		# attack
-# 		var target: Territory = adjacent.pick_random()
-# 		return AttackAction.new(_context, empire, _context.get_territory_owner(target), target, 0)
-	
-# 	# rest
-# 	return RestAction.new(_context, empire)
-	
-
-## Called by actions to transfer territory.
-# func transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
-# 	if old_owner == new_owner:
-# 		return
-# 	_transfer_territory(old_owner, new_owner, territory)
-	
-# 	if territory == old_owner.home_territory:
-# 		if Preferences.defeat_if_home_territory_captured:
-# 			while not old_owner.territories.is_empty():
-# 				var t: Territory = old_owner.territories.pop_back()
-# 				_transfer_territory(old_owner, new_owner, t)
-# 		else:
-# 			pass # no action taken for losing home territory yet
-			
-	
-# func _transfer_territory(old_owner: Empire, new_owner: Empire, territory: Territory):
-# 	#print('transfer %s from %s to %s' % [territory.name, old_owner.leader_name() if old_owner else '(null)', new_owner.leader_name()])
-# 	# transfer territory
-# 	_unset_empire_territory(_context, old_owner, territory)
-# 	_set_empire_territory(_context, new_owner, territory, false)
-	
-# 	# update buttons
-# 	for btn in territory_buttons:
-# 		if btn.get_territory(_context) == territory:
-# 			btn.initialize(_context, territory)
-	
-	
 func _on_territory_button_attack_pressed(button: TerritoryButton):
 	if not overworld.on_turn().is_player_owned():
 		push_warning('attack button pressed when not on turn!')
@@ -435,7 +247,6 @@ func _on_territory_button_attack_pressed(button: TerritoryButton):
 		territory = button._territory,
 		map_id = 0,
 	})
-	#initiate_battle(attacker, defender, button._territory, 0)
 	
 
 func _on_territory_button_rest_pressed(_button: TerritoryButton):

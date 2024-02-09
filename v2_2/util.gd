@@ -24,6 +24,12 @@ static func is_f6(node: Node) -> bool:
 	return false
 	
 	
+## Returns true a is closer than b from c.[br]
+## Can be used with [code]is_closer.bind(start)[/code] for comparing two points.
+static func is_closer(a: Vector2, b: Vector2, c: Vector2) -> bool:
+	return a.distance_squared_to(c) < b.distance_squared_to(c)
+	
+	
 ## Makes big caps for [RichTextLabel].
 static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
 	# "setting text to an empty string also clears the stack" is a fucking lie

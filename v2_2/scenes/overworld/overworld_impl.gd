@@ -14,7 +14,6 @@ extends Overworld
 @export var _cycle_count: int
 @export var _turn_index: int
 @export var _state: StringName
-@export var _prev_state: StringName
 
 
 var _ai_decision_function: Callable
@@ -48,7 +47,6 @@ func on_new_save(save: SaveState):
 	data.cycle_count = 0
 	data.turn_index = 0
 	data.state = &''
-	data.prev_state = &''
 	
 	# add empires to active
 	data.active_empires.append(data.player_empire)
@@ -85,7 +83,6 @@ func on_save(save: SaveState):
 		cycle_count = _cycle_count,
 		turn_index = _turn_index,
 		state = _state,
-		prev_state = _state,
 	}
 
 
@@ -103,7 +100,6 @@ func on_load(save: SaveState):
 	_cycle_count = data.cycle_count
 	_turn_index = data.turn_index
 	_state = data.state
-	_prev_state = data.prev_state
 
 
 ## Starts the overworld cycle.
@@ -136,7 +132,6 @@ func get_continuation(state: StringName) -> Callable:
 func next(cont: Callable) -> void:
 	if _should_end:
 		return
-	_prev_state = _state
 	_state = cont.get_method()
 	cont.call_deferred()
 	
@@ -178,9 +173,9 @@ func _cont_take_action() -> void:
 	if action.type == 'train':
 		print('%s trains units (TODO does nothing)' % on_turn().leader_id)
 		return next(_cont_turn_end)
-
-	if action.type == 'interrupted':
-		return next(_cont_turn_end)
+		
+	# pass, interrupt, etc
+	return next(_cont_turn_end)
 			
 
 ## Waits for the battle to finish.
@@ -257,20 +252,21 @@ func _cont_cycle_end() -> void:
 ## Advances to the next turn.
 func next_turn() -> bool:
 	# finds the first valid and active empire
-	var end_turn_cycle := false
-	while true:
-		_turn_index += 1
-		if _turn_index >= _active_empires.size():
-			_turn_index = 0
-			end_turn_cycle = true
+	var valid := 0
+	for i in range(_turn_index + 1, _active_empires.size()):
+		if _active_empires[i] not in _defeated_empires:
+			valid = i
 			break
-		if on_turn() not in _defeated_empires:
-			break
-	return not end_turn_cycle
+	_turn_index = valid
+	return _turn_index == 0
 
 
 ## Basic ai action.
 func default_ai_action(empire: Empire) -> Dictionary:
+	# boss don't do anything
+	if empire.is_boss():
+		return {type='pass'}
+		
 	# if hurt, rest
 	if empire.hp_multiplier < 0.8:
 		return {type='rest'}
