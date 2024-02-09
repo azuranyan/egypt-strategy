@@ -3,7 +3,16 @@ extends Node
 
 @export var start_scene_name: StringName = &'intro'
 
-@export var scene_registry: Array[SceneRegistryEntry]
+const scene_registry := {
+	battle = 'res://scenes/battle/battle.tscn',
+	credits = 'res://scenes/credits/credits.tscn',
+	game_over = 'res://scenes/game_over/game_over.tscn',
+	intro = 'res://scenes/intro/intro.tscn',
+	main_menu = 'res://scenes/main_menu/main_menu.tscn',
+	overworld = 'res://scenes/overworld/overworld_scene.tscn',
+	pause = 'res://scenes/pause/pause.tscn',
+	save_load = 'res://scenes/save_load/save_load.tscn',
+}
 
 
 func _ready():
@@ -13,8 +22,7 @@ func _ready():
 ## The actual start point of the game.[br]
 ## This scene will be replaced by the first scene, so no persistent data.
 func launch_game():
-	for entry in scene_registry:
-		SceneManager.scenes[entry.scene_name] = entry.scene_path
+	SceneManager.scenes = scene_registry
 	
 	# initialize run args here
 	var kwargs := {

@@ -54,25 +54,28 @@ hero_unit = ExtResource("7_1lo02")
 [node name="Tali" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_rq8ib")
 leader_id = &"tali"
+base_aggression = 0.8
 leader = ExtResource("8_l0af5")
 hero_unit = ExtResource("9_fsjus")
 
 [node name="Maia" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_rq8ib")
 leader_id = &"maia"
+base_aggression = 0.9
 leader = ExtResource("10_6jdt3")
 hero_unit = ExtResource("11_wn8u1")
 
 [node name="Zahra" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_rq8ib")
 leader_id = &"zahra"
+base_aggression = 0.7
 leader = ExtResource("12_8mfsj")
 hero_unit = ExtResource("13_salgo")
 
 [node name="Alara" type="Node" parent="RandomEmpireSelection"]
 script = ExtResource("3_rq8ib")
 leader_id = &"alara"
-base_aggression = 0.9
+base_aggression = 0.5
 leader = ExtResource("14_plgjf")
 hero_unit = ExtResource("15_p03ft")
 
@@ -82,8 +85,9 @@ offset_top = 801.0
 offset_right = 1475.0
 offset_bottom = 801.0
 
-[node name="Zetennu" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("empire_node")]
+[node name="Zetennu" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("adjacent", "empire_node")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton7/Neru-Khisi")]
 _unit_list = PackedStringArray("cultist_axe")
 empire_node = NodePath("../../Empires/Player")
 
@@ -103,8 +107,9 @@ offset_top = 638.0
 offset_right = 467.0
 offset_bottom = 638.0
 
-[node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton3"]
+[node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton9/Fort Zaka")]
 
 [node name="TerritoryButton4" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 826.0
@@ -112,8 +117,9 @@ offset_top = 212.0
 offset_right = 826.0
 offset_bottom = 212.0
 
-[node name="Forsaken Temple" type="Node" parent="TerritoryButton4"]
+[node name="Forsaken Temple" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton10/Ruins of Atesh")]
 
 [node name="TerritoryButton5" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1313.0
@@ -121,8 +127,9 @@ offset_top = 163.0
 offset_right = 1313.0
 offset_bottom = 163.0
 
-[node name="Khel-Et" type="Node" parent="TerritoryButton5"]
+[node name="Khel-Et" type="Node" parent="TerritoryButton5" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
 
 [node name="TerritoryButton6" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1638.0
@@ -130,8 +137,9 @@ offset_top = 244.0
 offset_right = 1638.0
 offset_bottom = 244.0
 
-[node name="Satayi" type="Node" parent="TerritoryButton6"]
+[node name="Satayi" type="Node" parent="TerritoryButton6" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton7/Neru-Khisi")]
 
 [node name="TerritoryButton7" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1594.0
@@ -139,8 +147,9 @@ offset_top = 519.0
 offset_right = 1594.0
 offset_bottom = 519.0
 
-[node name="Neru-Khisi" type="Node" parent="TerritoryButton7"]
+[node name="Neru-Khisi" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton/Zetennu"), NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1088.0
@@ -148,8 +157,9 @@ offset_top = 463.0
 offset_right = 1088.0
 offset_bottom = 463.0
 
-[node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton8"]
+[node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton8" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton9/Fort Zaka"), NodePath("../../TerritoryButton7/Neru-Khisi")]
 
 [node name="TerritoryButton9" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 948.0
@@ -157,8 +167,9 @@ offset_top = 712.0
 offset_right = 948.0
 offset_bottom = 712.0
 
-[node name="Fort Zaka" type="Node" parent="TerritoryButton9"]
+[node name="Fort Zaka" type="Node" parent="TerritoryButton9" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton3/Nekhet\'s Rest")]
 
 [node name="TerritoryButton10" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 702.0
@@ -166,8 +177,9 @@ offset_top = 456.0
 offset_right = 702.0
 offset_bottom = 456.0
 
-[node name="Ruins of Atesh" type="Node" parent="TerritoryButton10"]
+[node name="Ruins of Atesh" type="Node" parent="TerritoryButton10" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
+adjacent = [NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton9/Fort Zaka"), NodePath("../../TerritoryButton3/Nekhet\'s Rest")]
 
 [node name="InputBlocker" type="Control" parent="."]
 layout_mode = 3

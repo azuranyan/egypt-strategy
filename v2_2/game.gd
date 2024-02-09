@@ -5,27 +5,6 @@ signal game_started
 signal game_ended
 signal game_resumed
 
-## Emitted when the overworld enters scene.
-signal overworld_started
-
-## Emitted when the overworld exits. [b]Cannot be suspended.[/b]
-signal overworld_ended # TODO FIX: never emitted
-
-## Emitted when a new cycle starts. Can be suspended.
-signal overworld_cycle_started(cycle: int)
-
-## Emitted when a cycle ends. Can be suspended.
-signal overworld_cycle_ended(cycle: int)
-
-## Emitted an empire's turn starts. Can be suspended.
-signal overworld_turn_started(empire: Empire)
-
-## Emitted an empire's turn ends. Can be suspended.
-signal overworld_turn_ended(empire: Empire)
-
-## Emitted when an empire is defeated. Can be suspended.
-signal empire_defeated(empire: Empire)
-
 ## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
 signal battle_started
 
@@ -208,28 +187,13 @@ func create_new_data() -> SaveState:
 	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
 	save.battle_context = BattleContext.new()
-	save.battle_context.territories = save.overworld_context.territories
-	save.battle_context.empires = save.overworld_context.empires
-	save.units = units.duplicate() # TODO this feels REALLY weird
-	
 	
 	# TODO currently a hack, change this to the real start point later
 	var fr := SceneStackFrame.new()
-	fr.scene_path = "res://scenes/overworld/overworld.tscn" # TODO main event
+	fr.scene_path = SceneManager.scenes.overworld # TODO main event
 	fr.scene = null # this will be loaded in later (hopefully)
 	save.scene_stack = [fr]
 	return save
-	
-	
-func _create_new_overworld_context() -> OverworldContext:
-	# can't preload or declare type (circular dependency)
-	var overworld = load("res://scenes/overworld/overworld.tscn").instantiate()
-	overworld.hide()
-	add_child(overworld)
-	var ctx = overworld.create_new_context()
-	remove_child(overworld)
-	overworld.queue_free()
-	return ctx
 	
 	
 func _create_save() -> SaveState:
@@ -249,25 +213,21 @@ func save_state() -> SaveState:
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_save', save)
 	
-	# create data
-	if _overworld_context:
-		save.overworld_context = _overworld_context.duplicate()
 	if _battle_context:
 		save.battle_context = _battle_context.duplicate()
-	save.units = units.duplicate()
 	return save
 	
 
 ## Changes the game state.
 func load_state(save: SaveState):
 	print('[Game] Loading state.')
-	# load data
-	_overworld_context = save.overworld_context
-	_battle_context = save.battle_context
-	units = save.units
-	notify_property_list_changed()
-	
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_load', save)
+	
+	# load data
+	_battle_context = save.battle_context
+	
+	# TODO hack
+	overworld.start_overworld_cycle()
 
 

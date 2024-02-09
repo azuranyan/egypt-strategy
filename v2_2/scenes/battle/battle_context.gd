@@ -6,21 +6,18 @@ extends Resource
 @export var territory: Territory
 @export var map_id: int
 
-var territories: Array[Territory]
-var empires: Array[Empire]
-var units: Array[Unit]
-
-func are_enemies(a: Unit, b: Unit) -> bool:
-	return (a != b) and get_unit_owner(a) == get_unit_owner(b)
-	
-
-func are_allies(a: Unit, b: Unit) -> bool:
-	return (a != b) and get_unit_owner(a) != get_unit_owner(b)
-	
-	
-func get_unit_owner(a: Unit) -> Empire:
-	for e in empires:
-		if a in e.units:
-			return e
-	return null # TODO
- 
+#
+#func are_enemies(a: Unit, b: Unit) -> bool:
+	#return (a != b) and get_unit_owner(a) == get_unit_owner(b)
+	#
+#
+#func are_allies(a: Unit, b: Unit) -> bool:
+	#return (a != b) and get_unit_owner(a) != get_unit_owner(b)
+	#
+	#
+#func get_unit_owner(a: Unit) -> Empire:
+	#for e in empires:
+		#if a in e.units:
+			#return e
+	#return null # TODO
+ #

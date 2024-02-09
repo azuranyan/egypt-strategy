@@ -1,47 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://dxi1gfo7ucwfk"]
+[gd_scene load_steps=3 format=3 uid="uid://dxi1gfo7ucwfk"]
 
 [ext_resource type="Script" path="res://main/bootstrap.gd" id="1_ooyf5"]
-[ext_resource type="Script" path="res://main/scene_registry_entry.gd" id="2_ltpw3"]
 [ext_resource type="Texture2D" uid="uid://cejlajuuresil" path="res://scenes/credits/logo_small_color_dark.svg" id="3_vaek6"]
-
-[sub_resource type="Resource" id="Resource_4afpp"]
-script = ExtResource("2_ltpw3")
-scene_name = &"intro"
-scene_path = "res://scenes/intro/intro.tscn"
-
-[sub_resource type="Resource" id="Resource_jte05"]
-script = ExtResource("2_ltpw3")
-scene_name = &"main_menu"
-scene_path = "res://scenes/main_menu/main_menu.tscn"
-
-[sub_resource type="Resource" id="Resource_xk2vm"]
-script = ExtResource("2_ltpw3")
-scene_name = &"battle"
-scene_path = "res://scenes/battle/battle.tscn"
-
-[sub_resource type="Resource" id="Resource_0v3gg"]
-script = ExtResource("2_ltpw3")
-scene_name = &"overworld"
-scene_path = "res://scenes/overworld/overworld.tscn"
-
-[sub_resource type="Resource" id="Resource_wd4y4"]
-script = ExtResource("2_ltpw3")
-scene_name = &"credits"
-scene_path = "res://scenes/credits/credits.tscn"
-
-[sub_resource type="Resource" id="Resource_2xqyi"]
-script = ExtResource("2_ltpw3")
-scene_name = &"save_load"
-scene_path = "res://scenes/save_load/save_load.tscn"
-
-[sub_resource type="Resource" id="Resource_6qaol"]
-script = ExtResource("2_ltpw3")
-scene_name = &"pause"
-scene_path = "res://scenes/pause/pause.tscn"
 
 [node name="Bootstrap" type="Node"]
 script = ExtResource("1_ooyf5")
-scene_registry = Array[ExtResource("2_ltpw3")]([SubResource("Resource_4afpp"), SubResource("Resource_jte05"), SubResource("Resource_xk2vm"), SubResource("Resource_0v3gg"), SubResource("Resource_wd4y4"), SubResource("Resource_2xqyi"), SubResource("Resource_6qaol")])
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

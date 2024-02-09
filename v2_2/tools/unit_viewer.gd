@@ -34,9 +34,9 @@ func _ready():
 func on_load(save: SaveState):
 	$ItemList.clear()
 	_index_to_tag.clear()
-	for u in save.units:
+	for u in save.units.values():
 		$ItemList.add_item(u.display_name)
-		_index_to_tag.append(Game.get_unit_tag(u))
+		_index_to_tag.append(u.id)
 	
 	
 func set_minimized(minimized: bool):
@@ -48,7 +48,7 @@ func set_minimized(minimized: bool):
 	
 	
 func _on_item_list_item_selected(index):
-	var unit := Game.get_unit_by_tag(_index_to_tag[index])
+	var unit := Game.load_unit(_index_to_tag[index])
 	character_info_panel.initialize(unit.chara) 
 	unit_type_panel.initialize(unit.unit_type)
 

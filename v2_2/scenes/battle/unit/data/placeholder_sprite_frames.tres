@@ -95,7 +95,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("5_py7qc")
 }],
-"loop": false,
+"loop": true,
 "name": &"front_walk_loop",
 "speed": 5.0
 }]

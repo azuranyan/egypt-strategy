@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2q4wbj7grghy"]
+
+[ext_resource type="Script" path="res://scenes/overworld/marching_animation.gd" id="1_8yn85"]
+[ext_resource type="SpriteFrames" uid="uid://q7fm5unoyvur" path="res://scenes/battle/unit/data/placeholder_sprite_frames.tres" id="2_o1l1g"]
+
+[sub_resource type="Curve2D" id="Curve2D_wsj2m"]
+
+[node name="MarchingAnimation" type="Path2D"]
+curve = SubResource("Curve2D_wsj2m")
+script = ExtResource("1_8yn85")
+speed = 456.359
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+rotates = false
+cubic_interp = false
+loop = false
+
+[node name="Sprite" type="AnimatedSprite2D" parent="PathFollow2D"]
+unique_name_in_owner = true
+sprite_frames = ExtResource("2_o1l1g")
+animation = &"back_walk_loop"
+frame_progress = 0.243122
