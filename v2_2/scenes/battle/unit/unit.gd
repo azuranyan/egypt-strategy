@@ -168,7 +168,14 @@ func _init(_chara: CharacterInfo = null, _unit_type: UnitType = null, prop := {}
 	
 ## Returns the base stats.
 func base_stats() -> Dictionary:
-	return unit_type.stats
+	var re := unit_type.stats.duplicate()
+	if bond >= 1:
+		for stat in stats:
+			re[stat] += unit_type.stat_growth_1[stat]
+	if bond >= 2:
+		for stat in stats:
+			re[stat] += unit_type.stat_growth_2[stat]
+	return re
 
 
 ## Returns the cell position.
