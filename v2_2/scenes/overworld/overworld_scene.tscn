@@ -1,9 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=26 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
 [ext_resource type="Script" path="res://scenes/overworld/empire_node.gd" id="3_rq8ib"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="3_sc2vb"]
 [ext_resource type="Resource" uid="uid://bq47arkapu6hu" path="res://units/lysandra/chara.tres" id="4_ai0xe"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="4_bp11s"]
 [ext_resource type="Resource" uid="uid://4vhw74hddihj" path="res://units/lysandra/unit_type.tres" id="5_j6qdb"]
 [ext_resource type="Resource" uid="uid://ceufx8acegtc1" path="res://units/sitri/chara.tres" id="6_gxwvc"]
 [ext_resource type="Resource" uid="uid://bnvl35k6vwirj" path="res://units/sitri/unit_type.tres" id="7_1lo02"]
@@ -18,8 +20,39 @@
 [ext_resource type="PackedScene" uid="uid://vo0h66hnj2jc" path="res://scenes/overworld/territory_button.tscn" id="16_0hx7d"]
 [ext_resource type="Script" path="res://scenes/overworld/territory_node.gd" id="17_wovx7"]
 [ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="18_l1pmu"]
+[ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
 
-[node name="Overworld" type="CanvasLayer"]
+[sub_resource type="Gradient" id="Gradient_n8nx8"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.654321, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yq7nc"]
+gradient = SubResource("Gradient_n8nx8")
+width = 120
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_sdpw6"]
+font = ExtResource("4_bp11s")
+font_size = 40
+font_color = Color(0.898039, 0.713726, 0.486275, 1)
+outline_size = 4
+outline_color = Color(0.0588235, 0.0392157, 0.0196078, 1)
+shadow_size = 6
+shadow_color = Color(0.266667, 0.266667, 0.266667, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lcrub"]
+font = ExtResource("4_bp11s")
+font_size = 50
+font_color = Color(0.898039, 0.713726, 0.486275, 1)
+outline_size = 4
+outline_color = Color(0.0588235, 0.0392157, 0.0196078, 1)
+shadow_size = 6
+shadow_color = Color(0.266667, 0.266667, 0.266667, 1)
+
+[node name="OverworldScene" type="CanvasLayer"]
 script = ExtResource("1_fqotl")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
@@ -190,4 +223,101 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="BattleResultBanner" parent="." instance=ExtResource("18_l1pmu")]
-visible = false
+metadata/_edit_lock_ = true
+
+[node name="HUD" type="Control" parent="."]
+z_index = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_sc2vb")
+
+[node name="TurnBox" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 889.0
+offset_top = 4.0
+offset_right = -889.0
+offset_bottom = 56.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="HUD/TurnBox"]
+self_modulate = Color(0, 0, 0, 0.545098)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -48.0
+offset_top = -6.0
+offset_right = 48.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_yq7nc")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/TurnBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Label3" type="Label" parent="HUD/TurnBox/HBoxContainer"]
+layout_mode = 2
+text = "Turn"
+label_settings = SubResource("LabelSettings_sdpw6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TurnCountLabel" type="Label" parent="HUD/TurnBox/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "5"
+label_settings = SubResource("LabelSettings_lcrub")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StrategyRoomButton" type="Button" parent="HUD"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 648.0
+offset_top = -517.0
+offset_right = 927.0
+offset_bottom = -463.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Strategy Room ➤"
+
+[node name="NewSceneIcon" type="TextureRect" parent="HUD/StrategyRoomButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -144.5
+offset_top = -34.0
+offset_right = -124.5
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("21_sy7q1")
+expand_mode = 1
+stretch_mode = 4
+
+[connection signal="pressed" from="HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]

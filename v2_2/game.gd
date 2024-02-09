@@ -15,8 +15,11 @@ signal battle_ended(result: BattleResult)
 ## Reference to the [Overworld] system.
 var overworld: Overworld
 
-
+## Record of unit id and unit.
 var unit_registry: Dictionary
+
+## Record of playable scenes and whether they've been checked once.
+var available_scenes: Dictionary
 
 ## Reference to the [Battle] system.
 var battle: Battle
@@ -37,8 +40,8 @@ var _event_context
 
 func _ready():
 	overworld = preload("res://scenes/overworld/overworld_impl.gd").new()
+	overworld.name = 'Overworld'
 	add_child(overworld)
-
 
 
 func _notification(what):
@@ -62,6 +65,14 @@ func _main(kwargs := {}):
 	# the scene to launch on main and will be replaced by the start scene.
 	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
 		
+		
+## Returns true if there are scenes that have not been checked yet.
+func has_new_scenes() -> bool:
+	for scene_id in available_scenes:
+		if not available_scenes[scene_id]:
+			return true
+	return false
+	
 
 ## Calls a function with minimum delay time.
 func delay_function(callable: Callable, delay: float, argv := []) -> Variant:
@@ -215,6 +226,9 @@ func save_state() -> SaveState:
 	
 	if _battle_context:
 		save.battle_context = _battle_context.duplicate()
+	
+	save.units = unit_registry.duplicate()
+	
 	return save
 	
 
@@ -229,5 +243,7 @@ func load_state(save: SaveState):
 	
 	# TODO hack
 	overworld.start_overworld_cycle()
+	
+	unit_registry = save.units.duplicate()
 
 

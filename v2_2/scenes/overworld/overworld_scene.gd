@@ -4,12 +4,7 @@ extends GameScene
 signal _player_choose_action(action: Dictionary)
 
 
-@export var _state: StringName
-
-var last_battle_result: BattleResult
 var territory_buttons: Array[TerritoryButton]
-
-var _should_end: bool
 var overworld: Overworld
 
 @onready var battle_result_banner = $BattleResultBanner
@@ -27,6 +22,8 @@ func _ready():
 		button.train_pressed.connect(_on_territory_button_train_pressed)
 	overworld = Game.overworld
 	overworld.territory_owner_changed.connect(func(_a, _b, _c): update_territory_buttons())
+	overworld.cycle_started.connect(update_turn_counter)
+	overworld.turn_ended.connect(update_new_available_scenes)
 	
 
 ## Returns the empire nodes.
@@ -182,7 +179,21 @@ func _distribute_empires(data: Dictionary):
 
 func scene_enter(_kwargs = {}):
 	update_territory_buttons()
+	update_turn_counter(overworld.cycle())
+	update_new_available_scenes()
+	# TODO just a hack to keep it working when resumed
+	# and overworld is waiting for player action
+	if overworld.on_turn():
+		$InputBlocker.mouse_filter = 2
 	
+	
+func update_turn_counter(cycle: int):
+	%TurnCountLabel.text = str(cycle + 1)
+	
+	
+func update_new_available_scenes(_empire: Empire = null):
+	%NewSceneIcon.visible = Game.has_new_scenes()
+
 
 func update_territory_buttons():
 	for btn in territory_buttons:
@@ -213,7 +224,7 @@ func show_marching_animation(attacker: Empire, _defender: Empire, target: Territ
 	# find nearest position
 	var start_pos := find_territory_button(target).global_position
 	var sorted_positions := territory_buttons \
-		.filter(func(btn): return overworld.get_territory_owner(btn._territory) == attacker) \
+		.filter(func(btn): return overworld.get_territory_owner(btn._territory) == attacker and attacker.is_adjacent_territory(target)) \
 		.map(func(btn): return btn.global_position)
 	sorted_positions.sort_custom(Util.is_closer.bind(start_pos))
 	
@@ -224,9 +235,6 @@ func show_marching_animation(attacker: Empire, _defender: Empire, target: Territ
 	anim.march(start_pos)
 	await anim.done
 	
-	
-	
-
 
 func show_battle_result_banner(result: BattleResult):
 	var banner := battle_result_banner.duplicate()
@@ -263,6 +271,10 @@ func _on_territory_button_train_pressed(_button: TerritoryButton):
 	_player_choose_action.emit({type='train'})
 	
 	
+func _on_strategy_room_button_pressed():
+	scene_call('strategy_room')
+
+
 func _unhandled_input(event) -> void:
 	if not is_active():
 		return

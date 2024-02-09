@@ -26,7 +26,19 @@ func scene_enter(kwargs := {}):
 	
 func scene_exit():
 	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, Game._battle_context.attacker, Game._battle_context.defender, Game._battle_context.territory, Game._battle_context.map_id)
+	reset_units(Game._battle_context.attacker)
+	reset_units(Game._battle_context.defender)
 	Game.battle_ended.emit(result)
+	
+	
+func reset_units(e: Empire):
+	for u in e.units:
+		var base_stats := u.base_stats()
+		for stat in base_stats:
+			u.stats[stat] = base_stats[stat]
+		u.status_effects.clear()
+		u.map_position = Map.OUT_OF_BOUNDS
+		u.heading = Map.Heading.EAST
 
 
 func _input(event) -> void:

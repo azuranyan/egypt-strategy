@@ -70,16 +70,20 @@ func initialize(t: Territory):
 		else:
 			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ', '.join(heroes)
 				
-	var force_strength := 'Force Strength: %s' % _get_force_strength(empire)
-	%EnemyForceStrengthLabel.text = force_strength
-	%PlayerForceStrengthLabel.text = force_strength
-
+	if empire.is_player_owned():
+		%PlayerForceStrengthLabel.text = '(stub)'
+	else:
+		var force_strength: String = 'Force Strength: %s' % _force_string(_force_rating(empire))
+		if OS.is_debug_build():
+			force_strength += ' (%s)' % snappedf(_force_rating(empire), 0.01)
+		%EnemyForceStrengthLabel.text = force_strength
+		
 
 func update_territory_name(territory_name: String):
 	Util.bb_big_caps(%NameLabel, territory_name, {font_size = 18})
 	
 
-func _get_force_strength(e: Empire) -> String: # TODO update force strength
+func _get_force_strength_old(e: Empire) -> String: # TODO update force strength
 	var total_combined_maxhp := 0
 	var total_combined_hp := 0
 	for u in e.units:
@@ -94,6 +98,33 @@ func _get_force_strength(e: Empire) -> String: # TODO update force strength
 	if hp_ratio >= 0.3:
 		return 'Low'
 	return 'Critical'
+	
+	
+func _force_rating(e: Empire) -> float:
+	var player_empire := Game.overworld.player_empire()
+	var enemy_stats := _get_empire_combined_unit_stat(e, &'maxhp') + _get_empire_combined_unit_stat(e, &'dmg')
+	var player_stats := _get_empire_combined_unit_stat(player_empire, &'maxhp') + _get_empire_combined_unit_stat(player_empire, &'dmg')
+	return float(enemy_stats)/player_stats
+	
+	
+func _force_string(rating: float) -> String:
+	if rating > 2:
+		return 'Dangerous'
+	if rating >= 1.5:
+		return 'Formidable'
+	if rating >= 1.2:
+		return 'Strong'
+	if rating >= 0.8:
+		return 'Moderate'
+	if rating >= 0.5:
+		return 'Fair'
+	return 'Weak'
+	
+	
+func _get_empire_combined_unit_stat(e: Empire, stat: StringName) -> int:
+	if e.units.size() == 0:
+		return 0
+	return e.units.map(func(u): return u.stats[stat]).reduce(func(a, b): return a + b)
 	
 	
 func open_panel(t: Territory):

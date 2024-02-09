@@ -34,6 +34,8 @@ func on_new_save(save: SaveState):
 	add_child(instance)
 
 	var data := instance.create_initial_data()
+	instance.queue_free()
+	
 	# do some simple verification
 	if not data.player_empire:
 		push_error('player_empire not found %s' % instance)

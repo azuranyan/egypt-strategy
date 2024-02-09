@@ -1,0 +1,93 @@
+[gd_scene load_steps=6 format=3 uid="uid://m6454awul4gx"]
+
+[ext_resource type="Script" path="res://scenes/strategy_room/strategy_room.gd" id="1_f8a7s"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_sg0r4"]
+[ext_resource type="Texture2D" uid="uid://do2hdupoy1ivh" path="res://units/ishtar/IshtarF.png" id="3_7vhhe"]
+
+[sub_resource type="Gradient" id="Gradient_moclt"]
+offsets = PackedFloat32Array(0.0246914, 1)
+colors = PackedColorArray(0.0687983, 0.0687983, 0.0687983, 1, 0.180005, 0.180005, 0.180005, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hl1kw"]
+gradient = SubResource("Gradient_moclt")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[node name="StrategyRoom" type="CanvasLayer"]
+script = ExtResource("1_f8a7s")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_sg0r4")
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_hl1kw")
+metadata/_edit_lock_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="Control"]
+layout_mode = 0
+offset_left = 1232.0
+offset_top = 265.0
+offset_right = 2062.0
+offset_bottom = 1080.0
+mouse_filter = 2
+texture = ExtResource("3_7vhhe")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="UnitListPanel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 103.0
+offset_right = -1399.0
+offset_bottom = -328.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="UnitInfoPanel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1311.0
+offset_top = 120.0
+offset_right = -100.0
+offset_bottom = -692.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+modulate = Color(1, 1, 1, 0.513726)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 51.0
+offset_top = -231.0
+offset_right = 710.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="StrategyRoomLabel" type="RichTextLabel" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
