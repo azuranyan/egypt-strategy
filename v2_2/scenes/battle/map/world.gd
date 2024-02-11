@@ -90,8 +90,15 @@ func as_uniform(v: Vector2) -> Vector2:
 	return uniform_inverse * v
 	
 
+## Returns global coordinates aligned to top left.
 func as_aligned(v: Vector2) -> Vector2:
 	return as_global(v - Vector2(0.5, 0.5))
+	
+	
+## Transforms cell to index.
+func to_index(cell: Vector2) -> int:
+	# does this need rounding?
+	return int(cell.y * map_size.x + cell.x)
 	
 	
 ## Returns world transforms.

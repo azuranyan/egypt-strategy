@@ -20,33 +20,7 @@ var unit: Unit
 @onready var hp_bar = %HPBar
 
 
-func _ready():
-	var test := func():
-		var unit = load("res://scenes/battle/unit/unit_impl.tscn").instantiate()
-		unit._id = 0
-		unit._chara = load("res://units/alara/chara.tres")
-		unit._unit_type = load("res://units/alara/unit_type.tres")
-		unit._stats.hp = 3
-		unit._stats.maxhp = 6
-		get_tree().root.add_child(unit)
-		# hack for testing
-		unit.map_object.queue_free()
-		unit.map_object = self
-		# another hack for testing
-		unit.set_state(Unit.State.IDLE) 
-		initialize(unit)
-	test.call_deferred()
-
-
-func _input(event):
-	if event.is_action_pressed('ui_accept'):
-		unit.take_damage(2, null)
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		unit.walk_towards(Vector2.ZERO)
-
-
 func initialize(_unit: Unit):
-	print('initialized')
 	unit = _unit
 	$HUD/Label.text = unit.display_name()
 	
@@ -62,9 +36,6 @@ func update_hp_bar(hp: int, maxhp: int):
 	
 	
 func update_state(old: Unit.State, new: Unit.State):
-	const STATE_NAMES := ['invalid', 'idle', 'walking', 'attacking', 'hurt', 'dying', 'dead']
-	
-	print(self, ' unit change state: %s -> %s' % [STATE_NAMES[old], STATE_NAMES[new]])
 	unit_model.state = new
 	
 	

@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://tswv0jrmndgy"]
+[gd_scene load_steps=5 format=3 uid="uid://tswv0jrmndgy"]
 
 [ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_fyf4x"]
 [ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_1pxfs"]
 [ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="3_qtici"]
 [ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="4_7feta"]
-[ext_resource type="PackedScene" uid="uid://dgiub7m8fawlq" path="res://scenes/battle/unit/unit_map_object.tscn" id="5_hjjah"]
 
 [node name="Test" type="Node2D" node_paths=PackedStringArray("world")]
 y_sort_enabled = true
@@ -24,7 +23,3 @@ world = NodePath("../World")
 [node name="MapObjectContainer" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("3_qtici")
-
-[node name="Unit" parent="MapObjectContainer" instance=ExtResource("5_hjjah")]
-position = Vector2(1203.79, 571.138)
-map_position = Vector2(8, 4)

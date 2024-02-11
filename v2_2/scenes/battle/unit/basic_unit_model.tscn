@@ -12,15 +12,13 @@ size = Vector2(15, 51)
 [node name="UnitModel" type="Node2D"]
 scale = Vector2(-1, 1)
 script = ExtResource("1_l5fke")
-state = 5
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(0, -38)
 scale = Vector2(0.575, 0.575)
 sprite_frames = ExtResource("2_kix1i")
-animation = &"front_dying"
-frame = 7
+animation = &"front_idle"
 frame_progress = 1.0
 
 [node name="CursorDetector" type="Area2D" parent="."]

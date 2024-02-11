@@ -18,7 +18,7 @@ const ANIMATION_NAMES := {
 }
 
 
-@export var state := Unit.State.INVALID:
+@export var state := Unit.State.IDLE:
 	set(value):
 		state = value
 		if not is_node_ready():

@@ -19,11 +19,12 @@ const TILE_COLORS := {
 
 @export var map_position: Vector2 = Vector2.ZERO:
 	set(value):
+		var old := map_position
 		map_position = value
 		if not is_node_ready():
 			await ready
 		_update_position()
-		map_position_changed.emit()
+		map_position_changed.emit(old, map_position)
 
 @export_group("Editor")
 
@@ -98,8 +99,9 @@ func _update_position():
 	position = _global_pos
 	
 	if cell() != _cell:
+		var old := _cell
 		_cell = cell()
-		cell_changed.emit()
+		cell_changed.emit(old, _cell)
 		
 		
 func _sync_map_position():

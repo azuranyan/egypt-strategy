@@ -80,7 +80,6 @@ func _ready():
 	map_object.map_position_changed.connect(sync_map_position)
 	
 	driver.target = map_object
-	reset()
 	
 	battle = Game.battle
 	battle.started.connect(enter_battle)
@@ -96,6 +95,7 @@ func enter_battle(_attacker, _defender, _territory, _map_id):
 	set_position(_map_position)
 	
 	Game.battle.add_map_object(map_object)
+	map_object.initialize(self)
 	set_state(State.IDLE)
 	reset()
 	
@@ -107,6 +107,7 @@ func exit_battle(_result):
 	
 	
 func reset():
+	_state = _state
 	var _base := base_stats()
 	for stat in _base:
 		set_stat(stat, _base[stat])
@@ -460,7 +461,8 @@ func walk_towards(target: Vector2):
 	var old_state := _state
 	set_state(State.WALKING)
 	walking_started.emit(start, target)
-	await driver.start_driver(pathfind_to(target))
+	if target != cell():
+		await driver.start_driver(pathfind_to(target))
 	set_state(old_state)
 	walking_finished.emit(start, target)
 	

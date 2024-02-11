@@ -1,0 +1,59 @@
+[gd_scene load_steps=4 format=3 uid="uid://cj17rk2orwu6t"]
+
+[ext_resource type="Script" path="res://scenes/battle/level.gd" id="1_uee7d"]
+[ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_m8p1b"]
+[ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="3_pg464"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_uee7d")
+
+[node name="WorldSample" parent="." instance=ExtResource("2_m8p1b")]
+
+[node name="Cursor" type="Sprite2D" parent="."]
+
+[node name="WorldOverlays" type="Node2D" parent="."]
+
+[node name="Pathing" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
+modulate = Color(0, 1, 0, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(327684, 0, 0, 393220, 0, 0, 458756, 0, 0, 524292, 0, 0)
+world = NodePath("../../WorldSample")
+
+[node name="AttackRange" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
+modulate = Color(1, 0, 0, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(327686, 0, 0, 393222, 0, 0, 458758, 0, 0, 524294, 0, 0)
+world = NodePath("../../WorldSample")
+
+[node name="TargetShape" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
+modulate = Color(0, 0, 1, 0.360784)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(327688, 0, 0, 393224, 0, 0, 458760, 0, 0, 524296, 0, 0, 589832, 0, 0)
+world = NodePath("../../WorldSample")
+
+[node name="UnitPath" type="Node2D" parent="WorldOverlays"]
+
+[node name="LineEdit" type="LineEdit" parent="."]
+offset_left = 230.0
+offset_top = 271.0
+offset_right = 483.0
+offset_bottom = 302.0
+placeholder_text = "paste instance id here"
+
+[node name="Button" type="Button" parent="LineEdit"]
+layout_mode = 0
+offset_top = 44.0
+offset_right = 119.0
+offset_bottom = 78.0
+text = "zap the fucker"
+
+[connection signal="pressed" from="LineEdit/Button" to="." method="_on_button_pressed"]

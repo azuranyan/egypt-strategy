@@ -50,6 +50,13 @@ const OUT_OF_BOUNDS := Vector2(69, 69)
 @export var world_update_frequency: float = 0.5
 
 
+## For painting custom pathing.
+@export var pathing_painter: TileOverlay
+
+#@export var triggers: Array[Trigger]
+
+#@export var evaluators: Array[BattleResultEvaluator] = [ConquerEvaluator.new()]
+
 var _world_update_cooldown: float = 0
 
 

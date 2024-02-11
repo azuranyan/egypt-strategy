@@ -8,6 +8,7 @@ class_name BattleImpl extends Battle
 
 @export var _should_end: bool
 
+@export var level: Level
 
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
@@ -111,39 +112,37 @@ func map_id() -> int:
 	
 
 ## Returns the unit at cell.
-func get_unit_at(_cell: Vector2) -> Unit:
-	assert(false, 'not implemented')
+func get_unit_at(cell: Vector2) -> Unit:
+	for obj in get_objects_at(cell):
+		# this is ugly as shit
+		if obj is UnitMapObject and obj.unit.is_valid_target():
+			return obj.unit
 	return null
-
+		
 
 ## Returns true if cell is occupied by a unit.
-func is_occupied(_cell: Vector2) -> bool:
-	assert(false, 'not implemented')
-	return false
+func is_occupied(cell: Vector2) -> bool:
+	return get_unit_at(cell) != null
 	
 	
 ## Returns the objects at cell.
-func get_objects_at(_cell: Vector2) -> Array[MapObject]:
-	assert(false, 'not implemented')
-	return []
+func get_objects_at(cell: Vector2) -> Array[MapObject]:
+	return level.get_objects_at(cell)
 	
 
 ## Returns all the pathables.
 func get_pathables() -> Array[PathableComponent]:
-	assert(false, 'not implemented')
-	return []
+	return level.pathables
 
 
 ## Returns all the pathables at cell.
-func get_pathables_at(_cell: Vector2) -> Array[PathableComponent]:
-	assert(false, 'not implemented')
-	return []
+func get_pathables_at(cell: Vector2) -> Array[PathableComponent]:
+	return level.get_pathables_at(cell)
 
 	
 ## Returns the world bounds.
 func world_bounds() -> Rect2:
-	assert(false, 'not implemented')
-	return Rect2()
+	return level.get_bounds()
 
 
 ## Tests the evaluators and returns the first valid [enum Battle.Result].
@@ -162,9 +161,11 @@ func get_config_value(config: StringName) -> Variant:
 	
 ## Adds a map object.
 func add_map_object(map_object: MapObject) -> void:
-	pass # TODO
+	#level.add_object(map_object)
+	level.map.add_child(map_object)
 	
 	
 ## Removes a map object.
 func remove_map_object(map_object: MapObject) -> void:
-	pass # TODO
+	#level.remove_object(map_object)
+	level.map.remove_child(map_object)

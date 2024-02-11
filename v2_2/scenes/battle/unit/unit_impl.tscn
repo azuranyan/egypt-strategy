@@ -13,5 +13,10 @@ curve = SubResource("Curve2D_38cup")
 script = ExtResource("2_pi83f")
 
 [node name="PathFollow2D" type="PathFollow2D" parent="UnitDriver"]
+rotates = false
+cubic_interp = false
+loop = false
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="UnitDriver/PathFollow2D"]
+update_rotation = false
+update_scale = false

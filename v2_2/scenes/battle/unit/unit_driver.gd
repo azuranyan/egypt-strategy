@@ -34,7 +34,7 @@ func _exit_tree():
 func _process(delta):
 	assert(_walking and target)
 	
-	path_follow.progress += target.walk_speed * delta
+	path_follow.progress += target.unit.walk_speed() * delta
 	
 	# this is a deceptive amount of computation..
 	var new_pos = target.world.as_uniform(path_follow.position - position)
@@ -57,15 +57,14 @@ func start_driver(path: PackedVector2Array):
 	remote_transform.remote_path = target.get_path()
 	
 	# skip all the work if walking speed is invalid 
-	if target.walk_speed > 0:
-		_old_pos = target.map_pos
+	if target.unit.walk_speed() > 0:
+		_old_pos = target.map_position
 		#curve.add_point(Vector2.ZERO)
 			
 		for p in path:
 			curve.add_point(target.world.as_global(p) - position)
 			
 		# start
-		#target.play_animation('walk', true)
 		_walking = true
 		remote_transform.force_update_cache()
 		remote_transform.update_position = true
@@ -78,8 +77,6 @@ func start_driver(path: PackedVector2Array):
 		set_process(false)
 		remote_transform.update_position = false
 		target.map_position = path[-1]
-		target = null
-		#target.stop_animation()
 		path_follow.progress = 0
 		curve.clear_points()
 	
