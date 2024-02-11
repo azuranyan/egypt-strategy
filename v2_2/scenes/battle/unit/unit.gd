@@ -11,10 +11,9 @@ signal attack_finished(st: AttackState)
 signal empire_changed(old: Empire, new: Empire)
 signal behavior_changed(old: Behavior, new: Behavior)
 
+signal state_changed(old: State, new: State)
 signal position_changed(old_pos: Vector2, new_pos: Vector2)
 signal stat_changed(stat: StringName, value: int)
-signal acquired_target(target: Unit)
-signal targeted(other: Unit)
 signal damaged(value: int, source: Variant)
 signal healed(value: int, source: Variant)
 signal died

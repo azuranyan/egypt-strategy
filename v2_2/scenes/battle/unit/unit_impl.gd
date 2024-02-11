@@ -66,14 +66,22 @@ class_name UnitImpl extends Unit
 var battle: Battle
 var map_object: UnitMapObject
 
-var driver: UnitDriver #$Driver
+@onready var driver = $UnitDriver
 
 
 func _init(__id: int = 0, __chara: CharacterInfo = null, __unit_type: UnitType = null):
 	_id = __id
 	_chara = __chara
 	_unit_type = __unit_type
-	# it's kinda iffy to have them here, but it's necessary
+	
+	
+func _ready():
+	map_object = load("res://scenes/battle/unit/unit_map_object.tscn").instantiate()
+	map_object.map_position_changed.connect(sync_map_position)
+	
+	driver.target = map_object
+	reset()
+	
 	battle = Game.battle
 	battle.started.connect(enter_battle)
 	battle.ended.connect(exit_battle)
@@ -85,29 +93,35 @@ func sync_map_position(old: Vector2, new: Vector2):
 	
 	
 func enter_battle(_attacker, _defender, _territory, _map_id):
-	map_object = preload("res://scenes/battle/unit/unit_map_object.tscn").instantiate()
-	map_object.initialize(self)
-	
 	set_position(_map_position)
-	map_object.map_position_changed.connect(sync_map_position)
-	
-	#driver.target = map_object
 	
 	Game.battle.add_map_object(map_object)
+	set_state(State.IDLE)
+	reset()
 	
 
 func exit_battle(_result):
-	var base_stats := base_stats()
-	for stat in base_stats:
-		set_stat(stat, base_stats[stat])
+	stop_walking()
+	Game.battle.remove_map_object(map_object)
+	reset()
+	
+	
+func reset():
+	var _base := base_stats()
+	for stat in _base:
+		set_stat(stat, _base[stat])
 	clear_status_effects()
 	set_position(Map.OUT_OF_BOUNDS)
 	set_heading(Map.Heading.EAST)
+	if is_alive():
+		_state = State.IDLE
 		
-	Game.battle.remove_map_object(map_object)
-	map_object.queue_free()
-	map_object = null
-	
+		
+func set_state(new_state: State):
+	var old_state := _state
+	_state = new_state
+	state_changed.emit(old_state, new_state)
+
 
 #region Unit Attributes
 ## Returns the unit id.
@@ -443,8 +457,11 @@ func walk_towards(target: Vector2):
 	if is_walking():
 		stop_walking()
 	var start := _map_position
+	var old_state := _state
+	set_state(State.WALKING)
 	walking_started.emit(start, target)
 	await driver.start_driver(pathfind_to(target))
+	set_state(old_state)
 	walking_finished.emit(start, target)
 	
 
@@ -489,27 +506,49 @@ func get_pathable_cells(use_mov_stat := false) -> PackedVector2Array:
 	
 ## Makes unit take damage.
 func take_damage(value: int, source: Variant) -> void:
+	# this will emit the hp changed signal
+	set_stat(&'hp', clampi(_stats.hp - value, 0, _stats.maxhp))
 	
-	# TODO add floating number
-	# mark red
+	# emit more specific signal
+	damaged.emit(value, source)
+	
 	# hurt animation
-	# animate hp bar
-	assert(false, 'not implemented')
+	var old_state := _state
+	set_state(State.HURT)
+	await map_object.unit_model.animation_finished
+	set_state(old_state)
+	
+	# die
+	if get_stat(&'hp') <= 0:
+		kill()
 	
 	
 ## Makes unit heal from damage.
-func restore_health(_value: int, _source: Variant) -> void:
-	assert(false, 'not implemented')
+func restore_health(value: int, source: Variant) -> void:
+	# this will emit the hp changed signal
+	set_stat(&'hp', clampi(_stats.hp + value, 0, _stats.maxhp))
+	
+	# emit more specific signal
+	healed.emit(value, source)
 	
 	
 ## Kills a unit.
 func kill() -> void:
-	assert(false, 'not implemented')
+	# dying animation
+	set_state(State.DYING)
+	await map_object.unit_model.animation_finished
+	
+	# dead
+	set_state(State.DEAD)
+	map_object.set_standby(true)
+	died.emit()
 
 
 ## Revives unit if dead.
 func revive() -> void:
-	assert(false, 'not implemented')
+	set_stat(&'hp', 1)
+	set_state(State.IDLE)
+	map_object.set_standby(false)
 	
 	
 ## Uses attack on target cell.

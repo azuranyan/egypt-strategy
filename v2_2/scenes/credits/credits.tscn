@@ -75,3 +75,12 @@ mouse_filter = 2
 texture = ExtResource("1_6y11g")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="Label4" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 724.0
+offset_top = 192.0
+offset_right = 764.0
+offset_bottom = 215.0
+text = "puff animation
+Kelyn Crandall: kelync.itch.io"

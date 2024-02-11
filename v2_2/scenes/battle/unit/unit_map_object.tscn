@@ -1,13 +1,249 @@
-[gd_scene load_steps=3 format=3 uid="uid://dgiub7m8fawlq"]
+[gd_scene load_steps=16 format=3 uid="uid://dgiub7m8fawlq"]
 
 [ext_resource type="Script" path="res://scenes/battle/unit/unit_map_object.gd" id="1_vvuqf"]
 [ext_resource type="Script" path="res://scenes/battle/pathable_component.gd" id="2_4td8b"]
+[ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="2_8334l"]
+[ext_resource type="PackedScene" uid="uid://diawd3fxwy2cy" path="res://scenes/battle/unit/basic_unit_model.tscn" id="3_xkg2k"]
 
-[node name="Unit" type="Node2D"]
+[sub_resource type="Animation" id="Animation_rmo6h"]
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_q75w4"]
+resource_name = "highlight"
+length = 0.7
+loop_mode = 2
+
+[sub_resource type="Animation" id="Animation_ijtl7"]
+resource_name = "highlight_red"
+length = 0.8
+loop_mode = 2
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_etagh"]
+_data = {
+"RESET": SubResource("Animation_rmo6h"),
+"highlight": SubResource("Animation_q75w4"),
+"highlight_red": SubResource("Animation_ijtl7")
+}
+
+[sub_resource type="Gradient" id="Gradient_cq0w5"]
+offsets = PackedFloat32Array(0, 0.487654, 0.691358)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.498039, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_e55k7"]
+gradient = SubResource("Gradient_cq0w5")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t8na8"]
+bg_color = Color(0.372549, 0.85098, 0.262745, 1)
+border_width_left = 1
+border_width_bottom = 1
+border_color = Color(0.0705882, 0.160784, 0.0784314, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="Gradient" id="Gradient_s5vj5"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.386484, 0.138965, 0.116327, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_lum62"]
+gradient = SubResource("Gradient_s5vj5")
+width = 77
+height = 6
+
+[sub_resource type="Gradient" id="Gradient_ll6km"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.18, 1, 0.439667, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_o6du0"]
+gradient = SubResource("Gradient_ll6km")
+width = 77
+height = 6
+
+[node name="UnitMapObject" type="Node2D"]
 script = ExtResource("1_vvuqf")
 metadata/pathable_component = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":ExtResource("2_4td8b"),"pathing_group":0,"conditions":Array[Resource("res://scenes/battle/pathing_condition.gd")]([]),"enabled":true,"map_object":null)
 
 
-[node name="Node" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_etagh")
+}
+autoplay = "RESET"
+
+[node name="Transformable" type="Node2D" parent="."]
+script = ExtResource("2_8334l")
+
+[node name="Shadow" type="Sprite2D" parent="Transformable"]
+self_modulate = Color(0.109804, 0.0823529, 0.168627, 0.560784)
+scale = Vector2(0.67, 0.67)
+texture = SubResource("GradientTexture2D_e55k7")
+
+[node name="UnitModel" parent="." instance=ExtResource("3_xkg2k")]
+
+[node name="Pathable" type="Node" parent="." node_paths=PackedStringArray("map_object")]
 script = ExtResource("2_4td8b")
 map_object = NodePath("..")
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -127.0
+offset_right = 52.0
+offset_bottom = -87.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Lysandra"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HUD"]
+visible = false
+modulate = Color(1, 0.184314, 0, 1)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 0
+
+[node name="HPBarSingle" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel2" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel3" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel4" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel5" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel6" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel7" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel8" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel9" type="Panel" parent="HUD/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 0
+
+[node name="HPBarSingle" type="Panel" parent="HUD/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel2" type="Panel" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel3" type="Panel" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel4" type="Panel" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel5" type="Panel" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel6" type="Panel" parent="HUD/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel7" type="Panel" parent="HUD/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel8" type="Panel" parent="HUD/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="Panel9" type="Panel" parent="HUD/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(10, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
+
+[node name="HPBar" type="TextureProgressBar" parent="HUD"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -16.0
+offset_right = -13.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_under = SubResource("GradientTexture2D_lum62")
+texture_progress = SubResource("GradientTexture2D_o6du0")

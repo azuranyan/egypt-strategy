@@ -65,7 +65,7 @@ func start_driver(path: PackedVector2Array):
 			curve.add_point(target.world.as_global(p) - position)
 			
 		# start
-		target.play_animation('walk', true)
+		#target.play_animation('walk', true)
 		_walking = true
 		remote_transform.force_update_cache()
 		remote_transform.update_position = true
@@ -77,8 +77,9 @@ func start_driver(path: PackedVector2Array):
 		# finish
 		set_process(false)
 		remote_transform.update_position = false
-		target.map_pos = path[-1]
-		target.stop_animation()
+		target.map_position = path[-1]
+		target = null
+		#target.stop_animation()
 		path_follow.progress = 0
 		curve.clear_points()
 	

@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://uo1mf10ei78w"]
+[gd_scene load_steps=4 format=3 uid="uid://uo1mf10ei78w"]
 
 [ext_resource type="Script" path="res://scenes/battle/unit/unit_impl.gd" id="1_555e3"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_driver.gd" id="2_pi83f"]
+
+[sub_resource type="Curve2D" id="Curve2D_38cup"]
 
 [node name="UnitImpl" type="Node"]
 script = ExtResource("1_555e3")
+
+[node name="UnitDriver" type="Path2D" parent="."]
+curve = SubResource("Curve2D_38cup")
+script = ExtResource("2_pi83f")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="UnitDriver"]
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="UnitDriver/PathFollow2D"]

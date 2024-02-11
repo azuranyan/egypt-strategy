@@ -3,11 +3,11 @@
 [ext_resource type="Resource" uid="uid://cmv06wyvg0mm" path="res://units/placeholder/basic_melee.tres" id="1_pserv"]
 [ext_resource type="Resource" uid="uid://dokspd24u3mo6" path="res://units/placeholder/special_attack.tres" id="3_dhehh"]
 [ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="3_gyjdn"]
-[ext_resource type="PackedScene" uid="uid://c14iwicbveult" path="res://scenes/battle/unit/base_unit_model.tscn" id="4_ceq6e"]
+[ext_resource type="PackedScene" uid="uid://diawd3fxwy2cy" path="res://scenes/battle/unit/basic_unit_model.tscn" id="4_acqmv"]
 
 [resource]
 script = ExtResource("3_gyjdn")
-unit_model = ExtResource("4_ceq6e")
+unit_model = ExtResource("4_acqmv")
 stats = {
 "dmg": 1,
 "maxhp": 4,
