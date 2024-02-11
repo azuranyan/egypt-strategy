@@ -4,7 +4,7 @@ extends Node
 @export var start_scene_name: StringName = &'intro'
 
 const scene_registry := {
-	battle = 'res://scenes/battle/battle.tscn',
+	battle = 'res://scenes/battle/battle_scene.tscn',
 	credits = 'res://scenes/credits/credits.tscn',
 	game_over = 'res://scenes/game_over/game_over.tscn',
 	intro = 'res://scenes/intro/intro.tscn',

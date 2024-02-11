@@ -1,40 +1,56 @@
-class_name Battle extends Node
+class_name BattleImpl extends Battle
 
-	
-## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
-signal started(attacker: Empire, defender: Empire, territory: Territory, map_id: int)
 
-## Emitted when the battle exits. [b]Cannot be suspended.[/b]
-signal ended(result: BattleResult)
+@export var _attacker: Empire
+@export var _defender: Empire
+@export var _territory: Territory
+@export var _map_id: int
 
-## Emitted when a new cycle starts.
-signal cycle_started(cycle: int)
-
-## Emitted when a cycle ends.
-signal cycle_ended(cycle: int)
+@export var _should_end: bool
 
 
 ## Starts the battle cycle.
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id: int) -> void:
-	assert(false, 'not implemented')
+@warning_ignore("shadowed_variable")
+func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
+	if not is_running():
+		SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
+		await SceneManager.transition_finished
+		
+	self._attacker = _attacker
+	self._defender = _defender
+	self._territory = _territory
+	self._map_id = _map_id
+	started.emit(_attacker, _defender, _territory, _map_id)
 	
 	
 ## Stops the battle cycle.
 func stop_battle() -> void:
-	assert(false, 'not implemented')
-
+	if not is_running():
+		return
+	
+	get_active_battle_scene().scene_return()
+	await SceneManager.transition_finished
+	var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, _attacker, _defender, _territory, _map_id)
+	ended.emit(result)
+	
 
 ## Returns true if the battle is running.
 func is_running() -> bool:
-	assert(false, 'not implemented')
-	return false
+	# a small hack to get the current overworld scene
+	return get_tree().current_scene is BattleScene
 	
 	
 ## Returns true if battle should end.
 func should_end() -> bool:
-	assert(false, 'not implemented')
-	return false
+	return _should_end
 	
+	
+## Returns the active overworld scene. Kind of a hack, but yes.
+func get_active_battle_scene() -> BattleScene:
+	assert(is_running(), 'overworld not running!')
+	return get_tree().current_scene
+	
+
 
 ## Creates the agent for the empire.
 func create_agent(_empire: Empire) -> BattleAgent:
@@ -137,16 +153,18 @@ func get_battle_result() -> BattleResult:
 
 
 ## Returns a config variable.
-func get_config_value(_config: StringName) -> Variant:
-	assert(false, 'not implemented')
-	return null
+func get_config_value(config: StringName) -> Variant:
+	var config_data := {
+		poison_damage = 1,
+	}
+	return config_data.get(config, null)
 	
 	
 ## Adds a map object.
-func add_map_object(_map_object: MapObject) -> void:
-	assert(false, 'not implemented')
+func add_map_object(map_object: MapObject) -> void:
+	pass # TODO
 	
 	
 ## Removes a map object.
-func remove_map_object(_map_object: MapObject) -> void:
-	assert(false, 'not implemented')
+func remove_map_object(map_object: MapObject) -> void:
+	pass # TODO

@@ -11,7 +11,7 @@ signal attack_finished
 var handlers := {}
 
 
-func execute(context: BattleContext, state: AttackState):
+func execute(state: AttackState):
 	attack_started.emit()
 	var timer := get_tree().create_timer(minimum_attack_time)
 	# hide

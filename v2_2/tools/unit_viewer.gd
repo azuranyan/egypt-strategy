@@ -8,25 +8,8 @@ var _index_to_tag: Array
 
 func _ready():
 	add_to_group('game_event_listeners')
-		
-	#var dir := DirAccess.open('res://units/')
-	#if not dir:
-		#push_error('cannot open units folder')
-		#return
-		#
-	#dir.list_dir_begin()
-	#var filename := dir.get_next()
-	#var i := 0
-	#while filename != '':
-		#if dir.current_is_dir():
-			#var unit := Game.load_unit(filename, str(i))
-			#$ItemList.add_item(unit.display_name)
-		#else:
-			#pass
-		#i += 1
-		#filename = dir.get_next()
-	#dir.list_dir_end()
-	$ItemList.clear() # remove samples
+	# remove samples
+	$ItemList.clear()
 
 	set_minimized(true)
 	
@@ -35,7 +18,7 @@ func on_load(save: SaveState):
 	$ItemList.clear()
 	_index_to_tag.clear()
 	for u in save.units.values():
-		$ItemList.add_item(u.display_name)
+		$ItemList.add_item(u.chara.name) # TODO
 		_index_to_tag.append(u.id)
 	
 	
@@ -49,8 +32,8 @@ func set_minimized(minimized: bool):
 	
 func _on_item_list_item_selected(index):
 	var unit := Game.load_unit(_index_to_tag[index])
-	character_info_panel.initialize(unit.chara) 
-	unit_type_panel.initialize(unit.unit_type)
+	character_info_panel.initialize(unit.chara()) 
+	unit_type_panel.initialize(unit.unit_type())
 
 
 func _on_show_button_pressed():

@@ -5,7 +5,7 @@ extends Node2D
 
 signal world_changed
 signal cell_changed(old_cell: Vector2, new_cell: Vector2)
-signal map_sync_map_position(old_position: Vector2, new_position: Vector2)
+signal map_position_changed(old_position: Vector2, new_position: Vector2)
 
 
 ## Colors for the debug tile.
@@ -23,7 +23,7 @@ const TILE_COLORS := {
 		if not is_node_ready():
 			await ready
 		_update_position()
-		map_sync_map_position.emit()
+		map_position_changed.emit()
 
 @export_group("Editor")
 

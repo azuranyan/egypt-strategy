@@ -62,12 +62,14 @@ func on_new_save(save: SaveState):
 		if not e.home_territory:
 			continue
 		
-		e.hero_units = [Game.create_unit(save, e.leader_id)]
-		e.units.append_array(e.hero_units)
+		e.hero_units = [Game.create_unit(save, e.leader_id, e).id()]
 		for t in e.territories:
 			for chara_id in t.units:
 				for i in t.units[chara_id]:
-					e.units.append(Game.create_unit(save, e.leader_id))
+					e.units.append(Game.create_unit(save, chara_id, e).id())
+		# yes, this is dumb
+		e.units = e.hero_units + e.units
+		
 	
 	# add to save
 	save.overworld_data = data
@@ -182,7 +184,7 @@ func _cont_take_action() -> void:
 
 ## Waits for the battle to finish.
 func _cont_wait_for_battle_result() -> void:
-	var result: BattleResult = await Game.battle_ended
+	var result: BattleResult = await Game.battle.ended
 	match result.value:
 		BattleResult.CANCELLED:
 			return next(_cont_take_action)

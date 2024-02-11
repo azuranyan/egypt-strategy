@@ -213,11 +213,14 @@ func initiate_battle(attacker: Empire, defender: Empire, territory: Territory, m
 	print("%s attacks %s (%s)!" % [attacker.leader_id, territory.name, defender.leader_id])
 	await show_marching_animation(attacker, defender, territory)
 	if (attacker.is_player_owned() or defender.is_player_owned()):
-		scene_call('battle', {attacker=attacker, defender=defender, territory=territory, map_id=map_id})
+		Game.battle.start_battle(attacker, defender, territory, map_id)
+		#scene_call('battle', {attacker=attacker, defender=defender, territory=territory, map_id=map_id})
 	else:
+		# TODO show quick battle sim
 		var result := BattleResult.new(BattleResult.ATTACKER_VICTORY, attacker, defender, territory, map_id)
+		Game.battle.started.emit(attacker, defender, territory, map_id)
 		await get_tree().create_timer(0.1).timeout
-		Game.battle_ended.emit(result)
+		Game.battle.ended.emit(result)
 		
 		
 func show_marching_animation(attacker: Empire, _defender: Empire, target: Territory):

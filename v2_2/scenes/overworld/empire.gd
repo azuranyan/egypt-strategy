@@ -30,10 +30,10 @@ enum Type {
 @export var territories: Array[Territory]
 
 ## List of hero units this empire owns. Slot 0 is the empire's own unique unit.
-@export var hero_units: Array[Unit]
+@export var hero_units: Array[int]
 
 ## The list of units this empire owns.
-@export var units: Array[Unit]
+@export var units: Array[int]
 
 ## This empires current level of aggression.
 @export var aggression: float

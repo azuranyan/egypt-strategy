@@ -1,9 +1,7 @@
 @tool
-class_name UnitNode
+class_name UnitMapObject
 extends MapObject
 
-
-@export var unit: Unit
 
 @export_group("Editor")
 @export var unit_type: UnitType
@@ -11,3 +9,9 @@ extends MapObject
 @export var display_icon: Texture
 @export var heading: Map.Heading
 @export var owner_name: String
+
+var selected: bool
+var unit: Unit
+
+func initialize(_unit: Unit):
+	unit = _unit

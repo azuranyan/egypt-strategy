@@ -64,7 +64,7 @@ func initialize(t: Territory):
 	
 	var heroes: Array[String] = []
 	for u in empire.hero_units:
-		heroes.append(u.display_name)
+		heroes.append(Game.load_unit(u).display_name())
 		if empire.is_player_owned():
 			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ', '.join(heroes)
 		else:
@@ -87,8 +87,8 @@ func _get_force_strength_old(e: Empire) -> String: # TODO update force strength
 	var total_combined_maxhp := 0
 	var total_combined_hp := 0
 	for u in e.units:
-		total_combined_maxhp += u.stats.maxhp
-		total_combined_hp += u.stats.hp
+		total_combined_maxhp += Game.load_unit(u).get_stat('maxhp')
+		total_combined_hp += Game.load_unit(u).get_stat('hp')
 		
 	var hp_ratio := float(total_combined_hp)/total_combined_maxhp
 	if hp_ratio >= 1:
@@ -124,7 +124,7 @@ func _force_string(rating: float) -> String:
 func _get_empire_combined_unit_stat(e: Empire, stat: StringName) -> int:
 	if e.units.size() == 0:
 		return 0
-	return e.units.map(func(u): return u.stats[stat]).reduce(func(a, b): return a + b)
+	return e.units.map(func(u): return Game.load_unit(u).get_stat(stat)).reduce(func(a, b): return a + b)
 	
 	
 func open_panel(t: Territory):

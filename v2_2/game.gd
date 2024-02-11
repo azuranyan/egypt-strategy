@@ -5,12 +5,6 @@ signal game_started
 signal game_ended
 signal game_resumed
 
-## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
-signal battle_started
-
-## Emitted when the battle exits scene. [b]Cannot be suspended.[/b]
-signal battle_ended(result: BattleResult)
-
 
 ## Reference to the [Overworld] system.
 var overworld: Overworld
@@ -27,21 +21,24 @@ var battle: Battle
 ## Reference to the [Dialog] aka event system.
 var dialog: Variant
 
-
-
 var _suspended: bool
-
-var _battle: Battle
-var _battle_context: BattleContext
-
-var _event
-var _event_context
 
 
 func _ready():
-	overworld = preload("res://scenes/overworld/overworld_impl.gd").new()
+	var node := Node.new()
+	node.name = 'Units'
+	add_child(node)
+	node.owner = self
+	
+	overworld = load("res://scenes/overworld/overworld_impl.gd").new()
 	overworld.name = 'Overworld'
 	add_child(overworld)
+	overworld.owner = self
+	
+	battle = load('res://scenes/battle/battle_impl.gd').new()
+	battle.name = 'battle'
+	add_child(battle)
+	battle.owner = self
 
 
 func _notification(what):
@@ -104,18 +101,30 @@ func get_viewport_size() -> Vector2:
 
 #region Unit
 ## Creates a new unit.
-func create_unit(save: SaveState, chara_id: StringName) -> Unit:
+func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -> Unit:
 	# load unit data
 	var chara := get_character_info(chara_id)
 	var unit_type := get_unit_type(chara_id)
 	assert(chara != null, 'placeholder chara not found')
 	assert(unit_type != null, 'placeholder unit_type expected')
 
-	# create new unit
-	var unit := Unit.new(chara, unit_type)
-	unit.id = save.next_unit_id
-	save.units[save.next_unit_id] = unit
+	
+	# create new unit, don't use preload to prevent a cascading error
+	# when UnitImpl fails to compile and avoid circular dependencies.
+	var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
+	
+	# a stupid way of doing it, but we can't pass args to instantiate()
+	var data = unit.save_state()
+	data.id = save.next_unit_id
+	data.chara = chara
+	data.unit_type = unit_type
+	data.empire = empire
+	unit.load_state(data)
+	unit.name = chara_id
+	
+	save.units[save.next_unit_id] = unit.save_state()
 	save.next_unit_id += 1
+	
 	return unit
 
 
@@ -127,7 +136,20 @@ func load_unit(unit_id: int) -> Unit:
 ## Removes the unit.
 func destroy_unit(unit: Unit):
 	unit_registry.erase(unit)
+	get_node('Units').remove_child(unit)
+	unit.queue_free()
 	
+	
+## Returns the empire units.
+func get_empire_units(e: Empire) -> Array[Unit]:
+	var arr: Array[Unit] = []
+	arr.append_array(unit_registry.values().filter(_is_valid_empire_unit.bind(e)))
+	return arr
+	
+
+func _is_valid_empire_unit(u: Unit, e: Empire) -> bool:
+	return u.get_empire() == e and u.is_valid_target()
+
 
 ## Returns the character info for given unit name.
 func get_character_info(unit_name: String) -> CharacterInfo:
@@ -197,8 +219,6 @@ func create_new_data() -> SaveState:
 	var save := _create_save()
 	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
-	save.battle_context = BattleContext.new()
-	
 	# TODO currently a hack, change this to the real start point later
 	var fr := SceneStackFrame.new()
 	fr.scene_path = SceneManager.scenes.overworld # TODO main event
@@ -221,13 +241,12 @@ func save_state() -> SaveState:
 	print('[Game] Saving state.')
 	var save := _create_save()
 	
+	# we created this unit so we know it's a UnitImpl
+	for unit in unit_registry.values():
+		save.units[unit.id()] = unit.save_state()
+		
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_save', save)
-	
-	if _battle_context:
-		save.battle_context = _battle_context.duplicate()
-	
-	save.units = unit_registry.duplicate()
 	
 	return save
 	
@@ -235,15 +254,24 @@ func save_state() -> SaveState:
 ## Changes the game state.
 func load_state(save: SaveState):
 	print('[Game] Loading state.')
+	
+	
+	for u in unit_registry.values():
+		destroy_unit(u)
+	unit_registry.clear()
+		
+	# load them again as UnitImpl's
+	for data in save.units.values():
+		var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
+		unit.load_state(data)
+		unit_registry[unit.id()] = unit
+		get_node('Units').add_child(unit)
+		
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_load', save)
-	
-	# load data
-	_battle_context = save.battle_context
 	
 	# TODO hack
 	overworld.start_overworld_cycle()
 	
-	unit_registry = save.units.duplicate()
 
 

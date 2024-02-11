@@ -31,7 +31,7 @@ extends Resource
 @export var overworld_data: Dictionary
 
 ## The battle data.
-@export var battle_context: BattleContext
+@export var battle_data: Dictionary
 
 ## For unit id generation.
 @export var next_unit_id: int

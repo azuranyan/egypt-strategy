@@ -1,24 +1,42 @@
-@tool # tool so it runs _init
-class_name Unit
-extends Resource
-## The saveable unit state resource and controller.
+class_name Unit extends Node
+## The interface for unit.
+
+
+signal walking_started(start: Vector2, end: Vector2)
+signal walking_finished(start: Vector2, end: Vector2)
+
+signal attack_started(st: AttackState)
+signal attack_finished(st: AttackState)
+
+signal empire_changed(old: Empire, new: Empire)
+signal behavior_changed(old: Behavior, new: Behavior)
+
+signal position_changed(old_pos: Vector2, new_pos: Vector2)
+signal stat_changed(stat: StringName, value: int)
+signal acquired_target(target: Unit)
+signal targeted(other: Unit)
+signal damaged(value: int, source: Variant)
+signal healed(value: int, source: Variant)
+signal died
+signal revived
+
+signal status_effect_added(effect: StringName, duration: int)
+signal status_effect_removed(effect: StringName)
+
+signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
+
 
 # Turn flags
-
-## New turn.
-const TURN_NEW := 0
-
 ## Unit moved bitflag.
-const TURN_MOVED := 1 << 0
+const HAS_MOVED := 1 << 0
 
 ## Unit attacked bitflag.
-const TURN_ATTACKED := 1 << 1
+const HAS_ATTACKED := 1 << 1
 
 ## Unit attacked bitflag.
-const TURN_DONE := 1 << 2
+const IS_DONE := 1 << 2
 
 # Phase flags
-
 ## Default walk (phase friendly units).
 const PHASE_NONE = 0
 	
@@ -33,6 +51,7 @@ const PHASE_TERRAIN = 1 << 2
 	
 ## Ignores all pathing and placement restrictions.
 const PHASE_NO_CLIP = 1 << 3
+
 
 ## Dictates how his unit chooses its actions.
 enum Behavior {
@@ -64,194 +83,390 @@ enum Behavior {
 	STATUS_APPLIER,
 }
 
+
 ## The state of a unit.
 enum State {INVALID, IDLE, WALKING, ATTACKING, HURT, DYING, DEAD}
 
-@export var id: int
 
-@export_group("Character")
+#region Unit Attributes
+## Returns the unit id.
+func id() -> int:
+	assert(false, 'not implemented')
+	return 0
+
 
 ## The character representing this unit.
-@export var chara: CharacterInfo
-
+func chara() -> CharacterInfo:
+	assert(false, 'not implemented')
+	return null
+	
+	
 ## The blueprint unit type of this unit.
-@export var unit_type: UnitType
+func unit_type() -> UnitType:
+	assert(false, 'not implemented')
+	return null
+	
+	
+## The name displayed in the game.
+func display_name() -> String:
+	assert(false, 'not implemented')
+	return ''
+	
 
-## Custom display name. If set, will override the name from character info.
-@export var display_name: String
-
-## Custom display icon. If set, will override the portrait from character info.
-@export var display_icon: Texture
-
+## The name displayed in the game.
+func display_icon() -> Texture:
+	assert(false, 'not implemented')
+	return null
+	
+	
 ## The scale of the unit model.
-@export var model_scale: Vector2 = Vector2.ONE
-
-@export_group("State")
-
-## Unit behavior.
-@export var behavior: Behavior
-
-## The unit state.
-@export var state: State
-
-## Action flags made on the turn.
-@export_flags('Moved:1', 'Attacked:2', 'Done:4') var turn_flags: int
-
-## Whether unit is selectable or not.
-@export var selectable: bool = true
-
-@export_subgroup("Stats")
-
-## UnitState stats. Not meant to be changed directly.
-@export var stats := {
-	maxhp = 1,
-	hp = 1,
-	mov = 1,
-	dmg = 1,
-	rng = 1,
-}
-
-## Bond level.
-@export var bond: int
-
-## Overrides bond level and unlocks special.
-@export var _special_unlocked: bool
-
-## List of buffs and debuffs.
-@export var status_effects: Dictionary
-
-@export_subgroup("Movement")
-
-## The direction this unit is facing.
-@export var heading: Map.Heading
-
-## The map position.
-@export var map_position: Vector2
-
-## This unit's walk speed.
-@export var walk_speed: float = 200
-
-## Objects this unit can phase through.
-@export_flags('Enemies:1', 'Doodads:2', 'Terrain:4') var phase_flags: int
-			
-			
-func _to_string() -> String:
-	return '<Unit#%s>' % self.get_instance_id()
- 
-
-func _init(_chara: CharacterInfo = null, _unit_type: UnitType = null, prop := {}):
-	chara = _chara
-	unit_type = _unit_type
-	display_name = prop.get('display_name', chara.name if display_name == "" and chara else display_name)
-	display_icon = prop.get('display_icon', chara.portrait if display_icon == null and chara else display_icon)
-	model_scale = prop.get('model_scale', Vector2.ONE)
-	behavior = prop.get('behavior', Behavior.PLAYER_CONTROLLED)
-	
-	stats.maxhp = prop.get('maxhp', unit_type.stats.maxhp if unit_type else 1)
-	stats.hp = prop.get('hp', stats.maxhp)
-	stats.mov = prop.get('mov', unit_type.stats.mov if unit_type else 1)
-	stats.dmg = prop.get('dmg', unit_type.stats.dmg if unit_type else 1)
-	stats.rng = prop.get('rng', unit_type.stats.rng if unit_type else 1)
-	bond = prop.get('bond', 0)
-	_special_unlocked = prop.get('special_unlocked', false)
-	status_effects = prop.get('status_effects', {})
-	
-	heading = prop.get('heading', Map.Heading.EAST)
-	map_position = prop.get('map_position', Map.OUT_OF_BOUNDS if not Engine.is_editor_hint() else Vector2.ZERO)
-	walk_speed = prop.get('heading', 200)
-	phase_flags = prop.get('phase_flags', PHASE_NONE)
-	
-	turn_flags = prop.get('turn_flags', TURN_NEW)
-	selectable = prop.get('selectable', true)
-	state = prop.get('state', State.INVALID)
+func model_scale() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
 	
 	
 ## Returns the base stats.
 func base_stats() -> Dictionary:
-	var re := unit_type.stats.duplicate()
-	if bond >= 1:
-		for stat in stats:
-			re[stat] += unit_type.stat_growth_1[stat]
-	if bond >= 2:
-		for stat in stats:
-			re[stat] += unit_type.stat_growth_2[stat]
-	return re
+	assert(false, 'not implemented')
+	return {}
+#endregion Unit Attributes
 
 
-## Returns the cell position.
-func cell() -> Vector2:
-	return Vector2(roundf(map_position.x), roundf(map_position.y))
+#region Unit State
+## Returns the state of this unit.
+func state() -> State:
+	assert(false, 'not implemented')
+	return 0 as State
+	
+	
+## Returns the empire this unit belongs to.
+func get_empire() -> Empire:
+	assert(false, 'not implemented')
+	return null
+	
+	
+## Sets the empire this unit belongs to.
+func set_empire(_empire: Empire) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if another unit is an enemy.
+func is_enemy(_other: Unit) -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns true if another unit is an ally.
+func is_ally(_other: Unit) -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns true if this unit is player owned.
+func is_player_owned() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns the turn flags.
+func turn_flags() -> int:
+	assert(false, 'not implemented')
+	return 0
+	
+	
+## Returns the unit phase flags.
+func get_phase_flags() -> int:
+	assert(false, 'not implemented')
+	return 0
+	
+	
+## Sets the unit phase flags.
+func set_phase_flags(_flags: int) -> void:
+	assert(false, 'not implemented')
+	
 
+## Returns the unit behavior.
+func get_behavior() -> Behavior:
+	assert(false, 'not implemented')
+	return 0 as Behavior
+	
+	
+## Changes the unit behavior.
+func set_behavior(_behavior: Behavior) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if unit is selectable.
+func is_selectable() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Makes the unit selectable or not.
+func set_selectable(_selectable: bool) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if the unit is currently selected.
+func is_selected() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns the unit stat.
+func get_stat(_stat: StringName) -> int:
+	assert(false, 'not implemented')
+	return 0
+	
+	
+## Sets the unit stat.
+func set_stat(_stat: StringName, _value: int) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Sets the bond level of this unit.
+func set_bond(_value: int) -> void:
+	assert(false, 'not implemented')
+	
 
-## Returns true if special is unlocked.
+## Returns the bond level.
+func get_bond() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns this unit's basic attack.
+func basic_attack() -> Attack:
+	assert(false, 'not implemented')
+	return null
+	
+	
+## Returns this unit's special attack.
+func special_attack() -> Attack:
+	assert(false, 'not implemented')
+	return null
+	
+	
+## Set to true or false to override special unlock, or null for default rules.
+func set_special_unlocked(_value: Variant) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if unit special is unlocked.
 func is_special_unlocked() -> bool:
-	return (_special_unlocked or bond >= 2) and (unit_type.special_attack != null)
-	
-
-## Returns true if this unit can move.
-func can_move() -> bool:
-	return turn_flags & (Unit.TURN_DONE | Unit.TURN_ATTACKED | Unit.TURN_MOVED) == 0
+	assert(false, 'not implemented')
+	return false
 	
 	
-## Returns true if this unit can attack.
-func can_attack() -> bool:
-	var has_attack := ((unit_type.basic_attack != null) or (unit_type.special_attack != null))
-	return (turn_flags & (Unit.TURN_DONE | Unit.TURN_ATTACKED) == 0) and has_attack
+## Adds status effect to unit.
+func add_status_effect(_effect: StringName, _duration: int) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Removes status effect from unit.
+func remove_status_effect(_effect: StringName) -> void:
+	assert(false, 'not implemented')
 
+	
+## Returns true if unit has a specific status effect.
+func has_status_effect(_effect: String) -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Ticks all status effects, triggering them and reducing duration by one.
+func tick_status_effects() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Removes all status effects.
+func clear_status_effects() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns the cell this unit is residing in.
+func cell() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+	
+	
+## Returns the position of this unit.
+func get_position() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+	
+	
+## Sets the position of this unit.
+func set_position(_pos: Vector2) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if this unit is on standby.
+func is_standby() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Makes this unit face towards target.
+func face_towards(_target: Vector2) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns the direction this unit is facing.
+func get_heading() -> Map.Heading:
+	assert(false, 'not implemented')
+	return 0 as Map.Heading
+	
+	
+## Sets the direction this unit is facing.
+func set_heading(_heading: Map.Heading) -> void:
+	assert(false, 'not implemented')
+	
 
-## Returns true if this unit can act.
-func can_act() -> bool:
-	if (turn_flags & Unit.TURN_DONE == 0):
-		return false
-	return (turn_flags & Unit.TURN_ATTACKED == 0) or (turn_flags & Unit.TURN_MOVED == 0)
-
-
-## Returns true if this unit has taken any actions.
-func has_taken_action() -> bool:
-	return turn_flags & (Unit.TURN_ATTACKED | Unit.TURN_MOVED) != 0
+## Sets this units walk speed.
+func walk_speed() -> float:
+	assert(false, 'not implemented')
+	return 0
 
 
 ## Returns true if alive.
 func is_alive() -> bool:
-	return not ((state == State.INVALID) or (state == State.DEAD))
+	assert(false, 'not implemented')
+	return false
+	
 
+## Returns true if unit is playing death animation.
+func is_dying() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
 
 ## Returns true if dead.
 func is_dead() -> bool:
-	return (state != State.INVALID) and (state == State.DEAD)
+	assert(false, 'not implemented')
+	return false
 
 
-## Returns true if unit is on standby.
-func is_standby() -> bool:
-	return map_position == Map.OUT_OF_BOUNDS
+## Returns true if the unit is a valid target.
+func is_valid_target() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
 
-##
-#### Returns the path to reach target cell.
-##func pathfind_cell(context: BattleContext, target: Vector2) -> PackedVector2Array:
-	### don't go through all that trouble if target == cell
-	##if target == cell():
-		##return [target]
-##
-	##var pathable_cells := get_pathable_cells(context, false)
-##
-	### append the target in pathable list so we can path to it
-	##if target not in pathable_cells:
-		##pathable_cells.append(target)
-##
-	### pathfind
-	##var pathfinder := PathFinder.new(context.map.world, pathable_cells)
-	##var path := pathfinder.calculate_point_path(cell(), target)
-	##
-	### starting from the end, trim off path until we get a spot we can land on
-	##for i in range(path.size() - 1, -1, -1):
-		##if (not context.is_occupied(path[i])) and (Util.cell_distance(cell(), path[i]) <= stats.mov):
-			##return path.slice(0, i + 1)
-			##
-	##return path
-	##
-##
-#### Returns an array of cells this unit can path through.
-##func get_pathable_cells(context: BattleContext, use_mov_stat := false) -> PackedVector2Array:
-	##var cond := func(x):
-		##return context.is_pathable(self, x)
-	##return Util.flood_fill(cell(), stats.mov if use_mov_stat else 20, context.world_bounds(), cond)
+## Returns true if unit can path over cell.
+func is_pathable(_cell: Vector2) -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns true if unit can be placed over cell.
+func is_placeable(_cell: Vector2) -> bool:
+	assert(false, 'not implemented')
+	return false
+#endregion Unit State
+
+
+#region Unit Actions
+## Performs an action. This makes
+func do_action(_type: StringName, _kwargs := {}) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Sets the turn flag.
+func set_turn_flag(_flag: int) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Clears the turn flag.
+func clear_turn_flag(_flag: int) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Checks if the turn flag is set.
+func is_turn_flag_set(_flag: int) -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns true if this unit can move.
+func can_move() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Returns true if this unit can attack.
+func can_attack() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+
+## Returns true if this unit can act.
+func can_act() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+
+## Returns true if this unit has taken any actions.
+func has_taken_action() -> bool:
+	assert(false, 'not implemented')
+	return false
+
+
+## Makes unit walk towards cell.
+func walk_towards(_target: Vector2):
+	assert(false, 'not implemented')
+	
+
+## Returns true if unit is walking.
+func is_walking() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
+## Makes unit stop walking.
+func stop_walking() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Pathfinds to a cell.
+func pathfind_to(_target: Vector2) -> PackedVector2Array:
+	assert(false, 'not implemented')
+	return []
+	
+	
+## Returns an array of cells this unit can path through.
+func get_pathable_cells(_use_mov_stat := false) -> PackedVector2Array:
+	assert(false, 'not implemented')
+	return []
+	
+	
+## Makes unit take damage.
+func take_damage(_value: int, _source: Variant) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Makes unit heal from damage.
+func restore_health(_value: int, _source: Variant) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Kills a unit.
+func kill() -> void:
+	assert(false, 'not implemented')
+
+
+## Revives unit if dead.
+func revive() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Uses attack on target cell.
+func use_attack(_attack: Attack, _cell: Vector2, _rotation: Vector2) -> void:
+	assert(false, 'not implemented')
+	
+	
+## Multicasts the attack on target cell.
+func use_attack_multicast(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
+	assert(false, 'not implemented')
+#endregion Unit Actions
+

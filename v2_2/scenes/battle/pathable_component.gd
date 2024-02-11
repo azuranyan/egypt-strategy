@@ -3,7 +3,6 @@ class_name PathableComponent
 extends MapObjectComponent
 
 
-
 const GROUP_ID := 'Pathables'
 
 
@@ -32,28 +31,12 @@ func group_id() -> StringName:
 
 
 ## Returns true if unit can path through this object.
-func is_pathable(context: BattleContext, unit: Unit) -> bool:
-	return default_pathable(context, unit) and conditionally_pathable(context, unit)
-	
-
-func default_pathable(context: BattleContext, unit: Unit) -> bool:
-	if (not enabled) or (unit.phase & Unit.PHASE_NO_CLIP != 0):
-		return true
-	match pathing_group:
-		Map.PathingGroup.UNIT:
-			if (map_object is UnitNode) and context.are_enemies(map_object.unit, unit):
-				return unit.phase & Unit.PHASE_ENEMIES != 0
-		Map.PathingGroup.DOODAD:
-			return unit.phase & Unit.PHASE_DOODADS != 0
-		Map.PathingGroup.TERRAIN:
-			return unit.phase & Unit.PHASE_TERRAIN != 0
-		Map.PathingGroup.IMPASSABLE:
-			return false
-	return true
+func is_pathable(unit: Unit) -> bool:
+	return enabled and _conditionally_pathable(unit)
 
 
-func conditionally_pathable(context: BattleContext, unit: Unit) -> bool:
+func _conditionally_pathable(unit: Unit) -> bool:
 	for condition in conditions:
-		if not condition.is_pathable(context, map_object, unit):
+		if not condition.is_pathable(map_object, pathing_group, unit):
 			return false
 	return true

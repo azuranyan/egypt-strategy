@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://uo1mf10ei78w"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_impl.gd" id="1_555e3"]
+
+[node name="UnitImpl" type="Node"]
+script = ExtResource("1_555e3")

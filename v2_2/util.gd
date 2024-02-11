@@ -5,6 +5,13 @@ class_name Util
 ## Simple do nothing function.
 static func do_nothing():
 	pass
+	
+	
+## Print stray nodes.
+static func print_orphan_nodes_tagged(node: Node, tag: String):
+	if OS.is_debug_build():
+		print('orphans since ', node, ' (tag=', tag, ')')
+		node.print_orphan_nodes()
 
 
 ## Returns true if the scene is root.
