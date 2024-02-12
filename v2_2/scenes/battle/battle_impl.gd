@@ -6,9 +6,12 @@ class_name BattleImpl extends Battle
 @export var _territory: Territory
 @export var _map_id: int
 
+@export var _on_turn: Empire
 @export var _should_end: bool
 
-@export var level: Level
+
+var level: Level
+
 
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
@@ -51,7 +54,6 @@ func get_active_battle_scene() -> BattleScene:
 	assert(is_running(), 'overworld not running!')
 	return get_tree().current_scene
 	
-
 
 ## Creates the agent for the empire.
 func create_agent(_empire: Empire) -> BattleAgent:
@@ -110,7 +112,45 @@ func map_id() -> int:
 	assert(false, 'not implemented')
 	return 0
 	
+	
+## Returns the battle missions.
+func missions() -> Array[VictoryCondition]:
+	assert(false, 'not implemented')
+	return []
+	
+	
+## Returns the battle bonus goals.
+func bonus_goals() -> Array[VictoryCondition]:
+	assert(false, 'not implemented')
+	return []
 
+
+## Returns the empire currently on turn.
+func on_turn() -> Empire:
+	return _on_turn
+	
+
+## Returns true if battle is on battle phase.
+func is_battle_phase() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+
+## Returns true if this is a training battle.
+func is_training_battle() -> bool:
+	return false
+	
+	
+## Returns true if this is a quick battle.
+func is_quick_battle() -> bool:
+	return false
+	
+	
+## Returns true if saving is allowed.
+func saving_allowed() -> bool:
+	return false
+	
+	
 ## Returns the unit at cell.
 func get_unit_at(cell: Vector2) -> Unit:
 	for obj in get_objects_at(cell):
@@ -169,3 +209,15 @@ func add_map_object(map_object: MapObject) -> void:
 func remove_map_object(map_object: MapObject) -> void:
 	#level.remove_object(map_object)
 	level.map.remove_child(map_object)
+
+
+## Draws overlays.
+func draw_overlay(cells: PackedVector2Array, overlay: Overlay):
+	assert(false, 'not implemented')
+	
+	
+## Clears overlays.
+func clear_overlays(overlay_mask: int):
+	assert(false, 'not implemented')
+	
+	

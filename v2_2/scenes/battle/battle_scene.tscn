@@ -1,9 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=10 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
 [ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="2_yi0k6"]
 [ext_resource type="Script" path="res://scenes/battle/attack/debug_print_effect.gd" id="3_7rp7p"]
 [ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
+[ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
+[ext_resource type="PackedScene" uid="uid://cgiu5x8itr8ah" path="res://scenes/battle/hud/pause_menu.tscn" id="6_tryo3"]
+[ext_resource type="PackedScene" uid="uid://dtsua53pi2tya" path="res://scenes/battle/hud/forfeit_dialog.tscn" id="7_obk5d"]
 
 [sub_resource type="Gradient" id="Gradient_nf1a3"]
 offsets = PackedFloat32Array(0, 0.987654)
@@ -32,6 +35,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="BG" type="TextureRect" parent="Control"]
 modulate = Color(0.345098, 0.286275, 0.184314, 1)
@@ -55,3 +59,12 @@ size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
 [node name="Level" parent="Control/SubViewportContainer/SubViewport" instance=ExtResource("4_loo3i")]
+unique_name_in_owner = true
+
+[node name="HUD" parent="." instance=ExtResource("5_ghoy2")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("6_tryo3")]
+visible = false
+
+[node name="ForfeitDialog" parent="." instance=ExtResource("7_obk5d")]
+visible = false
