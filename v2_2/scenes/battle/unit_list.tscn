@@ -1,0 +1,170 @@
+[gd_scene load_steps=14 format=3 uid="uid://c2d0inp2wo1f2"]
+
+[ext_resource type="Theme" uid="uid://p1h8tvkglser" path="res://scenes/battle/data/ui_theme.tres" id="1_laeo7"]
+[ext_resource type="Script" path="res://scenes/battle/unit_list.gd" id="2_hng7r"]
+[ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="3_47pyr"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="4_c77k7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yw1qb"]
+bg_color = Color(0.223529, 0.207843, 0.203922, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="LabelSettings" id="LabelSettings_2farv"]
+font = ExtResource("4_c77k7")
+font_size = 20
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_bvnok"]
+font = ExtResource("4_c77k7")
+font_size = 12
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ki1e6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cbeqq"]
+bg_color = Color(1, 1, 1.2, 0.585)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gemi8"]
+bg_color = Color(1, 1, 1.2, 0.585)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85098, 0.52549, 0.333333, 1)
+shadow_color = Color(0.894118, 0.709804, 0.447059, 0.6)
+shadow_size = 4
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1u0ad"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5r3b1"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85098, 0.52549, 0.333333, 1)
+shadow_color = Color(0.894118, 0.709804, 0.447059, 0.6)
+shadow_size = 4
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_x7o0x"]
+allow_unpress = true
+
+[node name="UnitList" type="Control"]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -375.0
+offset_top = 53.0
+offset_right = -40.0
+offset_bottom = 507.0
+grow_horizontal = 0
+theme = ExtResource("1_laeo7")
+script = ExtResource("2_hng7r")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 335.0
+offset_bottom = 12.0
+text = "UNITS"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="ItemContainer" type="VBoxContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="UnitItemSample" type="Panel" parent="ScrollContainer/ItemContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_yw1qb")
+
+[node name="ColorRect" type="ColorRect" parent="ScrollContainer/ItemContainer/UnitItemSample"]
+clip_children = 2
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 1.0
+offset_right = 119.0
+offset_bottom = -1.0
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Portrait" type="TextureRect" parent="ScrollContainer/ItemContainer/UnitItemSample/ColorRect"]
+layout_mode = 0
+offset_left = -24.0
+offset_top = -33.0
+offset_right = 131.0
+offset_bottom = 115.0
+mouse_filter = 2
+texture = ExtResource("3_47pyr")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="ScrollContainer/ItemContainer/UnitItemSample"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 2.0
+offset_right = 188.0
+offset_bottom = 44.0
+text = "Alara"
+label_settings = SubResource("LabelSettings_2farv")
+
+[node name="TitleLabel" type="Label" parent="ScrollContainer/ItemContainer/UnitItemSample"]
+layout_mode = 0
+offset_left = 141.0
+offset_top = 29.0
+offset_right = 246.0
+offset_bottom = 71.0
+text = "Boastful Bird God"
+label_settings = SubResource("LabelSettings_bvnok")
+
+[node name="Button" type="Button" parent="ScrollContainer/ItemContainer/UnitItemSample"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ki1e6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_cbeqq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_gemi8")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_1u0ad")
+theme_override_styles/focus = SubResource("StyleBoxFlat_5r3b1")
+toggle_mode = true
+keep_pressed_outside = true
+button_group = SubResource("ButtonGroup_x7o0x")
