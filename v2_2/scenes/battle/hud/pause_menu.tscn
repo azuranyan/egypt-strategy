@@ -1,0 +1,148 @@
+[gd_scene load_steps=8 format=3 uid="uid://cgiu5x8itr8ah"]
+
+[ext_resource type="Script" path="res://scenes/battle/hud/pause_menu.gd" id="1_hhvgv"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="2_jpu1p"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="3_qcm4y"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lok7g"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_po01f"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.223529, 0.168627, 0.105882, 0.698039)
+
+[sub_resource type="LabelSettings" id="LabelSettings_jrk2x"]
+font = ExtResource("2_jpu1p")
+font_size = 46
+font_color = Color(0.360784, 0.254902, 0.113725, 1)
+shadow_color = Color(0, 0, 0, 0.572549)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_621nr"]
+
+[node name="PauseMenu" type="Control"]
+process_mode = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hhvgv")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.345098)
+
+[node name="Panel" type="Panel" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -122.0
+offset_top = -175.0
+offset_right = 123.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lok7g")
+
+[node name="Panel2" type="Panel" parent="ColorRect/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = -8.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_po01f")
+
+[node name="Label" type="Label" parent="ColorRect/Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -170.0
+offset_bottom = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Paused"
+label_settings = SubResource("LabelSettings_jrk2x")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 34.0
+offset_top = 81.0
+offset_right = -34.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ResumeButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Resume"
+
+[node name="ForfeitButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Forfeit"
+
+[node name="SaveButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Load"
+
+[node name="SettingsButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Settings"
+
+[node name="HSeparator" type="HSeparator" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxEmpty_621nr")
+
+[node name="QuitToTitleButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_qcm4y")
+text = "Quit to Title"
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]

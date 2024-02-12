@@ -37,6 +37,7 @@ func update_hp_bar(hp: int, maxhp: int):
 	
 func update_state(old: Unit.State, new: Unit.State):
 	unit_model.state = new
+	$HUD.visible = unit.is_alive()
 	
 	
 func on_unit_stat_changed(stat: StringName, value: int):
@@ -75,5 +76,5 @@ func play_floating_number(value: int, color: Color):
 
 func _world_changed(_world: World):
 	super._world_changed(_world)
-	$Transformable.world = _world
+	%Shadow.world = _world
 

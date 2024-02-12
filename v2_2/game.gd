@@ -23,6 +23,8 @@ var dialog: Variant
 
 var _suspended: bool
 
+var _pause_count: int
+
 
 func _ready():
 	var node := Node.new()
@@ -69,6 +71,20 @@ func has_new_scenes() -> bool:
 		if not available_scenes[scene_id]:
 			return true
 	return false
+	
+	
+## Pushes a pause. Pauses the game.
+func push_pause():
+	_pause_count += 1
+	get_tree().paused = true
+	
+	
+## Pops a pause. Unpauses if pause count is 0.
+func pop_pause():
+	_pause_count -= 1
+	if _pause_count <= 0:
+		_pause_count = 0
+		get_tree().paused = false
 	
 
 ## Calls a function with minimum delay time.

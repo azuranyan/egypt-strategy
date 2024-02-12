@@ -26,6 +26,9 @@ var pathables := []
 var out_of_bounds_pathables: Array[PathableComponent] = []
 
 
+var unit: Unit
+
+
 @onready var cursor := $Cursor
 @onready var world_overlays := $WorldOverlays
 @onready var pathing_overlay := $WorldOverlays/Pathing as TileOverlay
@@ -34,7 +37,6 @@ var out_of_bounds_pathables: Array[PathableComponent] = []
 @onready var unit_path := $WorldOverlays/UnitPath
 
 
-var unit: Unit
 
 func _ready():
 	var test := func():
@@ -56,23 +58,41 @@ func _ready():
 		
 		# these functions cannot be used before everything is ready
 		unit.set_position(Vector2(4, 4))
+		unit.walk_towards(Vector2.ZERO)
+		#$PrepUnitList.add_unit(unit)
+		#var u2 := unit.duplicate()
+		#u2._id = 1
+		#$PrepUnitList.add_unit(u2)
+		#var u3 := unit.duplicate()
+		#u3._id = 2
+		#$PrepUnitList.add_unit(u3)
+		#$PrepUnitList.set_selected_unit(u2)
+		#$PrepUnitList.set_selected_unit(null)
+		
 		
 	test.call_deferred()
 
 
-func _on_button_pressed():
-	var fucker_id: int = $LineEdit.text.to_int()
-	var fucker := instance_from_id(fucker_id)
-	print(fucker)
-	get_tree().root.add_child(fucker)
-	fucker.name = 'motherfucker'
-
-
+var _cur: Vector2
 func _input(event):
 	if event.is_action_pressed('ui_accept'):
 		unit.take_damage(2, null)
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and unit:
-		unit.walk_towards(Vector2.ZERO)
+	
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_W:
+				_cur += Vector2.UP
+			KEY_S:
+				_cur += Vector2.DOWN
+			KEY_A:
+				_cur += Vector2.LEFT
+			KEY_D:
+				_cur += Vector2.RIGHT
+		var tween := get_tree().create_tween()
+		tween.tween_property(cursor, 'position', map.world.as_global(_cur), 0.04)
+				
+	#if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and unit:
+	#	unit.walk_towards(Map.cell(map.world.as_uniform(event.position)))
 
 
 ## Loads a map.
@@ -100,7 +120,6 @@ func load_map(packed_scene: PackedScene) -> bool:
 	map.object_removed.connect(remove_object)
 	
 	add_child(map)
-	move_child(map, 0)
 	
 	print("[Level] Adding pathing barriers.")
 	_add_pathing_barriers()
@@ -110,6 +129,9 @@ func load_map(packed_scene: PackedScene) -> bool:
 	pathing_overlay.world = map.world
 	attack_range_overlay.world = map.world
 	target_shape_overlay.world = map.world
+	cursor.world = map.world
+	_cur = Vector2.ZERO
+	cursor.position = map.world.as_global(_cur)
 	
 	print("[Level] Loading done.")
 	return true
@@ -148,6 +170,7 @@ func unload_map():
 		pathing_overlay.world = $SampleWorld
 		attack_range_overlay.world = $SampleWorld
 		target_shape_overlay.world = $SampleWorld
+		cursor.world = $SampleWorld
 		map = null
 		print("[Level] Unloading done.")
 	

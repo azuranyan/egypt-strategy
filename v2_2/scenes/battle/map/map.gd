@@ -73,6 +73,11 @@ static func to_facing(heading: Heading) -> float:
 	return heading * (PI/2)
 
 
+## Returns cell.
+static func cell(pos: Vector2) -> Vector2:
+	return Vector2(round(pos.x), round(pos.y))
+
+
 func _ready():
 	y_sort_enabled = true
 	_update_world_changes()

@@ -73,10 +73,11 @@ libraries = {
 }
 autoplay = "RESET"
 
-[node name="Transformable" type="Node2D" parent="."]
+[node name="Shadow" type="Node2D" parent="."]
+unique_name_in_owner = true
 script = ExtResource("2_8334l")
 
-[node name="Shadow" type="Sprite2D" parent="Transformable"]
+[node name="Sprite" type="Sprite2D" parent="Shadow"]
 self_modulate = Color(0.109804, 0.0823529, 0.168627, 0.560784)
 scale = Vector2(0.67, 0.67)
 texture = SubResource("GradientTexture2D_e55k7")

@@ -1,0 +1,633 @@
+[gd_scene load_steps=25 format=3 uid="uid://mmt7kfrybnfi"]
+
+[ext_resource type="Texture2D" uid="uid://dla7kpvvg4cf6" path="res://scenes/battle/data/Test_Map_Mockup_V8_HD.png" id="1_a1ld6"]
+[ext_resource type="Script" path="res://scenes/battle/hud/hud.gd" id="1_kh8gv"]
+[ext_resource type="Theme" uid="uid://p1h8tvkglser" path="res://scenes/battle/data/ui_theme.tres" id="2_2bpvx"]
+[ext_resource type="Texture2D" uid="uid://bmv2y1vvw64of" path="res://scenes/battle/data/menu_icon.png" id="3_u1yjg"]
+[ext_resource type="Texture2D" uid="uid://cf6guoges8ejj" path="res://scenes/battle/data/undo_icon.png" id="4_70dey"]
+[ext_resource type="Texture2D" uid="uid://ycy81qoliwvh" path="res://scenes/battle/data/end_icon.png" id="5_pq055"]
+[ext_resource type="Texture2D" uid="uid://dr0y5md660g32" path="res://scenes/battle/data/action_order_icon.png" id="6_2vhg0"]
+[ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="7_8rpxo"]
+[ext_resource type="Texture2D" uid="uid://cppvl4wp7ack1" path="res://scenes/battle/data/rest_icon.png" id="8_kq64v"]
+[ext_resource type="Texture2D" uid="uid://cea3hhnnfwaca" path="res://scenes/battle/data/attack_icon.png" id="9_7iq2f"]
+[ext_resource type="Texture2D" uid="uid://1f4n0pfmvbq6" path="res://scenes/battle/data/diefy_icon.png" id="10_r1sxg"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="11_nda56"]
+[ext_resource type="PackedScene" uid="uid://c2d0inp2wo1f2" path="res://scenes/battle/unit_list.tscn" id="12_nfnju"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="14_joq1b"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="15_gfjgd"]
+
+[sub_resource type="Animation" id="Animation_5a12m"]
+resource_name = "show_attack_banner"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Overlay/AttackBanner:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_eb6rr"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Overlay/AttackBanner:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1w0vn"]
+_data = {
+"RESET": SubResource("Animation_eb6rr"),
+"show_attack_banner": SubResource("Animation_5a12m")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_m3l50"]
+font = ExtResource("11_nda56")
+font_size = 26
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_wrbc0"]
+font = ExtResource("11_nda56")
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jr81h"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_n4l44"]
+font = ExtResource("15_gfjgd")
+font_size = 34
+font_color = Color(0.360784, 0.254902, 0.113725, 1)
+
+[sub_resource type="Gradient" id="Gradient_t5ewa"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.3, 0.7, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1en02"]
+gradient = SubResource("Gradient_t5ewa")
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kh8gv")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_1w0vn")
+}
+speed_scale = 10.0
+
+[node name="HideAttackInfoTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="TestMapMockupV8Hd" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_a1ld6")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 50.0
+offset_right = 114.0
+offset_bottom = 137.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("3_u1yjg")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/MenuButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -30.0
+offset_right = 90.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "MENU"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="UndoButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 165.0
+offset_top = 96.0
+offset_right = 266.0
+offset_bottom = 193.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("4_70dey")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/UndoButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 101.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "UNDO
+MOVE"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="EndButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 279.0
+offset_top = 96.0
+offset_right = 380.0
+offset_bottom = 193.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("5_pq055")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/EndButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 101.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "END
+TURN"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ActionOrderButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 1391.0
+offset_top = 96.0
+offset_right = 1498.0
+offset_bottom = 145.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("6_2vhg0")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/ActionOrderButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 107.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "ACTION
+ORDER"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="CharacterPanel" type="Control" parent="Control"]
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 824.0
+offset_right = 633.0
+offset_bottom = 1058.0
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="Control/CharacterPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 41.0
+offset_right = 209.0
+offset_bottom = 229.0
+theme = ExtResource("2_2bpvx")
+
+[node name="CharacterNameLabel" type="Label" parent="Control/CharacterPanel/Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = -52.0
+offset_right = 201.0
+offset_bottom = 13.0
+theme = ExtResource("2_2bpvx")
+text = "LYSANDRA"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="CharacterPortraitRect" type="TextureRect" parent="Control/CharacterPanel/Panel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_8rpxo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RestButton" type="Button" parent="Control/CharacterPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 221.0
+offset_top = 72.0
+offset_right = 320.0
+offset_bottom = 203.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("8_kq64v")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/CharacterPanel/RestButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 99.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "REST"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Shortcut" type="Label" parent="Control/CharacterPanel/RestButton"]
+layout_mode = 0
+offset_left = 77.0
+offset_top = 118.0
+offset_right = 99.0
+offset_bottom = 147.0
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 16
+text = "R"
+horizontal_alignment = 1
+
+[node name="FightButton" type="Button" parent="Control/CharacterPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 332.0
+offset_top = 72.0
+offset_right = 460.0
+offset_bottom = 203.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("9_7iq2f")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/CharacterPanel/FightButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 128.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "FIGHT"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Shortcut" type="Label" parent="Control/CharacterPanel/FightButton"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 118.0
+offset_right = 128.0
+offset_bottom = 147.0
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 16
+text = "Q"
+horizontal_alignment = 1
+
+[node name="DeifyButton" type="Button" parent="Control/CharacterPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 472.0
+offset_top = 72.0
+offset_right = 600.0
+offset_bottom = 203.0
+theme = ExtResource("2_2bpvx")
+icon = ExtResource("10_r1sxg")
+icon_alignment = 1
+
+[node name="Label" type="Label" parent="Control/CharacterPanel/DeifyButton"]
+show_behind_parent = true
+layout_mode = 0
+offset_top = -53.0
+offset_right = 128.0
+offset_bottom = 12.0
+theme = ExtResource("2_2bpvx")
+text = "DEIFY"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Shortcut" type="Label" parent="Control/CharacterPanel/DeifyButton"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 118.0
+offset_right = 128.0
+offset_bottom = 147.0
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 16
+text = "E"
+horizontal_alignment = 1
+
+[node name="AttackInfoPanel" type="Panel" parent="Control/CharacterPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1387.0
+offset_top = 43.0
+offset_right = 1860.0
+offset_bottom = 225.0
+pivot_offset = Vector2(236, 91)
+theme = ExtResource("2_2bpvx")
+
+[node name="Label" type="Label" parent="Control/CharacterPanel/AttackInfoPanel"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 473.0
+offset_bottom = 12.0
+text = "INFORMATION"
+horizontal_alignment = 1
+
+[node name="AttackInfoLabel" type="Label" parent="Control/CharacterPanel/AttackInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_right = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Envelope yourself in a torrent of divine fire, incinerating your foes. Deals 1 damage and pushes all  adjacent enemies back 1 space."
+label_settings = SubResource("LabelSettings_m3l50")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="MessageBox" type="Control" parent="Control"]
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 212.0
+offset_right = 380.0
+offset_bottom = 241.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="Control/MessageBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="MessageLabel" type="Label" parent="Control/MessageBox"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_right = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Cannot fight left handed."
+label_settings = SubResource("LabelSettings_wrbc0")
+vertical_alignment = 1
+
+[node name="ObjectivesPanel" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -375.0
+offset_top = 53.0
+offset_right = -40.0
+offset_bottom = 301.0
+grow_horizontal = 0
+theme_override_constants/separation = 40
+
+[node name="MissionPanel" type="PanelContainer" parent="Control/ObjectivesPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_2bpvx")
+theme_override_styles/panel = SubResource("StyleBoxFlat_jr81h")
+metadata/_edit_group_ = true
+
+[node name="Control" type="Control" parent="Control/ObjectivesPanel/MissionPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/ObjectivesPanel/MissionPanel/Control"]
+layout_mode = 2
+offset_top = -30.0
+offset_right = 335.0
+offset_bottom = 12.0
+text = "MISSION"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/ObjectivesPanel/MissionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="MissionContainer" type="VBoxContainer" parent="Control/ObjectivesPanel/MissionPanel/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MissionSample" type="Label" parent="Control/ObjectivesPanel/MissionPanel/MarginContainer/MissionContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+text = "Defeat all enemies within 10 turns!"
+label_settings = SubResource("LabelSettings_m3l50")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="BonusGoalPanel" type="PanelContainer" parent="Control/ObjectivesPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_2bpvx")
+theme_override_styles/panel = SubResource("StyleBoxFlat_jr81h")
+metadata/_edit_group_ = true
+
+[node name="Control" type="Control" parent="Control/ObjectivesPanel/BonusGoalPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/ObjectivesPanel/BonusGoalPanel/Control"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 335.0
+offset_bottom = 12.0
+text = "BONUS GOAL"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/ObjectivesPanel/BonusGoalPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="BonusGoalContainer" type="VBoxContainer" parent="Control/ObjectivesPanel/BonusGoalPanel/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BonusGoalSample" type="Label" parent="Control/ObjectivesPanel/BonusGoalPanel/MarginContainer/BonusGoalContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+text = "Win the battle with full health points!"
+label_settings = SubResource("LabelSettings_m3l50")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="PrepUnitList" parent="Control" instance=ExtResource("12_nfnju")]
+visible = false
+layout_mode = 1
+offset_left = 1505.0
+offset_right = 1840.0
+
+[node name="Overlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TurnBanner" type="Control" parent="Overlay"]
+visible = false
+custom_minimum_size = Vector2(484, 58)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -29.0
+offset_right = 242.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("14_joq1b")
+
+[node name="ColorRect" type="ColorRect" parent="Overlay/TurnBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+metadata/_edit_group_ = true
+
+[node name="OnTurnLabel" type="Label" parent="Overlay/TurnBanner/ColorRect"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "ENEMY TURN"
+label_settings = SubResource("LabelSettings_n4l44")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackBanner" type="Control" parent="Overlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -508.0
+offset_top = 53.0
+offset_right = 508.0
+offset_bottom = 118.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/AttackBanner"]
+self_modulate = Color(0.937255, 0.901961, 0.870588, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_right = -90.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_1en02")
+
+[node name="AttackLabel" type="RichTextLabel" parent="Overlay/AttackBanner"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(0.360784, 0.254902, 0.113725, 1)
+theme_override_colors/font_shadow_color = Color(0.439216, 0.439216, 0.439216, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/shadow_outline_size = 2
+theme_override_fonts/normal_font = ExtResource("15_gfjgd")
+bbcode_enabled = true
+text = "[center][font_size=40][font_size=50]F[/font_size]ire's [font_size=50]S[/font_size]ojourner[/font_size][/center]"
+fit_content = true
+
+[connection signal="timeout" from="HideAttackInfoTimer" to="." method="_on_hide_attack_info_timer_timeout"]
+[connection signal="focus_entered" from="Control/CharacterPanel/RestButton" to="." method="_on_rest_button_focus_entered"]
+[connection signal="focus_exited" from="Control/CharacterPanel/RestButton" to="." method="_on_rest_button_focus_exited"]
+[connection signal="mouse_entered" from="Control/CharacterPanel/RestButton" to="." method="_on_rest_button_mouse_entered"]
+[connection signal="mouse_exited" from="Control/CharacterPanel/RestButton" to="." method="_on_rest_button_mouse_exited"]
+[connection signal="focus_entered" from="Control/CharacterPanel/FightButton" to="." method="_on_fight_button_focus_entered"]
+[connection signal="focus_exited" from="Control/CharacterPanel/FightButton" to="." method="_on_fight_button_focus_exited"]
+[connection signal="mouse_entered" from="Control/CharacterPanel/FightButton" to="." method="_on_fight_button_mouse_entered"]
+[connection signal="mouse_exited" from="Control/CharacterPanel/FightButton" to="." method="_on_fight_button_mouse_exited"]
+[connection signal="focus_entered" from="Control/CharacterPanel/DeifyButton" to="." method="_on_deify_button_focus_entered"]
+[connection signal="focus_exited" from="Control/CharacterPanel/DeifyButton" to="." method="_on_deify_button_focus_exited"]
+[connection signal="mouse_entered" from="Control/CharacterPanel/DeifyButton" to="." method="_on_deify_button_mouse_entered"]
+[connection signal="mouse_exited" from="Control/CharacterPanel/DeifyButton" to="." method="_on_deify_button_mouse_exited"]
