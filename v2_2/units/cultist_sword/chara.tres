@@ -11,3 +11,4 @@ avatar = ""
 title = ""
 map_color = Color(1, 1, 1, 1)
 portrait = ExtResource("1_n42uf")
+

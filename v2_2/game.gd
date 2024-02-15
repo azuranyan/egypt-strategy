@@ -6,6 +6,29 @@ signal game_ended
 signal game_resumed
 
 
+
+## Alive unit mask for [method get_empire_units].
+const ALIVE_MASK := 1
+
+## Dead unit mask for [method get_empire_units].
+const DEAD_MASK := 2
+
+## Unit on-field mask for [method get_empire_units].
+const FIELDED_MASK := 4
+
+## Unit standby mask for [method get_empire_units].
+const STANDBY_MASK := 8
+
+## Selectable unit mask
+const SELECTABLE_MASK := 16
+
+## Valid target mask for [method get_empire_units].
+const VALID_TARGET_MASK := ALIVE_MASK | FIELDED_MASK | SELECTABLE_MASK
+
+## All units mask for [method get_empire_units].
+const ALL_UNITS_MASK := ~0
+
+
 ## Reference to the [Overworld] system.
 var overworld: Overworld
 
@@ -38,7 +61,7 @@ func _ready():
 	overworld.owner = self
 	
 	battle = load('res://scenes/battle/battle_impl.gd').new()
-	battle.name = 'battle'
+	battle.name = 'Battle'
 	add_child(battle)
 	battle.owner = self
 
@@ -124,7 +147,6 @@ func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -
 	assert(chara != null, 'placeholder chara not found')
 	assert(unit_type != null, 'placeholder unit_type expected')
 
-	
 	# create new unit, don't use preload to prevent a cascading error
 	# when UnitImpl fails to compile and avoid circular dependencies.
 	var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
@@ -132,16 +154,28 @@ func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -
 	# a stupid way of doing it, but we can't pass args to instantiate()
 	var data = unit.save_state()
 	data.id = save.next_unit_id
+	data.chara_id = chara_id
 	data.chara = chara
 	data.unit_type = unit_type
 	data.empire = empire
 	unit.load_state(data)
-	unit.name = chara_id
+	
+	if chara == preload("res://units/placeholder/chara.tres"):
+		unit._display_name = chara_id.capitalize()
+		unit._display_icon = chara.portrait
+	else:
+		unit._display_name = chara.name
+		unit._display_icon = chara.portrait
+	
+	unit.name = '%s%s' % [chara_id, save.next_unit_id]
+	get_node('Units').add_child(unit)
 	
 	save.units[save.next_unit_id] = unit.save_state()
 	save.next_unit_id += 1
 	
 	return unit
+	
+
 
 
 ## Loads a unit by id.
@@ -151,21 +185,32 @@ func load_unit(unit_id: int) -> Unit:
 
 ## Removes the unit.
 func destroy_unit(unit: Unit):
-	unit_registry.erase(unit)
+	unit_registry.erase(unit.id())
 	get_node('Units').remove_child(unit)
 	unit.queue_free()
 	
 	
 ## Returns the empire units.
-func get_empire_units(e: Empire) -> Array[Unit]:
+func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
 	var arr: Array[Unit] = []
-	arr.append_array(unit_registry.values().filter(_is_valid_empire_unit.bind(e)))
+	for id in unit_registry:
+		var u: Unit = unit_registry[id]
+		if e and u.get_empire() != e:
+			continue
+		if mask != ALL_UNITS_MASK:
+			if mask & ALIVE_MASK and not u.is_alive():
+				continue
+			if mask & DEAD_MASK and not u.is_dead():
+				continue
+			if mask & STANDBY_MASK and not u.is_standby():
+				continue
+			if mask & FIELDED_MASK and not u.is_fielded():
+				continue
+			if mask & SELECTABLE_MASK and not u.is_selectable():
+				continue
+		arr.append(u)
 	return arr
 	
-
-func _is_valid_empire_unit(u: Unit, e: Empire) -> bool:
-	return u.get_empire() == e and u.is_valid_target()
-
 
 ## Returns the character info for given unit name.
 func get_character_info(unit_name: String) -> CharacterInfo:
@@ -271,7 +316,10 @@ func save_state() -> SaveState:
 func load_state(save: SaveState):
 	print('[Game] Loading state.')
 	
-	
+	for child in get_node('Units').get_children():
+		get_node('Units').remove_child(child)
+		child.queue_free()
+		
 	for u in unit_registry.values():
 		destroy_unit(u)
 	unit_registry.clear()
@@ -280,6 +328,7 @@ func load_state(save: SaveState):
 	for data in save.units.values():
 		var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
 		unit.load_state(data)
+		unit.name = '%s%s' % [unit._chara_id, unit.id()]
 		unit_registry[unit.id()] = unit
 		get_node('Units').add_child(unit)
 		

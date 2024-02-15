@@ -2,10 +2,13 @@ class_name Battle extends Node
 
 	
 ## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
-signal started(attacker: Empire, defender: Empire, territory: Territory, map_id: int)
+signal battle_started(attacker: Empire, defender: Empire, territory: Territory, map_id: int)
 
 ## Emitted when the battle exits. [b]Cannot be suspended.[/b]
-signal ended(result: BattleResult)
+signal battle_ended(result: BattleResult)
+
+## Emitted right before player prep phase starts.
+signal player_prep_phase
 
 ## Emitted when a new cycle starts.
 signal cycle_started(cycle: int)
@@ -49,8 +52,41 @@ enum {
 }
 
 
+enum {
+	## No errors.
+	OK = 0,
+
+	## Generic invalid action error.
+	INVALID_ACTION,
+	
+	## Unit's turn is already done.
+	TURN_DONE,
+	
+	## Unit has already taken this type of action.
+	ACTION_ALREADY_TAKEN,
+	
+	## Attack is null.
+	NO_ATTACK,
+	
+	## Attack or movement target is out of range.
+	OUT_OF_RANGE,
+	
+	## Attack target is inside minimum range.
+	INSIDE_MIN_RANGE,
+	
+	## Special attack is not yet unlocked.
+	SPECIAL_NOT_UNLOCKED,
+	
+	## Attack requires a target unit but none is found.
+	NO_TARGET,
+	
+	## Target unit does not meet requirements.
+	INVALID_TARGET,
+}
+
+
 ## Starts the battle cycle.
-func start_battle(attacker: Empire, defender: Empire, territory: Territory, map_id: int) -> void:
+func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
 	assert(false, 'not implemented')
 	
 	
@@ -69,28 +105,6 @@ func is_running() -> bool:
 func should_end() -> bool:
 	assert(false, 'not implemented')
 	return false
-	
-
-## Creates the agent for the empire.
-func create_agent(_empire: Empire) -> BattleAgent:
-	assert(false, 'not implemented')
-	return null
-		
-		
-## Sets the agent for empire.
-func set_agent(_empire: Empire, _agent: BattleAgent) -> void:
-	assert(false, 'not implemented')
-	
-	
-## Deletes the agent.
-func delete_agent(_agent: BattleAgent) -> void:
-	assert(false, 'not implemented')
-	
-	
-## Returns the agent for the empire if available.
-func get_agent(_empire: Empire) -> BattleAgent:
-	assert(false, 'not implemented')
-	return null
 	
 	
 ## Returns the ai-controlled empire.
@@ -207,6 +221,12 @@ func world_bounds() -> Rect2:
 	return Rect2()
 
 
+## Returns the spawn points
+func get_spawn_points(_type: SpawnPoint.Type) -> Array[SpawnPoint]:
+	assert(false, 'not implemented')
+	return []
+
+
 ## Returns the battle result.
 func get_battle_result() -> BattleResult:
 	assert(false, 'not implemented')
@@ -236,12 +256,64 @@ func remove_map_object(_map_object: MapObject) -> void:
 
 
 ## Draws overlays.
-func draw_overlay(cells: PackedVector2Array, overlay: Overlay):
+func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay):
 	assert(false, 'not implemented')
 	
 	
 ## Clears overlays.
-func clear_overlays(overlay_mask: int):
+func clear_overlays(_overlay_mask: int) -> void:
 	assert(false, 'not implemented')
 	
+
+## Sets the camera target. If target are either [Unit] or [Node2D],
+## the camera will follow it and if target is [Vector2], the camera
+## will be fixed to that position. Setting this to [code]null[/code]
+## will stop following the previous target node.
+func set_camera_target(_target: Variant) -> void:
+	assert(false, 'not implemented')
+
 	
+#region Actions
+## Returns [constant Error.OK] if movement is valid otherwise returns the error code.
+func check_unit_move(_unit: Unit, _cell: Vector2) -> int:
+	assert(false, 'not implemented')
+	return 0
+
+
+## Returns [constant Error.OK] if attack is valid otherwise returns the error code.
+func check_unit_attack(_unit: Unit, _attack: Attack, _target: Vector2, _rotation: float) -> int:
+	assert(false, 'not implemented')
+	return 0
+
+
+## Executes unit action.
+func do_action(_unit: Unit, _action: UnitAction) -> void:
+	assert(false, 'not implemented')
+
+		
+## Unit does nothing and ends their turn.
+func unit_action_pass(_unit: Unit) -> void:
+	assert(false, 'not implemented')
+
+
+## Unit walks towards a target.
+func unit_action_move(_unit: Unit, _target: Vector2) -> void:
+	assert(false, 'not implemented')
+
+
+## Unit executes attack.
+func unit_action_attack(_unit: Unit, _attack: Attack, _target: PackedVector2Array, _rotation: PackedFloat64Array) -> void:
+	assert(false, 'not implemented')
+
+
+## Generates an array of all possible actions.
+func generate_actions(_unit: Unit) -> Array[UnitAction]:
+	assert(false, 'not implemented')
+	return []
+			
+	
+## Returns true if the given action is a valid action for the unit.
+func is_valid_action(_action: UnitAction, _unit: Unit) -> bool:
+	assert(false, 'not implemented')
+	return false
+#endregion Actions

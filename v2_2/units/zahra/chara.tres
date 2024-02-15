@@ -11,3 +11,4 @@ avatar = "Avatar of Sobek"
 title = "Cruel Crocodile God"
 map_color = Color(0, 0.501961, 0.501961, 1)
 portrait = ExtResource("1_mgsvh")
+

@@ -1,9 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://dgiub7m8fawlq"]
+[gd_scene load_steps=15 format=3 uid="uid://dgiub7m8fawlq"]
 
-[ext_resource type="Script" path="res://scenes/battle/unit/unit_map_object.gd" id="1_vvuqf"]
+[ext_resource type="Script" path="res://scenes/battle/map_objects/unit_map_object.gd" id="1_vvuqf"]
 [ext_resource type="Script" path="res://scenes/battle/pathable_component.gd" id="2_4td8b"]
 [ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="2_8334l"]
-[ext_resource type="PackedScene" uid="uid://diawd3fxwy2cy" path="res://scenes/battle/unit/basic_unit_model.tscn" id="3_xkg2k"]
 
 [sub_resource type="Animation" id="Animation_rmo6h"]
 length = 0.001
@@ -66,6 +65,7 @@ height = 6
 
 [node name="UnitMapObject" type="Node2D"]
 script = ExtResource("1_vvuqf")
+state = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -81,8 +81,6 @@ script = ExtResource("2_8334l")
 self_modulate = Color(0.109804, 0.0823529, 0.168627, 0.560784)
 scale = Vector2(0.67, 0.67)
 texture = SubResource("GradientTexture2D_e55k7")
-
-[node name="UnitModel" parent="." instance=ExtResource("3_xkg2k")]
 
 [node name="Pathable" type="Node" parent="." node_paths=PackedStringArray("map_object")]
 script = ExtResource("2_4td8b")
@@ -112,64 +110,6 @@ text = "Lysandra"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HUD"]
-visible = false
-modulate = Color(1, 0.184314, 0, 1)
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -16.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 0
-
-[node name="HPBarSingle" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel2" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel3" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel4" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel5" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel6" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel7" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel8" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
-[node name="Panel9" type="Panel" parent="HUD/HBoxContainer2"]
-custom_minimum_size = Vector2(10, 16)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
-
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
 visible = false
 layout_mode = 1
@@ -194,6 +134,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
 
 [node name="Panel3" type="Panel" parent="HUD/HBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(10, 16)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
@@ -209,13 +150,11 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
 
 [node name="Panel6" type="Panel" parent="HUD/HBoxContainer"]
-visible = false
 custom_minimum_size = Vector2(10, 16)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
 
 [node name="Panel7" type="Panel" parent="HUD/HBoxContainer"]
-visible = false
 custom_minimum_size = Vector2(10, 16)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_t8na8")
@@ -246,3 +185,4 @@ grow_horizontal = 2
 grow_vertical = 0
 texture_under = SubResource("GradientTexture2D_lum62")
 texture_progress = SubResource("GradientTexture2D_o6du0")
+

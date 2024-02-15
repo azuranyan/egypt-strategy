@@ -7,6 +7,22 @@
 
 [node name="UnitImpl" type="Node"]
 script = ExtResource("1_555e3")
+_id = null
+_chara_id = null
+_display_name = null
+_model_scale = null
+_behavior = null
+_state = null
+_turn_flags = null
+_selectable = null
+_stats = null
+_bond = null
+_special_unlock = null
+_status_effects = null
+_heading = null
+_map_position = null
+_walk_speed = null
+_phase_flags = null
 
 [node name="UnitDriver" type="Path2D" parent="."]
 curve = SubResource("Curve2D_38cup")

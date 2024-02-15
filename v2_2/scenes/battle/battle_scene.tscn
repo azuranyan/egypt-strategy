@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=11 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
 [ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="2_yi0k6"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
 [ext_resource type="PackedScene" uid="uid://cgiu5x8itr8ah" path="res://scenes/battle/hud/pause_menu.tscn" id="6_tryo3"]
 [ext_resource type="PackedScene" uid="uid://dtsua53pi2tya" path="res://scenes/battle/hud/forfeit_dialog.tscn" id="7_obk5d"]
+[ext_resource type="PackedScene" uid="uid://c1i2yiwf08gqj" path="res://scenes/battle/battle_result_screen.tscn" id="8_6a2cn"]
 
 [sub_resource type="Gradient" id="Gradient_nf1a3"]
 offsets = PackedFloat32Array(0, 0.987654)
@@ -55,16 +56,34 @@ offset_bottom = 40.0
 [node name="SubViewport" type="SubViewport" parent="Control/SubViewportContainer"]
 transparent_bg = true
 handle_input_locally = false
+canvas_cull_mask = 4294966783
 size = Vector2i(1920, 1080)
 render_target_update_mode = 4
+
+[node name="Camera2D" type="Camera2D" parent="Control/SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+position = Vector2(960, 540)
+position_smoothing_enabled = true
 
 [node name="Level" parent="Control/SubViewportContainer/SubViewport" instance=ExtResource("4_loo3i")]
 unique_name_in_owner = true
 
-[node name="HUD" parent="." instance=ExtResource("5_ghoy2")]
+[node name="HUDVisibilityControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUD" parent="HUDVisibilityControl" instance=ExtResource("5_ghoy2")]
+layout_mode = 1
 
 [node name="PauseMenu" parent="." instance=ExtResource("6_tryo3")]
 visible = false
 
 [node name="ForfeitDialog" parent="." instance=ExtResource("7_obk5d")]
+visible = false
+
+[node name="BattleResultScreen" parent="." instance=ExtResource("8_6a2cn")]
 visible = false

@@ -347,3 +347,4 @@ VSplitContainer/constants/autohide = 1
 VSplitContainer/constants/minimum_grab_thickness = 6
 VSplitContainer/constants/separation = 3
 VSplitContainer/icons/grabber = SubResource("PlaceholderTexture2D_s752x")
+

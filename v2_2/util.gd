@@ -5,14 +5,21 @@ class_name Util
 ## Simple do nothing function.
 static func do_nothing():
 	pass
-	
-	
-## Print stray nodes.
-static func print_orphan_nodes_tagged(node: Node, tag: String):
-	if OS.is_debug_build():
-		print('orphans since ', node, ' (tag=', tag, ')')
-		node.print_orphan_nodes()
 
+
+## Returns the mean center of an array of points.
+static func centroid(arr) -> Vector2:
+	var total := Vector2.ZERO
+	for e in arr:
+		total += e
+	return total/arr.size()
+
+	
+## Shuts up the error for already connected callables.
+static func just_connect(sig: Signal, callable: Callable):
+	if not sig.is_connected(callable):
+		sig.connect(callable)
+	
 
 ## Returns true if the scene is root.
 static func is_scene_root(node: Node) -> bool:
@@ -23,11 +30,10 @@ static func is_scene_root(node: Node) -> bool:
 
 
 ## Returns true if the game is ran in f6 mode. Doesn't work if F6 is used on the main scene though.
-@warning_ignore("unreachable_code")
-static func is_f6(node: Node) -> bool:
-	return false # TODO fix
-	if node and node.is_inside_tree() and node.get_tree().current_scene:
-		return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
+static func is_f6(_node: Node) -> bool:
+	# TODO fix
+	# if node and node.is_inside_tree() and node.get_tree().current_scene:
+	# 	return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
 	return false
 	
 	

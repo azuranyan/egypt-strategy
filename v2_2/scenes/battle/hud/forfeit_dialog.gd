@@ -1,3 +1,4 @@
+class_name ForfeitDialog
 extends Control
 
 signal forfeited(value: bool)

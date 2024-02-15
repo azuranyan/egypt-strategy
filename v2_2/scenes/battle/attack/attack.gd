@@ -45,7 +45,8 @@ enum {
 ## Melee targeting mode.
 @export var melee: bool
 
-@export_flags("Self:1", "Ally:2", "Enemy:4") var targeting: int = TARGET_ENEMY
+## Attack target flags.
+@export_flags("Self:1", "Ally:2", "Enemy:4") var target_flags: int = TARGET_ENEMY
 
 ## Whether rotation is allowed.
 @export var allow_rotation: bool
@@ -62,10 +63,23 @@ func is_multicast() -> bool:
 	return multicast > 0
 	
 	
+## Returns the attack range for a given unit.
+func attack_range(unit_range: int) -> int:
+	return max_range if max_range != -1 else unit_range
+
+
 ## Returns the cells in range.
-func get_cells_in_range(origin: Vector2, unit_range: int) -> PackedVector2Array:
-	var _range := max_range if max_range != -1 else unit_range
-	return Util.flood_fill(origin, _range , Util.bounds(Vector2(12, 12)))
+func get_cells_in_range(cell: Vector2, unit_range: int) -> PackedVector2Array:
+	var _range := attack_range(unit_range)
+	if melee:
+		return [
+			Vector2(cell.x, cell.y + _range),
+			Vector2(cell.x, cell.y - _range),
+			Vector2(cell.x + _range, cell.y),
+			Vector2(cell.x - _range, cell.y),
+		]
+	else:
+		return Util.flood_fill(cell, _range, Util.bounds(Vector2(12, 12)))
 
 
 ## Returns an array of cells in the target aoe.
@@ -80,3 +94,7 @@ func get_target_cells(target: Vector2, target_rotation: float) -> PackedVector2A
 		re.append(Vector2(roundi(p.x), roundi(p.y)))
 	return re
 	
+	
+## Returns the name of this attack.
+func _to_string() -> String:
+	return name

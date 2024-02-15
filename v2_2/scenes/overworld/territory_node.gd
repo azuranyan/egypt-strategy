@@ -4,7 +4,10 @@ extends Node
 ## Serves as a marker for creating territories on the editor.
 
 @export var adjacent: Array[TerritoryNode]
-@export var maps: Array[PackedScene]
+@export var maps: Array[PackedScene]:
+	set(value):
+		maps = value
+		update_configuration_warnings()
 
 ## Unit names. Count is optional by doing [code]name:count[/code].
 @export var _unit_list: PackedStringArray
@@ -23,6 +26,10 @@ extends Node
 		notify_property_list_changed()
 
 
+func _ready():
+	update_configuration_warnings()
+
+
 ## Returns the territory this node refers to.
 func get_territory() -> Territory:
 	assert(not Engine.is_editor_hint(), "can't use in editor")
@@ -39,3 +46,9 @@ func get_unit_entries() -> Dictionary:
 		var unit_count := split[1].to_int() if split.size() > 1 else 1
 		arr[unit_name] = unit_count
 	return arr
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	if maps.is_empty():
+		return ['no maps assigned']
+	return []

@@ -27,6 +27,7 @@ func show_result(header: String, message: String):
 	_done = false
 	Util.bb_big_caps($Control/RichTextLabel, header, {font_size = 40, call_caps = true})
 	$Control/Label.text = message
+	modulate = Color.TRANSPARENT # prevent flicker
 	show()
 	$AnimationPlayer.play('show')
 	await $AnimationPlayer.animation_finished

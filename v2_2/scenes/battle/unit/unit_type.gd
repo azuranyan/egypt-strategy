@@ -18,7 +18,7 @@ extends Resource
 	mov = 0,
 	dmg = 0,
 	rng = 0,
-}
+}	
 
 @export var stat_growth_2 := {
 	maxhp = 0,

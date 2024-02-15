@@ -55,6 +55,10 @@ func loser() -> Empire:
 	return attacker if defender_won() else defender
 	
 	
+func is_none() -> bool:
+	return value == NONE
+	
+	
 func player_won() -> bool:
 	if attacker.is_player_owned():
 		return attacker_won()

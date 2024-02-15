@@ -117,3 +117,4 @@ text = "Cancel"
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="Panel/HBoxContainer/ForfeitConfirmButton" to="." method="_on_forfeit_confirm_button_pressed"]
 [connection signal="pressed" from="Panel/HBoxContainer/ForfeitCancelButton" to="." method="_on_forfeit_cancel_button_pressed"]
+

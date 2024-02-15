@@ -62,7 +62,9 @@ func on_new_save(save: SaveState):
 		if not e.home_territory:
 			continue
 		
-		e.hero_units = [Game.create_unit(save, e.leader_id, e).id()]
+		var hero := Game.create_unit(save, e.leader_id, e)
+		e.hero_units = [hero.id()]
+		e.units.append(hero.id())
 		for t in e.territories:
 			for chara_id in t.units:
 				for i in t.units[chara_id]:
@@ -184,13 +186,13 @@ func _cont_take_action() -> void:
 
 ## Waits for the battle to finish.
 func _cont_wait_for_battle_result() -> void:
-	var result: BattleResult = await Game.battle.ended
+	var result: BattleResult = await Game.battle.battle_ended
 	match result.value:
 		BattleResult.CANCELLED:
 			return next(_cont_take_action)
 			
 		BattleResult.NONE:
-			push_warning('result == BattleResult.NONE')
+			pass
 			
 		BattleResult.ATTACKER_VICTORY:
 			transfer_territory(result.attacker, result.territory)
@@ -205,6 +207,12 @@ func _cont_wait_for_battle_result() -> void:
 		BattleResult.DEFENDER_WITHDRAW:
 			transfer_territory(result.attacker, result.territory)
 	
+	# TODO until scene manager is fixed, it had to be done this way
+	# clean this up later when milestones have been reached
+	if not is_running():
+		# wait for battle to finish returning
+		await SceneManager.transition_finished
+		
 	await get_active_overworld_scene().show_battle_result_banner(result)
 	
 	if result.loser().is_defeated():

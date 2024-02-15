@@ -26,19 +26,19 @@ func _ready():
 	
 ## Called before the battle starts and before the map is loaded.
 func initialize(_empire: Empire):
-	print("[%s]: initializing" % agent_name())
 	_agent_state = State.STANDBY
 	empire = _empire
+	print("[%s]: initializing" % agent_name())
 	_initialize()
 	_agent_state = State.STANDBY
 	
 	
 ## Called by the engine to fill units in.
 func prepare_units():
-	print("[%s]: preparing units" % agent_name())
 	set_process_input(true)
 	_agent_state = State.PREPARE_UNITS
 	_enter_prepare_units.call_deferred()
+	print("[%s]: preparing units" % agent_name())
 	await _prepare_units_done
 	_agent_state = State.PREPARE_UNITS
 	_exit_prepare_units()
@@ -53,10 +53,10 @@ func end_prepare_units():
 	
 ## Called by the engine for doing the agent's turn.
 func start_turn():
-	print("[%s]: doing turn" % agent_name())
 	set_process_input(true)
 	_agent_state = State.ON_TURN
 	_enter_turn.call_deferred()
+	print("[%s]: doing turn" % agent_name())
 	await _turn_done
 	_agent_state = State.ON_TURN
 	_exit_turn()
@@ -71,7 +71,7 @@ func end_turn():
 		
 ## Returns the agent name.
 func agent_name() -> String:
-	return "BaseAgent"
+	return "<BaseAgent:%s" % empire.leader_id
 	
 	
 ## Called on initialize.

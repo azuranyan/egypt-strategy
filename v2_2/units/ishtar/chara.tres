@@ -11,3 +11,4 @@ avatar = "Avatar of Isis"
 title = "Selfless Scorpion Goddess"
 map_color = Color(0.74902, 0.25098, 0.74902, 1)
 portrait = ExtResource("1_mincb")
+

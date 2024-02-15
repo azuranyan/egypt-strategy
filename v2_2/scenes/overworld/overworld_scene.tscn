@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=27 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
@@ -19,6 +19,7 @@
 [ext_resource type="Resource" uid="uid://m278p32g20ar" path="res://units/alara/unit_type.tres" id="15_p03ft"]
 [ext_resource type="PackedScene" uid="uid://vo0h66hnj2jc" path="res://scenes/overworld/territory_button.tscn" id="16_0hx7d"]
 [ext_resource type="Script" path="res://scenes/overworld/territory_node.gd" id="17_wovx7"]
+[ext_resource type="PackedScene" uid="uid://tswv0jrmndgy" path="res://maps/test/test.tscn" id="18_b6tny"]
 [ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="18_l1pmu"]
 [ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
 
@@ -121,6 +122,7 @@ offset_bottom = 801.0
 [node name="Zetennu" type="Node" parent="TerritoryButton" node_paths=PackedStringArray("adjacent", "empire_node")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton7/Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 _unit_list = PackedStringArray("cultist_axe")
 empire_node = NodePath("../../Empires/Player")
 
@@ -132,6 +134,7 @@ offset_bottom = 201.0
 
 [node name="Cursed Stronghold" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("empire_node")]
 script = ExtResource("17_wovx7")
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 empire_node = NodePath("../../Empires/Boss")
 
 [node name="TerritoryButton3" parent="." instance=ExtResource("16_0hx7d")]
@@ -143,6 +146,7 @@ offset_bottom = 638.0
 [node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton9/Fort Zaka")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton4" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 826.0
@@ -153,6 +157,7 @@ offset_bottom = 212.0
 [node name="Forsaken Temple" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton10/Ruins of Atesh")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton5" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1313.0
@@ -163,6 +168,7 @@ offset_bottom = 163.0
 [node name="Khel-Et" type="Node" parent="TerritoryButton5" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton6" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1638.0
@@ -173,6 +179,7 @@ offset_bottom = 244.0
 [node name="Satayi" type="Node" parent="TerritoryButton6" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton7/Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton7" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1594.0
@@ -183,6 +190,8 @@ offset_bottom = 519.0
 [node name="Neru-Khisi" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton/Zetennu"), NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+_unit_list = PackedStringArray("cultist_axe", "cultist_sword", "cultist_priest")
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1088.0
@@ -193,6 +202,7 @@ offset_bottom = 463.0
 [node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton8" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton5/Khel-Et"), NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton9/Fort Zaka"), NodePath("../../TerritoryButton7/Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton9" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 948.0
@@ -203,6 +213,7 @@ offset_bottom = 712.0
 [node name="Fort Zaka" type="Node" parent="TerritoryButton9" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton10/Ruins of Atesh"), NodePath("../../TerritoryButton3/Nekhet\'s Rest")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="TerritoryButton10" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 702.0
@@ -213,6 +224,7 @@ offset_bottom = 456.0
 [node name="Ruins of Atesh" type="Node" parent="TerritoryButton10" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton4/Forsaken Temple"), NodePath("../../TerritoryButton8/Medjed\'s Beacon"), NodePath("../../TerritoryButton9/Fort Zaka"), NodePath("../../TerritoryButton3/Nekhet\'s Rest")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
 
 [node name="InputBlocker" type="Control" parent="."]
 layout_mode = 3
@@ -221,6 +233,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_lock_ = true
 
 [node name="BattleResultBanner" parent="." instance=ExtResource("18_l1pmu")]
 metadata/_edit_lock_ = true
@@ -235,6 +248,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("3_sc2vb")
+metadata/_edit_lock_ = true
 
 [node name="TurnBox" type="Control" parent="HUD"]
 layout_mode = 1
@@ -321,3 +335,4 @@ expand_mode = 1
 stretch_mode = 4
 
 [connection signal="pressed" from="HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]
+

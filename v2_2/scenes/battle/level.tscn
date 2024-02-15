@@ -43,14 +43,9 @@ world = NodePath("../../WorldSample")
 
 [node name="UnitPath" type="Node2D" parent="WorldOverlays"]
 
-[node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+[node name="Cursor" type="Node2D" parent="."]
 modulate = Color(1, 0.960784, 0.94902, 0.941176)
-position = Vector2(771, 433)
-rotation = 0.524835
-scale = Vector2(0.166352, 0.166352)
-skew = 0.521126
 script = ExtResource("3_x6cdp")
-world = NodePath("../WorldSample")
 internal_size = Vector2(334, 334)
 
 [node name="Sprite" type="Sprite2D" parent="Cursor"]

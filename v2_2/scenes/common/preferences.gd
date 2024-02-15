@@ -7,6 +7,8 @@ const SAVE_PATH := 'user://preferences.tscn'
 
 @export var show_intro: bool = true
 
+@export var auto_end_turn: bool = false
+
 
 func _ready():
 	reload()

@@ -28,6 +28,18 @@ extends Node2D
 	set(value):
 		transform_flags = value
 		_on_world_changed()
+		
+		
+func _enter_tree():
+	var p := get_parent()
+	while p != null:
+		if p is MapObject or p is Map:
+			world = p.world
+		p = p.get_parent()
+	
+	
+func _exit_tree():
+	world = null
 
 
 func _get_configuration_warnings() -> PackedStringArray:

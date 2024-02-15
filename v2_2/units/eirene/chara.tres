@@ -11,3 +11,4 @@ avatar = "Avatar of Hathor"
 title = "Caring Cow Goddess"
 map_color = Color(0.886275, 0.313726, 0.596078, 1)
 portrait = ExtResource("1_c3ewk")
+

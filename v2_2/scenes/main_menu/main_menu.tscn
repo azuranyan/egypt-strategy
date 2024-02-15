@@ -217,3 +217,4 @@ alignment = 0
 [connection signal="pressed" from="Control/HBoxContainer/ExtrasButton" to="." method="_on_extras_button_pressed"]
 [connection signal="pressed" from="Control/HBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
 [connection signal="pressed" from="Control/HBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]
+

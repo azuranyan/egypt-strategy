@@ -33,3 +33,4 @@ position = Vector2(-3, -25)
 shape = SubResource("RectangleShape2D_266ts")
 
 [connection signal="input_event" from="CursorDetector" to="." method="_on_cursor_detector_input_event"]
+

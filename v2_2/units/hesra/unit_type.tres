@@ -26,3 +26,4 @@ stat_growth_2 = {
 }
 basic_attack = ExtResource("1_phbhx")
 special_attack = ExtResource("3_b0xwc")
+

@@ -45,3 +45,4 @@ text = "some body once told me"
 label_settings = SubResource("LabelSettings_tp2qw")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+

@@ -20,3 +20,4 @@ unique_name_in_owner = true
 sprite_frames = ExtResource("2_o1l1g")
 animation = &"back_walk_loop"
 frame_progress = 0.243122
+

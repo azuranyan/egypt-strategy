@@ -55,7 +55,8 @@ const OUT_OF_BOUNDS := Vector2(69, 69)
 
 #@export var triggers: Array[Trigger]
 
-#@export var evaluators: Array[BattleResultEvaluator] = [ConquerEvaluator.new()]
+@export var victory_conditions: Array[VictoryCondition] = [VictoryCondition.new()]
+
 
 var _world_update_cooldown: float = 0
 

@@ -10,3 +10,4 @@ script = ExtResource("1_h10pe")
 [node name="Empire" type="Node" parent="."]
 script = ExtResource("2_05kkr")
 leader = ExtResource("3_nf2ia")
+

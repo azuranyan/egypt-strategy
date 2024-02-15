@@ -94,3 +94,4 @@ text = "Main Menu"
 
 [connection signal="pressed" from="Control/VBoxContainer/LastCheckpointButton" to="." method="_on_last_checkpoint_button_pressed"]
 [connection signal="pressed" from="Control/VBoxContainer/QuitToTitleButton" to="." method="_on_quit_to_title_button_pressed"]
+

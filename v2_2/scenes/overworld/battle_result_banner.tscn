@@ -152,3 +152,4 @@ scroll_active = false
 autowrap_mode = 0
 
 [connection signal="pressed" from="Control/Button" to="." method="_on_button_pressed"]
+

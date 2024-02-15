@@ -12,8 +12,8 @@ func _ready():
 	Game.overworld.turn_started.connect(func(empire): print('%s turn started' % empire.leader_id))
 	Game.overworld.turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_id))
 
-	Game.battle.started.connect(func(_a, _d, _t, _m): print('Battle Started'))
-	Game.battle.ended.connect(show_parsed_result)
+	Game.battle.battle_started.connect(func(_a, _d, _t, _m): print('Battle Started'))
+	Game.battle.battle_ended.connect(show_parsed_result)
 	Game.overworld.empire_defeated.connect(empire_defeated)
 
 

@@ -58,3 +58,4 @@ item_2/text = "intro"
 [connection signal="pressed" from="VBoxContainer/ReturnToButton" to="." method="_on_return_to_button_pressed"]
 [connection signal="item_activated" from="ItemList" to="." method="_on_item_list_item_activated"]
 [connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]
+

@@ -1,8 +1,20 @@
 class_name UnitImpl extends Unit
 
 
+const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_object.tscn")
+
+
 ## The unit id.
 @export var _id: int
+
+## The chara id of unit, solely for debugging.
+@export var _chara_id: StringName
+
+## Display name override.
+@export var _display_name: String
+
+## Display icon override.
+@export var _display_icon: Texture
 	
 ## The character representing this unit.
 @export var _chara: CharacterInfo
@@ -69,48 +81,23 @@ var map_object: UnitMapObject
 @onready var driver = $UnitDriver
 
 
-func _init(__id: int = 0, __chara: CharacterInfo = null, __unit_type: UnitType = null):
+func _init(__id: int = 0, __chara_id: StringName = &'', __chara: CharacterInfo = null, __unit_type: UnitType = null):
 	_id = __id
+	_chara_id = __chara_id
 	_chara = __chara
 	_unit_type = __unit_type
 	
 	
 func _ready():
-	map_object = load("res://scenes/battle/unit/unit_map_object.tscn").instantiate()
-	map_object.map_position_changed.connect(sync_map_position)
-	
-	driver.target = map_object
-	
 	battle = Game.battle
-	battle.started.connect(enter_battle)
-	battle.ended.connect(exit_battle)
-	
-
-func sync_map_position(old: Vector2, new: Vector2):
-	_map_position = new
-	position_changed.emit(old, new)
 	
 	
-func enter_battle(_attacker, _defender, _territory, _map_id):
-	set_position(_map_position)
-	
-	Game.battle.add_map_object(map_object)
-	map_object.initialize(self)
-	set_state(State.IDLE)
-	reset()
-	
-
-func exit_battle(_result):
-	stop_walking()
-	Game.battle.remove_map_object(map_object)
-	reset()
-	
-	
-func reset():
-	_state = _state
+func reset(initial_state: State):
+	set_state(initial_state)
 	var _base := base_stats()
 	for stat in _base:
 		set_stat(stat, _base[stat])
+	set_stat(&'hp', _base.maxhp)
 	clear_status_effects()
 	set_position(Map.OUT_OF_BOUNDS)
 	set_heading(Map.Heading.EAST)
@@ -122,6 +109,16 @@ func set_state(new_state: State):
 	var old_state := _state
 	_state = new_state
 	state_changed.emit(old_state, new_state)
+
+	
+func sync_map_position(old: Vector2, new: Vector2):
+	_map_position = new
+	position_changed.emit(old, new)
+	
+	
+func _on_model_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
+	if _selectable:
+		interacted.emit(cursor_pos, button_index, pressed)
 
 
 #region Unit Attributes
@@ -142,12 +139,12 @@ func unit_type() -> UnitType:
 	
 ## The name displayed in the game.
 func display_name() -> String:
-	return _chara.name
+	return _display_name
 	
 
 ## The name displayed in the game.
 func display_icon() -> Texture:
-	return _chara.portrait
+	return _display_icon
 	
 	
 ## The scale of the unit model.
@@ -172,6 +169,41 @@ func base_stats() -> Dictionary:
 ## Returns the state of this unit.
 func state() -> State:
 	return _state
+	
+	
+## Fields the unit into battle.
+func field_unit() -> void:
+	if is_fielded():
+		push_warning('unit is already fielded, re-fielding')
+		unfield_unit()
+	map_object = UnitMapObjectScene.instantiate()
+	map_object.map_position_changed.connect(sync_map_position)
+	map_object.interacted.connect(_on_model_interacted)
+	battle.add_map_object(map_object)
+	map_object.initialize(self)
+	driver.target = map_object
+	reset(State.IDLE)
+	fielded.emit()
+	
+	
+## Unfields unit from battle.
+func unfield_unit() -> void:
+	if not is_fielded():
+		return
+	driver.target = null
+	map_object.initialize(null)
+	battle.remove_map_object(map_object)
+	map_object.map_position_changed.disconnect(sync_map_position)
+	map_object.interacted.disconnect(_on_model_interacted)
+	map_object.queue_free()
+	map_object = null
+	reset(State.INVALID)
+	unfielded.emit()
+	
+	
+## Returns true if this unit is on the field.
+func is_fielded() -> bool:
+	return map_object != null
 	
 	
 ## Returns the empire this unit belongs to.
@@ -241,7 +273,9 @@ func set_selectable(selectable: bool) -> void:
 	
 ## Returns true if the unit is currently selected.
 func is_selected() -> bool:
-	return map_object.selected
+	if is_fielded():
+		return map_object.selected
+	return false
 	
 	
 ## Returns the unit stat.
@@ -277,6 +311,21 @@ func basic_attack() -> Attack:
 ## Returns this unit's special attack.
 func special_attack() -> Attack:
 	return _unit_type.special_attack
+	
+	
+## Returns the attack range of a given attack.
+func get_attack_range(attack: Attack) -> int:
+	return attack.attack_range(get_stat(&'rng'))
+
+
+## Returns the cells in range.
+func get_cells_in_range(attack: Attack) -> PackedVector2Array:
+	return attack.get_cells_in_range(get_position(), get_stat(&'rng'))
+
+
+## Returns an array of cells in the target aoe.
+func get_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
+	return attack.get_target_cells(target, target_rotation)
 	
 	
 ## Set to true or false to override special unlock, or null for default rules.
@@ -339,27 +388,33 @@ func clear_status_effects() -> void:
 	
 ## Returns the cell this unit is residing in.
 func cell() -> Vector2:
-	return map_object.cell()
+	return Map.cell(_map_position)
 	
 	
 ## Returns the position of this unit.
 func get_position() -> Vector2:
-	return map_object.map_position
+	return _map_position
 	
 	
 ## Sets the position of this unit.
 func set_position(pos: Vector2) -> void:
-	map_object.map_position = pos
+	if is_fielded():
+		map_object.map_position = pos # this will sync to our _map_position
+	else:
+		_map_position = pos
 	
 	
 ## Returns true if this unit is on standby.
 func is_standby() -> bool:
-	return map_object.is_standby()
+	return _map_position == Map.OUT_OF_BOUNDS
 	
 	
 ## Makes this unit face towards target.
 func face_towards(target: Vector2) -> void:
-	map_object.heading = Map.to_heading(map_object.map_position.angle_to_point(target))
+	if is_fielded():
+		map_object.heading = Map.to_heading(map_object.map_position.angle_to_point(target))
+	else:
+		_heading = Map.to_heading(_map_position.angle_to_point(target))
 	
 	
 ## Returns the direction this unit is facing.
@@ -395,7 +450,7 @@ func is_dead() -> bool:
 	
 ## Returns true if the unit is a valid target.
 func is_valid_target() -> bool:
-	return not is_standby() and is_alive() and is_selectable()
+	return not is_standby() and is_alive() and is_selectable() and is_fielded()
 	
 
 ## Returns true if unit can path over cell.
@@ -413,11 +468,6 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
-## Performs an action. This makes
-func do_action(_type: StringName, _kwargs := {}) -> void:
-	assert(false, 'not implemented')
-	
-	
 ## Sets the turn flag.
 func set_turn_flag(flag: int) -> void:
 	_turn_flags |= flag
@@ -454,7 +504,7 @@ func has_taken_action() -> bool:
 
 
 ## Makes unit walk towards cell.
-func walk_towards(target: Vector2):
+func walk_towards(target: Vector2) -> void:
 	if is_walking():
 		stop_walking()
 	var start := _map_position
@@ -553,15 +603,15 @@ func revive() -> void:
 	map_object.set_standby(false)
 	
 	
-## Uses attack on target cell.
-func use_attack(_attack: Attack, _cell: Vector2, _rotation: Vector2) -> void:
-	assert(false, 'not implemented')
-	
-	
 ## Multicasts the attack on target cell.
-func use_attack_multicast(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
-	assert(false, 'not implemented')
+func use_attack(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
+	print('attack!')
 #endregion Unit Actions
+
+
+## Returns this unit's map object, or [code]null[/code] if unfielded.
+func get_map_object() -> MapObject:
+	return map_object
 
 
 #region Serialization
@@ -569,7 +619,10 @@ func use_attack_multicast(_attack: Attack, _cells: PackedVector2Array, _rotation
 func save_state() -> Dictionary:
 	return {
 		id = _id,
+		chara_id = _chara_id,
 		chara = _chara,
+		display_name = _display_name,
+		display_icon = _display_icon,
 		unit_type = _unit_type,
 		model_scale = _model_scale,
 		empire = _empire,
@@ -591,7 +644,10 @@ func save_state() -> Dictionary:
 ## Loads the unit from data.
 func load_state(data: Dictionary):
 	_id = data.id
+	_chara_id = data.chara_id
 	_chara = data.chara
+	_display_name = data.display_name
+	_display_icon = data.display_icon
 	_unit_type = data.unit_type
 	_model_scale = data.model_scale
 	_empire = data.empire

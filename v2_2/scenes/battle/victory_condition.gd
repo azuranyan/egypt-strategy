@@ -2,14 +2,14 @@ class_name VictoryCondition
 extends Resource
 
 
-func evaluate() -> BattleResult:
+func evaluate() -> int:
 	if Game.get_empire_units(Game.battle.defender()).is_empty():
-		return BattleResult.attacker_victory()
+		return BattleResult.ATTACKER_VICTORY
 		
 	if Game.get_empire_units(Game.battle.attacker()).is_empty():
-		return BattleResult.defender_victory()
+		return BattleResult.DEFENDER_VICTORY
 		
-	return null
+	return BattleResult.NONE
 	
 
 func win_description() -> String:

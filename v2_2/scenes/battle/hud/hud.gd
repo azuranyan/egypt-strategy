@@ -1,3 +1,4 @@
+class_name BattleHUD
 extends Control
 
 
@@ -35,19 +36,23 @@ func _ready():
 	%MissionSample.hide()
 	%BonusGoalSample.hide()
 	%AttackInfoPanel.hide()
+	hide()
+	character_panel.hide()
+	Game.battle.player_prep_phase.connect(_on_player_prep_phase)
 	
-	update.call_deferred()
 	
-	
+func _on_player_prep_phase():
+	for u in Game.get_empire_units(Game.battle.player()):
+		prep_unit_list.add_unit(u)
+
+
 func update():
+	show()
 	# mock test
-	var battle := Game.battle
-	var battle_phase := true
-	var is_player_turn := true
-	var is_training := false
-	var missions: Array[VictoryCondition] = [
-		VictoryCondition.new(),
-	]
+	var battle_phase := Game.battle.is_battle_phase()
+	var is_player_turn := Game.battle.on_turn().is_player_owned()
+	var is_training := Game.battle.is_training_battle()
+	var missions: Array[VictoryCondition] = Game.battle.missions()
 	var bonus_goals: Array[VictoryCondition] = [
 		VictoryCondition.new(),
 	]
@@ -71,17 +76,6 @@ func update():
 	%BonusGoalPanel.visible = battle_phase and not is_training
 	set_bonus_goal(bonus_goals)
 	action_order_button.visible = battle_phase and is_player_turn
-	
-	
-	var unit := preload("res://scenes/battle/unit/unit_impl.tscn").instantiate()
-	unit._id = 0
-	unit._chara = load("res://units/alara/chara.tres")
-	unit._unit_type = load("res://units/alara/unit_type.tres")
-	unit._stats.hp = 3
-	unit._stats.maxhp = 6
-	unit.notify_property_list_changed()
-	add_child(unit)
-	set_selected_unit(unit)
 
 	
 ## Sets the selected unit. This will call [method clear_selected_unit] if null.
@@ -96,8 +90,8 @@ func set_selected_unit(unit: Unit):
 	%CharacterPortraitRect.texture = unit.display_icon()
 	
 	var is_owned := unit.get_empire() == Game.battle.on_turn()
-	%RestButton.visible = is_owned
-	%RestButton.disabled = not unit.can_act()
+	rest_button.visible = is_owned
+	rest_button.disabled = not unit.can_act()
 	
 	fight_button.visible = is_owned
 	fight_button.visible = unit.basic_attack() != null
@@ -108,10 +102,17 @@ func set_selected_unit(unit: Unit):
 	deify_button.disabled = not unit.can_attack() or not unit.is_special_unlocked()
 	
 	
+## Clears the selected unit and hides the character panel.
+func clear_selected_unit():
+	character_panel.hide()
+	_selected_unit = null
+	
+	
 ## Shows the turn banner for a certain duration.
 func show_turn_banner(duration: float = 1):
 	$Control.hide()
 	turn_banner.show()
+	%OnTurnLabel.text = 'PLAYER TURN' if Game.battle.on_turn().is_player_owned() else 'ENEMY TURN'
 	await get_tree().create_timer(duration).timeout
 	turn_banner.hide()
 	$Control.show()
@@ -138,12 +139,6 @@ func hide_attack_banner():
 	$Control.show()
 	await $AnimationPlayer.animation_finished
 	attack_banner.hide()
-	
-	
-## Clears the selected unit and hides the character panel.
-func clear_selected_unit():
-	character_panel.hide()
-	_selected_unit = null
 	
 	
 ## Shows message.

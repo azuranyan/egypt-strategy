@@ -1,16 +1,12 @@
 class_name Unit extends Node
 ## The interface for unit.
 
-
-signal walking_started(start: Vector2, end: Vector2)
-signal walking_finished(start: Vector2, end: Vector2)
-
-signal attack_started(st: AttackState)
-signal attack_finished(st: AttackState)
-
+#region Game Signals
 signal empire_changed(old: Empire, new: Empire)
 signal behavior_changed(old: Behavior, new: Behavior)
+#endregion Game Signals
 
+#region Unit State Signals
 signal state_changed(old: State, new: State)
 signal position_changed(old_pos: Vector2, new_pos: Vector2)
 signal stat_changed(stat: StringName, value: int)
@@ -18,11 +14,24 @@ signal damaged(value: int, source: Variant)
 signal healed(value: int, source: Variant)
 signal died
 signal revived
-
 signal status_effect_added(effect: StringName, duration: int)
 signal status_effect_removed(effect: StringName)
+#endregion Unit State Signals
 
+#region Unit Actions Signals
+
+signal walking_started(start: Vector2, end: Vector2)
+signal walking_finished(start: Vector2, end: Vector2)
+
+signal attack_started(st: AttackState)
+signal attack_finished(st: AttackState)
+#endregion Unit Actions Signals
+
+#region Map and Interaction Signals
 signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
+signal fielded
+signal unfielded
+#endregion Map and Interaction Signals
 
 
 # Turn flags
@@ -138,6 +147,22 @@ func state() -> State:
 	return 0 as State
 	
 	
+## Fields the unit into battle.
+func field_unit() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Unfields unit from battle.
+func unfield_unit() -> void:
+	assert(false, 'not implemented')
+	
+	
+## Returns true if this unit is on the field.
+func is_fielded() -> bool:
+	assert(false, 'not implemented')
+	return false
+	
+	
 ## Returns the empire this unit belongs to.
 func get_empire() -> Empire:
 	assert(false, 'not implemented')
@@ -244,6 +269,24 @@ func basic_attack() -> Attack:
 func special_attack() -> Attack:
 	assert(false, 'not implemented')
 	return null
+	
+	
+## Returns the attack range of a given attack.
+func get_attack_range(_attack: Attack) -> int:
+	assert(false, 'not implemented')
+	return 0
+
+
+## Returns the cells in range.
+func get_cells_in_range(_attack: Attack) -> PackedVector2Array:
+	assert(false, 'not implemented')
+	return []
+
+
+## Returns an array of cells in the target aoe.
+func get_target_cells(_attack: Attack, _target: Vector2, _target_rotation: float) -> PackedVector2Array:
+	assert(false, 'not implemented')
+	return []
 	
 	
 ## Set to true or false to override special unlock, or null for default rules.
@@ -366,11 +409,6 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
-## Performs an action. This makes
-func do_action(_type: StringName, _kwargs := {}) -> void:
-	assert(false, 'not implemented')
-	
-	
 ## Sets the turn flag.
 func set_turn_flag(_flag: int) -> void:
 	assert(false, 'not implemented')
@@ -412,7 +450,7 @@ func has_taken_action() -> bool:
 
 
 ## Makes unit walk towards cell.
-func walk_towards(_target: Vector2):
+func walk_towards(_target: Vector2) -> void:
 	assert(false, 'not implemented')
 	
 
@@ -459,13 +497,14 @@ func revive() -> void:
 	assert(false, 'not implemented')
 	
 	
-## Uses attack on target cell.
-func use_attack(_attack: Attack, _cell: Vector2, _rotation: Vector2) -> void:
-	assert(false, 'not implemented')
-	
-	
 ## Multicasts the attack on target cell.
-func use_attack_multicast(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
+func use_attack(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
 	assert(false, 'not implemented')
 #endregion Unit Actions
 
+
+## Returns this unit's map object, or [code]null[/code] if unfielded.
+func get_map_object() -> MapObject:
+	assert(false, 'not implemented')
+	return null
+	

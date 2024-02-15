@@ -11,3 +11,4 @@ avatar = "Avatar of Horus"
 title = "Boastful Bird God"
 map_color = Color(0.0588235, 0.321569, 0.729412, 1)
 portrait = ExtResource("1_v40mf")
+

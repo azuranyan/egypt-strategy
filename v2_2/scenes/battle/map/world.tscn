@@ -24,3 +24,4 @@ skew = 0.521126
 script = ExtResource("2_12vfm")
 tile_size = 68.0
 size = Vector2i(12, 12)
+

@@ -146,3 +146,4 @@ text = "Quit to Title"
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="ColorRect/Panel/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+

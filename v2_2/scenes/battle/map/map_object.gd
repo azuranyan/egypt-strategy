@@ -17,6 +17,8 @@ const TILE_COLORS := {
 	Map.PathingGroup.IMPASSABLE: Color(1, 0, 0, 0.3),
 }
 
+@export_group("Map")
+
 @export var map_position: Vector2 = Vector2.ZERO:
 	set(value):
 		var old := map_position
@@ -25,8 +27,6 @@ const TILE_COLORS := {
 			await ready
 		_update_position()
 		map_position_changed.emit(old, map_position)
-
-@export_group("Editor")
 
 @export var snap_to_cell: bool = true:
 	set(value):
@@ -43,7 +43,8 @@ var _standby_pos: Vector2
 
 
 func _ready():
-	set_notify_transform(true)
+	if Engine.is_editor_hint():
+		set_notify_transform(true)
 	
 	
 func _notification(what):

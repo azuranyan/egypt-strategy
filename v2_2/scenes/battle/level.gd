@@ -6,6 +6,8 @@ extends Node2D
 signal object_added(map_object: MapObject)
 signal object_removed(map_object: MapObject)
 
+const BarrierScene := preload("res://scenes/battle/map_objects/barrier.tscn")
+
 
 ## The loaded map.
 var map: Map
@@ -25,7 +27,6 @@ var pathables := []
 ## An array of out of bounds pathable objects.
 var out_of_bounds_pathables: Array[PathableComponent] = []
 
-
 var unit: Unit
 
 
@@ -35,64 +36,6 @@ var unit: Unit
 @onready var attack_range_overlay := $WorldOverlays/AttackRange as TileOverlay
 @onready var target_shape_overlay := $WorldOverlays/TargetShape as TileOverlay
 @onready var unit_path := $WorldOverlays/UnitPath
-
-
-
-func _ready():
-	var test := func():
-		unit = preload("res://scenes/battle/unit/unit_impl.tscn").instantiate()
-		unit._id = 0
-		unit._chara = load("res://units/alara/chara.tres")
-		unit._unit_type = load("res://units/alara/unit_type.tres")
-		unit._stats.hp = 3
-		unit._stats.maxhp = 6
-		unit.notify_property_list_changed()
-		add_child(unit)
-		
-		# map should be loaded first
-		load_map(load("res://maps/test/test.tscn"))
-		
-		Game.battle.level = self # hack for testing
-		Game.battle.started.emit(null, null, null, 0)
-		#Game.battle.ended.emit(null)
-		
-		# these functions cannot be used before everything is ready
-		unit.set_position(Vector2(4, 4))
-		unit.walk_towards(Vector2.ZERO)
-		#$PrepUnitList.add_unit(unit)
-		#var u2 := unit.duplicate()
-		#u2._id = 1
-		#$PrepUnitList.add_unit(u2)
-		#var u3 := unit.duplicate()
-		#u3._id = 2
-		#$PrepUnitList.add_unit(u3)
-		#$PrepUnitList.set_selected_unit(u2)
-		#$PrepUnitList.set_selected_unit(null)
-		
-		
-	test.call_deferred()
-
-
-var _cur: Vector2
-func _input(event):
-	if event.is_action_pressed('ui_accept'):
-		unit.take_damage(2, null)
-	
-	if event is InputEventKey and event.pressed:
-		match event.keycode:
-			KEY_W:
-				_cur += Vector2.UP
-			KEY_S:
-				_cur += Vector2.DOWN
-			KEY_A:
-				_cur += Vector2.LEFT
-			KEY_D:
-				_cur += Vector2.RIGHT
-		var tween := get_tree().create_tween()
-		tween.tween_property(cursor, 'position', map.world.as_global(_cur), 0.04)
-				
-	#if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and unit:
-	#	unit.walk_towards(Map.cell(map.world.as_uniform(event.position)))
 
 
 ## Loads a map.
@@ -130,8 +73,7 @@ func load_map(packed_scene: PackedScene) -> bool:
 	attack_range_overlay.world = map.world
 	target_shape_overlay.world = map.world
 	cursor.world = map.world
-	_cur = Vector2.ZERO
-	cursor.position = map.world.as_global(_cur)
+	cursor.position = map.world.as_global(Vector2.ZERO)
 	
 	print("[Level] Loading done.")
 	return true
@@ -149,12 +91,21 @@ func _add_pathing_barriers():
 	dummy_container.name = '_LevelBarriers'
 	map.add_child(dummy_container)
 	
-	#for cell in impassable:
-	#	var barrier := preload("res://scenes/battle/map/map_objects/barrier.tscn").instantiate() as MapObject
-	#	barrier.map_position = Vector2(cell)
-	#	dummy_container.add_child(barrier)
+	for cell in impassable:
+		if _has_barrier(cell):
+			continue
+		var barrier: Barrier = BarrierScene.instantiate()
+		barrier.map_position = Vector2(cell)
+		dummy_container.add_child(barrier)
 	
 	map.pathing_painter.visible = false
+	
+	
+func _has_barrier(cell: Vector2) -> bool:
+	for obj in get_objects_at(cell):
+		if obj is Barrier:
+			return true
+	return false
 	
 	
 ## Unloads the map
@@ -166,11 +117,11 @@ func unload_map():
 		out_of_bounds.clear()
 		map.queue_free()
 		
-		$SampleWorld.visible = true
-		pathing_overlay.world = $SampleWorld
-		attack_range_overlay.world = $SampleWorld
-		target_shape_overlay.world = $SampleWorld
-		cursor.world = $SampleWorld
+		$WorldSample.visible = true
+		pathing_overlay.world = $WorldSample
+		attack_range_overlay.world = $WorldSample
+		target_shape_overlay.world = $WorldSample
+		cursor.world = $WorldSample
 		map = null
 		print("[Level] Unloading done.")
 	
@@ -251,6 +202,15 @@ func get_pathables_at(cell: Vector2) -> Array[PathableComponent]:
 	else:
 		return pathables[_to_index(cell)]
 		
+		
+## Returns the spawn points
+func get_spawn_points(type: SpawnPoint.Type) -> Array[SpawnPoint]:
+	var arr: Array[SpawnPoint] = []
+	for obj in objects:
+		if obj is SpawnPoint and obj.type == type:
+			arr.append(obj)
+	return arr
+	
 
 func _to_index(cell: Vector2) -> int:
 	return int(cell.y) * map.world.map_size.x + int(cell.x)
