@@ -21,6 +21,7 @@ Preferences="*res://scenes/common/preferences.gd"
 Persistent="*res://scenes/common/persistent.gd"
 SceneManager="*res://scene_manager.gd"
 SaveManager="*res://save_manager.gd"
+UnitEvents="*res://scenes/battle/unit/unit_events.gd"
 Game="*res://game.gd"
 
 [display]
