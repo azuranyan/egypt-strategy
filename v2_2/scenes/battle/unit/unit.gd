@@ -1,64 +1,25 @@
 class_name Unit extends Node
 ## The interface for unit.
 
-#region Game Signals
-signal empire_changed(old: Empire, new: Empire)
-signal behavior_changed(old: Behavior, new: Behavior)
-#endregion Game Signals
-
-#region Unit State Signals
-signal state_changed(old: State, new: State)
-signal position_changed(old_pos: Vector2, new_pos: Vector2)
-signal stat_changed(stat: StringName, value: int)
-signal damaged(value: int, source: Variant)
-signal healed(value: int, source: Variant)
-signal died
-signal revived
-signal status_effect_added(effect: StringName, duration: int)
-signal status_effect_removed(effect: StringName)
-#endregion Unit State Signals
-
-#region Unit Actions Signals
-
-signal walking_started(start: Vector2, end: Vector2)
-signal walking_finished(start: Vector2, end: Vector2)
-
-signal attack_started(st: AttackState)
-signal attack_finished(st: AttackState)
-#endregion Unit Actions Signals
-
-#region Map and Interaction Signals
-signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
-signal fielded
-signal unfielded
-#endregion Map and Interaction Signals
-
 
 # Turn flags
-## Unit moved bitflag.
-const HAS_MOVED := 1 << 0
-
-## Unit attacked bitflag.
-const HAS_ATTACKED := 1 << 1
-
-## Unit attacked bitflag.
-const IS_DONE := 1 << 2
+const HAS_MOVED := 1 << 0 ## Unit moved bitflag.
+const HAS_ATTACKED := 1 << 1 ## Unit attacked bitflag.
+const IS_DONE := 1 << 2 ## Unit attacked bitflag.
 
 # Phase flags
-## Default walk (phase friendly units).
-const PHASE_NONE = 0
-	
-## Ignores enemies.
-const PHASE_ENEMIES = 1 << 0
-	
-## Ignores doodads.
-const PHASE_DOODADS = 1 << 1
-	
-## Ignores terrain.
-const PHASE_TERRAIN = 1 << 2
-	
-## Ignores all pathing and placement restrictions.
-const PHASE_NO_CLIP = 1 << 3
+const PHASE_NONE := 0 ## Default movement (phase friendly units).
+const PHASE_ENEMIES := 1 << 0 ## Ignores enemies.
+const PHASE_DOODADS := 1 << 1 ## Ignores doodads.
+const PHASE_TERRAIN := 1 << 2 ## Ignores terrain.
+const PHASE_NO_CLIP := 1 << 3 ## Ignores all pathing and placement restrictions.
+
+# Stats.
+const MAX_HP := &'maxhp' ## Unit's max hp.
+const HP := &'hp' ## Unit's current hp.
+const RANGE := &'rng' ## Unit's range.
+const MOVE := &'mov' ## Unit's move range.
+const DAMAGE := &'dmg' ## Unit's damage.
 
 
 ## Dictates how his unit chooses its actions.
