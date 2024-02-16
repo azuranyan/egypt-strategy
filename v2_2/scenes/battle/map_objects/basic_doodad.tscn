@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=3 uid="uid://by6f8r0xmje87"]
+
+[ext_resource type="Script" path="res://scenes/battle/map_objects/basic_doodad.gd" id="1_wbcot"]
+[ext_resource type="Script" path="res://scenes/battle/pathable_component.gd" id="2_i7u0d"]
+[ext_resource type="Script" path="res://scenes/battle/default_pathing_condition.gd" id="3_d8x8d"]
+
+[sub_resource type="Resource" id="Resource_b7lmu"]
+script = ExtResource("3_d8x8d")
+
+[node name="BasicDoodad" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_wbcot")
+
+[node name="PathableComponent" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("2_i7u0d")
+pathing_group = 2
+conditions = Array[Resource("res://scenes/battle/pathing_condition.gd")]([SubResource("Resource_b7lmu")])
+map_object = NodePath("..")

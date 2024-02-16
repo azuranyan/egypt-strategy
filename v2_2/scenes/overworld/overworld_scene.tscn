@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=28 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
@@ -21,6 +21,7 @@
 [ext_resource type="Script" path="res://scenes/overworld/territory_node.gd" id="17_wovx7"]
 [ext_resource type="PackedScene" uid="uid://tswv0jrmndgy" path="res://maps/test/test.tscn" id="18_b6tny"]
 [ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="18_l1pmu"]
+[ext_resource type="PackedScene" uid="uid://c1r233k6re33q" path="res://maps/starting_zone/starting_zone.tscn" id="19_mec2q"]
 [ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
 
 [sub_resource type="Gradient" id="Gradient_n8nx8"]
@@ -190,7 +191,7 @@ offset_bottom = 519.0
 [node name="Neru-Khisi" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton/Zetennu"), NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
-maps = Array[PackedScene]([ExtResource("18_b6tny")])
+maps = Array[PackedScene]([ExtResource("19_mec2q")])
 _unit_list = PackedStringArray("cultist_axe", "cultist_sword", "cultist_priest")
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("16_0hx7d")]
@@ -335,4 +336,3 @@ expand_mode = 1
 stretch_mode = 4
 
 [connection signal="pressed" from="HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]
-

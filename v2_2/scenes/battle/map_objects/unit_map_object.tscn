@@ -84,6 +84,7 @@ texture = SubResource("GradientTexture2D_e55k7")
 
 [node name="Pathable" type="Node" parent="." node_paths=PackedStringArray("map_object")]
 script = ExtResource("2_4td8b")
+pathing_group = 1
 map_object = NodePath("..")
 
 [node name="HUD" type="Control" parent="."]
@@ -185,4 +186,3 @@ grow_horizontal = 2
 grow_vertical = 0
 texture_under = SubResource("GradientTexture2D_lum62")
 texture_progress = SubResource("GradientTexture2D_o6du0")
-

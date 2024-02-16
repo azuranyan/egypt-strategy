@@ -243,6 +243,7 @@ offset_bottom = 40.0
 
 [node name="Viewport" type="SubViewport" parent="Control/ViewportContainer"]
 unique_name_in_owner = true
+transparent_bg = true
 handle_input_locally = false
 physics_object_picking = true
 size = Vector2i(1920, 1080)

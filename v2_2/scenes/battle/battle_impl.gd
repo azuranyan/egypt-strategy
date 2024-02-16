@@ -404,12 +404,32 @@ func remove_map_object(map_object: MapObject) -> void:
 
 ## Draws overlays.
 func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay):
-	assert(false, 'not implemented')
+	# TODO yes i know this is stupid, but i need the debugging info
+	# for this so i want them to be separate for now
+	var overlays := {
+		Overlay.PATHABLE: level.pathing_overlay,
+		Overlay.ATTACK_RANGE: level.attack_range_overlay,
+		Overlay.TARGET_SHAPE: level.target_shape_overlay, 
+		Overlay.PATH: level.unit_path,
+	}
+
+	for overlay in overlays:
+		if _overlay == overlay:
+			overlays[overlay].set_cells(_cells)
+		else:
+			overlays[overlay].erase_cells(_cells)
 	
 	
 ## Clears overlays.
 func clear_overlays(_overlay_mask: int):
-	assert(false, 'not implemented')
+	if _overlay_mask & (1 << Overlay.PATHABLE):
+		level.pathing_overlay.clear()
+	if _overlay_mask & (1 << Overlay.ATTACK_RANGE):
+		level.attack_range_overlay.clear()
+	if _overlay_mask & (1 << Overlay.TARGET_SHAPE):
+		level.target_shape_overlay.clear()
+	if _overlay_mask & (1 << Overlay.PATH):
+		level.unit_path.clear()
 	
 
 ## Sets the camera target. If target are either [Unit] or [Node2D],
@@ -567,6 +587,11 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 	get_active_battle_scene().hud.hide()
 	await set_camera_target(unit)
 
+	if on_turn() == ai():
+		Game.battle.draw_overlay(unit.get_pathable_cells(true), Battle.Overlay.PATHABLE)
+		await get_tree().create_timer(0.5).timeout
+		Game.battle.clear_overlays(1 << Battle.Overlay.PATHABLE)
+		
 	await unit.walk_towards(target)
 
 	await set_camera_target(null)

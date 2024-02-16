@@ -35,6 +35,11 @@ func set_cells(cells: PackedVector2Array, tile_color: TileColor = TileColor.SOLI
 		set_cell(layer, cell, 0, Vector2i(tile_color, 0))
 
 
+func erase_cells(cells: PackedVector2Array, layer: int = 0):
+	for cell in cells:
+		erase_cell(layer, cell)
+
+
 func get_used_cells_by_color(tile_color: TileColor, layer: int = 0) -> Array[Vector2i]:
 	return get_used_cells_by_id(layer, 0, Vector2i(tile_color, 0))
 

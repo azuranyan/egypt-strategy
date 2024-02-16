@@ -79,6 +79,10 @@ func get_internal_size() -> Vector2:
 	else:
 		return Vector2.ZERO
 		
+
+## Returns the internal scale.
+func get_internal_scale() -> Vector2:
+	return Game.get_viewport_size()/get_internal_size()
 		
 ## Returns the global coordinates of uniform v.
 func as_global(v: Vector2) -> Vector2:

@@ -10,7 +10,7 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
 gradient = SubResource("Gradient_xu6og")
 
 [node name="SpawnPoint" type="Node2D"]
-visible = false
+modulate = Color(1, 0, 0, 0.2)
 script = ExtResource("1_8lfal")
 
 [node name="Transformable" type="Node2D" parent="."]

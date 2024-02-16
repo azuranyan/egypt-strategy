@@ -25,6 +25,7 @@ func _initialize():
 	battle = Game.battle
 	battle.hud().end_button.pressed.connect(_on_end_pressed)
 	battle.hud().undo_button.pressed.connect(_on_undo_pressed)
+	battle.hud().undo_button.disabled = true
 	battle.hud().prep_unit_list.unit_selected.connect(_on_prep_unit_selected)
 	battle.hud().prep_unit_list.unit_released.connect(_on_prep_unit_released)
 	battle.hud().prep_unit_list.unit_dragged.connect(_on_prep_unit_dragged)
@@ -108,6 +109,9 @@ func interact_start_battle():
 		return
 	end_prepare_units()
 	
+
+func interact_try_use_attack() -> bool:
+	return false
 
 	
 func is_hero_deployed() -> bool:

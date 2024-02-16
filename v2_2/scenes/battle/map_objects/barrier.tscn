@@ -14,10 +14,11 @@ light_mask = 512
 visibility_layer = 512
 script = ExtResource("1_g6v07")
 
-[node name="PathableComponent" type="Node" parent="."]
+[node name="PathableComponent" type="Node" parent="." node_paths=PackedStringArray("map_object")]
 script = ExtResource("1_x3k7x")
 pathing_group = 4
 conditions = Array[Resource("res://scenes/battle/pathing_condition.gd")]([SubResource("Resource_5jrwb")])
+map_object = NodePath("..")
 
 [node name="Transformable" type="Node2D" parent="."]
 script = ExtResource("3_p2csm")

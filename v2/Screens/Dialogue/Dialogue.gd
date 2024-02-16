@@ -18,6 +18,9 @@ var is_waiting_for_input: bool = false
 ## See if we are running a long mutation and should hide the balloon
 var will_hide_balloon: bool = false
 
+## If we should skip the opening animation
+var skip_animation: bool = false
+
 ## The current line
 var dialogue_line: DialogueLine:
 	set(next_dialogue_line):
@@ -46,6 +49,9 @@ var dialogue_line: DialogueLine:
 		responses_menu.set_responses(dialogue_line.responses)
 
 		# Show our balloon
+		if not skip_animation:
+			$AnimationPlayer.play("appear")
+			skip_animation = true
 		balloon.show()
 		will_hide_balloon = false
 
@@ -61,6 +67,7 @@ var dialogue_line: DialogueLine:
 		elif dialogue_line.time != "":
 			var time = dialogue_line.text.length() * 0.02 if dialogue_line.time == "auto" else dialogue_line.time.to_float()
 			await get_tree().create_timer(time).timeout
+			skip_animation = false
 			next(dialogue_line.next_id)
 		else:
 			is_waiting_for_input = true
@@ -85,7 +92,7 @@ func start(dialogue_resource: DialogueResource, title: String, extra_game_states
 	temporary_game_states =  [self] + extra_game_states
 	is_waiting_for_input = false
 	resource = dialogue_resource
-	$AnimationPlayer.play("appear")
+	skip_animation = false
 	self.dialogue_line = await resource.get_next_dialogue_line(title, temporary_game_states)
 
 

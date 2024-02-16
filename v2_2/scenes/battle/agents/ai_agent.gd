@@ -60,7 +60,8 @@ func _enter_turn():
 	while not unit_action_queue.is_empty():
 		var unit: Unit = unit_action_queue.pop_back()
 		
-		await battle.do_action(unit, make_action_for(unit))
+		var action := make_action_for(unit)
+		await battle.do_action(unit, action)
 		await get_tree().create_timer(action_cooldown).timeout
 	end_turn()
 	
