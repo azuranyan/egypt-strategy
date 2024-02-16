@@ -42,7 +42,7 @@ func _ready():
 	
 	
 func _on_player_prep_phase():
-	for u in Game.get_empire_units(Game.battle.player()):
+	for u in Game.get_empire_units(Game.battle.player(), Game.ALL_UNITS_MASK):
 		prep_unit_list.add_unit(u)
 
 
@@ -77,6 +77,11 @@ func update():
 	set_bonus_goal(bonus_goals)
 	action_order_button.visible = battle_phase and is_player_turn
 
+
+## Returns the selected unit.
+func get_selected_unit() -> Unit:
+	return _selected_unit
+
 	
 ## Sets the selected unit. This will call [method clear_selected_unit] if null.
 func set_selected_unit(unit: Unit):
@@ -89,18 +94,16 @@ func set_selected_unit(unit: Unit):
 	%CharacterNameLabel.text = unit.display_name().to_upper()
 	%CharacterPortraitRect.texture = unit.display_icon()
 	
-	var is_owned := unit.get_empire() == Game.battle.on_turn()
-	rest_button.visible = is_owned
+	var show_buttons := Game.battle.is_battle_phase() and unit.get_empire() == Game.battle.on_turn()
+	rest_button.visible = show_buttons
 	rest_button.disabled = not unit.can_act()
 	
-	fight_button.visible = is_owned
-	fight_button.visible = unit.basic_attack() != null
+	fight_button.visible = show_buttons and unit.basic_attack() != null
 	fight_button.disabled = not unit.can_attack()
 	
-	deify_button.visible = is_owned
-	deify_button.visible = unit.special_attack() != null
+	deify_button.visible = show_buttons and unit.special_attack() != null
 	deify_button.disabled = not unit.can_attack() or not unit.is_special_unlocked()
-	
+
 	
 ## Clears the selected unit and hides the character panel.
 func clear_selected_unit():

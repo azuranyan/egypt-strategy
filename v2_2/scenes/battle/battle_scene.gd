@@ -7,17 +7,18 @@ signal _ctc
 
 @onready var level := %Level
 @onready var hud: BattleHUD = $HUDVisibilityControl/HUD
-@onready var hud_visibility_control = $HUDVisibilityControl
+@onready var hud_visibility_control := $HUDVisibilityControl
+@onready var battle_start_banner := $BattleStartBanner
 @onready var pause_menu := $PauseMenu
-@onready var forfeit_dialog := $ForfeitDialog
 @onready var battle_result_screen = $BattleResultScreen
 
-@onready var camera = %Camera2D
-
+@onready var viewport: Viewport = %Viewport
+@onready var camera: Camera2D = %Camera2D
 
 
 func _ready():
-	pause_menu.forfeit_button.pressed.connect(forfeit_dialog.show)
+	viewport.canvas_cull_mask &= ~(1 << 9)
+	pause_menu.forfeit_button.pressed.connect(Game.battle.show_forfeit_dialog)
 		
 
 func _unhandled_input(event):
@@ -28,7 +29,7 @@ func _unhandled_input(event):
 		if Game.battle.is_battle_phase():
 			pause_menu.show()
 		else:
-			forfeit_dialog.show()
+			Game.battle.show_forfeit_dialog()
 		get_viewport().set_input_as_handled()
 	
 
@@ -71,6 +72,17 @@ func clear_camera_target(reset_position: bool = false):
 	if reset_position:
 		camera.position = Game.get_viewport_size()/2
 	
+
+## Displays the battle start banner.
+func show_battle_start():
+	battle_start_banner.show()
+	var anim: AnimationPlayer = battle_start_banner.get_node('AnimationPlayer')
+	anim.play('show')
+	await anim.animation_finished
+	anim.play('hide')
+	await anim.animation_finished
+	battle_start_banner.hide()
+
 	
 ## Displays the battle result.
 func show_battle_results():

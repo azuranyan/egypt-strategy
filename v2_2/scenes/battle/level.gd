@@ -38,6 +38,10 @@ var unit: Unit
 @onready var unit_path := $WorldOverlays/UnitPath
 
 
+func _ready():
+	load_map(preload('res://maps/test/test.tscn'))
+
+
 ## Loads a map.
 func load_map(packed_scene: PackedScene) -> bool:
 	if not packed_scene:

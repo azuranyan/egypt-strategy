@@ -69,6 +69,7 @@ func _real_battle():
 	print("Entering real battle.")
 	SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
 	await SceneManager.transition_finished
+	get_active_battle_scene().hud.menu_button.pressed.connect(show_pause_menu)
 	level = get_active_battle_scene().level
 	
 	_field_units()
@@ -101,7 +102,7 @@ func _field_units():
 	
 func _unfield_units():
 	for u: Unit in Game.unit_registry.values():
-		u.state_changed.connect(_on_unit_state_changed_to_dying.bind(u))
+		u.state_changed.disconnect(_on_unit_state_changed_to_dying.bind(u))
 		u.died.disconnect(_queue_unit_death.bind(u))
 		u.unfield_unit()
 		
@@ -127,6 +128,8 @@ func _real_battle_main():
 	# player can quit on prep, so make sure to account for it
 	if _should_end:
 		return
+	
+	await get_active_battle_scene().show_battle_start()
 
 	_battle_phase = true
 	battle_started.emit(_attacker, _defender, _territory, _map_id)
@@ -218,6 +221,7 @@ func create_agent(empire: Empire) -> BattleAgent:
 	else:
 		agent = load("res://scenes/battle/agents/ai_agent.gd").new()
 	add_child(agent)
+	agent.name = empire.leader_name()
 	agent.initialize(empire)
 	agents[empire] = agent
 	return agent
@@ -347,6 +351,11 @@ func get_pathables_at(cell: Vector2) -> Array[PathableComponent]:
 		return []
 	return level.get_pathables_at(cell)
 
+
+## Returns the world.
+func world() -> World:
+	return level.map.world
+
 	
 ## Returns the world bounds.
 func world_bounds() -> Rect2:
@@ -423,6 +432,50 @@ func _camera_target_position(target: Variant) -> Vector2:
 		return target
 	return get_active_battle_scene().camera.position
 		
+
+## Returns the HUD.
+func hud() -> BattleHUD:
+	return get_active_battle_scene().hud
+
+
+func show_pause_menu() -> void:
+	get_active_battle_scene().pause_menu.show()
+
+
+func hide_pause_menu() -> void:
+	get_active_battle_scene().pause_menu.hide()
+
+
+var forfeit_dialog: PauseDialog
+
+
+func show_forfeit_dialog() -> void:
+	hide_forfeit_dialog()
+
+	if not is_battle_phase() and player() == attacker():
+		forfeit_dialog = Game.create_pause_dialog("Cancel Attack?", 'Yes', 'No')
+	else:
+		forfeit_dialog = Game.create_pause_dialog("Forfeit?", 'Confirm', 'Cancel')
+		forfeit_dialog.confirm_button.disabled = player() == defender()
+	
+	var forfeit_confirm: bool = await forfeit_dialog.closed
+	print(forfeit_confirm)
+	if not forfeit_confirm:
+		return
+	
+	if not is_battle_phase():
+		end_battle(BattleResult.CANCELLED)
+	else:
+		if player() == attacker():
+			end_battle(BattleResult.ATTACKER_WITHDRAW)
+		else:
+			end_battle(BattleResult.DEFENDER_WITHDRAW)
+
+
+func hide_forfeit_dialog() -> void:
+	if is_instance_valid(forfeit_dialog):
+		forfeit_dialog.hide()
+	
 
 #region Actions
 ## Returns [constant Error.OK] if movement is valid otherwise returns the error code.

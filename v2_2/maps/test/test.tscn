@@ -36,81 +36,72 @@ y_sort_enabled = true
 script = ExtResource("3_qtici")
 
 [node name="UnitMapObject" parent="." instance=ExtResource("6_1hp1t")]
-position = Vector2(1155.71, 598.978)
 map_position = Vector2(8, 5)
 
 [node name="SpawnPoint" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(1, 0, 0, 0.2)
-position = Vector2(867.21, 543.297)
 map_position = Vector2(4, 7)
 
 [node name="SpawnPoint2" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(1, 0, 0, 0.2)
-position = Vector2(819.127, 682.499)
 map_position = Vector2(6, 10)
 
 [node name="SpawnPoint3" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(1, 0, 0, 0.2)
-position = Vector2(1107.63, 682.499)
 map_position = Vector2(9, 7)
 
 [node name="SpawnPoint4" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(1, 0, 0, 0.2)
-position = Vector2(1299.96, 515.457)
 map_position = Vector2(8, 2)
 
 [node name="SpawnPoint5" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(0, 0, 1, 0.2)
-position = Vector2(963.377, 543.297)
 type = 1
 map_position = Vector2(5, 6)
 
 [node name="SpawnPoint6" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(0, 0, 1, 0.2)
-position = Vector2(915.294, 682.499)
 type = 1
 map_position = Vector2(7, 9)
 
 [node name="SpawnPoint7" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(0, 0, 1, 0.2)
-position = Vector2(1059.54, 766.019)
 type = 1
 map_position = Vector2(10, 9)
 
 [node name="SpawnPoint8" parent="." instance=ExtResource("7_wihym")]
+visible = true
 modulate = Color(0, 0, 1, 0.2)
-position = Vector2(1348.04, 598.978)
 type = 1
 map_position = Vector2(10, 3)
 
 [node name="Barrier" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(722.96, 571.138)
 map_position = Vector2(3, 9)
 
 [node name="Barrier6" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(674.877, 543.297)
 map_position = Vector2(2, 9)
 
 [node name="Barrier7" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(626.794, 515.457)
 map_position = Vector2(1, 9)
 
 [node name="Barrier8" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(578.711, 487.617)
 map_position = Vector2(0, 9)
 
 [node name="Barrier2" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(674.877, 598.978)
 map_position = Vector2(3, 10)
 
 [node name="Barrier3" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(722.96, 626.818)
 map_position = Vector2(4, 10)
 
 [node name="Barrier4" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(771.044, 654.658)
 map_position = Vector2(5, 10)
 
 [node name="Barrier5" parent="." instance=ExtResource("8_njobe")]
-position = Vector2(722.96, 682.499)
 map_position = Vector2(5, 11)

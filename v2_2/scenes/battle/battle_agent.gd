@@ -67,6 +67,12 @@ func start_turn():
 func end_turn():
 	if _agent_state == State.ON_TURN:
 		_turn_done.emit()
+
+
+## Unconditionally ends either phase.
+func force_end():
+	end_prepare_units()
+	end_turn()
 		
 		
 ## Returns the agent name.

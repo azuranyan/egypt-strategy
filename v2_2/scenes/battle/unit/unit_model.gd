@@ -48,6 +48,10 @@ func _emit_animation_finished():
 	animation_finished.emit(state)
 
 
+func _emit_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
+	interacted.emit(cursor_pos, button_index, pressed)
+
+
 ## Updates the animation to match the current state.
 func update_animation():
 	sprite.play(get_animation_name(state))
@@ -84,7 +88,7 @@ func _on_cursor_detector_input_event(_viewport, event, _shape_idx):
 		_mouse_button_mask |= event.button_mask
 		set_process_input(true)
 		# TODO probably wrong, check position, this should be global
-		interacted.emit(event.position, event.button_index, true)
+		_emit_interacted(event.position, event.button_index, true)
 		
 
 func _input(event):
@@ -93,5 +97,5 @@ func _input(event):
 		if _mouse_button_mask & mask != 0:
 			_mouse_button_mask &= ~mask
 			set_process_input(_mouse_button_mask != 0)
-			interacted.emit(event.position, event.button_index, false)
+			_emit_interacted(event.position, event.button_index, false)
 			

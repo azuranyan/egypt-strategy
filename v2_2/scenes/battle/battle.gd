@@ -214,6 +214,12 @@ func get_pathables_at(_cell: Vector2) -> Array[PathableComponent]:
 	assert(false, 'not implemented')
 	return []
 
+
+## Returns the world.
+func world() -> World:
+	assert(false, 'not implemented')
+	return null
+
 	
 ## Returns the world bounds.
 func world_bounds() -> Rect2:
@@ -272,6 +278,28 @@ func clear_overlays(_overlay_mask: int) -> void:
 func set_camera_target(_target: Variant) -> void:
 	assert(false, 'not implemented')
 
+
+## Returns the HUD.
+func hud() -> BattleHUD:
+	assert(false, 'not implemented')
+	return null
+
+
+func show_pause_menu() -> void:
+	assert(false, 'not implemented')
+
+
+func hide_pause_menu() -> void:
+	assert(false, 'not implemented')
+
+
+func show_forfeit_dialog() -> void:
+	assert(false, 'not implemented')
+
+
+func hide_forfeit_dialog() -> void:
+	assert(false, 'not implemented')
+	
 	
 #region Actions
 ## Returns [constant Error.OK] if movement is valid otherwise returns the error code.

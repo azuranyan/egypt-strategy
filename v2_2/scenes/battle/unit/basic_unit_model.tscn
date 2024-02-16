@@ -4,10 +4,10 @@
 [ext_resource type="SpriteFrames" uid="uid://q7fm5unoyvur" path="res://scenes/battle/unit/data/placeholder_sprite_frames.tres" id="2_kix1i"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mveqy"]
-radius = 12.0
+radius = 15.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_266ts"]
-size = Vector2(15, 51)
+size = Vector2(30, 51)
 
 [node name="UnitModel" type="Node2D"]
 scale = Vector2(-1, 1)
@@ -33,4 +33,3 @@ position = Vector2(-3, -25)
 shape = SubResource("RectangleShape2D_266ts")
 
 [connection signal="input_event" from="CursorDetector" to="." method="_on_cursor_detector_input_event"]
-

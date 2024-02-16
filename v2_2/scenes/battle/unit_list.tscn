@@ -168,4 +168,3 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_5r3b1")
 toggle_mode = true
 keep_pressed_outside = true
 button_group = SubResource("ButtonGroup_x7o0x")
-

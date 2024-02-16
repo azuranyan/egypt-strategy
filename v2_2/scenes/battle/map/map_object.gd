@@ -2,9 +2,13 @@
 class_name MapObject
 extends Node2D
 
-
+## Emitted when world is changed.
 signal world_changed
+
+## Emitted when object cell position is changed.
 signal cell_changed(old_cell: Vector2, new_cell: Vector2)
+
+## Emitted when object map position is changed.
 signal map_position_changed(old_position: Vector2, new_position: Vector2)
 
 
@@ -19,6 +23,7 @@ const TILE_COLORS := {
 
 @export_group("Map")
 
+## Object position in uniform (map) coordinates.
 @export var map_position: Vector2 = Vector2.ZERO:
 	set(value):
 		var old := map_position
@@ -28,13 +33,17 @@ const TILE_COLORS := {
 		_update_position()
 		map_position_changed.emit(old, map_position)
 
+## Snaps object to cell grid. Only works in the editor.
 @export var snap_to_cell: bool = true:
 	set(value):
 		snap_to_cell = value
 		_sync_map_position()
 
 
+## A reference to the world.
 var world: World
+
+## Attached components.
 var components := {}
 
 var _global_pos: Vector2
@@ -69,6 +78,7 @@ func _exit_tree():
 	update_configuration_warnings()
 
 
+## Sets the position to [constant Map.OUT_OF_BOUNDS].
 func set_standby(standby: bool):
 	if standby:
 		_standby_pos = map_position
@@ -77,10 +87,12 @@ func set_standby(standby: bool):
 		map_position = _standby_pos
 	
 
+## Returns true if this object is on standby.
 func is_standby() -> bool:
 	return map_position == Map.OUT_OF_BOUNDS
 	
 
+## Returns the cell this object resides in.
 func cell() -> Vector2:
 	return Vector2(round(map_position.x), round(map_position.y))
 	

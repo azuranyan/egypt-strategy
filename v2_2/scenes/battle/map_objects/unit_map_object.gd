@@ -117,8 +117,8 @@ func set_unit_model(new_model: UnitModel):
 	add_child(unit_model)
 	
 	
-func _emit_model_animation_finished(state: Unit.State):
-	animation_finished.emit(state)
+func _emit_model_animation_finished(st: Unit.State):
+	animation_finished.emit(st)
 	
 	
 func _emit_model_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
@@ -157,7 +157,7 @@ func _update_hp_bar(hp: int, maxhp: int):
 	hp_bar.value = hp/float(maxhp) * hp_bar.max_value
 	
 	
-func _update_state(old: Unit.State, new: Unit.State):
+func _update_state(_old: Unit.State, new: Unit.State):
 	unit_model.state = new
 	$HUD.visible = unit.is_alive()
 	

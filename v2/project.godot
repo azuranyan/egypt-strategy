@@ -35,6 +35,10 @@ window/size/mode=2
 window/stretch/mode="viewport"
 window/stretch/aspect="keep_width"
 
+[dotnet]
+
+project/assembly_name="Egyptian Fantasy"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg")

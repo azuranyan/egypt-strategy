@@ -6,7 +6,6 @@ signal game_ended
 signal game_resumed
 
 
-
 ## Alive unit mask for [method get_empire_units].
 const ALIVE_MASK := 1
 
@@ -198,15 +197,15 @@ func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
 		if e and u.get_empire() != e:
 			continue
 		if mask != ALL_UNITS_MASK:
-			if mask & ALIVE_MASK and not u.is_alive():
+			if bool(mask & ALIVE_MASK) != u.is_alive():
 				continue
-			if mask & DEAD_MASK and not u.is_dead():
+			if bool(mask & DEAD_MASK) != u.is_dead():
 				continue
-			if mask & STANDBY_MASK and not u.is_standby():
+			if bool(mask & STANDBY_MASK) != u.is_standby():
 				continue
-			if mask & FIELDED_MASK and not u.is_fielded():
+			if bool(mask & FIELDED_MASK) != u.is_fielded():
 				continue
-			if mask & SELECTABLE_MASK and not u.is_selectable():
+			if bool(mask & SELECTABLE_MASK) != u.is_selectable():
 				continue
 		arr.append(u)
 	return arr
@@ -234,7 +233,17 @@ func get_unit_type(unit_name: String) -> UnitType:
 		return preload('res://units/placeholder/unit_type.tres')
 #endregion Unit
 
-	
+
+## Creates a pause dialog.
+func create_pause_dialog(message: String, confirm: String, cancel: String, background := true) -> PauseDialog:
+	# avoid circular ref(!!)
+	var pause = load('res://scenes/battle/hud/pause_dialog.tscn').instantiate()
+	get_tree().root.add_child(pause)
+	pause.background = background
+	pause.open_dialog(message, confirm, cancel)
+	return pause
+
+
 ## Suspends the game execution.[br]
 ##
 ## This is different from pause that stops game execution and processing.

@@ -341,6 +341,17 @@ func get_position() -> Vector2:
 ## Sets the position of this unit.
 func set_position(_pos: Vector2) -> void:
 	assert(false, 'not implemented')
+
+
+## Returns the global position of this unit.
+func get_global_position() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
+## Sets the global position of this unit.
+func set_global_position(_pos: Vector2) -> void:
+	assert(false, 'not implemented')
 	
 	
 ## Returns true if this unit is on standby.

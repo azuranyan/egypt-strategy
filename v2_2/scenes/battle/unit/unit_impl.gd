@@ -402,6 +402,16 @@ func set_position(pos: Vector2) -> void:
 		map_object.map_position = pos # this will sync to our _map_position
 	else:
 		_map_position = pos
+
+
+## Returns the global position of this unit.
+func get_global_position() -> Vector2:
+	return battle.world().as_global(get_position())
+
+
+## Sets the global position of this unit.
+func set_global_position(pos: Vector2) -> void:
+	set_position(battle.world().as_uniform(pos))
 	
 	
 ## Returns true if this unit is on standby.
@@ -424,8 +434,10 @@ func get_heading() -> Map.Heading:
 	
 ## Sets the direction this unit is facing.
 func set_heading(heading: Map.Heading) -> void:
-	_heading = heading
-	map_object.heading = heading
+	if is_fielded():
+		map_object.heading = heading
+	else:
+		_heading = heading
 	
 	
 ## Sets this units walk speed.
