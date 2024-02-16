@@ -146,36 +146,37 @@ func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -
 	assert(chara != null, 'placeholder chara not found')
 	assert(unit_type != null, 'placeholder unit_type expected')
 
-	# create new unit, don't use preload to prevent a cascading error
-	# when UnitImpl fails to compile and avoid circular dependencies.
+	# don't use preload to prevent a cascading error when UnitImpl
+	# fails to compile and avoid circular dependencies.
 	var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
-	
-	# a stupid way of doing it, but we can't pass args to instantiate()
+	var unit_id := save.next_unit_id
+
+	# we can't pass args to instantate so we do it this way
 	var data = unit.save_state()
-	data.id = save.next_unit_id
+	data.id = unit_id
+	if chara != preload("res://units/placeholder/chara.tres"):
+		data.display_name = chara.name
+	else:
+		data.display_name = chara_id.capitalize()
+	data.display_icon = chara.portrait
 	data.chara_id = chara_id
 	data.chara = chara
 	data.unit_type = unit_type
 	data.empire = empire
 	unit.load_state(data)
 	
-	if chara == preload("res://units/placeholder/chara.tres"):
-		unit._display_name = chara_id.capitalize()
-		unit._display_icon = chara.portrait
-	else:
-		unit._display_name = chara.name
-		unit._display_icon = chara.portrait
+	# making it look nice in the remote inspector
+	unit.name = '%s%s' % [chara_id, unit_id]
 	
-	unit.name = '%s%s' % [chara_id, save.next_unit_id]
+	# adding to registry
 	get_node('Units').add_child(unit)
-	
-	save.units[save.next_unit_id] = unit.save_state()
-	save.next_unit_id += 1
-	
+	save.units[unit_id] = unit.save_state()
+	save.next_unit_id = unit_id + 1
+	unit_registry[unit_id] = unit
+	unit.add_to_group('all_units')
+	UnitEvents.created.emit(unit)
 	return unit
 	
-
-
 
 ## Loads a unit by id.
 func load_unit(unit_id: int) -> Unit:
@@ -184,6 +185,12 @@ func load_unit(unit_id: int) -> Unit:
 
 ## Removes the unit.
 func destroy_unit(unit: Unit):
+	if unit.id() not in unit_registry:
+		push_error('destroying unit not in the registry')
+		return
+
+	UnitEvents.destroying.emit(unit)
+	unit.remove_from_group('all_units')
 	unit_registry.erase(unit.id())
 	get_node('Units').remove_child(unit)
 	unit.queue_free()
@@ -325,13 +332,8 @@ func save_state() -> SaveState:
 func load_state(save: SaveState):
 	print('[Game] Loading state.')
 	
-	for child in get_node('Units').get_children():
-		get_node('Units').remove_child(child)
-		child.queue_free()
-		
 	for u in unit_registry.values():
 		destroy_unit(u)
-	unit_registry.clear()
 		
 	# load them again as UnitImpl's
 	for data in save.units.values():
