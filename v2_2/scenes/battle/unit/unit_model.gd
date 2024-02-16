@@ -7,8 +7,17 @@ extends Node2D
 ## Emitted when model is done animating. This will not be emitted for looping animations!
 signal animation_finished(state: Unit.State)
 
-## Emitted when the model is interacted to.
-signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
+## Emitted when the model receives an input event.
+signal input_event(event: InputEvent)
+
+## Emitted when the mouse enters the detection area.
+signal mouse_entered()
+
+## Emitted when the mouse exit the detection area.
+signal mouse_exited()
+
+## Emitted when the model is clicked.
+signal clicked(mouse_pos: Vector2, button_index: int, pressed: bool)
 
 
 ## The state of this model.
@@ -27,13 +36,26 @@ signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
 			await ready
 		scale.x = -1 if heading == Map.Heading.NORTH or heading == Map.Heading.EAST else 1
 		update_animation()
-		
-		
+
 ## The sprite used for the model.
-@onready var sprite: AnimatedSprite2D = %Sprite
+@export var sprite: AnimatedSprite2D:
+	set(value):
+		Util.just_disconnect(sprite, 'animation_finished', _emit_animation_finished)
+		sprite = value
+		Util.just_connect(sprite, 'animation_finished', _emit_animation_finished)
+		update_configuration_warnings()
 
 ## The [Area2D] used for mouse detections.
-@onready var cursor_detector: Area2D = %CursorDetector
+@export var detector: Area2D:
+	set(value):
+		Util.just_disconnect(detector, 'input_event', _on_detector_input_event)
+		Util.just_disconnect(detector, 'mouse_entered', emit_signal.bind('mouse_entered'))
+		Util.just_disconnect(detector, 'mouse_exited', emit_signal.bind('mouse_exited'))
+		detector = value
+		Util.just_connect(detector, 'input_event', _on_detector_input_event)
+		Util.just_connect(detector, 'mouse_entered', emit_signal.bind('mouse_entered'))
+		Util.just_connect(detector, 'mouse_exited', emit_signal.bind('mouse_exited'))
+		update_configuration_warnings()
 
 
 var _mouse_button_mask := 0
@@ -41,15 +63,19 @@ var _mouse_button_mask := 0
 
 func _ready():
 	set_process_input(false)
-	sprite.animation_finished.connect(_emit_animation_finished)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var re := PackedStringArray()
+	if not sprite:
+		re.append('sprite is null!')
+	if not detector:
+		re.append('detector is null!')
+	return re
 
 
 func _emit_animation_finished():
 	animation_finished.emit(state)
-
-
-func _emit_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
-	interacted.emit(cursor_pos, button_index, pressed)
 
 
 ## Updates the animation to match the current state.
@@ -83,19 +109,21 @@ func get_animation_name(_state: Unit.State) -> StringName:
 		return front_animation_names[_state]
 
 
-func _on_cursor_detector_input_event(_viewport, event, _shape_idx):
+func _on_detector_input_event(_viewport, event, _shape_idx):
+	input_event.emit(event)
 	if event is InputEventMouseButton and event.pressed:
 		_mouse_button_mask |= event.button_mask
 		set_process_input(true)
-		# TODO probably wrong, check position, this should be global
-		_emit_interacted(event.position, event.button_index, true)
+		# might be wrong? check position if it should be global
+		clicked.emit(event.position, event.button_index, true)
 		
 
 func _input(event):
+	# this allows buttons to be released outside the object.
 	if event is InputEventMouseButton and not event.pressed:
 		var mask: int = (1 << (event.button_index - 1))
 		if _mouse_button_mask & mask != 0:
 			_mouse_button_mask &= ~mask
 			set_process_input(_mouse_button_mask != 0)
-			_emit_interacted(event.position, event.button_index, false)
+			clicked.emit(event.position, event.button_index, false)
 			

@@ -9,27 +9,28 @@ radius = 15.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_266ts"]
 size = Vector2(30, 51)
 
-[node name="UnitModel" type="Node2D"]
+[node name="UnitModel" type="Node2D" node_paths=PackedStringArray("sprite", "detector")]
+position = Vector2(323, 222)
 scale = Vector2(-1, 1)
 script = ExtResource("1_l5fke")
+sprite = NodePath("Sprite")
+detector = NodePath("MouseDetector")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
-unique_name_in_owner = true
 position = Vector2(0, -38)
 scale = Vector2(0.575, 0.575)
 sprite_frames = ExtResource("2_kix1i")
 animation = &"front_idle"
 frame_progress = 1.0
 
-[node name="CursorDetector" type="Area2D" parent="."]
-unique_name_in_owner = true
+[node name="MouseDetector" type="Area2D" parent="."]
 
-[node name="Head" type="CollisionShape2D" parent="CursorDetector"]
+[node name="Head" type="CollisionShape2D" parent="MouseDetector"]
 position = Vector2(-4, -65)
 shape = SubResource("CircleShape2D_mveqy")
 
-[node name="Body" type="CollisionShape2D" parent="CursorDetector"]
+[node name="Body" type="CollisionShape2D" parent="MouseDetector"]
 position = Vector2(-3, -25)
 shape = SubResource("RectangleShape2D_266ts")
 
-[connection signal="input_event" from="CursorDetector" to="." method="_on_cursor_detector_input_event"]
+[connection signal="input_event" from="MouseDetector" to="." method="_on_cursor_detector_input_event"]
