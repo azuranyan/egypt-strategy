@@ -36,6 +36,7 @@ y_sort_enabled = true
 script = ExtResource("3_qtici")
 
 [node name="UnitMapObject" parent="." instance=ExtResource("6_1hp1t")]
+highlight = null
 map_position = Vector2(8, 5)
 
 [node name="SpawnPoint" parent="." instance=ExtResource("7_wihym")]

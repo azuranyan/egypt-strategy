@@ -11,6 +11,12 @@ signal animation_finished(state: Unit.State)
 signal heading_changed(old_heading: Map.Heading, new_heading: Map.Heading)
 
 
+enum Highlight {
+	NONE,
+	NORMAL,
+	RED,
+}
+
 const BasicUnitModel := preload("res://scenes/battle/unit/basic_unit_model.tscn")
 
 
@@ -42,6 +48,15 @@ const BasicUnitModel := preload("res://scenes/battle/unit/basic_unit_model.tscn"
 		if unit_model:
 			unit_model.heading = heading
 		heading_changed.emit(old, heading)
+
+
+@export var highlight := Highlight.NONE:
+	set(value):
+		const HIGHLIGHT_ANIMATIONS := ['RESET', 'highlight', 'highlight_red']
+		highlight = value
+		if not is_node_ready():
+			await ready
+		$AnimationPlayer.play(HIGHLIGHT_ANIMATIONS[highlight])
 		
 		
 ## A reference to the created unit. It's here for convenience, [b]do not change.[/b]
@@ -57,12 +72,24 @@ var unit_model: UnitModel
 
 func _ready():
 	super._ready()
+
+	# cleanup dangling unitmodels from scene (tool changes and stuff)
+	_remove_model_recursive(self)
+
 	if not Engine.is_editor_hint():
 		UnitEvents.state_changed.connect(_on_unit_state_changed)
 		UnitEvents.stat_changed.connect(_on_unit_stat_changed)
 		UnitEvents.damaged.connect(_on_unit_damaged)
 	initialize(null)
 	assert(unit_model != null)
+
+
+func _remove_model_recursive(node: Node):
+	for child in node.get_children():
+		if child is UnitModel:
+			node.remove_child(child)
+		else:
+			_remove_model_recursive(child)
 
 
 ## Initializes this unit object with a new unit.
@@ -93,13 +120,13 @@ func load_unit_model(model_scene: PackedScene):
 	_connect_unit_model_signals(unit_model)
 	unit_model.heading = heading
 
-	add_child(unit_model)
+	$UnitModelContainer.add_child(unit_model)
 
 
 func _remove_unit_model():
 	_disconnect_unit_model_signals(unit_model)
 	if unit_model:
-		remove_child(unit_model)
+		$UnitModelContainer.remove_child(unit_model)
 		unit_model.queue_free()
 		unit_model = null
 
@@ -169,7 +196,7 @@ func play_floating_number(value: int, color: Color):
 	anim.play('start')
 	await anim.animation_finished
 	anim.queue_free()
-	
+
 
 func update_hp_bar(hp: int, maxhp: int):
 	hp_bar.value = hp/float(maxhp) * hp_bar.max_value

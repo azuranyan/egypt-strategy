@@ -21,13 +21,49 @@ func _process(_delta):
 
 	if repositioned_unit:
 		repositioned_unit.set_global_position(get_viewport().get_mouse_position() - unit_drag_offset)
-		if battle.is_occupied(repositioned_unit.cell()):
-			if not ghost:
-				ghost = repositioned_unit.get_map_object().duplicate()
-				battle.add_map_object(ghost)
-				ghost.map_position = ghost.world.as_uniform(unit_drag_start)
-				print(ghost.map_position)
-		
+		var new_pos := repositioned_unit.cell()
+
+		#repositioned_unit.get_map_object().highlight = UnitMapObject.Highlight.RED if repositioned_unit.is_pathable(new_pos) else UnitMapObject.Highlight.NORMAL
+
+		if battle.is_occupied(new_pos, repositioned_unit):
+			var occupant := battle.get_unit_at(new_pos, repositioned_unit)
+			create_ghost(occupant).map_position = ghost.world.as_uniform(unit_drag_start)
+		else:
+			remove_ghost()
+
+
+## Creates a ghost of unit.
+func create_ghost(unit: Unit) -> MapObject:
+	if ghost and unit != _get_ghosted_unit():
+		return ghost
+
+	remove_ghost()
+
+	ghost = unit.get_map_object().duplicate()
+	battle.add_map_object(ghost)
+	_set_ghosted_unit(unit)
+	unit.get_map_object().modulate = Color.TRANSPARENT
+	
+	return ghost
+
+
+## Removes the ghost of a unit.
+func remove_ghost():
+	if not ghost: 
+		return
+	_get_ghosted_unit().get_map_object().modulate = Color.WHITE
+	battle.remove_map_object(ghost)
+	ghost.queue_free()
+	ghost = null
+
+
+func _get_ghosted_unit() -> Unit:
+	return ghost.get_meta('ghosted_unit')
+
+
+func _set_ghosted_unit(unit: Unit):
+	ghost.set_meta('ghosted_unit', unit)
+
 
 ## Called on initialize.
 func _initialize():
@@ -146,10 +182,12 @@ func prep_on_unit_clicked(unit: Unit, mouse_pos: Vector2, button_index: int, pre
 			if not prep_try_spawn_at(unit, unit.cell()):
 				prep_remove_unit(unit)
 			Game.deselect_unit(unit)
+			remove_ghost()
 			repositioned_unit = null
 
 	if button_index == MOUSE_BUTTON_RIGHT and pressed and can_reposition(unit):
 		Game.deselect_unit(unit)
+		remove_ghost()
 		prep_remove_unit(unit)
 
 
