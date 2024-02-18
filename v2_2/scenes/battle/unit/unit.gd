@@ -450,12 +450,12 @@ func get_pathable_cells(_use_mov_stat := false) -> PackedVector2Array:
 	
 	
 ## Makes unit take damage.
-func take_damage(_value: int, _source: Variant) -> void:
+func take_damage(_amount: int, _source: Variant) -> void:
 	assert(false, 'not implemented')
 	
 	
 ## Makes unit heal from damage.
-func restore_health(_value: int, _source: Variant) -> void:
+func restore_health(_amount: int, _source: Variant) -> void:
 	assert(false, 'not implemented')
 	
 	

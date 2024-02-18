@@ -108,17 +108,17 @@ func reset(initial_state: State):
 func set_state(new_state: State):
 	var old_state := _state
 	_state = new_state
-	state_changed.emit(old_state, new_state)
+	UnitEvents.state_changed.emit(self, old_state, new_state)
 
 	
 func sync_map_position(old: Vector2, new: Vector2):
 	_map_position = new
-	position_changed.emit(old, new)
+	UnitEvents.position_changed.emit(self, old, new)
 	
-	
-func _on_model_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
-	if _selectable:
-		interacted.emit(cursor_pos, button_index, pressed)
+
+func sync_heading(old: Map.Heading, new: Map.Heading):
+	_heading = new
+	UnitEvents.heading_changed.emit(self, old, new)
 
 
 #region Unit Attributes
@@ -178,12 +178,12 @@ func field_unit() -> void:
 		unfield_unit()
 	map_object = UnitMapObjectScene.instantiate()
 	map_object.map_position_changed.connect(sync_map_position)
-	map_object.interacted.connect(_on_model_interacted)
+	map_object.heading_changed.connect(sync_heading)
 	battle.add_map_object(map_object)
 	map_object.initialize(self)
 	driver.target = map_object
 	reset(State.IDLE)
-	fielded.emit()
+	UnitEvents.fielded.emit(self)
 	
 	
 ## Unfields unit from battle.
@@ -194,11 +194,11 @@ func unfield_unit() -> void:
 	map_object.initialize(null)
 	battle.remove_map_object(map_object)
 	map_object.map_position_changed.disconnect(sync_map_position)
-	map_object.interacted.disconnect(_on_model_interacted)
+	map_object.heading_changed.disconnect(sync_heading)
 	map_object.queue_free()
 	map_object = null
 	reset(State.INVALID)
-	unfielded.emit()
+	UnitEvents.unfielded.emit(self)
 	
 	
 ## Returns true if this unit is on the field.
@@ -215,7 +215,7 @@ func get_empire() -> Empire:
 func set_empire(empire: Empire) -> void:
 	var old := _empire
 	_empire = empire
-	empire_changed.emit(old, empire)
+	UnitEvents.empire_changed.emit(self, old, empire)
 	
 	
 ## Returns true if another unit is an enemy.
@@ -258,7 +258,7 @@ func get_behavior() -> Behavior:
 func set_behavior(behavior: Behavior) -> void:
 	var old := _behavior
 	_behavior = behavior
-	behavior_changed.emit(old, behavior)
+	UnitEvents.behavior_changed.emit(self, old, behavior)
 	
 	
 ## Returns true if unit is selectable.
@@ -289,14 +289,14 @@ func set_stat(stat: StringName, value: int) -> void:
 		set_bond(value)
 	else:
 		_stats[stat] = value
-		stat_changed.emit(stat, value)
+		UnitEvents.stat_changed.emit(self, stat)
 	
 	
 ## Sets the bond level of this unit.
 func set_bond(value: int) -> void:
 	_bond = value
-	stat_changed.emit(&'bond', value)
-	
+	UnitEvents.bond_changed.emit(self)
+
 
 ## Returns the bond level.
 func get_bond() -> bool:
@@ -346,13 +346,13 @@ func is_special_unlocked() -> bool:
 ## Adds status effect to unit.
 func add_status_effect(effect: StringName, duration: int) -> void:
 	_status_effects[effect] = duration
-	status_effect_added.emit(effect, duration)
+	UnitEvents.status_effect_added.emit(self, effect, duration)
 	
 	
 ## Removes status effect from unit.
 func remove_status_effect(effect: StringName) -> void:
 	_status_effects.erase(effect)
-	status_effect_removed.emit(effect)
+	UnitEvents.status_effect_removed.emit(self, effect)
 
 	
 ## Returns true if unit has a specific status effect.
@@ -376,6 +376,7 @@ func tick_status_effects() -> void:
 		_status_effects[effect] -= 1
 		if _status_effects[effect] <= 0:
 			expired_effects.append(effect)
+		UnitEvents.status_effect_ticked.emit(self, effect)
 	for effect in expired_effects:
 		remove_status_effect(effect)
 	
@@ -522,12 +523,12 @@ func walk_towards(target: Vector2) -> void:
 	var start := _map_position
 	var old_state := _state
 	set_state(State.WALKING)
-	walking_started.emit(start, target)
+	UnitEvents.walking_started.emit(self, start, target)
 	if target != cell():
 		await driver.start_driver(pathfind_to(target))
 	set_state(old_state)
-	walking_finished.emit(start, target)
-	
+	UnitEvents.walking_finished.emit(self)
+
 
 ## Returns true if unit is walking.
 func is_walking() -> bool:
@@ -569,12 +570,12 @@ func get_pathable_cells(use_mov_stat := false) -> PackedVector2Array:
 	
 	
 ## Makes unit take damage.
-func take_damage(value: int, source: Variant) -> void:
+func take_damage(amount: int, source: Variant) -> void:
 	# this will emit the hp changed signal
-	set_stat(&'hp', clampi(_stats.hp - value, 0, _stats.maxhp))
+	set_stat(&'hp', clampi(_stats.hp - amount, 0, _stats.maxhp))
 	
 	# emit more specific signal
-	damaged.emit(value, source)
+	UnitEvents.damaged.emit(self, amount, source)
 	
 	# hurt animation
 	var old_state := _state
@@ -588,12 +589,12 @@ func take_damage(value: int, source: Variant) -> void:
 	
 	
 ## Makes unit heal from damage.
-func restore_health(value: int, source: Variant) -> void:
+func restore_health(amount: int, source: Variant) -> void:
 	# this will emit the hp changed signal
-	set_stat(&'hp', clampi(_stats.hp + value, 0, _stats.maxhp))
+	set_stat(&'hp', clampi(_stats.hp + amount, 0, _stats.maxhp))
 	
 	# emit more specific signal
-	healed.emit(value, source)
+	UnitEvents.healed.emit(self, amount, source)
 	
 	
 ## Kills a unit.
@@ -605,7 +606,7 @@ func kill() -> void:
 	# dead
 	set_state(State.DEAD)
 	map_object.set_standby(true)
-	died.emit()
+	UnitEvents.died.emit(self)
 
 
 ## Revives unit if dead.

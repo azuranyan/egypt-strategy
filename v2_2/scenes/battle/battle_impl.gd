@@ -94,27 +94,26 @@ func _real_battle():
 		
 	
 func _field_units():
-	for u: Unit in Game.unit_registry.values():
-		u.state_changed.connect(_on_unit_state_changed_to_dying.bind(u))
-		u.died.connect(_queue_unit_death.bind(u))
-		u.field_unit()
+	UnitEvents.state_changed.connect(_on_unit_state_changed)
+	UnitEvents.died.connect(_on_unit_death)
+	get_tree().call_group(Game.ALL_UNITS_GROUP, 'field_unit')
 	
 	
 func _unfield_units():
-	for u: Unit in Game.unit_registry.values():
-		u.state_changed.disconnect(_on_unit_state_changed_to_dying.bind(u))
-		u.died.disconnect(_queue_unit_death.bind(u))
-		u.unfield_unit()
+	UnitEvents.state_changed.disconnect(_on_unit_state_changed)
+	UnitEvents.died.disconnect(_on_unit_death)
+	get_tree().call_group(Game.ALL_UNITS_GROUP, 'unfield_unit')
 		
 		
-func _on_unit_state_changed_to_dying(_old: Unit.State, _new: Unit.State, _unit: Unit):
+func _on_unit_state_changed(_unit: Unit, _old: Unit.State, _new: Unit.State):
 	if _new == Unit.State.DYING:
 		_dying_units += 1
 		
 		
-func _queue_unit_death(_unit: Unit):
+func _on_unit_death(_unit: Unit):
 	if _dying_units <= 0:
 		return
+	assert(_dying_units >= 0)
 	_dying_units -= 1
 	_death_animations_finished.emit()
 	
@@ -217,9 +216,9 @@ func get_active_battle_scene() -> BattleScene:
 func create_agent(empire: Empire) -> BattleAgent:
 	var agent: BattleAgent
 	if empire.is_player_owned():
-		agent = load("res://scenes/battle/agents/player_agent.gd").new()
+		agent = load("res://scenes/battle/agents/player_agent.tscn").instantiate()
 	else:
-		agent = load("res://scenes/battle/agents/ai_agent.gd").new()
+		agent = load("res://scenes/battle/agents/ai_agent.tscn").instantiate()
 	add_child(agent)
 	agent.name = empire.leader_name()
 	agent.initialize(empire)

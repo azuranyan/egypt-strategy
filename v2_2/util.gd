@@ -15,10 +15,16 @@ static func centroid(arr) -> Vector2:
 	return total/arr.size()
 
 	
-## Shuts up the error for already connected callables.
-static func just_connect(sig: Signal, callable: Callable):
-	if not sig.is_connected(callable):
-		sig.connect(callable)
+## Connects signals. Will not produce an error if object is null or signal is already connected.
+static func just_connect(obj: Object, sig: StringName, fun: Callable):
+	if is_instance_valid(obj) and not obj.is_connected(sig, fun):
+		obj.connect(sig, fun)
+
+
+## Disconnects signals. Will not produce an error if object is null or signal is not connected.
+static func just_disconnect(obj: Object, sig: StringName, fun: Callable):
+	if is_instance_valid(obj) and obj.is_connected(sig, fun):
+		obj.disconnect(sig, fun)
 	
 
 ## Returns true if the scene is root.

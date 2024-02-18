@@ -5,6 +5,7 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+const ALL_UNITS_GROUP := &'all_units'
 
 ## Alive unit mask for [method get_empire_units].
 const ALIVE_MASK := 1
@@ -46,6 +47,29 @@ var dialog: Variant
 var _suspended: bool
 
 var _pause_count: int
+
+var _interaction_handler
+
+
+
+## Returns the last selected unit.
+func get_selected_unit() -> Unit:
+	if is_instance_valid(_interaction_handler):
+		return _interaction_handler.get_selected_unit()
+	return null
+	
+
+## Selects a unit.
+func select_unit(unit: Unit):
+	if is_instance_valid(_interaction_handler):
+		_interaction_handler.select_unit(unit)
+
+
+
+## Deselects a unit.
+func deselect_unit(unit: Unit):
+	if is_instance_valid(_interaction_handler):
+		_interaction_handler.deselect_unit(unit)
 
 
 func _ready():
@@ -173,7 +197,7 @@ func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -
 	save.units[unit_id] = unit.save_state()
 	save.next_unit_id = unit_id + 1
 	unit_registry[unit_id] = unit
-	unit.add_to_group('all_units')
+	unit.add_to_group(ALL_UNITS_GROUP)
 	UnitEvents.created.emit(unit)
 	return unit
 	
@@ -342,6 +366,7 @@ func load_state(save: SaveState):
 		unit.name = '%s%s' % [unit._chara_id, unit.id()]
 		unit_registry[unit.id()] = unit
 		get_node('Units').add_child(unit)
+		unit.add_to_group(ALL_UNITS_GROUP)
 		
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_load', save)

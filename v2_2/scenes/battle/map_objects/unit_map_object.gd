@@ -7,9 +7,6 @@ extends MapObject
 ## Emitted when model is done animating. This will not be emitted for looping animations!
 signal animation_finished(state: Unit.State)
 
-## Emitted when the model is interacted to.
-signal interacted(cursor_pos: Vector2, button_index: int, pressed: bool)
-
 ## Emitted when the heading is changed.
 signal heading_changed(old_heading: Map.Heading, new_heading: Map.Heading)
 
@@ -25,7 +22,7 @@ const BasicUnitModel := preload("res://scenes/battle/unit/basic_unit_model.tscn"
 		unit_type = value
 		if not is_node_ready():
 			await ready
-		set_unit_model(_get_unit_type_unit_model(unit_type))
+		load_unit_model(unit_type.unit_model if unit_type and unit_type.unit_model else BasicUnitModel)
 
 ## The empire this unit will be given to.[br]
 ## Also understands special strings like [code]$ai[/code] and [code]$player[/code].
@@ -47,10 +44,10 @@ const BasicUnitModel := preload("res://scenes/battle/unit/basic_unit_model.tscn"
 		heading_changed.emit(old, heading)
 		
 		
-## A reference to the created unit.
+## A reference to the created unit. It's here for convenience, [b]do not change.[/b]
 var unit: Unit
 
-## A reference to the unit type unit_model.
+## A reference to the unit type unit_model. It's here for convenience, [b]do not change.[/b]
 var unit_model: UnitModel
 
 # TODO these could be diff components too
@@ -60,17 +57,17 @@ var unit_model: UnitModel
 
 func _ready():
 	super._ready()
+	if not Engine.is_editor_hint():
+		UnitEvents.state_changed.connect(_on_unit_state_changed)
+		UnitEvents.stat_changed.connect(_on_unit_stat_changed)
+		UnitEvents.damaged.connect(_on_unit_damaged)
 	initialize(null)
+	assert(unit_model != null)
 
 
 ## Initializes this unit object with a new unit.
 func initialize(new_unit: Unit):
-	if unit:
-		_disconnect_from_unit(unit)
-		
 	if new_unit:
-		_connect_to_unit(new_unit)
-		
 		# initialize ui elements that doesn't change. the unit will reset
 		# after us so we don't have to manually update our stuff
 		$HUD/Label.text = new_unit.display_name()
@@ -82,48 +79,74 @@ func initialize(new_unit: Unit):
 		empire_id = &''
 		state = Unit.State.IDLE
 	unit = new_unit
+
 	
-	
-func _connect_to_unit(_unit: Unit):
-	_unit.stat_changed.connect(_on_unit_stat_changed)
-	_unit.state_changed.connect(_update_state)
-	_unit.damaged.connect(_on_damage_taken)
-	
-	
-func _disconnect_from_unit(_unit: Unit):
-	_unit.stat_changed.disconnect(_on_unit_stat_changed)
-	_unit.state_changed.disconnect(_update_state)
-	_unit.damaged.disconnect(_on_damage_taken)
-	
-	
-func _get_unit_type_unit_model(ut: UnitType) -> UnitModel:
-	if ut and ut.unit_model:
-		return ut.unit_model.instantiate()
-	return BasicUnitModel.instantiate()
-	
-	
-## Sets the unit model. Must not be null.
-func set_unit_model(new_model: UnitModel):
-	if unit_model: 
-		# make sure no stray signals are fired after queue_free
-		unit_model.animation_finished.disconnect(_emit_model_animation_finished)
-		unit_model.interacted.disconnect(_emit_model_interacted)
+## Loads the unit model.
+func load_unit_model(model_scene: PackedScene):
+	_remove_unit_model()
+
+	unit_model = model_scene.instantiate()
+	if not unit_model:
+		push_error('error loading model')
+		return
+
+	_connect_unit_model_signals(unit_model)
+	unit_model.heading = heading
+
+	add_child(unit_model)
+
+
+func _remove_unit_model():
+	_disconnect_unit_model_signals(unit_model)
+	if unit_model:
 		remove_child(unit_model)
 		unit_model.queue_free()
-	unit_model = new_model
-	unit_model.animation_finished.connect(_emit_model_animation_finished)
-	unit_model.interacted.connect(_emit_model_interacted)
-	unit_model.heading = heading
-	add_child(unit_model)
+		unit_model = null
+
+
+func _connect_unit_model_signals(mdl: UnitModel):
+	if Engine.is_editor_hint():
+		return
+	Util.just_connect(mdl, 'animation_finished', _emit_model_animation_finished)
+	Util.just_connect(mdl, 'input_event', _emit_model_input_event)
+	Util.just_connect(mdl, 'mouse_entered', _emit_model_mouse_entered)
+	Util.just_connect(mdl, 'mouse_exited', _emit_model_mouse_exited)
+	Util.just_connect(mdl, 'clicked', _emit_model_clicked)
+
+
+func _disconnect_unit_model_signals(mdl: UnitModel):
+	if Engine.is_editor_hint():
+		return
+	Util.just_disconnect(mdl, 'animation_finished', _emit_model_animation_finished)
+	Util.just_disconnect(mdl, 'input_event', _emit_model_input_event)
+	Util.just_disconnect(mdl, 'mouse_entered', _emit_model_mouse_entered)
+	Util.just_disconnect(mdl, 'mouse_exited', _emit_model_mouse_exited)
+	Util.just_disconnect(mdl, 'clicked', _emit_model_clicked)
 	
 	
 func _emit_model_animation_finished(st: Unit.State):
 	animation_finished.emit(st)
 	
+
+func _emit_model_input_event(event: InputEvent):
+	if is_instance_valid(unit) and unit.is_selectable():
+		UnitEvents.input_event.emit(unit, event)
+
+
+func _emit_model_mouse_entered():
+	if is_instance_valid(unit) and unit.is_selectable():
+		UnitEvents.mouse_entered.emit(unit)
+
+
+func _emit_model_mouse_exited():
+	if is_instance_valid(unit) and unit.is_selectable():
+		UnitEvents.mouse_exited.emit(unit)
+		
 	
-func _emit_model_interacted(cursor_pos: Vector2, button_index: int, pressed: bool):
-	interacted.emit(cursor_pos, button_index, pressed)
-	
+func _emit_model_clicked(mouse_pos: Vector2, button_index: int, pressed: bool):
+	if is_instance_valid(unit) and unit.is_selectable():
+		UnitEvents.clicked.emit(unit, mouse_pos, button_index, pressed)
+
 	
 ## Makes this unit face towards target.
 func face_towards(target: Vector2):
@@ -148,26 +171,32 @@ func play_floating_number(value: int, color: Color):
 	anim.queue_free()
 	
 
+func update_hp_bar(hp: int, maxhp: int):
+	hp_bar.value = hp/float(maxhp) * hp_bar.max_value
+
+
 func _world_changed(_world: World):
 	super._world_changed(_world)
 	%Shadow.world = _world
 
 
-func _update_hp_bar(hp: int, maxhp: int):
-	hp_bar.value = hp/float(maxhp) * hp_bar.max_value
-	
-	
-func _update_state(_old: Unit.State, new: Unit.State):
-	unit_model.state = new
+func _on_unit_state_changed(_unit: Unit, _old_state: Unit.State, new_state: Unit.State):
+	if _unit != unit:
+		return
+	unit_model.state = new_state
 	$HUD.visible = unit.is_alive()
 	
 
-func _on_unit_stat_changed(stat: StringName, value: int):
+func _on_unit_stat_changed(_unit: Unit, stat: StringName):
+	if _unit != unit:
+		return
 	if stat == &'hp':
-		_update_hp_bar(value, unit.get_stat(&'maxhp'))
-		
-		
-func _on_damage_taken(amount: int, source: Variant):
+		update_hp_bar(unit.get_stat(&'hp'), unit.get_stat(&'maxhp'))
+
+
+func _on_unit_damaged(_unit: Unit, amount: int, source: Variant):
+	if _unit != unit:
+		return
 	var color := Color.WHITE
 	if source == &'PSN':
 		color = Color(0.949, 0.29, 0.949)
@@ -177,3 +206,5 @@ func _on_damage_taken(amount: int, source: Variant):
 		#camera.get_node("AnimationPlayer").play('shake') # battle will do the shake
 		color = Color(0.949, 0.29, 0.392)
 	play_floating_number(abs(amount), color)
+	
+	

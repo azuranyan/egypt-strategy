@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cde10wnnt2njl"]
+
+[ext_resource type="Script" path="res://scenes/battle/agents/ai_agent.gd" id="1_vxivm"]
+
+[node name="AIAgent" type="Node"]
+script = ExtResource("1_vxivm")

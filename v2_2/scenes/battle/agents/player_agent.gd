@@ -9,6 +9,9 @@ var unit_drag_start: Vector2
 var unit_drag_offset: Vector2
 
 
+var ghost: MapObject
+
+
 func _process(_delta):
 	if rotated_unit:
 		const ROTATION_DEADZONE := 0.2
@@ -17,7 +20,13 @@ func _process(_delta):
 			rotated_unit.face_towards(mpos)
 
 	if repositioned_unit:
-		repositioned_unit.set_global_position(get_viewport().get_mouse_position() + unit_drag_offset)
+		repositioned_unit.set_global_position(get_viewport().get_mouse_position() - unit_drag_offset)
+		if battle.is_occupied(repositioned_unit.cell()):
+			if not ghost:
+				ghost = repositioned_unit.get_map_object().duplicate()
+				battle.add_map_object(ghost)
+				ghost.map_position = ghost.world.as_uniform(unit_drag_start)
+				print(ghost.map_position)
 		
 
 ## Called on initialize.
@@ -36,26 +45,26 @@ func _initialize():
 
 ## Called on start preparation.
 func _enter_prepare_units():
-	# make units unselectable until they're added from play
-	for id in Game.unit_registry:
-		var u: Unit = Game.unit_registry[id]
-		if not u.interacted.is_connected(_on_unit_interacted.bind(u)):
-			u.interacted.connect(_on_unit_interacted.bind(u))
+	UnitEvents.clicked.connect(global_on_unit_clicked)
+	UnitEvents.clicked.connect(prep_on_unit_clicked)
 	
 	
 ## Called on end preparation.
 func _exit_prepare_units():
-	pass
+	UnitEvents.clicked.disconnect(global_on_unit_clicked)
+	UnitEvents.clicked.disconnect(prep_on_unit_clicked)
 	
 	
 ## Called on turn start.
 func _enter_turn():
-	end_turn()
+	UnitEvents.clicked.connect(global_on_unit_clicked)
+	UnitEvents.clicked.connect(battle_on_unit_clicked)
 	
 	
 ### Called on turn end.
 func _exit_turn():
-	pass
+	UnitEvents.clicked.disconnect(global_on_unit_clicked)
+	UnitEvents.clicked.disconnect(battle_on_unit_clicked)
 	
 
 ## Adds unit to the play area.
@@ -87,7 +96,7 @@ func prep_try_spawn_at(unit: Unit, cell: Vector2) -> bool:
 	if not is_spawn_cell(cell):
 		return false
 	
-	var old_pos := unit_drag_start + unit_drag_offset
+	var old_pos := Map.cell(unit_drag_start)# + unit_drag_offset
 	unit.set_position(Map.OUT_OF_BOUNDS)
 
 	if battle.is_occupied(cell):
@@ -97,10 +106,57 @@ func prep_try_spawn_at(unit: Unit, cell: Vector2) -> bool:
 		if old_pos == Map.OUT_OF_BOUNDS:
 			prep_remove_unit(occupant)
 		else:
-			occupant.set_position(old_pos)
+			occupant.set_global_position(old_pos)
 	
 	prep_add_unit(unit, cell)
 	return true
+
+
+func can_reposition(unit: Unit) -> bool:
+	return (unit.is_player_owned()
+		and not unit.has_meta('preplaced')
+		and battle.on_turn() == empire)
+
+
+func can_rotate(unit: Unit) -> bool:
+	return (unit.is_player_owned()
+		and not unit.has_meta('preplaced')
+		and battle.on_turn() == empire
+		and Game.get_selected_unit() == null)
+
+
+## Accepts interacted event from unit.
+func global_on_unit_clicked(unit: Unit, _mouse_pos: Vector2, button_index: int, pressed: bool):
+	if button_index == MOUSE_BUTTON_MIDDLE:
+		if pressed and can_rotate(unit):
+			rotated_unit = unit
+		elif not pressed and unit == rotated_unit: 
+			rotated_unit = null
+
+		
+## Accepts interacted event from unit.
+func prep_on_unit_clicked(unit: Unit, mouse_pos: Vector2, button_index: int, pressed: bool):
+	if button_index == MOUSE_BUTTON_LEFT:
+		if pressed and can_reposition(unit):
+			Game.select_unit(unit)
+			unit_drag_start = unit.get_global_position()
+			unit_drag_offset = mouse_pos - unit.get_global_position() 
+			repositioned_unit = unit
+		elif not pressed and unit == repositioned_unit:
+			if not prep_try_spawn_at(unit, unit.cell()):
+				prep_remove_unit(unit)
+			Game.deselect_unit(unit)
+			repositioned_unit = null
+
+	if button_index == MOUSE_BUTTON_RIGHT and pressed and can_reposition(unit):
+		Game.deselect_unit(unit)
+		prep_remove_unit(unit)
+
+
+
+## Accepts interacted event from unit.
+func battle_on_unit_clicked(unit: Unit, mouse_pos: Vector2, button_index: int, pressed: bool):
+	pass
 
 
 func interact_start_battle():
@@ -121,38 +177,9 @@ func is_hero_deployed() -> bool:
 	return false
 	
 
-func _on_unit_interacted(cursor_pos: Vector2, button_index: int, pressed: bool, unit: Unit):
-	# units are not controls and overlapping objects will cause problems
-	# that's why we need to add guards to make sure it's our unit.
 
-	if button_index == MOUSE_BUTTON_MIDDLE:
-		var can_rotate := (unit.is_player_owned()
-			and battle.on_turn() == empire
-			and battle.hud().get_selected_unit() == null)
-		if pressed and can_rotate:
-			rotated_unit = unit
-		elif not pressed:
-			if unit == rotated_unit: # guard
-				rotated_unit = null
 
-	if button_index == MOUSE_BUTTON_LEFT:
-		if pressed:
-			battle.hud().set_selected_unit(unit)
-			unit_drag_start = unit.cell()
-			unit_drag_offset = unit.get_global_position() - cursor_pos
-			repositioned_unit = unit
-		else:
-			if unit == repositioned_unit: # guard
-				if not prep_try_spawn_at(unit, unit.cell()):
-					prep_remove_unit(unit)
-				repositioned_unit = null
 
-	if not battle.is_battle_phase():
-		if button_index == MOUSE_BUTTON_RIGHT and pressed and unit.is_player_owned():
-			battle.hud().set_selected_unit(null)
-			prep_remove_unit(unit)
-	else:
-		pass
 	
 
 func _on_end_pressed():
@@ -167,12 +194,13 @@ func _on_undo_pressed():
 
 
 func _on_prep_unit_selected(unit: Unit):
-	battle.hud().set_selected_unit(unit)
+	Game.select_unit(unit)
 	unit_drag_start = Map.OUT_OF_BOUNDS
 	unit_drag_offset = Vector2.ZERO # unit sprite height or drag_offset maybe?
 
 
 func _on_prep_unit_released(unit: Unit):
+	Game.deselect_unit(unit)
 	battle.hud().set_selected_unit(null)
 
 	if not prep_try_spawn_at(unit, unit.cell()):

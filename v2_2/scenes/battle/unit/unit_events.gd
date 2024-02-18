@@ -14,9 +14,11 @@ signal unfielded(unit: Unit) ## Emitted when unit is loaded on the map.
 #region Unit State Signals
 signal state_changed(unit: Unit, old: Unit.State, new: Unit.State) ## Emitted when unit transitions from one state to the next.
 signal position_changed(unit: Unit) ## Emitted when unit's position on the map is changed.
+signal heading_changed(unit: Unit) ## Emitted when the direction the unit is facing is changed.
 signal stat_changed(unit: Unit, stat: StringName) ## Emitted when unit's stat value is changed.
-signal damaged(unit: Unit, value: int, source: Variant) ## Emitted when the unit takes damage.
-signal healed(unit: Unit, value: int, source: Variant) ## Emitted when the unit gets healed.
+signal bond_changed(unit: Unit) ## Emitted when unit's bond value is changed.
+signal damaged(unit: Unit, amount: int, source: Variant) ## Emitted when the unit takes damage.
+signal healed(unit: Unit, amount: int, source: Variant) ## Emitted when the unit gets healed.
 signal died(unit: Unit) ## Emitted when the unit dies and put on standby.
 signal revived(unit: Unit) ## Emitted when the unit comes back from the dead state.
 signal status_effect_added(unit: Unit, effect: StringName, duration: int) ## Emitted when status effect is added.
@@ -39,4 +41,5 @@ signal input_event(unit: Unit, event: InputEvent) ## Emitted when unit is intera
 signal mouse_entered(unit: Unit) ## Emitted when mouse enters the unit detection area.
 signal mouse_exited(unit: Unit) ## Emitted when mouse exits the unit detection area.
 signal clicked(unit: Unit, mouse_pos: Vector2, button_index: int, pressed: bool) ## Emitted when unit is clicked.
+signal selected(unit: Unit, is_selected: bool) ## Emitted when unit is (de)selected.
 #endregion Map and Interaction Signals

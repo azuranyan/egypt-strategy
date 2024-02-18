@@ -39,6 +39,8 @@ func _ready():
 	hide()
 	character_panel.hide()
 	Game.battle.player_prep_phase.connect(_on_player_prep_phase)
+
+	UnitEvents.selected.connect(_on_unit_selected)
 	
 	
 func _on_player_prep_phase():
@@ -287,3 +289,8 @@ func _on_deify_button_mouse_exited():
 
 func _on_hide_attack_info_timer_timeout():
 	%AttackInfoPanel.hide()
+
+
+func _on_unit_selected(_unit: Unit, _is_selected: bool):
+	set_selected_unit(Game.get_selected_unit())
+	
