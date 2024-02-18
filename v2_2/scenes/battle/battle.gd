@@ -186,13 +186,13 @@ func saving_allowed() -> bool:
 	
 
 ## Returns the unit at cell.
-func get_unit_at(_cell: Vector2) -> Unit:
+func get_unit_at(_cell: Vector2, _excluded: Unit = null) -> Unit:
 	assert(false, 'not implemented')
 	return null
 
 
 ## Returns true if cell is occupied by a unit.
-func is_occupied(_cell: Vector2) -> bool:
+func is_occupied(_cell: Vector2, _excluded: Unit = null) -> bool:
 	assert(false, 'not implemented')
 	return false
 	

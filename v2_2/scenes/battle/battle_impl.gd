@@ -318,18 +318,16 @@ func saving_allowed() -> bool:
 	
 	
 ## Returns the unit at cell.
-func get_unit_at(cell: Vector2) -> Unit:
+func get_unit_at(cell: Vector2, excluded: Unit = null) -> Unit:
 	for obj in get_objects_at(cell):
-		# TODO level put the redistribute units function back,
-		# obj.unit will fail if a dangling unit is left on the map
-		if obj is UnitMapObject and obj.unit and obj.unit.is_valid_target():
+		if obj is UnitMapObject and obj.unit and obj.unit != excluded and obj.unit.is_valid_target():
 			return obj.unit
 	return null
 		
 
 ## Returns true if cell is occupied by a unit.
-func is_occupied(cell: Vector2) -> bool:
-	return get_unit_at(cell) != null
+func is_occupied(cell: Vector2, excluded: Unit = null) -> bool:
+	return get_unit_at(cell, excluded) != null
 	
 	
 ## Returns the objects at cell.
