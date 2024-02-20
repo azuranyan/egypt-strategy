@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyhpqo8l0uf7u"]
+
+[ext_resource type="Script" path="res://scenes/battle/map_objects/ghost.gd" id="1_33rrt"]
+
+[node name="UnitGhost" type="Node2D"]
+position = Vector2(0, -1)
+script = ExtResource("1_33rrt")

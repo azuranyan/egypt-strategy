@@ -40,7 +40,7 @@ func prepare_units():
 	_enter_prepare_units.call_deferred()
 	print("[%s]: preparing units" % agent_name())
 	await _prepare_units_done
-	_agent_state = State.PREPARE_UNITS
+	_agent_state = State.STANDBY
 	_exit_prepare_units()
 	set_process_input(false)
 	
@@ -58,7 +58,7 @@ func start_turn():
 	_enter_turn.call_deferred()
 	print("[%s]: doing turn" % agent_name())
 	await _turn_done
-	_agent_state = State.ON_TURN
+	_agent_state = State.STANDBY
 	_exit_turn()
 	set_process_input(false)
 	

@@ -44,6 +44,8 @@ var battle: Battle
 ## Reference to the [Dialog] aka event system.
 var dialog: Variant
 
+var audio_stream_player: AudioStreamPlayer2D
+
 var _suspended: bool
 
 var _pause_count: int
@@ -67,7 +69,7 @@ func select_unit(unit: Unit):
 
 
 ## Deselects a unit.
-func deselect_unit(unit: Unit):
+func deselect_unit(unit: Unit = get_selected_unit()):
 	if is_instance_valid(_interaction_handler):
 		_interaction_handler.deselect_unit(unit)
 
@@ -87,6 +89,9 @@ func _ready():
 	battle.name = 'Battle'
 	add_child(battle)
 	battle.owner = self
+
+	audio_stream_player = AudioStreamPlayer2D.new()
+	add_child(audio_stream_player)
 
 
 func _notification(what):
@@ -263,6 +268,13 @@ func get_unit_type(unit_name: String) -> UnitType:
 		push_warning('%s: "res://units/%s/unit_type.tres" not found' % [unit_name, dirname])
 		return preload('res://units/placeholder/unit_type.tres')
 #endregion Unit
+
+
+## Plays error sound.
+func play_error_sound():
+	if not audio_stream_player.is_playing():
+		audio_stream_player.stream = preload("res://scenes/data/error-126627.wav")
+		audio_stream_player.play()
 
 
 ## Creates a pause dialog.

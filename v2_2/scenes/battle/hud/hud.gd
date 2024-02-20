@@ -39,6 +39,7 @@ func _ready():
 	hide()
 	character_panel.hide()
 	Game.battle.player_prep_phase.connect(_on_player_prep_phase)
+	Game.battle.turn_started.connect(_on_turn_started)
 
 	UnitEvents.selected.connect(_on_unit_selected)
 	
@@ -46,6 +47,11 @@ func _ready():
 func _on_player_prep_phase():
 	for u in Game.get_empire_units(Game.battle.player(), Game.ALL_UNITS_MASK):
 		prep_unit_list.add_unit(u)
+	update()
+
+
+func _on_turn_started(_empire: Empire):
+	update()
 
 
 func update():
@@ -149,10 +155,13 @@ func hide_attack_banner():
 ## Shows message.
 func show_message(message: String, duration: float = -1):
 	%MessageLabel.text = message
-	message_box.show()
-	if duration != -1:
-		await get_tree().create_timer(duration).timeout
+	if message.is_empty():
 		message_box.hide()
+	else:
+		message_box.show()
+		if duration != -1:
+			await get_tree().create_timer(duration).timeout
+			message_box.hide()
 
 
 ## Displays the list of missions.

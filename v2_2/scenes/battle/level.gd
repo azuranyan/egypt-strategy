@@ -167,19 +167,22 @@ func _remove_object(map_object: MapObject):
 func _add_to_cells(map_object: MapObject, cell: Vector2):
 	if not is_within_bounds(cell):
 		return
+		
 	get_objects_at(cell).append(map_object)
-	
+
 	if map_object.components.has(PathableComponent.GROUP_ID):
 		get_pathables_at(cell).append(map_object.components[PathableComponent.GROUP_ID])
-	
+		
 	
 func _remove_from_cells(map_object: MapObject, cell: Vector2):
 	if not is_within_bounds(cell):
 		return
-	get_objects_at(cell).erase(map_object)
-	
+
 	if map_object.components.has(PathableComponent.GROUP_ID):
 		get_pathables_at(cell).erase(map_object.components[PathableComponent.GROUP_ID])
+
+	get_objects_at(cell).erase(map_object)
+	
 	
 	
 func _update_object_cell(old_cell: Vector2, new_cell: Vector2, map_object: MapObject):

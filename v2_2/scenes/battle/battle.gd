@@ -85,6 +85,13 @@ enum {
 }
 
 
+## This exists because [Game] battle intellisense doesn't work.
+## This also lets us do additional checks and intercept accesses.
+static func instance() -> Battle:
+	assert(Game.battle != null)
+	return Game.battle
+
+
 ## Starts the battle cycle.
 func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
 	assert(false, 'not implemented')
@@ -262,14 +269,34 @@ func remove_map_object(_map_object: MapObject) -> void:
 
 
 ## Draws overlays.
-func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay):
+func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay) -> void:
 	assert(false, 'not implemented')
-	
+
 	
 ## Clears overlays.
-func clear_overlays(_overlay_mask: int) -> void:
+func clear_overlays(_overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARGET_SHAPE_MASK | PATH_MASK) -> void:
 	assert(false, 'not implemented')
+
 	
+## Draws the unit path.
+func draw_unit_path(_unit: Unit, _cell: Vector2) -> void:
+	assert(false, 'not implemented')
+
+
+## Draws the pathable cells.
+func draw_unit_placeable_cells(_unit: Unit, _use_alt_color := false) -> void:
+	assert(false, 'not implemented')
+
+
+## Draws the cells that can be reached by specified attack.
+func draw_unit_attack_range(_unit: Unit, _attack: Attack) -> void:
+	assert(false, 'not implemented')
+
+
+## Draws the cells in target aoe.
+func draw_unit_attack_target(_unit: Unit, _attack: Attack, _target: Array[Vector2], _rotation: Array[float]) -> void:
+	assert(false, 'not implemented')
+
 
 ## Sets the camera target. If target are either [Unit] or [Node2D],
 ## the camera will follow it and if target is [Vector2], the camera
@@ -277,6 +304,17 @@ func clear_overlays(_overlay_mask: int) -> void:
 ## will stop following the previous target node.
 func set_camera_target(_target: Variant) -> void:
 	assert(false, 'not implemented')
+
+
+## Sets the cursor position
+func set_cursor_pos(_screen_pos: Vector2) -> void:
+	assert(false, 'not implemented')
+
+
+## Returns the cursor position.
+func get_cursor_pos() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
 
 
 ## Returns the HUD.

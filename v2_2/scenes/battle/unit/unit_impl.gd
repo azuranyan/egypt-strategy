@@ -75,7 +75,6 @@ const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_ob
 @export_flags('Enemies:1', 'Doodads:2', 'Terrain:4') var _phase_flags: int
 
 
-var battle: Battle
 var map_object: UnitMapObject
 
 @onready var driver = $UnitDriver
@@ -86,10 +85,6 @@ func _init(__id: int = 0, __chara_id: StringName = &'', __chara: CharacterInfo =
 	_chara_id = __chara_id
 	_chara = __chara
 	_unit_type = __unit_type
-	
-	
-func _ready():
-	battle = Game.battle
 	
 	
 func reset(initial_state: State):
@@ -179,7 +174,7 @@ func field_unit() -> void:
 	map_object = UnitMapObjectScene.instantiate()
 	map_object.map_position_changed.connect(sync_map_position)
 	map_object.heading_changed.connect(sync_heading)
-	battle.add_map_object(map_object)
+	Battle.instance().add_map_object(map_object)
 	map_object.initialize(self)
 	driver.target = map_object
 	reset(State.IDLE)
@@ -192,7 +187,7 @@ func unfield_unit() -> void:
 		return
 	driver.target = null
 	map_object.initialize(null)
-	battle.remove_map_object(map_object)
+	Battle.instance().remove_map_object(map_object)
 	map_object.map_position_changed.disconnect(sync_map_position)
 	map_object.heading_changed.disconnect(sync_heading)
 	map_object.queue_free()
@@ -314,17 +309,17 @@ func special_attack() -> Attack:
 	
 	
 ## Returns the attack range of a given attack.
-func get_attack_range(attack: Attack) -> int:
+func attack_range(attack: Attack) -> int:
 	return attack.attack_range(get_stat(&'rng'))
 
 
 ## Returns the cells in range.
-func get_cells_in_range(attack: Attack) -> PackedVector2Array:
+func attack_range_cells(attack: Attack) -> PackedVector2Array:
 	return attack.get_cells_in_range(get_position(), get_stat(&'rng'))
 
 
 ## Returns an array of cells in the target aoe.
-func get_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
+func attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
 	return attack.get_target_cells(target, target_rotation)
 	
 	
@@ -407,12 +402,12 @@ func set_position(pos: Vector2) -> void:
 
 ## Returns the global position of this unit.
 func get_global_position() -> Vector2:
-	return battle.world().as_global(get_position())
+	return Battle.instance().world().as_global(get_position())
 
 
 ## Sets the global position of this unit.
 func set_global_position(pos: Vector2) -> void:
-	set_position(battle.world().as_uniform(pos))
+	set_position(Battle.instance().world().as_uniform(pos))
 	
 	
 ## Returns true if this unit is on standby.
@@ -468,7 +463,7 @@ func is_valid_target() -> bool:
 
 ## Returns true if unit can path over cell.
 func is_pathable(_cell: Vector2) -> bool:
-	for pathable in battle.get_pathables_at(_cell):
+	for pathable in Battle.instance().get_pathables_at(_cell):
 		if not pathable.is_pathable(self):
 			return false
 	return true
@@ -476,7 +471,7 @@ func is_pathable(_cell: Vector2) -> bool:
 	
 ## Returns true if unit can be placed over cell.
 func is_placeable(_cell: Vector2) -> bool:
-	return not battle.is_occupied(_cell) and is_pathable(_cell)
+	return not Battle.instance().is_occupied(_cell) and is_pathable(_cell)
 #endregion Unit State
 
 
@@ -568,7 +563,12 @@ func pathfind_to(target: Vector2) -> PackedVector2Array:
 func get_pathable_cells(use_mov_stat := false) -> PackedVector2Array:
 	return Util.flood_fill(cell(), _stats.mov if use_mov_stat else 20, Game.battle.world_bounds(), is_pathable)
 	
+
+## Returns an array of cells this unit can be placed on.
+func get_placeable_cells() -> PackedVector2Array:
+	return Util.flood_fill(cell(), _stats.mov, Game.battle.world_bounds(), is_placeable)
 	
+
 ## Makes unit take damage.
 func take_damage(amount: int, source: Variant) -> void:
 	# this will emit the hp changed signal

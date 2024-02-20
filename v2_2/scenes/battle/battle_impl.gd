@@ -4,11 +4,17 @@ signal _death_animations_finished
 
 
 enum State {
+	INVALID = -1,
+	STANDBY,
+	AI_PREP,
+	PLAYER_PREP,
+	BATTLE_START,
 	CYCLE_START,
 	CYCLE_END,
 	TURN_START,
 	TURN_END,
 	ON_TURN,
+	BATTLE_END,
 }
 
 
@@ -49,6 +55,7 @@ func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _
 	
 	self._quick = not _attacker.is_player_owned() and not _defender.is_player_owned()
 	self._battle_phase = false
+	self._next_state = State.STANDBY
 	
 	# do battle
 	if _quick:
@@ -69,7 +76,7 @@ func _real_battle():
 	print("Entering real battle.")
 	SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
 	await SceneManager.transition_finished
-	get_active_battle_scene().hud.menu_button.pressed.connect(show_pause_menu)
+	hud().menu_button.pressed.connect(show_pause_menu)
 	level = get_active_battle_scene().level
 	
 	_field_units()
@@ -77,13 +84,11 @@ func _real_battle():
 	# initialize agents and ai placement
 	create_agent(_attacker)
 	create_agent(_defender)
-	_turn_queue = [ai()]
-	agents[on_turn()].prepare_units()
+
 	
 	# do battle
 	await _real_battle_main()
-	await get_active_battle_scene().show_battle_results()
-			
+
 	for agent in agents.values():
 		agent.queue_free()
 	agents.clear()
@@ -119,22 +124,37 @@ func _on_unit_death(_unit: Unit):
 	
 
 func _real_battle_main():
-	_turn_queue = [player()]
-	get_active_battle_scene().hud.update()
-	player_prep_phase.emit()
-	await agents[on_turn()].prepare_units()
+	while true:
+		if check_for_battle_end():
+			_next_state = State.BATTLE_END
 
-	# player can quit on prep, so make sure to account for it
-	if _should_end:
-		return
-	
-	await get_active_battle_scene().show_battle_start()
-
-	_battle_phase = true
-	battle_started.emit(_attacker, _defender, _territory, _map_id)
-
-	while not _should_end:
 		match _next_state:
+			State.INVALID:
+				push_error('invalid state')
+			
+			State.STANDBY:
+				_next_state = State.AI_PREP
+
+			State.AI_PREP:
+				_turn_queue = [ai()]
+				await agents[on_turn()].prepare_units()
+				_next_state = State.PLAYER_PREP
+
+			State.PLAYER_PREP:
+				_turn_queue = [player()]
+				hud().update()
+				player_prep_phase.emit()
+				await agents[on_turn()].prepare_units()
+				battle_started.emit(_attacker, _defender, _territory, _map_id)
+				_next_state = State.BATTLE_START
+
+			State.BATTLE_START:
+				hud().hide()
+				await get_active_battle_scene().show_battle_start()
+				hud().show()
+				_battle_phase = true
+				_next_state = State.CYCLE_START
+			
 			State.CYCLE_START:
 				_turn_queue = [_attacker, _defender]
 
@@ -145,7 +165,7 @@ func _real_battle_main():
 				if last_acting_unit:
 					await set_camera_target(last_acting_unit.get_map_object().position)
 				get_active_battle_scene().hud_visibility_control.show()
-				await get_active_battle_scene().hud.show_turn_banner(1)
+				await hud().show_turn_banner(1)
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
 
 				for u in Game.get_empire_units(on_turn()):
@@ -159,6 +179,8 @@ func _real_battle_main():
 				_next_state = State.TURN_END
 
 			State.TURN_END:
+				clear_overlays()
+				
 				for u in Game.get_empire_units(on_turn()):
 					if not u.has_taken_action():
 						u.restore_health(get_config_value('idle_heal_value'), self)
@@ -174,13 +196,20 @@ func _real_battle_main():
 				cycle_ended.emit(_turns) 
 				_turns += 1
 				_next_state = State.CYCLE_START
-		check_for_battle_end()
-	_result_value = BattleResult.ATTACKER_VICTORY
-	battle_ended.emit(get_battle_result())
-	
+
+			State.BATTLE_END:
+				battle_ended.emit(get_battle_result())
+				if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
+					await get_active_battle_scene().show_battle_results()
+				_next_state = State.INVALID
+				break
+		
 	
 ## Checks for battle end.
 func check_for_battle_end() -> bool:
+	if not (_next_state > State.PLAYER_PREP):
+		return false
+
 	var result := evaluate_battle_result()
 	if not result.is_none():
 		stop_battle()
@@ -400,7 +429,7 @@ func remove_map_object(map_object: MapObject) -> void:
 
 
 ## Draws overlays.
-func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay):
+func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay) -> void:
 	# TODO yes i know this is stupid, but i need the debugging info
 	# for this so i want them to be separate for now
 	var overlays := {
@@ -418,22 +447,52 @@ func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay):
 	
 	
 ## Clears overlays.
-func clear_overlays(_overlay_mask: int):
-	if _overlay_mask & (1 << Overlay.PATHABLE):
+func clear_overlays(overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARGET_SHAPE_MASK | PATH_MASK) -> void:
+	if overlay_mask & (1 << Overlay.PATHABLE):
 		level.pathing_overlay.clear()
-	if _overlay_mask & (1 << Overlay.ATTACK_RANGE):
+	if overlay_mask & (1 << Overlay.ATTACK_RANGE):
 		level.attack_range_overlay.clear()
-	if _overlay_mask & (1 << Overlay.TARGET_SHAPE):
+	if overlay_mask & (1 << Overlay.TARGET_SHAPE):
 		level.target_shape_overlay.clear()
-	if _overlay_mask & (1 << Overlay.PATH):
+	if overlay_mask & (1 << Overlay.PATH):
 		level.unit_path.clear()
 	
+
+## Draws the unit path.
+func draw_unit_path(unit: Unit, cell: Vector2) -> void:
+	clear_overlays(PATH_MASK)
+	level.unit_path.initialize(unit.get_pathable_cells())
+	level.unit_path.draw(unit.cell(), cell)
+
+
+## Draws the pathable cells.
+func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
+	clear_overlays(PATHABLE_MASK)
+	var color := TileOverlay.TileColor.RED if use_alt_color else TileOverlay.TileColor.GREEN
+	var cells := unit.get_placeable_cells()
+	level.pathing_overlay.set_cells(cells, color)
+
+
+## Draws the cells that can be reached by specified attack.
+func draw_unit_attack_range(unit: Unit, attack: Attack) -> void:
+	clear_overlays(ATTACK_RANGE_MASK)
+	var cells := unit.attack_range_cells(attack)
+	level.attack_range_overlay.set_cells(cells, TileOverlay.TileColor.RED)
+
+
+## Draws the cells in target aoe.
+func draw_unit_attack_target(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
+	clear_overlays(TARGET_SHAPE_MASK)
+	for i in target.size():
+		var cells := unit.attack_target_cells(attack, target[i], rotation[i])
+		level.target_shape_overlay.set_cells(cells, TileOverlay.TileColor.BLUE)
+
 
 ## Sets the camera target. If target are either [Unit] or [Node2D],
 ## the camera will follow it and if target is [Vector2], the camera
 ## will be fixed to that position. Setting this to [code]null[/code]
 ## will stop following the previous target node.
-func set_camera_target(target: Variant):
+func set_camera_target(target: Variant) -> void:
 	var final_pos := _camera_target_position(target)
 	get_active_battle_scene().set_camera_target(target)
 	while get_active_battle_scene().camera.position != final_pos:
@@ -449,6 +508,18 @@ func _camera_target_position(target: Variant) -> Vector2:
 		return target
 	return get_active_battle_scene().camera.position
 		
+
+## Sets the cursor position
+func set_cursor_pos(screen_pos: Vector2) -> void:
+	var tween := create_tween()
+	tween.tween_property(level.cursor, 'position', screen_pos, 0.2)
+	#level.cursor.position = screen_pos
+
+
+## Returns the cursor position.
+func get_cursor_pos() -> Vector2:
+	return level.cursor.position
+
 
 ## Returns the HUD.
 func hud() -> BattleHUD:
@@ -538,7 +609,7 @@ func check_unit_attack(unit: Unit, attack: Attack, target: Vector2, rotation: fl
 	for offs in attack.target_shape:
 		var m := Transform2D()
 		var t := m.translated(offs).rotated(rotation) * Vector2.ZERO + target
-		var u := Game.battle.get_unit_at(t)
+		var u := get_unit_at(t)
 		if not u:
 			continue
 		targets += 1
@@ -581,18 +652,18 @@ func unit_action_pass(unit: Unit) -> void:
 ## Unit walks towards a target.
 @warning_ignore("redundant_await")
 func unit_action_move(unit: Unit, target: Vector2) -> void:
-	get_active_battle_scene().hud.hide()
+	hud().hide()
 	await set_camera_target(unit)
 
 	if on_turn() == ai():
-		Game.battle.draw_overlay(unit.get_pathable_cells(true), Battle.Overlay.PATHABLE)
+		draw_overlay(unit.get_pathable_cells(true), Battle.Overlay.PATHABLE)
 		await get_tree().create_timer(0.5).timeout
-		Game.battle.clear_overlays(1 << Battle.Overlay.PATHABLE)
+		clear_overlays(1 << Battle.Overlay.PATHABLE)
 		
 	await unit.walk_towards(target)
 
 	await set_camera_target(null)
-	get_active_battle_scene().hud.show()
+	hud().show()
 	unit.set_turn_flag(Unit.HAS_MOVED)
 
 	last_acting_unit = unit
@@ -603,14 +674,14 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 ## Unit executes attack.
 @warning_ignore("redundant_await")
 func unit_action_attack(unit: Unit, attack: Attack, target: PackedVector2Array, rotation: PackedFloat64Array) -> void:
-	get_active_battle_scene().hud.show_attack_banner(attack)
+	hud().show_attack_banner(attack)
 	var centroid := Util.centroid(target)
 	await set_camera_target(level.map.world.as_global(centroid))
 
 	await unit.use_attack(attack, target, rotation)
 
 	await set_camera_target(unit)
-	get_active_battle_scene().hud.hide_attack_banner()
+	hud().hide_attack_banner()
 	unit.set_turn_flag(Unit.HAS_ATTACKED)
 
 	last_acting_unit = unit

@@ -29,6 +29,10 @@ func get_selected_unit() -> Unit:
 
 ## Selects a unit.
 func select_unit(unit: Unit):
+	if not unit:
+		deselect_unit(get_selected_unit())
+		return
+		
 	if not unit.is_selectable() or unit in _selected_units_list:
 		return
 
@@ -41,7 +45,7 @@ func select_unit(unit: Unit):
 
 ## Deselects a unit.
 func deselect_unit(unit: Unit):
-	if not unit.is_selectable() or unit not in _selected_units_list:
+	if not unit or not unit.is_selectable() or unit not in _selected_units_list:
 		return
 
 	_set_selected_unit(unit, false)

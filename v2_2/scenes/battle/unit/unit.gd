@@ -233,19 +233,19 @@ func special_attack() -> Attack:
 	
 	
 ## Returns the attack range of a given attack.
-func get_attack_range(_attack: Attack) -> int:
+func attack_range(_attack: Attack) -> int:
 	assert(false, 'not implemented')
 	return 0
 
 
 ## Returns the cells in range.
-func get_cells_in_range(_attack: Attack) -> PackedVector2Array:
+func attack_range_cells(_attack: Attack) -> PackedVector2Array:
 	assert(false, 'not implemented')
 	return []
 
 
 ## Returns an array of cells in the target aoe.
-func get_target_cells(_attack: Attack, _target: Vector2, _target_rotation: float) -> PackedVector2Array:
+func attack_target_cells(_attack: Attack, _target: Vector2, _target_rotation: float) -> PackedVector2Array:
 	assert(false, 'not implemented')
 	return []
 	
@@ -445,6 +445,12 @@ func pathfind_to(_target: Vector2) -> PackedVector2Array:
 	
 ## Returns an array of cells this unit can path through.
 func get_pathable_cells(_use_mov_stat := false) -> PackedVector2Array:
+	assert(false, 'not implemented')
+	return []
+	
+
+## Returns an array of cells this unit can be placed on.
+func get_placeable_cells() -> PackedVector2Array:
 	assert(false, 'not implemented')
 	return []
 	
