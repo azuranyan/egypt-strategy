@@ -92,7 +92,7 @@ display_icon = ExtResource("4_5wpuo")
 visibility_layer = 512
 script = ExtResource("4_3q77v")
 pathing_group = 1
-_debug_tile = NodePath("")
+_debug_tile = NodePath("@Polygon2D@22797")
 
 [node name="HPBar" type="TileMap" parent="."]
 visible = false
@@ -161,7 +161,9 @@ color = Color(0, 0, 0, 0.247059)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
+offset_left = 1.0
 offset_top = 2.0
+offset_right = 1.0
 offset_bottom = 19.0
 grow_horizontal = 2
 text = "Dummy"

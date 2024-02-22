@@ -234,6 +234,39 @@ func world_bounds() -> Rect2:
 	return Rect2()
 
 
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_global(_screen_pos: Vector2) -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_uniform(_screen_pos: Vector2) -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_cell(_screen_pos: Vector2) -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
+## Returns the mouse position in uniform coordinates.
+func get_uniform_mouse_position() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
+## Returns the mouse cell.
+func get_mouse_cell() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
 ## Returns the spawn points
 func get_spawn_points(_type: SpawnPoint.Type) -> Array[SpawnPoint]:
 	assert(false, 'not implemented')
@@ -307,7 +340,7 @@ func set_camera_target(_target: Variant) -> void:
 
 
 ## Sets the cursor position
-func set_cursor_pos(_screen_pos: Vector2) -> void:
+func set_cursor_pos(_cell: Vector2) -> void:
 	assert(false, 'not implemented')
 
 

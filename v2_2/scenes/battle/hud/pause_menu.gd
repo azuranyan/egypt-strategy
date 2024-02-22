@@ -15,7 +15,10 @@ func _ready():
 	
 	
 func _input(event):
-	if event.is_action_pressed('back') and visible:
+	if Engine.is_editor_hint():
+		return
+		
+	if event.is_action_pressed('cancel') and visible:
 		hide()
 		get_viewport().set_input_as_handled()
 

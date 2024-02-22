@@ -1,10 +1,72 @@
-[gd_scene load_steps=6 format=3 uid="uid://cj17rk2orwu6t"]
+[gd_scene load_steps=10 format=3 uid="uid://cj17rk2orwu6t"]
 
 [ext_resource type="Script" path="res://scenes/battle/level.gd" id="1_uee7d"]
 [ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_m8p1b"]
 [ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="3_pg464"]
 [ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="3_x6cdp"]
-[ext_resource type="Texture2D" uid="uid://d3npoyjfsdqqn" path="res://scenes/battle/data/cursor.png" id="4_rwt8q"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_path.gd" id="4_22vnm"]
+[ext_resource type="Texture2D" uid="uid://b13bfmaud6i0c" path="res://scenes/battle/data/arrows.svg" id="4_id51i"]
+[ext_resource type="PackedScene" uid="uid://cnyun2i5nbx3" path="res://scenes/battle/cursor.tscn" id="7_ij0h1"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aobpr"]
+texture = ExtResource("4_id51i")
+texture_region_size = Vector2i(80, 80)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/terrains_peering_bit/right_side = 0
+1:0/0/terrains_peering_bit/left_side = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/terrains_peering_bit/bottom_side = 0
+2:0/0/terrains_peering_bit/top_side = 0
+0:1/0 = 0
+0:1/0/terrain_set = 0
+0:1/0/terrain = 0
+0:1/0/terrains_peering_bit/right_side = 0
+0:1/0/terrains_peering_bit/bottom_side = 0
+1:1/0 = 0
+1:1/0/terrain_set = 0
+1:1/0/terrain = 0
+1:1/0/terrains_peering_bit/bottom_side = 0
+1:1/0/terrains_peering_bit/left_side = 0
+2:1/0 = 0
+2:1/0/terrain_set = 0
+2:1/0/terrain = 0
+2:1/0/terrains_peering_bit/bottom_side = 0
+3:1/0 = 0
+3:1/0/terrain_set = 0
+3:1/0/terrain = 0
+3:1/0/terrains_peering_bit/left_side = 0
+0:2/0 = 0
+0:2/0/terrain_set = 0
+0:2/0/terrain = 0
+0:2/0/terrains_peering_bit/right_side = 0
+0:2/0/terrains_peering_bit/top_side = 0
+1:2/0 = 0
+1:2/0/terrain_set = 0
+1:2/0/terrain = 0
+1:2/0/terrains_peering_bit/left_side = 0
+1:2/0/terrains_peering_bit/top_side = 0
+2:2/0 = 0
+2:2/0/terrain_set = 0
+2:2/0/terrain = 0
+2:2/0/terrains_peering_bit/top_side = 0
+3:2/0 = 0
+3:2/0/terrain_set = 0
+3:2/0/terrain = 0
+3:2/0/terrains_peering_bit/right_side = 0
+
+[sub_resource type="TileSet" id="TileSet_iul2h"]
+tile_size = Vector2i(80, 80)
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "Terrain 0"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/0 = SubResource("TileSetAtlasSource_aobpr")
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_uee7d")
@@ -12,49 +74,33 @@ script = ExtResource("1_uee7d")
 [node name="WorldSample" parent="." instance=ExtResource("2_m8p1b")]
 z_index = -10
 
-[node name="WorldOverlays" type="Node2D" parent="."]
+[node name="CellOverlays" type="Node2D" parent="."]
 z_index = -1
-
-[node name="Pathing" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
-modulate = Color(0, 1, 0, 0.360784)
-position = Vector2(1011.46, 209.215)
-rotation = 0.524835
-scale = Vector2(0.81708, 0.81708)
-skew = 0.521126
-world = NodePath("../../WorldSample")
-
-[node name="AttackRange" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
-modulate = Color(1, 0, 0, 0.360784)
-position = Vector2(1011.46, 209.215)
-rotation = 0.524835
-scale = Vector2(0.81708, 0.81708)
-skew = 0.521126
-world = NodePath("../../WorldSample")
-
-[node name="TargetShape" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
-modulate = Color(0, 0, 1, 0.360784)
-position = Vector2(1011.46, 209.215)
-rotation = 0.524835
-scale = Vector2(0.81708, 0.81708)
-skew = 0.521126
-world = NodePath("../../WorldSample")
-
-[node name="UnitPath" parent="WorldOverlays" node_paths=PackedStringArray("world") instance=ExtResource("3_pg464")]
-modulate = Color(1, 0, 1, 0.360784)
-position = Vector2(1011.46, 209.215)
-rotation = 0.524835
-scale = Vector2(0.81708, 0.81708)
-skew = 0.521126
-world = NodePath("../../WorldSample")
-
-[node name="UnitPathReal" type="Node2D" parent="WorldOverlays"]
-
-[node name="Cursor" type="Node2D" parent="."]
-modulate = Color(1, 0.960784, 0.94902, 0.941176)
 script = ExtResource("3_x6cdp")
-internal_size = Vector2(334, 334)
+internal_size = Vector2(68, 68)
+transform_flags = 7
 
-[node name="Sprite" type="Sprite2D" parent="Cursor"]
-position = Vector2(-2.89235e-05, 0.000395044)
-texture = ExtResource("4_rwt8q")
-offset = Vector2(-20, -20)
+[node name="Pathing" parent="CellOverlays" instance=ExtResource("3_pg464")]
+unique_name_in_owner = true
+
+[node name="AttackRange" parent="CellOverlays" instance=ExtResource("3_pg464")]
+unique_name_in_owner = true
+
+[node name="TargetShape" parent="CellOverlays" instance=ExtResource("3_pg464")]
+unique_name_in_owner = true
+
+[node name="UnitOverlays" type="Node2D" parent="."]
+z_index = -1
+script = ExtResource("3_x6cdp")
+internal_size = Vector2(80, 80)
+transform_flags = 7
+
+[node name="UnitPath" type="TileMap" parent="UnitOverlays" node_paths=PackedStringArray("world")]
+unique_name_in_owner = true
+tile_set = SubResource("TileSet_iul2h")
+format = 2
+script = ExtResource("4_22vnm")
+world = NodePath("../../WorldSample")
+
+[node name="Cursor" parent="." instance=ExtResource("7_ij0h1")]
+position = Vector2(964, 323)

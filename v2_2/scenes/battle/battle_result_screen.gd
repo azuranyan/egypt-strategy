@@ -38,6 +38,9 @@ func show_result(text: String, won: bool, wait_for_hide := false):
 	
 	
 func _unhandled_input(event):
+	if not visible:
+		return
+		
 	if (event is InputEventMouseButton or event is InputEventKey) and event.pressed:
 		animation_player.advance(999)
 		_continue = true

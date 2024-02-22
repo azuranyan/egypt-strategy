@@ -24,6 +24,7 @@ signal revived(unit: Unit) ## Emitted when the unit comes back from the dead sta
 signal status_effect_added(unit: Unit, effect: StringName, duration: int) ## Emitted when status effect is added.
 signal status_effect_ticked(unit: Unit, effect: StringName, duration: int) ## Emitted when status effect is applied and duration is decremented.
 signal status_effect_removed(unit: Unit, effect: StringName) ## Emitted when status effect is removed.
+signal turn_flags_changed(unit: Unit)
 #endregion Unit State Signals
 
 
@@ -43,3 +44,6 @@ signal mouse_exited(unit: Unit) ## Emitted when mouse exits the unit detection a
 signal clicked(unit: Unit, mouse_pos: Vector2, button_index: int, pressed: bool) ## Emitted when unit is clicked.
 signal selected(unit: Unit, is_selected: bool) ## Emitted when unit is (de)selected.
 #endregion Map and Interaction Signals
+
+
+var last_input_event: InputEvent

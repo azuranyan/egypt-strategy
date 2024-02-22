@@ -1,10 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://bw177ucuhg0l8"]
+[gd_scene load_steps=4 format=3 uid="uid://bw177ucuhg0l8"]
 
 [ext_resource type="Script" path="res://scenes/battle/agents/player_agent.gd" id="1_av1s7"]
 [ext_resource type="Script" path="res://scenes/battle/agents/interaction_handler.gd" id="2_3ia01"]
+[ext_resource type="Script" path="res://scenes/battle/agents/state_machine.gd" id="3_m66eo"]
 
-[node name="PlayerAgent" type="Node"]
+[node name="PlayerAgent" type="Node" node_paths=PackedStringArray("interaction_handler")]
 script = ExtResource("1_av1s7")
+undo_stack_size = null
+interaction_handler = NodePath("InteractionHandler")
+rotation_deadzone = null
 
 [node name="InteractionHandler" type="Node" parent="."]
 script = ExtResource("2_3ia01")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("3_m66eo")
+
+[node name="CursorCooldownTimer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = true

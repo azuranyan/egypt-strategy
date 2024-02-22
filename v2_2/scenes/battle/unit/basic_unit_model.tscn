@@ -9,11 +9,15 @@ radius = 15.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_266ts"]
 size = Vector2(30, 51)
 
-[node name="UnitModel" type="Node2D" node_paths=PackedStringArray("sprite", "detector")]
+[node name="UnitModel" type="Node2D" node_paths=PackedStringArray("sprite", "detector", "grab_point")]
 scale = Vector2(-1, 1)
 script = ExtResource("1_l5fke")
 sprite = NodePath("Sprite")
 detector = NodePath("MouseDetector")
+grab_point = NodePath("GrabPoint")
+
+[node name="GrabPoint" type="Node2D" parent="."]
+position = Vector2(-4, -76)
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -38)

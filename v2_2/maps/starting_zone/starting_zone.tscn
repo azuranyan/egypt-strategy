@@ -43,14 +43,13 @@ z_index = -10
 texture = ExtResource("4_o4n1p")
 metadata/_edit_lock_ = true
 
-[node name="Painter" parent="." node_paths=PackedStringArray("world") instance=ExtResource("5_lepi5")]
+[node name="Painter" parent="." instance=ExtResource("5_lepi5")]
 z_index = 1
 position = Vector2(1011.46, 209.215)
 rotation = 0.524835
 scale = Vector2(0.81708, 0.81708)
 skew = 0.521126
 layer_0/tile_data = PackedInt32Array(720905, 458752, 0, 720906, 458752, 0, 720907, 458752, 0, 720898, 458752, 0, 720897, 458752, 0, 720896, 458752, 0, 393218, 458752, 0, 327682, 458752, 0, 262146, 458752, 0, 196610, 458752, 0, 131075, 458752, 0, 131076, 458752, 0, 131077, 458752, 0, 131078, 458752, 0, 65542, 458752, 0, 131074, 458752, 0, 5, 458752, 0, 65541, 458752, 0, 458754, 458752, 0, 458752, 458752, 0, 458753, 458752, 0)
-world = NodePath("../World")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 y_sort_enabled = true

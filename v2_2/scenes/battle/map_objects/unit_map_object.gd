@@ -66,7 +66,6 @@ var unit: Unit
 var unit_model: UnitModel
 
 # TODO these could be diff components too
-@onready var hp_bar_single = %HPBarSingle
 @onready var hp_bar = %HPBar
 
 
@@ -80,6 +79,7 @@ func _ready():
 		UnitEvents.state_changed.connect(_on_unit_state_changed)
 		UnitEvents.stat_changed.connect(_on_unit_stat_changed)
 		UnitEvents.damaged.connect(_on_unit_damaged)
+		UnitEvents.turn_flags_changed.connect(_on_unit_turn_flags_changed)
 	initialize(null)
 	assert(unit_model != null)
 
@@ -121,6 +121,13 @@ func load_unit_model(model_scene: PackedScene):
 	unit_model.heading = heading
 
 	$UnitModelContainer.add_child(unit_model)
+
+
+## The grab offset.
+func grab_offset() -> Vector2:
+	if unit_model and unit_model.grab_point:
+		return unit_model.grab_point.position
+	return Vector2.ZERO
 
 
 func _remove_unit_model():
@@ -233,5 +240,10 @@ func _on_unit_damaged(_unit: Unit, amount: int, source: Variant):
 		#camera.get_node("AnimationPlayer").play('shake') # battle will do the shake
 		color = Color(0.949, 0.29, 0.392)
 	play_floating_number(abs(amount), color)
+
+
+func _on_unit_turn_flags_changed(_unit: Unit):
+	%EndTurnIcon.visible = not _unit.is_turn_done()
+
 	
 	

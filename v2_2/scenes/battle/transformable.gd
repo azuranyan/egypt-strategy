@@ -31,16 +31,31 @@ extends Node2D
 		
 		
 func _enter_tree():
+	if world:
+		return
 	var p := get_parent()
 	while p != null:
-		if p is MapObject or p is Map:
-			world = p.world
+		world = _get_world(p)
+		if _get_world(p):
+			return
+		for c in p.get_children():
+			world = _get_world(c)
+			if world:
+				return
 		p = p.get_parent()
 	
 	
 func _exit_tree():
 	world = null
 
+
+func _get_world(node: Node) -> World:
+	if node is MapObject or node is Map:
+		return node.world
+	if node is World:
+		return node
+	return null
+	
 
 func _get_configuration_warnings() -> PackedStringArray:
 	if not is_instance_valid(world):

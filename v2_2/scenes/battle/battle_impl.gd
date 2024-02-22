@@ -79,13 +79,13 @@ func _real_battle():
 	hud().menu_button.pressed.connect(show_pause_menu)
 	level = get_active_battle_scene().level
 	
+	_distribute_units()
 	_field_units()
 		
 	# initialize agents and ai placement
 	create_agent(_attacker)
 	create_agent(_defender)
 
-	
 	# do battle
 	await _real_battle_main()
 
@@ -97,6 +97,27 @@ func _real_battle():
 
 	SceneManager.scene_return('fade_to_black')
 		
+
+func _distribute_units():
+	print("[Battle] Redistributing units.")
+	for u in level.objects:
+		if not u is UnitMapObject:
+			continue
+
+		if u.empire_id.is_empty():
+			print('[Battle] Pre-placed unit missing `empire_id`.')
+			u.queue_free()
+			continue
+
+		var empire := Game.overworld.get_empire_by_chara_id(u.empire_id)
+		if empire:
+			#u.set_meta("preplaced", true)
+			#Game.create_unit(null, 
+			#spawn_unit(u.unit_type, empire, {map_unit=u, map_position=u.map_position})
+			push_error('not implemented')
+			pass
+		u.queue_free()
+
 	
 func _field_units():
 	UnitEvents.state_changed.connect(_on_unit_state_changed)
@@ -388,6 +409,34 @@ func world_bounds() -> Rect2:
 	return level.get_bounds()
 
 
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_global(screen_pos: Vector2) -> Vector2:
+	return get_viewport().canvas_transform.affine_inverse() * screen_pos
+
+
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_uniform(screen_pos: Vector2) -> Vector2:
+	return world().as_uniform(screen_to_global(screen_pos))
+
+
+## Returns the global coordinates of a screen position.
+## Screen positions are affected by camera transformation so conversion is necessary.
+func screen_to_cell(screen_pos: Vector2) -> Vector2:
+	return Map.cell(screen_to_uniform(screen_pos))
+
+
+## Returns the mouse position in uniform coordinates.
+func get_uniform_mouse_position() -> Vector2:
+	return world().as_uniform(world().get_global_mouse_position())
+
+
+## Returns the mouse cell.
+func get_mouse_cell() -> Vector2:
+	return Map.cell(get_uniform_mouse_position())
+
+
 ## Returns the spawn points
 func get_spawn_points(type: SpawnPoint.Type) -> Array[SpawnPoint]:
 	return level.get_spawn_points(type)
@@ -461,9 +510,16 @@ func clear_overlays(overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARG
 ## Draws the unit path.
 func draw_unit_path(unit: Unit, cell: Vector2) -> void:
 	clear_overlays(PATH_MASK)
-	level.unit_path.initialize(unit.get_pathable_cells())
+	level.unit_path.initialize(unit.get_pathable_cells(true))
 	level.unit_path.draw(unit.cell(), cell)
 
+
+var used_cells := [
+	PackedVector2Array(),
+	PackedVector2Array(),
+	PackedVector2Array(),
+	PackedVector2Array(),
+]
 
 ## Draws the pathable cells.
 func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
@@ -471,6 +527,8 @@ func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
 	var color := TileOverlay.TileColor.RED if use_alt_color else TileOverlay.TileColor.GREEN
 	var cells := unit.get_placeable_cells()
 	level.pathing_overlay.set_cells(cells, color)
+	used_cells[Overlay.PATHABLE].clear()
+	used_cells[Overlay.PATHABLE].append_array(cells)
 
 
 ## Draws the cells that can be reached by specified attack.
@@ -478,14 +536,18 @@ func draw_unit_attack_range(unit: Unit, attack: Attack) -> void:
 	clear_overlays(ATTACK_RANGE_MASK)
 	var cells := unit.attack_range_cells(attack)
 	level.attack_range_overlay.set_cells(cells, TileOverlay.TileColor.RED)
+	used_cells[Overlay.ATTACK_RANGE].clear()
+	used_cells[Overlay.ATTACK_RANGE].append_array(cells)
 
 
 ## Draws the cells in target aoe.
 func draw_unit_attack_target(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
 	clear_overlays(TARGET_SHAPE_MASK)
+	used_cells[Overlay.TARGET_SHAPE].clear()
 	for i in target.size():
 		var cells := unit.attack_target_cells(attack, target[i], rotation[i])
 		level.target_shape_overlay.set_cells(cells, TileOverlay.TileColor.BLUE)
+	used_cells[Overlay.TARGET_SHAPE].append_array(level.target_shape_overlay.get_used_cells_by_color(TileOverlay.TileColor.BLUE))
 
 
 ## Sets the camera target. If target are either [Unit] or [Node2D],
@@ -509,16 +571,23 @@ func _camera_target_position(target: Variant) -> Vector2:
 	return get_active_battle_scene().camera.position
 		
 
+var cursor_pos: Vector2 = Vector2.ZERO:
+	set(value):
+		cursor_pos = value
+		# if is_instance_valid(level):
+		# 	var tween := create_tween()
+		# 	tween.tween_property(level.cursor, 'position', world().as_global(Map.cell(cursor_pos)), 0.05)
+		level.cursor.position = world().as_global(Map.cell(cursor_pos))
+
+		
 ## Sets the cursor position
-func set_cursor_pos(screen_pos: Vector2) -> void:
-	var tween := create_tween()
-	tween.tween_property(level.cursor, 'position', screen_pos, 0.2)
-	#level.cursor.position = screen_pos
+func set_cursor_pos(cell: Vector2) -> void:
+	cursor_pos = cell
 
 
 ## Returns the cursor position.
 func get_cursor_pos() -> Vector2:
-	return level.cursor.position
+	return cursor_pos
 
 
 ## Returns the HUD.
@@ -547,7 +616,6 @@ func show_forfeit_dialog() -> void:
 		forfeit_dialog.confirm_button.disabled = player() == defender()
 	
 	var forfeit_confirm: bool = await forfeit_dialog.closed
-	print(forfeit_confirm)
 	if not forfeit_confirm:
 		return
 	
@@ -568,10 +636,10 @@ func hide_forfeit_dialog() -> void:
 #region Actions
 ## Returns [constant Error.OK] if movement is valid otherwise returns the error code.
 func check_unit_move(unit: Unit, cell: Vector2) -> int:
-	if unit.is_turn_flag_set(Unit.IS_DONE):
+	if unit.is_turn_done():
 		return TURN_DONE
 		
-	if unit.is_turn_flag_set(Unit.HAS_MOVED):
+	if unit.has_moved() or unit.has_attacked():
 		return ACTION_ALREADY_TAKEN
 		
 	if Util.cell_distance(unit.cell(), cell) > unit.get_stat(&'mov'):
@@ -582,10 +650,10 @@ func check_unit_move(unit: Unit, cell: Vector2) -> int:
 
 ## Returns [constant Error.OK] if attack is valid otherwise returns the error code.
 func check_unit_attack(unit: Unit, attack: Attack, target: Vector2, rotation: float) -> int:
-	if unit.is_turn_flag_set(Unit.IS_DONE):
+	if unit.is_turn_done():
 		return TURN_DONE
 		
-	if unit.is_turn_flag_set(Unit.HAS_ATTACKED):
+	if unit.has_attacked():
 		return ACTION_ALREADY_TAKEN
 		
 	if attack == null:
@@ -642,7 +710,7 @@ func do_action(unit: Unit, action: UnitAction) -> void:
 
 ## Unit does nothing and ends their turn.
 func unit_action_pass(unit: Unit) -> void:
-	unit.set_turn_flag(Unit.IS_DONE)
+	unit.set_is_done(true)
 
 	last_acting_unit = unit
 	check_for_battle_end()
@@ -664,7 +732,7 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 
 	await set_camera_target(null)
 	hud().show()
-	unit.set_turn_flag(Unit.HAS_MOVED)
+	unit.set_has_moved(true)
 
 	last_acting_unit = unit
 	check_for_battle_end()
@@ -682,7 +750,7 @@ func unit_action_attack(unit: Unit, attack: Attack, target: PackedVector2Array, 
 
 	await set_camera_target(unit)
 	hud().hide_attack_banner()
-	unit.set_turn_flag(Unit.HAS_ATTACKED)
+	unit.set_has_attacked(true)
 
 	last_acting_unit = unit
 	check_for_battle_end()
@@ -718,7 +786,7 @@ func _get_attack_actions_in_range(unit: Unit, attack: Attack, dest: Array[UnitAc
 	const ROTATIONS := [0, PI/2, PI, PI*3/2]
 	if not attack:
 		return
-	for t in unit.get_cells_in_range(attack):
+	for t in unit.attack_range_cells(attack):
 		for r in ROTATIONS:
 			var action := UnitAction.new(false, Vector2.ZERO, true, attack, t, r)
 			if not _is_action_present(action, dest) and check_unit_attack(unit, attack, t, r) == OK:

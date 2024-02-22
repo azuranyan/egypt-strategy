@@ -36,7 +36,14 @@ const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_ob
 ## The unit state.
 @export var _state: State
 
-@export_flags('Attacked:1', 'Moved:2', 'Done:4') var _turn_flags: int
+## Turn flag.
+@export var _has_moved: bool
+
+## Turn flag.
+@export var _has_attacked: bool
+
+## Turn flag.
+@export var _is_turn_done: bool
 
 @export var _selectable: bool = true
 
@@ -228,11 +235,6 @@ func is_player_owned() -> bool:
 	return _empire.is_player_owned()
 	
 	
-## Returns the turn flags.
-func turn_flags() -> int:
-	return _turn_flags
-	
-	
 ## Returns the unit phase flags.
 func get_phase_flags() -> int:
 	return _phase_flags
@@ -363,7 +365,7 @@ func tick_status_effects() -> void:
 			&'PSN':
 				take_damage(Game.battle.get_config_value(&'poison_damage'), &'PSN')
 			&'STN':
-				set_turn_flag(IS_DONE)
+				set_turn_done(true)
 			&'VUL':
 				pass
 			&'BLK':
@@ -476,29 +478,47 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
-## Sets the turn flag.
-func set_turn_flag(flag: int) -> void:
-	_turn_flags |= flag
+## Returns true if unit has moved.
+func has_moved() -> bool:
+	return _has_moved
+
+
+## Returns true if unit has attacked.
+func has_attacked() -> bool:
+	return _has_attacked
+
+
+## Returns true if unit's turn is done.
+func is_turn_done() -> bool:
+	return _is_turn_done
+
+
+## Sets `has_moved` flag of this unit.
+func set_has_moved(value: bool) -> void:
+	_has_moved = value
+	UnitEvents.turn_flags_changed.emit(self)
 	
 	
-## Clears the turn flag.
-func clear_turn_flag(flag: int) -> void:
-	_turn_flags &= ~flag
-	
-	
-## Checks if the turn flag is set.
-func is_turn_flag_set(flag: int) -> bool:
-	return _turn_flags & flag == flag
-	
-	
+## Sets `has_attacked` flag of this unit.
+func set_has_attacked(value: bool) -> void:
+	_has_attacked = value
+	UnitEvents.turn_flags_changed.emit(self)
+
+
+## Sets `has_attacked` flag of this unit.
+func set_turn_done(value: bool) -> void:
+	_is_turn_done = value
+	UnitEvents.turn_flags_changed.emit(self)
+
+
 ## Returns true if this unit can move.
 func can_move() -> bool:
-	return not is_turn_flag_set(IS_DONE | HAS_ATTACKED | HAS_MOVED)
+	return not (_is_turn_done or _has_attacked or _has_moved)
 	
 	
 ## Returns true if this unit can attack.
 func can_attack() -> bool:
-	return not is_turn_flag_set(IS_DONE | HAS_ATTACKED)
+	return not (_is_turn_done or _has_attacked)
 	
 
 ## Returns true if this unit can act.
@@ -508,7 +528,7 @@ func can_act() -> bool:
 
 ## Returns true if this unit has taken any actions.
 func has_taken_action() -> bool:
-	return is_turn_flag_set(HAS_ATTACKED) or is_turn_flag_set(HAS_MOVED)
+	return _has_attacked or _has_moved
 
 
 ## Makes unit walk towards cell.
@@ -641,7 +661,9 @@ func save_state() -> Dictionary:
 		empire = _empire,
 		behavior = _behavior,
 		state = _state,
-		turn_flags = _turn_flags,
+		has_attacked = _has_attacked,
+		has_moved = _has_moved,
+		is_turn_done = _is_turn_done,
 		selectable = _selectable,
 		stats = _stats.duplicate(),
 		bond = _bond,
@@ -665,15 +687,20 @@ func load_state(data: Dictionary):
 	_model_scale = data.model_scale
 	_empire = data.empire
 	_behavior = data.behavior
-	_state = data.state
-	_turn_flags = data.turn_flags
+	#_state = data.state
+	set_state(data.state)
+	set_has_attacked(data.has_attacked)
+	set_has_moved(data.has_moved)
+	set_turn_done(data.is_turn_done)
 	_selectable = data.selectable
 	_stats = data.stats
 	_bond = data.bond
 	_special_unlock = data.special_unlock
 	_status_effects = data.status_effects
-	_heading = data.heading
-	_map_position = data.map_position
+	#_heading = data.heading
+	set_heading(data.heading)
+	#_map_position = data.map_position
+	set_position(data.map_position)
 	_walk_speed = data.walk_speed
 	_phase_flags = data.phase_flags
 #region Serialization

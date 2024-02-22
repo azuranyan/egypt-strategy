@@ -29,7 +29,7 @@ enum PathingGroup {
 enum Heading {EAST, SOUTH, WEST, NORTH}
 
 ## UnitState directions corresponding to heading.
-const DIRECTIONS := [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, Vector2.UP]
+const DIRECTIONS: Array[Vector2] = [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, Vector2.UP]
 
 ## A special out of bounds location.
 const OUT_OF_BOUNDS := Vector2(69, 69)

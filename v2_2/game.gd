@@ -67,7 +67,6 @@ func select_unit(unit: Unit):
 		_interaction_handler.select_unit(unit)
 
 
-
 ## Deselects a unit.
 func deselect_unit(unit: Unit = get_selected_unit()):
 	if is_instance_valid(_interaction_handler):

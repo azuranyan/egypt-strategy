@@ -24,8 +24,9 @@ func _ready():
 func _unhandled_input(event):
 	if event.is_action_pressed('ui_accept'):
 		show_battle_results()
+		get_viewport().set_input_as_handled()
 		
-	if event.is_action_pressed('back'):
+	if event.is_action_pressed('cancel'):
 		if Game.battle.is_battle_phase():
 			pause_menu.show()
 		else:

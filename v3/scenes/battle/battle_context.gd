@@ -75,8 +75,8 @@ func get_unit_count(empire: Empire) -> int:
 
 
 ## Returns an iterator to the units owned by this empire.
-func get_empire_units(empire: Empire, include_standby := false) -> UnitIterator:
-	return UnitIterator.new(empire_units[empire], include_standby)
+func get_empire_units(empire: Empire, include_standby := false) -> EmpireUnitIterator:
+	return EmpireUnitIterator.new(empire_units[empire], include_standby)
 
 
 ## Returns the unit at cell.
@@ -140,7 +140,7 @@ func evaluate_result() -> Battle.Result:
 	
 	
 ## Iterates through units.
-class UnitIterator:
+class EmpireUnitIterator:
 	var arr: Array[Unit]
 	var include_standby: bool
 	var idx: int

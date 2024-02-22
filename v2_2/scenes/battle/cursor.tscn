@@ -1,0 +1,51 @@
+[gd_scene load_steps=6 format=3 uid="uid://cnyun2i5nbx3"]
+
+[ext_resource type="Script" path="res://scenes/battle/cursor.gd" id="1_geu6l"]
+[ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="2_k82xh"]
+[ext_resource type="Texture2D" uid="uid://d3npoyjfsdqqn" path="res://scenes/battle/data/cursor.png" id="3_35keo"]
+
+[sub_resource type="Gradient" id="Gradient_s2d7h"]
+offsets = PackedFloat32Array(0.298701, 0.675325)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ba142"]
+gradient = SubResource("Gradient_s2d7h")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="Cursor" type="Node2D"]
+modulate = Color(1, 0.960784, 0.94902, 0.941176)
+script = ExtResource("1_geu6l")
+
+[node name="Label" type="Label" parent="."]
+z_index = 5
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -141.0
+offset_right = 20.0
+offset_bottom = -99.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(20, 21)
+theme_override_font_sizes/font_size = 30
+text = "👇"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="Label"]
+modulate = Color(1.2, 0.937255, 0.792157, 0.372549)
+show_behind_parent = true
+position = Vector2(20, 15)
+texture = SubResource("GradientTexture2D_ba142")
+
+[node name="Transformable" type="Node2D" parent="."]
+script = ExtResource("2_k82xh")
+internal_size = Vector2(334, 334)
+
+[node name="Sprite" type="Sprite2D" parent="Transformable"]
+texture = ExtResource("3_35keo")
+offset = Vector2(-20, -20)

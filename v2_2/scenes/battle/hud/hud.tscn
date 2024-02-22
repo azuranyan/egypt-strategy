@@ -114,6 +114,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_kh8gv")
+metadata/_edit_lock_ = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -139,6 +140,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+metadata/_edit_lock_ = true
 
 [node name="MenuButton" type="Button" parent="Control"]
 layout_mode = 0
@@ -173,10 +175,12 @@ icon_alignment = 1
 
 [node name="Label" type="Label" parent="Control/UndoButton"]
 show_behind_parent = true
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
 offset_top = -53.0
 offset_right = 101.0
 offset_bottom = 12.0
+grow_horizontal = 2
 theme = ExtResource("2_2bpvx")
 text = "UNDO
 MOVE"
@@ -535,6 +539,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+metadata/_edit_lock_ = true
 
 [node name="TurnBanner" type="Control" parent="Overlay"]
 visible = false

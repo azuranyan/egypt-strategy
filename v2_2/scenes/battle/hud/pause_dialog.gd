@@ -57,7 +57,7 @@ func _input(event):
 	if Engine.is_editor_hint():
 		return
 		
-	if event.is_action_pressed('back') and visible:
+	if event.is_action_pressed('cancel') and visible:
 		close_dialog()
 		get_viewport().set_input_as_handled()
 

@@ -49,14 +49,12 @@ signal clicked(mouse_pos: Vector2, button_index: int, pressed: bool)
 @export var detector: Area2D:
 	set(value):
 		Util.just_disconnect(detector, 'input_event', _on_detector_input_event)
-		Util.just_disconnect(detector, 'mouse_entered', emit_signal.bind('mouse_entered'))
-		Util.just_disconnect(detector, 'mouse_exited', emit_signal.bind('mouse_exited'))
 		detector = value
 		Util.just_connect(detector, 'input_event', _on_detector_input_event)
-		Util.just_connect(detector, 'mouse_entered', emit_signal.bind('mouse_entered'))
-		Util.just_connect(detector, 'mouse_exited', emit_signal.bind('mouse_exited'))
 		update_configuration_warnings()
 
+## Node used to position grab offset.
+@export var grab_point: Node2D
 
 var _mouse_button_mask := 0
 
@@ -110,11 +108,11 @@ func get_animation_name(_state: Unit.State) -> StringName:
 
 
 func _on_detector_input_event(_viewport, event, _shape_idx):
+	UnitEvents.last_input_event = event
 	input_event.emit(event)
 	if event is InputEventMouseButton and event.pressed:
 		_mouse_button_mask |= event.button_mask
 		set_process_input(true)
-		# might be wrong? check position if it should be global
 		clicked.emit(event.position, event.button_index, true)
 		
 
@@ -125,5 +123,6 @@ func _input(event):
 		if _mouse_button_mask & mask != 0:
 			_mouse_button_mask &= ~mask
 			set_process_input(_mouse_button_mask != 0)
+			UnitEvents.last_input_event = event
 			clicked.emit(event.position, event.button_index, false)
 			

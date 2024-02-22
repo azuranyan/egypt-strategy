@@ -31,11 +31,10 @@ var unit: Unit
 
 
 @onready var cursor := $Cursor
-@onready var world_overlays := $WorldOverlays
-@onready var pathing_overlay := $WorldOverlays/Pathing as TileOverlay
-@onready var attack_range_overlay := $WorldOverlays/AttackRange as TileOverlay
-@onready var target_shape_overlay := $WorldOverlays/TargetShape as TileOverlay
-@onready var unit_path := $WorldOverlays/UnitPath
+@onready var pathing_overlay := %Pathing as TileOverlay
+@onready var attack_range_overlay := %AttackRange as TileOverlay
+@onready var target_shape_overlay := %TargetShape as TileOverlay
+@onready var unit_path := %UnitPath
 
 
 ## Loads a map.
@@ -69,12 +68,11 @@ func load_map(packed_scene: PackedScene) -> bool:
 
 	print("[Level] Finalizing map.")
 	$WorldSample.visible = false
-	pathing_overlay.world = map.world
-	attack_range_overlay.world = map.world
-	target_shape_overlay.world = map.world
-	cursor.world = map.world
+	$CellOverlays.world = map.world
+	$UnitOverlays.world = map.world
+	#cursor.world = map.world
 	cursor.position = map.world.as_global(Vector2.ZERO)
-	
+
 	print("[Level] Loading done.")
 	return true
 			
@@ -106,6 +104,15 @@ func _has_barrier(cell: Vector2) -> bool:
 		if obj is Barrier:
 			return true
 	return false
+
+
+func _distribute_units():
+	var evict := []
+	for u in objects:
+		if u is UnitMapObject:
+			evict.append(u)
+	
+
 	
 	
 ## Unloads the map
@@ -118,10 +125,9 @@ func unload_map():
 		map.queue_free()
 		
 		$WorldSample.visible = true
-		pathing_overlay.world = $WorldSample
-		attack_range_overlay.world = $WorldSample
-		target_shape_overlay.world = $WorldSample
-		cursor.world = $WorldSample
+		$CellOverlays.world = $WorldSample
+		$UnitOverlays.world = $WorldSample
+		#cursor.world = $WorldSample
 		map = null
 		print("[Level] Unloading done.")
 	

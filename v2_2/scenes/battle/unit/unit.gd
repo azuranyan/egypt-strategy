@@ -1,12 +1,6 @@
 class_name Unit extends Node
 ## The interface for unit.
 
-
-# Turn flags
-const HAS_MOVED := 1 << 0 ## Unit moved bitflag.
-const HAS_ATTACKED := 1 << 1 ## Unit attacked bitflag.
-const IS_DONE := 1 << 2 ## Unit attacked bitflag.
-
 # Phase flags
 const PHASE_NONE := 0 ## Default movement (phase friendly units).
 const PHASE_ENEMIES := 1 << 0 ## Ignores enemies.
@@ -151,12 +145,6 @@ func is_ally(_other: Unit) -> bool:
 func is_player_owned() -> bool:
 	assert(false, 'not implemented')
 	return false
-	
-	
-## Returns the turn flags.
-func turn_flags() -> int:
-	assert(false, 'not implemented')
-	return 0
 	
 	
 ## Returns the unit phase flags.
@@ -381,22 +369,39 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
-## Sets the turn flag.
-func set_turn_flag(_flag: int) -> void:
-	assert(false, 'not implemented')
-	
-	
-## Clears the turn flag.
-func clear_turn_flag(_flag: int) -> void:
-	assert(false, 'not implemented')
-	
-	
-## Checks if the turn flag is set.
-func is_turn_flag_set(_flag: int) -> bool:
+## Returns true if unit has moved.
+func has_moved() -> bool:
 	assert(false, 'not implemented')
 	return false
+
+
+## Returns true if unit has attacked.
+func has_attacked() -> bool:
+	assert(false, 'not implemented')
+	return false
+
+
+## Returns true if unit's turn is done.
+func is_turn_done() -> bool:
+	assert(false, 'not implemented')
+	return false
+
+
+## Sets `has_moved` flag of this unit.
+func set_has_moved(_has_moved: bool) -> void:
+	assert(false, 'not implemented')
 	
 	
+## Sets `has_attacked` flag of this unit.
+func set_has_attacked(_has_attacked: bool) -> void:
+	assert(false, 'not implemented')
+
+
+## Sets `has_attacked` flag of this unit.
+func set_turn_done(_turn_done: bool) -> void:
+	assert(false, 'not implemented')
+
+
 ## Returns true if this unit can move.
 func can_move() -> bool:
 	assert(false, 'not implemented')

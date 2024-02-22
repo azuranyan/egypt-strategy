@@ -1,8 +1,9 @@
-[gd_scene load_steps=19 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=20 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
 [ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="2_yi0k6"]
 [ext_resource type="Script" path="res://scenes/battle/attack/debug_print_effect.gd" id="3_7rp7p"]
+[ext_resource type="Script" path="res://scenes/battle/unhandled_input_listener.gd" id="4_0x7je"]
 [ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
 [ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="6_i7shf"]
@@ -224,7 +225,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
+mouse_filter = 2
 
 [node name="BG" type="TextureRect" parent="Control"]
 modulate = Color(0.345098, 0.286275, 0.184314, 1)
@@ -234,6 +235,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = SubResource("GradientTexture2D_b57ex")
 
 [node name="ViewportContainer" type="SubViewportContainer" parent="Control"]
@@ -252,7 +254,22 @@ render_target_update_mode = 4
 [node name="Camera2D" type="Camera2D" parent="Control/ViewportContainer/Viewport"]
 unique_name_in_owner = true
 position = Vector2(960, 540)
+limit_left = -384
+limit_top = -216
+limit_right = 2304
+limit_bottom = 1296
+limit_smoothed = true
 position_smoothing_enabled = true
+drag_left_margin = 0.75
+drag_top_margin = 0.87
+drag_right_margin = 0.75
+drag_bottom_margin = 0.72
+editor_draw_limits = true
+editor_draw_drag_margin = true
+
+[node name="UnhandledInputListener" type="Node" parent="Control/ViewportContainer/Viewport"]
+unique_name_in_owner = true
+script = ExtResource("4_0x7je")
 
 [node name="Level" parent="Control/ViewportContainer/Viewport" instance=ExtResource("4_loo3i")]
 unique_name_in_owner = true
