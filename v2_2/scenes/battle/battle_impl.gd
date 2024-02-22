@@ -409,20 +409,25 @@ func world_bounds() -> Rect2:
 	return level.get_bounds()
 
 
+## Returns the out of bounds location in global coordinates.
+func global_out_of_bounds() -> Vector2:
+	return world().as_global(Map.OUT_OF_BOUNDS)
+
+
 ## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_global(screen_pos: Vector2) -> Vector2:
 	return get_viewport().canvas_transform.affine_inverse() * screen_pos
 
 
-## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Returns the uniform coordinates of a screen position.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_uniform(screen_pos: Vector2) -> Vector2:
 	return world().as_uniform(screen_to_global(screen_pos))
 
 
-## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Returns the cell of a screen position.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_cell(screen_pos: Vector2) -> Vector2:
 	return Map.cell(screen_to_uniform(screen_pos))
 

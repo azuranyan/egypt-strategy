@@ -234,22 +234,28 @@ func world_bounds() -> Rect2:
 	return Rect2()
 
 
+## Returns the out of bounds location in global coordinates.
+func global_out_of_bounds() -> Vector2:
+	assert(false, 'not implemented')
+	return Vector2.ZERO
+
+
 ## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_global(_screen_pos: Vector2) -> Vector2:
 	assert(false, 'not implemented')
 	return Vector2.ZERO
 
 
-## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Returns the uniform coordinates of a screen position.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_uniform(_screen_pos: Vector2) -> Vector2:
 	assert(false, 'not implemented')
 	return Vector2.ZERO
 
 
-## Returns the global coordinates of a screen position.
-## Screen positions are affected by camera transformation so conversion is necessary.
+## Returns the cell of a screen position.
+## Screen positions are affected by camera transformation so this conversion is necessary.
 func screen_to_cell(_screen_pos: Vector2) -> Vector2:
 	assert(false, 'not implemented')
 	return Vector2.ZERO

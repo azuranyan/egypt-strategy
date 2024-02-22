@@ -6,7 +6,6 @@ enum {
 	STATE_NONE,
 	STATE_ROTATE_UNIT,
 	STATE_PREP_STANDBY,
-	STATE_PREP_SELECTED_UNIT,
 	STATE_PREP_PLACING_UNIT,
 	STATE_PREP_MOVING_UNIT,
 	STATE_BATTLE_STANDBY,
@@ -100,7 +99,7 @@ func _input(event: InputEvent):
 	#event = Battle.instance().world().make_input_local(event)
 
 	# run handlers
-	for handler in [handle_start_rotate_unit, handle_stop_rotate_unit, handle_rotate_unit, handle_drag_unit, handle_move_cursor]:
+	for handler in [handle_start_rotate_unit, handle_stop_rotate_unit, handle_rotate_unit, handle_start_drag_unit, handle_stop_drag_unit, handle_drag_unit, handle_move_cursor, handle_cancel]:
 		if handler.call(event):
 			get_viewport().set_input_as_handled()
 			return
@@ -144,10 +143,6 @@ func handle_stop_rotate_unit(event) -> bool:
 		and not event.pressed):
 		return false
 
-	#var unit := interaction_handler.get_hovered_unit()
-	#if unit != selected_unit:
-	#	return false
-
 	interact_stop_rotate_unit()
 	return true
 
@@ -190,10 +185,6 @@ func handle_stop_drag_unit(event) -> bool:
 		and event.button_index == MOUSE_BUTTON_LEFT
 		and not event.pressed):
 		return false
-
-	#var unit := interaction_handler.get_hovered_unit()
-	#if unit != selected_unit:
-	#	return false
 
 	interact_stop_drag_unit()
 	return true
@@ -285,7 +276,7 @@ func pop_state():
 
 
 func _enter_state(st: int):
-	if selected_unit and selected_unit.can_move() and st != STATE_PREP_PLACING_UNIT:
+	if selected_unit and selected_unit.can_move() and st in [STATE_PREP_STANDBY, STATE_BATTLE_STANDBY]:
 		battle.draw_unit_placeable_cells(selected_unit, selected_unit.is_player_owned())
 
 
@@ -337,7 +328,28 @@ func interact_end():
 ## Cancels current interaction.
 func interact_cancel():
 	update_message_box()
-	undo_action()
+	match state:
+		STATE_PREP_STANDBY:
+			var hovered_unit := interaction_handler.get_hovered_unit()
+			if hovered_unit:
+				if can_reposition(hovered_unit):
+					interact_remove_unit(hovered_unit)
+				else:
+					pass # do nothing
+			else:
+				undo_action()
+
+		STATE_BATTLE_STANDBY:
+			undo_action()
+
+		STATE_PREP_MOVING_UNIT:
+			interact_stop_drag_unit()
+
+		STATE_BATTLE_SELECTING_MOVE:
+			pass
+
+		STATE_BATTLE_SELECTING_TARGET:
+			pass
 
 
 ## Starts unit rotate interaction.
@@ -367,41 +379,37 @@ func interact_start_drag_unit(unit: Unit):
 
 	selected_unit = unit
 	
-	var unit_screen_pos := get_viewport().canvas_transform * unit.get_global_position()
-	unit_drag_start = unit_screen_pos
+	unit_drag_start = unit.get_global_position()
 
 	if from_unit_list:
-		unit_drag_offset = Vector2.ZERO # unit sprite height or drag_point maybe?
+		unit_drag_offset = battle.screen_to_global(unit.get_map_object().grab_offset())
 		change_state(STATE_PREP_PLACING_UNIT)
 	else:
-		unit_drag_offset = get_viewport().get_mouse_position() - unit_screen_pos
+		unit_drag_offset = battle.screen_to_global(get_viewport().get_mouse_position() - get_viewport().canvas_transform*unit_drag_start)
 		change_state(STATE_PREP_MOVING_UNIT)
 		
 
 ## Stops unit drag interaction.
-func interact_stop_drag_unit(cancelled := false):
+func interact_stop_drag_unit():
 	update_message_box()
-	# var drop_point := selected_unit.cell()
-	# selected_unit.set_position(battle.screen_to_cell(unit_drag_start))
-	# interact_place_unit(selected_unit, drop_point)
-	if cancelled:
-		prep_remove_unit(selected_unit)
-	else:
-		interact_place_unit(selected_unit, selected_unit.cell())
+	var drop_point := selected_unit.cell()
+	selected_unit.set_position(battle.screen_to_cell(unit_drag_start))
+	interact_place_unit(selected_unit, drop_point)
+	#interact_place_unit(selected_unit, selected_unit.cell())
 	selected_unit = null
 	change_state(STATE_PREP_STANDBY)
 
 
 ## Moves the unit.
 func interact_drag_unit(screen_pos: Vector2):
-	selected_unit.set_position(battle.screen_to_uniform(screen_pos - unit_drag_offset))
-	update_ghost(selected_unit.cell(), battle.screen_to_cell(unit_drag_start))
+	selected_unit.set_global_position(battle.screen_to_global(screen_pos) - unit_drag_offset)
+	update_ghost(selected_unit.cell(), battle.world().as_uniform(unit_drag_start))
 
 	
 ## Adds unit to play.
 func interact_place_unit(unit: Unit, cell: Vector2):
 	update_message_box()
-	var old_pos := battle.screen_to_cell(unit_drag_start)
+	var old_pos := unit.cell()
 	if is_spawn_cell(cell):
 		if battle.is_occupied(cell, unit):
 			var occupant := battle.get_unit_at(cell, unit)
@@ -418,7 +426,10 @@ func interact_place_unit(unit: Unit, cell: Vector2):
 		if old_pos == Map.OUT_OF_BOUNDS:
 			prep_remove_unit(unit)
 		else:
-			unit.set_position(old_pos)
+			if battle.hud().prep_unit_list.get_global_rect().has_point(battle.world().as_global(cell)):
+				prep_remove_unit(unit)
+			else:
+				unit.set_position(old_pos)
 
 
 ## Removes unit from play.
@@ -642,7 +653,7 @@ func can_move(unit: Unit) -> bool:
 		and battle.on_turn() == empire)
 
 
-func _on_unit_input_event(unit: Unit, event: InputEvent):
+func _on_unit_input_event(_unit: Unit, event: InputEvent):
 	pass
 
 
@@ -764,7 +775,8 @@ func _on_prep_unit_dragged(unit: Unit, pos: Vector2):
 
 func _on_prep_cancelled(unit: Unit):
 	assert(unit == selected_unit)
-	interact_stop_drag_unit(true)
+	interact_stop_drag_unit()
+	prep_remove_unit(unit)
 
 
 ## Base class for undoable actions.
