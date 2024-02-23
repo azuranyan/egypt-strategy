@@ -168,6 +168,15 @@ func interact_cancel():
 				interact_select_unit(null)
 				return
 
+			var hovered_unit := interaction_handler.get_hovered_unit()
+			if hovered_unit:
+				if not battle.is_battle_phase() and can_reposition(hovered_unit):
+					interact_remove_unit(hovered_unit)
+				else:
+					pass # do nothing
+			else:
+				undo_action()
+
 		STATE_BATTLE_SELECTING_MOVE:
 			if not undo_stack.is_empty() and undo_stack.back() is UnitMoveAction:
 				interact_undo()

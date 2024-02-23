@@ -124,7 +124,7 @@ offset_bottom = 801.0
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton7/Neru-Khisi")]
 maps = Array[PackedScene]([ExtResource("18_b6tny")])
-_unit_list = PackedStringArray("cultist_axe")
+_unit_list = PackedStringArray("maia", "cultist_axe")
 empire_node = NodePath("../../Empires/Player")
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("16_0hx7d")]
