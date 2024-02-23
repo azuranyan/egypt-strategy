@@ -226,7 +226,7 @@ func interact_stop_drag_unit():
 
 	dragged_unit.set_position(drag_start)
 	
-	if drop_point == drag_start or drag_prev_selected_unit:
+	if (drop_point == drag_start or drag_prev_selected_unit) and (drag_start != Map.OUT_OF_BOUNDS):
 		interact_select_unit.call_deferred(dragged_unit)
 	
 	if drop_point != drag_start:
@@ -351,13 +351,14 @@ func interact_select_unit(unit: Unit):
 	if state == STATE_BATTLE_SELECTING_TARGET:
 		interact_select_target(unit.cell())
 	else:
-		if unit != dragged_unit and unit != rotated_unit and unit.can_move():
-			battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
+		if unit.cell() != Map.OUT_OF_BOUNDS:
+			if unit != dragged_unit and unit != rotated_unit and unit.can_move():
+				battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
 
-		battle.draw_unit_non_pathable_cells(unit)
+			battle.draw_unit_non_pathable_cells(unit)
 
-		if battle.is_battle_phase() and unit.is_player_owned() and unit.can_move():
-			battle.draw_unit_path(unit, unit.cell())
+			if battle.is_battle_phase() and unit.is_player_owned() and unit.can_move():
+				battle.draw_unit_path(unit, unit.cell())
 		select_unit(unit)
 
 
