@@ -510,6 +510,8 @@ func clear_overlays(overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARG
 		level.target_shape_overlay.clear()
 	if overlay_mask & (1 << Overlay.PATH):
 		level.unit_path.clear()
+		
+	level.map.pathing_painter.visible = false
 	
 
 ## Draws the unit path.
@@ -535,6 +537,16 @@ func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
 	used_cells[Overlay.PATHABLE].clear()
 	used_cells[Overlay.PATHABLE].append_array(cells)
 
+
+func draw_non_pathable_cells(unit: Unit) -> void:
+	for x in world().map_size.x:
+		for y in world().map_size.y:
+			level.map.pathing_painter.set_cell(0, Vector2(x, y), 0, Vector2i(TileOverlay.TileColor.BLACK, 0))
+	for cell in unit.get_pathable_cells():
+		level.map.pathing_painter.erase_cell(0, cell)
+	level.map.pathing_painter.z_index = 0
+	level.map.pathing_painter.visible = true
+	
 
 ## Draws the cells that can be reached by specified attack.
 func draw_unit_attack_range(unit: Unit, attack: Attack) -> void:

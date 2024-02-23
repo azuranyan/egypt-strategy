@@ -89,13 +89,13 @@ func _add_pathing_barriers():
 	dummy_container.name = '_LevelBarriers'
 	map.add_child(dummy_container)
 	
-	for cell in impassable:
-		if _has_barrier(cell):
+	for celli in impassable:
+		if _has_barrier(celli):
 			continue
 		var barrier: Barrier = BarrierScene.instantiate()
-		barrier.map_position = Vector2(cell)
+		barrier.map_position = Vector2(celli)
 		dummy_container.add_child(barrier)
-	
+
 	map.pathing_painter.visible = false
 	
 	

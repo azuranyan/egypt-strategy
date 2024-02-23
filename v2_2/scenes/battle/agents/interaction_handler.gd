@@ -7,8 +7,29 @@ extends Node
 signal selected_unit_changed(unit: Unit, selected: bool)
 
 
+@export var rotation_deadzone := 0.2
+
+@export var interactable: Node
+
+
 var _selected_units_list: Array[Unit] = []
 var _aimed_target := {}
+
+var _alt_held := false
+var _mouse_input_mode: bool
+
+
+var _handlers := {}
+
+
+func _ready():
+	set_rotate_unit_handlers_enabled(true)
+	set_drag_unit_handlers_enabled(true)
+	set_global_handlers_enabled(true)
+
+	UnitEvents.input_event.connect(_on_unit_input_event)
+
+	set_battle_remote_unhandled_input_handler(self)
 
 
 func _enter_tree():
@@ -19,6 +40,22 @@ func _enter_tree():
 func _exit_tree():
 	assert(Game._interaction_handler == self)
 	Game._interaction_handler = null
+
+
+func _unhandled_input(event: InputEvent):
+	event = Battle.instance().world().make_input_local(event)
+
+	if event is InputEventKey and event.keycode == KEY_ALT:
+		_alt_held = event.pressed
+	
+	if _alt_held:
+		get_viewport().set_input_as_handled()
+		return 
+
+	for handler in _handlers:
+		if _handlers[handler] and handler.call(event):
+			get_viewport().set_input_as_handled()
+			return
 
 
 func _physics_process(_delta):
@@ -54,7 +91,15 @@ func _physics_process(_delta):
 		_aimed_target = {}
 
 
-func set_battle_remote_unhandled_input(node: Node):
+func _notification(what) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		_alt_held = false
+
+	elif what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_alt_held = false
+
+
+func set_battle_remote_unhandled_input_handler(node: Node):
 	Battle.instance().get_active_battle_scene().get_node('%UnhandledInputListener').remote_path = node.get_path() if is_instance_valid(node) else NodePath('')
 
 
@@ -120,8 +165,178 @@ func _set_selected_unit(unit: Unit, is_selected: bool):
 	UnitEvents.selected.emit(unit, is_selected)
 
 
+## Sets whether global handlers should be enabled.
+func set_global_handlers_enabled(enabled: bool):
+	_handlers[handle_move_cursor] = enabled
+	_handlers[handle_select_unit] = enabled
+	_handlers[handle_select_cell] = enabled
+	_handlers[handle_cancel] = enabled
+	_handlers[handle_esc] = enabled
+
+
+## Sets whether rotate handlers should be enabled.
+func set_rotate_unit_handlers_enabled(enabled: bool):
+	_handlers[handle_start_rotate_unit] = enabled
+	_handlers[handle_stop_rotate_unit] = enabled
+	_handlers[handle_rotate_unit] = enabled
+
+
+## Sets whether drag handlers should be enabled.
+func set_drag_unit_handlers_enabled(enabled: bool):
+	_handlers[handle_start_drag_unit] = enabled
+	_handlers[handle_stop_drag_unit] = enabled
+	_handlers[handle_drag_unit] = enabled
+	
+
+func set_mouse_input_mode(mouse_input_mode: bool):
+	if _mouse_input_mode == mouse_input_mode:
+		return
+	_mouse_input_mode = mouse_input_mode
+	interactable.set_mouse_input_mode(mouse_input_mode)
+
+
+## Handles rotation interaction.
+func handle_start_rotate_unit(event) -> bool:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed and not interactable.rotated_unit:
+		if has_hovered_unit() and interactable.can_rotate(get_hovered_unit()):
+			interactable.interact_start_rotate_unit(get_hovered_unit())
+			return true
+
+	return false
+
+
+## Handles rotation interaction.
+func handle_stop_rotate_unit(event) -> bool:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and not event.pressed and interactable.rotated_unit:
+		interactable.interact_stop_rotate_unit()
+		return true
+
+	return false
+
+
+## Rotates the unit.
+func handle_rotate_unit(event) -> bool:
+	if event is InputEventMouseMotion and interactable.rotated_unit:
+		var mpos := Battle.instance().screen_to_uniform(event.position)
+		if interactable.rotated_unit.get_position().distance_squared_to(mpos) > rotation_deadzone*rotation_deadzone:
+			set_mouse_input_mode(true)
+			interactable.interact_rotate_unit(mpos)
+			return true
+
+	return false
+
+
+## Handles drag interaction.
+func handle_start_drag_unit(event) -> bool:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and not interactable.dragged_unit:
+		if has_hovered_unit() and interactable.can_reposition(get_hovered_unit()):
+			interactable.interact_start_drag_unit(get_hovered_unit())
+			return true
+
+	return false
+
+
+## Handles drag interaction.
+func handle_stop_drag_unit(event) -> bool:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and interactable.dragged_unit:
+		interactable.interact_stop_drag_unit()
+		return true
+
+	return false
+
+
+## Moves the unit.
+func handle_drag_unit(event) -> bool:
+	if event is InputEventMouseMotion and interactable.dragged_unit:
+		set_mouse_input_mode(true)
+		interactable.interact_drag_unit(event.position)
+		return true
+
+	return false
+
+
+## Moves the cursor.
+func handle_move_cursor(event) -> bool:
+	# handle mouse
+	if event is InputEventMouseMotion:
+		set_mouse_input_mode(true)
+		interactable.interact_move_pointer(event.position)
+		return false
+
+	# handle non-mouse input
+	const ACTIONS := ['right', 'down', 'left', 'up']
+	for i in 4:
+		if event.is_action_pressed(ACTIONS[i]):
+			set_mouse_input_mode(false)
+			var new_pos := Battle.instance().get_cursor_pos() + Map.DIRECTIONS[i]
+			interactable.interact_move_cursor(new_pos)
+			return true
+
+	return false
+
+
+## Selects unit.
+func handle_select_unit(event) -> bool:
+	# for now only mouse can directly select unit
+	# this should be changed via focus group or better controller support (e.g. unit list for deployed units)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and get_hovered_unit():
+		set_mouse_input_mode(true)
+		interactable.interact_select_unit(get_hovered_unit())
+		return true
+
+	return false
+
+
+## Select cell.
+func handle_select_cell(event) -> bool:
+	# handle mouse input
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		set_mouse_input_mode(true)
+		interactable.interact_select_cell(Battle.instance().screen_to_cell(event.position))
+		return true
+	
+	# handle non-mouse input
+	if event.is_action_pressed('accept'):
+		set_mouse_input_mode(false)
+		interactable.interact_select_cell(Battle.instance().get_cursor_pos())
+		return true
+
+	return false
+
+
+## Cancel interaction.
+func handle_cancel(event) -> bool:
+	# handle mouse input
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		set_mouse_input_mode(true)
+		interactable.interact_cancel()
+		return true
+
+	# handle non-mouse input
+	if event.is_action_pressed('cancel'):
+		set_mouse_input_mode(false)
+		interactable.interact_cancel()
+		return true
+
+	return false
+
+
+## Quit.
+func handle_esc(event) -> bool:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		interactable.interact_quit()
+		return true
+
+	return false
+		
+
 func _on_unit_clicked(unit: Unit, _mouse_pos: Vector2, _button_index: int, pressed: bool):
 	if pressed:
 		select_unit(unit)
 	else:
 		deselect_unit(unit)
+
+
+func _on_unit_input_event(_unit: Unit, event: InputEvent):
+	_unhandled_input(event)
+	

@@ -8,8 +8,9 @@
 script = ExtResource("1_av1s7")
 interaction_handler = NodePath("InteractionHandler")
 
-[node name="InteractionHandler" type="Node" parent="."]
+[node name="InteractionHandler" type="Node" parent="." node_paths=PackedStringArray("interactable")]
 script = ExtResource("2_3ia01")
+interactable = NodePath("..")
 
 [node name="Node" type="Node" parent="."]
 script = ExtResource("3_m66eo")
