@@ -5,17 +5,8 @@ enum {
 	## Marker for none/invalid state.
 	STATE_NONE,
 
-	## Unit is being rotated.
-	STATE_ROTATE_UNIT,
-
 	## Prep standby.
 	STATE_PREP_STANDBY,
-
-	## Unit is from list and is being placed to the map.
-	STATE_PREP_PLACING_UNIT,
-
-	## Unit is being repositioned.
-	STATE_PREP_MOVING_UNIT,
 
 	## Battle standby.
 	STATE_BATTLE_STANDBY,
@@ -37,14 +28,9 @@ var spawn_points: Array[SpawnPoint]
 var state: int = STATE_NONE
 var ghost: Ghost
 
-var selected_unit: Unit:
-	set(value):
-		Game.deselect_unit(selected_unit)
-		selected_unit = value
-		Game.select_unit(value)
-
+var selected_unit: Unit
 var rotated_unit: Unit
-var moved_unit: Unit
+var dragged_unit: Unit
 
 var active_attack: Attack
 var multicast_targets: Array[Vector2]
@@ -56,14 +42,22 @@ var unit_drag_offset: Vector2
 var alt_held := false
 var undo_stack: Array[Action] = []
 
-var state_stack: Array[int] = [STATE_NONE]
+var global_handlers := [handle_select_unit, handle_move_cursor, handle_cancel, handle_esc]
+var rotate_unit_handlers := [handle_start_rotate_unit, handle_stop_rotate_unit, handle_rotate_unit]
+var drag_unit_handlers := [handle_start_drag_unit, handle_stop_drag_unit, handle_drag_unit]
+var handlers := {
+	STATE_NONE: [],
+	STATE_PREP_STANDBY: rotate_unit_handlers + drag_unit_handlers + global_handlers,
+	STATE_BATTLE_STANDBY: rotate_unit_handlers + global_handlers,
+	STATE_BATTLE_SELECTING_MOVE: global_handlers,
+	STATE_BATTLE_SELECTING_TARGET: global_handlers,
+}
 
 
-## Called on initialize.
 func _initialize():
 	battle = Game.battle
 	battle.hud().end_button.pressed.connect(interact_end)
-	battle.hud().undo_button.pressed.connect(interact_cancel)
+	battle.hud().undo_button.pressed.connect(interact_undo)
 	battle.hud().prep_unit_list.unit_selected.connect(_on_prep_unit_selected)
 	battle.hud().prep_unit_list.unit_released.connect(_on_prep_unit_released)
 	battle.hud().prep_unit_list.unit_dragged.connect(_on_prep_unit_dragged)
@@ -72,58 +66,37 @@ func _initialize():
 
 	spawn_points = battle.get_spawn_points(SpawnPoint.Type.PLAYER)
 
+	UnitEvents.input_event.connect(_on_unit_input_event)
 
-## Called on start preparation.
+
 func _enter_prepare_units():
 	clear_undo_stack()
 	change_state(STATE_PREP_STANDBY)
 	
 	
-## Called on end preparation.
 func _exit_prepare_units():
 	undo_stack.clear()
 	change_state(STATE_NONE)
 	
 	
-## Called on turn start.
 func _enter_turn():
 	clear_undo_stack()
 	change_state(STATE_BATTLE_STANDBY)
 	
 	
-### Called on turn end.
 func _exit_turn():
 	change_state(STATE_NONE)
 
 
-func _input(event: InputEvent):
+func _unhandled_input(event: InputEvent):
 	if event is InputEventKey and event.keycode == KEY_ALT:
 		alt_held = event.pressed
 	
-	# skip inputs when alt is held
 	if alt_held:
 		get_viewport().set_input_as_handled()
 		return 
 
-	# i don't fucking get why this is still necessary when we're already doing screen_to_* functions
-	#event = Battle.instance().world().make_input_local(event)
-
-	# run handlers
-	for handler in [handle_start_rotate_unit, handle_stop_rotate_unit, handle_rotate_unit, handle_start_drag_unit, handle_stop_drag_unit, handle_drag_unit, handle_select_unit, handle_move_cursor, handle_cancel]:
-		if handler.call(event):
-			get_viewport().set_input_as_handled()
-			return
-
-
-func _unhandled_input(event):
-	if interaction_handler.has_hovered_unit():
-		return
-
-	# i don't fucking get why this is still necessary when we're already doing screen_to_* functions
-	#event = Battle.instance().world().make_input_local(event)
-
-	# run handlers
-	for handler in [handle_cancel, handle_select_cell, handle_quit]:
+	for handler in handlers[state]:
 		if handler.call(event):
 			get_viewport().set_input_as_handled()
 			return
@@ -131,88 +104,64 @@ func _unhandled_input(event):
 
 ## Handles rotation interaction.
 func handle_start_rotate_unit(event) -> bool:
-	if not (state in [STATE_PREP_STANDBY, STATE_BATTLE_STANDBY]
-		and event is InputEventMouseButton
-		and event.button_index == MOUSE_BUTTON_MIDDLE
-		and event.pressed):
-		return false
-
-	var unit := interaction_handler.get_hovered_unit()
-	if not can_rotate(unit):
-		return false
-
-	interact_start_rotate_unit(unit)
-	return true
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed):
+		var unit := interaction_handler.get_hovered_unit()
+		if can_rotate(unit):
+			interact_start_rotate_unit(unit)
+			return true
+	return false
 
 
 ## Handles rotation interaction.
 func handle_stop_rotate_unit(event) -> bool:
-	if not (state == STATE_ROTATE_UNIT
-		and event is InputEventMouseButton
-		and event.button_index == MOUSE_BUTTON_MIDDLE
-		and not event.pressed):
-		return false
-
-	interact_stop_rotate_unit()
-	return true
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and not event.pressed and rotated_unit):
+		interact_stop_rotate_unit()
+		return true
+	return false
 
 
 ## Rotates the unit.
 func handle_rotate_unit(event) -> bool:
-	if not (state == STATE_ROTATE_UNIT
-		and event is InputEventMouseMotion):
-		return false
-		
-	var mpos := battle.screen_to_uniform(event.position)
-	if rotated_unit.get_position().distance_squared_to(mpos) <= rotation_deadzone*rotation_deadzone:
-		return false
-
-	set_mouse_input_mode(true)
-	interact_rotate_unit(mpos)
-	return true
+	if event is InputEventMouseMotion and rotated_unit:
+		var mpos := battle.screen_to_uniform(event.position)
+		if rotated_unit.get_position().distance_squared_to(mpos) > rotation_deadzone*rotation_deadzone:
+			set_mouse_input_mode(true)
+			interact_rotate_unit(mpos)
+			return true
+	return false
 
 
 ## Handles drag interaction.
 func handle_start_drag_unit(event) -> bool:
-	if not (state == STATE_PREP_STANDBY
-		and event is InputEventMouseButton
-		and event.button_index == MOUSE_BUTTON_LEFT
-		and event.pressed):
-		return false
-
-	var unit := interaction_handler.get_hovered_unit()
-	if not can_reposition(unit):
-		return false
-
-	interact_start_drag_unit(unit)
-	return true
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed):
+		# 
+		var unit := interaction_handler.get_hovered_unit()
+		if can_reposition(unit):
+			interact_start_drag_unit(unit)
+			return true
+	return false
 
 
 ## Handles drag interaction.
 func handle_stop_drag_unit(event) -> bool:
-	if not (state == STATE_PREP_MOVING_UNIT
-		and event is InputEventMouseButton
-		and event.button_index == MOUSE_BUTTON_LEFT
-		and not event.pressed):
-		return false
-
-	interact_stop_drag_unit()
-	return true
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and dragged_unit):
+		interact_stop_drag_unit()
+		return true
+	return false
 
 
 ## Moves the unit.
 func handle_drag_unit(event) -> bool:
-	if not (state == STATE_PREP_MOVING_UNIT
-		and event is InputEventMouseMotion):
-		return false
-
-	set_mouse_input_mode(true)
-	interact_drag_unit(event.position)
-	return true
+	if event is InputEventMouseMotion and dragged_unit:
+		set_mouse_input_mode(true)
+		interact_drag_unit(event.position)
+		return true
+	return false
 
 
 ## Moves the cursor.
 func handle_move_cursor(event) -> bool:
+	# handle mouse
 	if event is InputEventMouseMotion:
 		set_mouse_input_mode(true)
 		var unit := interaction_handler.get_hovered_unit()
@@ -222,20 +171,21 @@ func handle_move_cursor(event) -> bool:
 			interact_move_cursor(battle.screen_to_cell(event.position))
 		return false
 
+	# handle actions
 	const ACTIONS := ['right', 'down', 'left', 'up']
 	for i in 4:
 		if event.is_action_pressed(ACTIONS[i]):
 			set_mouse_input_mode(false)
-			var new_pos := battle.world().as_uniform(battle.get_cursor_pos()) + Map.DIRECTIONS[i]
+			var new_pos := battle.get_cursor_pos() + Map.DIRECTIONS[i]
 			interact_move_cursor(new_pos)
 			return true
-	
+
 	return false
 
 
 ## Selects unit.
 func handle_select_unit(event) -> bool:
-	if not (event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed):
 		return false
 	interact_select_unit(interaction_handler.get_hovered_unit())
 	return interaction_handler.has_hovered_unit()
@@ -243,72 +193,45 @@ func handle_select_unit(event) -> bool:
 
 ## Cancel interaction.
 func handle_cancel(event) -> bool:
-	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT):
-		return false
-	set_mouse_input_mode(true)
-	interact_cancel()
-	return true
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		set_mouse_input_mode(true)
+		interact_cancel()
+		return true
+	return false
 
 
 ## Select cell.
 func handle_select_cell(event) -> bool:
-	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-		return false
-	set_mouse_input_mode(true)
-	interact_select_cell(battle.get_cursor_pos())
-	return true
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		set_mouse_input_mode(true)
+		interact_select_cell(battle.get_cursor_pos())
+		return true
+	return false
 
 
 ## Quit.
-func handle_quit(event) -> bool:
-	if not (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
-		return false
-	interact_quit()
-	get_viewport().set_input_as_handled()
-	return true
+func handle_esc(event) -> bool:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		interact_quit()
+		return true
+	return false
 
 
 ## Changes state to new state.
 func change_state(new_state: int):
-	_change_state(state, new_state)
-	state_stack[-1] = new_state
-
-
-func _change_state(old_state: int, new_state: int):
-	_exit_state(old_state)
+	_exit_state(state)
 	state = new_state
 	_enter_state(new_state)
-
-
-## Changes to new state and pushes it on the stack.
-func push_state(new_state: int):
-	state_stack.append(new_state)
-	_change_state(state_stack[-2], state_stack[-1])
-
-
-## Pops the current state from the stack and restores the previous state.
-func pop_state():
-	if state_stack.size() > 1:
-		var old_state: int = state_stack.pop_back()
-		_change_state(old_state, state_stack[-1])
 
 
 func _enter_state(_st: int):
 	if selected_unit:
 		battle.draw_unit_placeable_cells(selected_unit, not selected_unit.is_player_owned())
-	# if selected_unit and selected_unit.can_move() and st in [STATE_PREP_STANDBY, STATE_BATTLE_STANDBY]:
-	# 	battle.draw_unit_placeable_cells(selected_unit, selected_unit.is_player_owned())
 
 
 func _exit_state(_st: int):
 	if not selected_unit:
 		battle.clear_overlays(Battle.PATHABLE_MASK)
-
-	# if st == STATE_BATTLE_SELECTING_MOVE:
-	# 	battle.clear_overlays(Battle.PATH_MASK)
-	
-
-
 
 
 ##################################################################################################################
@@ -343,42 +266,52 @@ func interact_end():
 ## Cancels current interaction.
 func interact_cancel():
 	update_message_box()
-	match state:
-		STATE_PREP_STANDBY:
-			var hovered_unit := interaction_handler.get_hovered_unit()
-			if hovered_unit:
-				if can_reposition(hovered_unit):
-					interact_remove_unit(hovered_unit)
-				else:
-					pass # do nothing
-			else:
-				undo_action()
+	if dragged_unit:
+		interact_stop_drag_unit()
+		return
 
-		STATE_BATTLE_STANDBY:
-			undo_action()
+	if rotated_unit:
+		interact_stop_rotate_unit()
+		return
 
-		STATE_PREP_MOVING_UNIT:
-			interact_stop_drag_unit()
+	if active_attack:
+		interact_select_attack(null)
+		return
 
-		STATE_BATTLE_SELECTING_MOVE:
-			pass
+	if selected_unit:
+		interact_select_unit(null)
+		return
 
-		STATE_BATTLE_SELECTING_TARGET:
-			pass
+	var hovered_unit := interaction_handler.get_hovered_unit()
+	if hovered_unit:
+		if not battle.is_battle_phase() and can_reposition(hovered_unit):
+			interact_remove_unit(hovered_unit)
+		else:
+			pass # do nothing
+	else:
+		undo_action()
+
+
+## Undo's action.
+func interact_undo():
+	update_message_box()
+	if dragged_unit: interact_stop_drag_unit()
+	if rotated_unit: interact_stop_rotate_unit()
+	if active_attack: interact_select_attack(null)
+	if selected_unit: interact_select_unit(null)
+	undo_action()
 
 
 ## Starts unit rotate interaction.
 func interact_start_rotate_unit(unit: Unit):
 	update_message_box()
 	rotated_unit = unit
-	change_state(STATE_ROTATE_UNIT)
 
 
 ## Stops unit rotate interaction.
 func interact_stop_rotate_unit():
 	update_message_box()
 	rotated_unit = null
-	change_state(STATE_BATTLE_STANDBY if battle.is_battle_phase() else STATE_PREP_STANDBY)
 
 
 ## Rotates the unit to face the target cell.
@@ -392,47 +325,43 @@ func interact_start_drag_unit(unit: Unit):
 	update_message_box()
 	var from_unit_list := unit.get_position() == Map.OUT_OF_BOUNDS
 
-	moved_unit = unit
+	dragged_unit = unit
 	
 	unit_drag_start = unit.get_global_position()
 
 	if from_unit_list:
 		unit_drag_offset = battle.screen_to_global(unit.get_map_object().grab_offset())
-		change_state(STATE_PREP_PLACING_UNIT)
 	else:
 		unit_drag_offset = battle.screen_to_global(get_viewport().get_mouse_position() - get_viewport().canvas_transform*unit_drag_start)
-		change_state(STATE_PREP_MOVING_UNIT)
 		
 
 ## Stops unit drag interaction.
 func interact_stop_drag_unit():
 	update_message_box()
 
-	var drop_point := moved_unit.cell()
+	var drop_point := dragged_unit.cell()
 	var drag_start := Map.cell(battle.world().as_uniform(unit_drag_start))
 
-	moved_unit.set_position(drag_start)
+	dragged_unit.set_position(drag_start)
 
 	if drop_point != drag_start:
-		interact_place_unit(moved_unit, drop_point)
-		moved_unit = null
-		change_state(STATE_PREP_STANDBY)
+		interact_place_unit(dragged_unit, drop_point)
+		dragged_unit = null
 	else:
-		var unit := moved_unit
-		moved_unit = null
-		change_state(STATE_PREP_STANDBY)
+		var unit := dragged_unit
+		dragged_unit = null
 		interact_select_unit(unit)
 
 
 ## Moves the unit.
 func interact_drag_unit(screen_pos: Vector2):
-	moved_unit.set_global_position(battle.screen_to_global(screen_pos) - unit_drag_offset)
+	dragged_unit.set_global_position(battle.screen_to_global(screen_pos) - unit_drag_offset)
 
-	var target_cell := moved_unit.cell()
+	var target_cell := dragged_unit.cell()
 	var ghost_cell := battle.world().as_uniform(unit_drag_start)
 
-	if moved_unit and battle.is_occupied(target_cell, moved_unit) and is_spawn_cell(target_cell):
-		var occupant := battle.get_unit_at(target_cell, moved_unit)
+	if dragged_unit and battle.is_occupied(target_cell, dragged_unit) and is_spawn_cell(target_cell):
+		var occupant := battle.get_unit_at(target_cell, dragged_unit)
 		set_ghost(occupant, ghost_cell)
 	else:
 		remove_ghost()
@@ -450,7 +379,6 @@ func interact_place_unit(unit: Unit, cell: Vector2):
 			if old_pos == Map.OUT_OF_BOUNDS:
 				push_undo_action(ReplaceUnitAction.new(unit, occupant))
 			else:
-				unit.set_position(old_pos)
 				push_undo_action(SwapUnitAction.new(unit, occupant))
 		else:
 			push_undo_action(PlaceUnitAction.new(unit, cell))
@@ -509,17 +437,15 @@ func interact_select_unit(unit: Unit):
 
 	if unit:
 		battle.set_cursor_pos(unit.cell())
-
-	match state:
-		STATE_PREP_STANDBY, STATE_BATTLE_STANDBY, STATE_BATTLE_SELECTING_MOVE:
-			push_undo_action(SelectUnitAction.new(unit))
-			
-		STATE_BATTLE_SELECTING_TARGET:
+		if state == STATE_BATTLE_SELECTING_TARGET:
 			interact_select_target(unit.cell())
+			return
+
+	select_unit(unit)
 
 
 ## Selects the attack.
-func interact_select_attack(unit: Unit, attack: Attack):
+func interact_select_attack(attack: Attack):
 	update_message_box()
 	# 	_select_unit(unit)
 	# 	multicast_targets.clear()
@@ -530,25 +456,76 @@ func interact_select_attack(unit: Unit, attack: Attack):
 	# 	active_attack = attack
 
 
+	# func execute() -> bool:
+
+	# 	get_attack_button().set_pressed_no_signal(true)
+	# 	Battle.instance().draw_unit_attack_range(unit, attack)
+	# 	return attack != null
+		
+	# func undo():
+	# 	get_attack_button().set_pressed_no_signal(false)
+	# 	Battle.instance().clear_overlays(Battle.ATTACK_RANGE_MASK)
+
+	# func get_attack_button() -> Button:
+	# 	if attack == unit.special_attack():
+	# 		return Battle.instance().hud().deify_button
+	# 	else:
+	# 		if attack != unit.basic_attack():
+	# 			push_error('invalid attack')
+	# 		return Battle.instance().hud().fight_button
+
 ## Selects the attack target.
 func interact_select_target(cell: Vector2):
 	update_message_box()
-	var err := battle.check_unit_attack(selected_unit, active_attack, cell, 0)
-	if err == Battle.OK:
-		push_undo_action(SelectTargetAction.new(selected_unit, active_attack, cell, 0))
-		if active_attack.multicast <= 0 or multicast_targets.size() > active_attack.multicast:
-			pass # TODO
-	else:
-		const message := {
-			Battle.SPECIAL_NOT_UNLOCKED: "Ability not unlocked.",
-			Battle.INSIDE_MIN_RANGE: "Target inside minimum range.",
-			Battle.OUT_OF_RANGE: "Target outside range.",
-			Battle.NO_TARGET: "No target found.",
-			Battle.INVALID_TARGET: "Invalid target.",
-		}
-		Game.play_error_sound()
-		update_message_box(message.get(err, ""))
+	# var err := battle.check_unit_attack(selected_unit, active_attack, cell, 0)
+	# if err == Battle.OK:
+	# 	push_undo_action(SelectTargetAction.new(selected_unit, active_attack, cell, 0))
+	# 	if active_attack.multicast <= 0 or multicast_targets.size() > active_attack.multicast:
+	# 		pass # TODO
+	# else:
+	# 	const message := {
+	# 		Battle.SPECIAL_NOT_UNLOCKED: "Ability not unlocked.",
+	# 		Battle.INSIDE_MIN_RANGE: "Target inside minimum range.",
+	# 		Battle.OUT_OF_RANGE: "Target outside range.",
+	# 		Battle.NO_TARGET: "No target found.",
+	# 		Battle.INVALID_TARGET: "Invalid target.",
+	# 	}
+	# 	Game.play_error_sound()
+	# 	update_message_box(message.get(err, ""))
 
+
+		# func execute() -> bool:
+		# 	agent.multicast_targets.push_back(target)
+		# 	agent.multicast_rotations.push_back(rotation)
+		# 	Battle.instance().draw_unit_attack_target(unit, attack, agent.multicast_targets, agent.multicast_rotations)
+		# 	return true
+	
+		# func undo():
+		# 	agent.multicast_targets.pop_back()
+		# 	agent.multicast_rotations.pop_back()
+		# 	Battle.instance().clear_overlays(Battle.TARGET_SHAPE_MASK)
+
+
+func select_unit(unit: Unit):
+	if selected_unit == unit:
+		return
+	if selected_unit:
+		deselect_unit()
+	if unit:
+		interaction_handler.select_unit(unit)
+		battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
+	selected_unit = unit
+
+
+func deselect_unit():
+	if not selected_unit:
+		return
+	interaction_handler.select_unit(null)
+	multicast_targets.clear()
+	multicast_rotations.clear()
+	battle.clear_overlays(Battle.PATHABLE_MASK)
+	selected_unit = null
+	
 
 ##################################################################################################################
 #endregion Interactions
@@ -560,12 +537,12 @@ func push_undo_action(action: Action):
 	if undo_stack.size() > undo_stack_size:
 		undo_stack.pop_front()
 
-	if action.execute():
-		battle.hud().undo_button.disabled = false
-		if undo_stack.size() >= 1 and undo_stack.back().type_tag() == action.type_tag():
-			action.collapse = true
-		undo_stack.append(action)
-		update_undo_text()
+	action.execute()
+	battle.hud().undo_button.disabled = false
+	if undo_stack.size() >= 1 and undo_stack.back().type_tag() == action.type_tag():
+		action.collapse = true
+	undo_stack.append(action)
+	update_undo_text()
 
 
 ## Undo's an action.
@@ -640,6 +617,9 @@ func _ensure_has_ghost():
 
 ## Adds unit to the play area.
 func prep_add_unit(unit: Unit, cell: Vector2):
+	# this is important because just removing the unit
+	# will trigger cancel if a unit is still selected.
+	battle.hud().prep_unit_list.set_selected_unit(null)
 	battle.hud().prep_unit_list.remove_unit(unit)
 	unit.set_position(cell)
 
@@ -688,40 +668,47 @@ func is_hero_deployed() -> bool:
 		if unit.chara() == empire.leader:
 			return true
 	return false
-	
+
 
 func _on_prep_unit_selected(unit: Unit):
 	interact_start_drag_unit(unit)
+	get_viewport().set_input_as_handled() # stop event from propagating to _unhandled_input
 
 
 func _on_prep_unit_released(unit: Unit):
-	assert(unit == moved_unit)
+	assert(unit == dragged_unit)
 	interact_stop_drag_unit()
+	get_viewport().set_input_as_handled() # stop event from propagating to _unhandled_input
 
 
 func _on_prep_unit_dragged(unit: Unit, pos: Vector2):
-	assert(unit == moved_unit)
+	assert(unit == dragged_unit)
 	interact_drag_unit(pos)
+	# we should also stop it here but for some reason button events
+	# are also consumed so we just skip it.
+	# get_viewport().set_input_as_handled() 
 
 
 func _on_prep_cancelled(unit: Unit):
-	assert(unit == moved_unit)
+	assert(unit == dragged_unit)
 	interact_stop_drag_unit()
 	prep_remove_unit(unit)
+	 
+	get_viewport().set_input_as_handled() # stop event from propagating to _unhandled_input
+
+
+func _on_unit_input_event(_unit: Unit, event: InputEvent):
+	_unhandled_input(event)
 
 
 ## Base class for undoable actions.
 class Action:
 
-	var agent: PlayerAgent
+	var agent: PlayerAgent = Battle.instance().agents[Battle.instance().player()]
 	var collapse := false
 
-	func _init():
-		# this is a hack but im too lazy to pass this around as a param
-		agent = Battle.instance().agents[Battle.instance().player()]
-	
-	func execute() -> bool:
-		return false
+	func execute():
+		pass
 
 	func undo():
 		pass
@@ -738,26 +725,21 @@ class PlaceUnitAction extends Action:
 
 	var unit: Unit
 	var cell: Vector2
-	var unit_pos: Vector2
+	var old_pos: Vector2
 
 	func _init(_unit: Unit, _cell: Vector2):
-		super._init()
 		unit = _unit
 		cell = _cell
-		unit_pos = Battle.instance().world().as_uniform(agent.unit_drag_start)
+		old_pos = unit.get_position()
 	
-	func execute() -> bool:
-		if unit_pos == Map.OUT_OF_BOUNDS:
-			agent.prep_add_unit(unit, cell)
-		else:
-			unit.set_position(cell)
-		return true
+	func execute():
+		agent.prep_add_unit(unit, cell)
 
 	func undo():
-		if unit_pos == Map.OUT_OF_BOUNDS:
+		if old_pos == Map.OUT_OF_BOUNDS:
 			agent.prep_remove_unit(unit)
 		else:
-			unit.set_position(unit_pos)
+			unit.set_position(old_pos)
 
 	func type_tag() -> String:
 		return 'place'
@@ -771,15 +753,13 @@ class ReplaceUnitAction extends Action:
 	var other_pos: Vector2
 
 	func _init(_unit: Unit, _other: Unit):
-		super._init()
 		unit = _unit
 		other = _other
 		other_pos = _other.get_position()
 	
-	func execute() -> bool:
+	func execute():
 		agent.prep_remove_unit(other)
 		agent.prep_add_unit(unit, other_pos)
-		return true
 
 	func undo():
 		agent.prep_remove_unit(unit)
@@ -798,16 +778,14 @@ class SwapUnitAction extends Action:
 	var other_pos: Vector2
 
 	func _init(_unit: Unit, _other: Unit):
-		super._init()
 		unit = _unit
 		unit_pos = Battle.instance().world().as_uniform(agent.unit_drag_start)
 		other = _other
 		other_pos = _other.get_position()
 	
-	func execute() -> bool:
+	func execute():
 		unit.set_position(other_pos)
 		other.set_position(unit_pos)
-		return true
 
 	func undo():
 		unit.set_position(unit_pos)
@@ -824,129 +802,17 @@ class RemoveUnitAction extends Action:
 	var unit_pos: Vector2
 
 	func _init(_unit: Unit):
-		super._init()
 		unit = _unit
 		unit_pos = _unit.get_position()
 	
-	func execute() -> bool:
-		#Game.deselect_unit(unit)
+	func execute():
 		agent.prep_remove_unit(unit)
-		return true
 
 	func undo():
-		#agent.selected_unit = unit
 		agent.prep_add_unit(unit, unit_pos)
 
 	func type_tag() -> String:
 		return 'remove'
-
-	func should_collapse() -> bool:
-		return false
-
-
-## Selects a unit.
-class SelectUnitAction extends Action:
-
-	var unit: Unit
-	var prev_selected_unit: Unit
-
-	func _init(_unit: Unit):
-		super._init()
-		unit = _unit
-		prev_selected_unit = agent.selected_unit
-	
-	func execute() -> bool:
-		_select_unit(unit)
-		return unit != null
-
-	func undo():
-		_select_unit(prev_selected_unit)
-
-	func _select_unit(u: Unit):
-		agent.selected_unit = u
-	
-		if u and Battle.instance().is_battle_phase() and agent.can_reposition(u):
-			Battle.instance().draw_unit_path(u, Battle.instance().get_mouse_cell())
-			agent.change_state(STATE_BATTLE_SELECTING_MOVE)
-			return
-
-		agent.change_state(STATE_BATTLE_STANDBY if Battle.instance().is_battle_phase() else STATE_PREP_STANDBY)
-
-	func type_tag() -> String:
-		return 'select'
-
-	func should_collapse() -> bool:
-		return false#collapse
-
-
-## Selects an attack.
-class SelectAttackAction extends Action:
-
-	var unit: Unit
-	var attack: Attack
-	var prev_selected_unit: Unit
-
-	func _init(_unit: Unit, _attack: Attack):
-		super._init()
-		unit = _unit
-		attack = _attack
-		prev_selected_unit = Game.get_selected_unit()
-	
-	func execute() -> bool:
-		get_attack_button().set_pressed_no_signal(true)
-		Battle.instance().draw_unit_attack_range(unit, attack)
-		return attack != null
-		
-	func undo():
-		get_attack_button().set_pressed_no_signal(false)
-		Battle.instance().clear_overlays(Battle.ATTACK_RANGE_MASK)
-
-	func get_attack_button() -> Button:
-		if attack == unit.special_attack():
-			return Battle.instance().hud().deify_button
-		else:
-			if attack != unit.basic_attack():
-				push_error('invalid attack')
-			return Battle.instance().hud().fight_button
-				
-	func type_tag() -> String:
-		return 'select_attack'
-
-	func should_collapse() -> bool:
-		return collapse
-
-
-## Selects attack target.
-class SelectTargetAction extends Action:
-
-	var unit: Unit
-	var attack: Attack
-	var target: Vector2
-	var rotation: float
-
-	func _init(_unit: Unit, _attack: Attack, _target: Vector2, _rotation: float):
-		super._init()
-		unit = _unit
-		attack = _attack
-		target = _target
-		rotation = _rotation
-	
-	func execute() -> bool:
-		agent.multicast_targets.push_back(target)
-		agent.multicast_rotations.push_back(rotation)
-		Battle.instance().draw_unit_attack_target(unit, attack, agent.multicast_targets, agent.multicast_rotations)
-		return true
-
-	func undo():
-		agent.multicast_targets.pop_back()
-		agent.multicast_rotations.pop_back()
-		Battle.instance().clear_overlays(Battle.TARGET_SHAPE_MASK)
-	
-	func type_tag() -> String:
-		return 'select_target'
-
-	func should_collapse() -> bool:
-		return collapse
 
 
 ## Issues a unit pass command.
@@ -957,7 +823,6 @@ class UnitPassAction extends Action:
 	var prev_state: int
 
 	func _init(_unit: Unit):
-		super._init()
 		unit = _unit
 		state = _unit.save_state()
 	
@@ -986,7 +851,6 @@ class UnitMoveAction extends Action:
 	var state: Dictionary
 
 	func _init(_unit: Unit, _target: Vector2):
-		super._init()
 		unit = _unit
 		target = _target
 		state = unit.save_state()

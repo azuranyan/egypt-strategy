@@ -88,6 +88,7 @@ func set_selected_unit(unit: Unit):
 	if unit == null:
 		if _active_unit:
 			_unit_buttons[_active_unit].button_pressed = false
+			_active_unit = null
 	else:
 		_unit_buttons[unit].button_pressed = true
 	
