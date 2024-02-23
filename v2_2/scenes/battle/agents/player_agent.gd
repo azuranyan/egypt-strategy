@@ -180,7 +180,7 @@ func interact_start_rotate_unit(unit: Unit):
 	update_message_box()
 	rotated_unit = unit
 	select_unit(unit)
-	battle.clear_overlays(Battle.PATHABLE_MASK)
+	battle.clear_overlays(Battle.PLACEABLE_CELLS)
 
 
 ## Stops unit rotate interaction.
@@ -325,7 +325,11 @@ func interact_select_cell(cell: Vector2):
 			interact_select_unit(battle.get_unit_at(cell))
 
 		STATE_BATTLE_SELECTING_MOVE:
-			push_undo_action(UnitMoveAction.new(selected_unit, cell))
+			if cell in selected_unit.get_placeable_cells():
+				push_undo_action(UnitMoveAction.new(selected_unit, cell))
+			else:
+				Game.play_error_sound()
+				update_message_box('Cannot move there.')
 
 		STATE_BATTLE_SELECTING_TARGET:
 			interact_select_target(cell)
@@ -335,16 +339,13 @@ func interact_select_cell(cell: Vector2):
 func interact_select_unit(unit: Unit):
 	update_message_box()
 
-	battle.clear_overlays(Battle.PATHABLE_MASK)
-	battle.clear_overlays(Battle.PATH_MASK)
+	battle.clear_overlays(Battle.PLACEABLE_CELLS)
+	battle.clear_overlays(Battle.NON_PLACEABLE_CELLS)
+	battle.clear_overlays(Battle.UNIT_PATH)
 	if not unit:
 		deselect_unit()
 		return
 		
-	if state == STATE_BATTLE_SELECTING_MOVE:
-		push_undo_action(UnitMoveAction.new(selected_unit, battle.get_cursor_pos()))
-		return
-
 	battle.set_cursor_pos(unit.cell())
 
 	if state == STATE_BATTLE_SELECTING_TARGET:
@@ -353,7 +354,7 @@ func interact_select_unit(unit: Unit):
 		if unit != dragged_unit and unit != rotated_unit and unit.can_move():
 			battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
 
-		battle.draw_non_pathable_cells(unit)
+		battle.draw_unit_non_pathable_cells(unit)
 
 		if battle.is_battle_phase() and unit.is_player_owned() and unit.can_move():
 			battle.draw_unit_path(unit, unit.cell())
@@ -540,7 +541,7 @@ func prep_remove_unit(unit: Unit):
 	battle.hud().prep_unit_list.add_unit(unit)
 	unit.set_position(Map.OUT_OF_BOUNDS)
 	if unit == selected_unit:
-		battle.clear_overlays(Battle.PATHABLE_MASK)
+		battle.clear_overlays(Battle.PLACEABLE_CELLS)
 
 
 ## Returns true if cell is a valid spawn point.
@@ -749,19 +750,10 @@ class UnitMoveAction extends Action:
 		target = _target
 		state = unit.save_state()
 
-	func execute() -> bool:
-		if unit.is_placeable(target):
-			_start_walk()
-			return true
-		else:
-			Game.play_error_sound()
-			agent.update_message_box('Cannot move there.')
-			return false
-
-	func _start_walk():
+	func execute():
 		assert(agent.state == STATE_BATTLE_SELECTING_MOVE)
 		agent.selected_unit = null
-		Battle.instance().clear_overlays(Battle.PATH_MASK)
+		Battle.instance().clear_overlays(Battle.UNIT_PATH)
 		agent.change_state(STATE_NONE)
 		await Battle.instance().unit_action_move(unit, target)
 		agent.change_state(STATE_BATTLE_STANDBY)

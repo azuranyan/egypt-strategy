@@ -23,33 +23,29 @@ signal turn_started(empire: Empire)
 signal turn_ended(empire: Empire)
 
 
-enum Overlay {
-	## The reachable tiles.
-	PATHABLE,
+## Bitflag for pathable cells overlay.
+const PLACEABLE_CELLS := 1
 	
-	## The units attack range.
-	ATTACK_RANGE,
-	
-	## Attack shape.
-	TARGET_SHAPE,
-	
-	## Unit path.
-	PATH,
-}
+## Bitflag for non pathable cells overlay.
+const NON_PLACEABLE_CELLS := 2
 
-enum {
-	## Mask for pathable overlay.
-	PATHABLE_MASK = 1 << Overlay.PATHABLE,
+## Bitflag for attack range overlay.
+const ATTACK_RANGE := 4
 	
-	## Mask for attack range overlay.
-	ATTACK_RANGE_MASK = 1 << Overlay.ATTACK_RANGE,
+## Bitflag for target shape overlay.
+const TARGET_SHAPE := 8
 	
-	## Mask for target shape overlay.
-	TARGET_SHAPE_MASK = 1 << Overlay.TARGET_SHAPE,
-	
-	## Mask for path overlay.
-	PATH_MASK = 1 << Overlay.PATH,
-}
+## Bitflag for unit path overlay.
+const UNIT_PATH := 16
+
+## All pathing related overlays.
+const PATHING_OVERLAYS := PLACEABLE_CELLS | NON_PLACEABLE_CELLS | UNIT_PATH
+
+## All attack related overlays.
+const ATTACK_OVERLAYS := ATTACK_RANGE | TARGET_SHAPE
+
+## All the overlays.
+const ALL_OVERLAYS := PATHING_OVERLAYS | ATTACK_OVERLAYS
 
 
 enum {
@@ -307,16 +303,6 @@ func remove_map_object(_map_object: MapObject) -> void:
 	assert(false, 'not implemented')
 
 
-## Draws overlays.
-func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay) -> void:
-	assert(false, 'not implemented')
-
-	
-## Clears overlays.
-func clear_overlays(_overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARGET_SHAPE_MASK | PATH_MASK) -> void:
-	assert(false, 'not implemented')
-
-	
 ## Draws the unit path.
 func draw_unit_path(_unit: Unit, _cell: Vector2) -> void:
 	assert(false, 'not implemented')
@@ -327,6 +313,11 @@ func draw_unit_placeable_cells(_unit: Unit, _use_alt_color := false) -> void:
 	assert(false, 'not implemented')
 
 
+## Draws non pathable cells that aren't solely units.
+func draw_unit_non_pathable_cells(_unit: Unit) -> void:
+	assert(false, 'not implemented')
+
+
 ## Draws the cells that can be reached by specified attack.
 func draw_unit_attack_range(_unit: Unit, _attack: Attack) -> void:
 	assert(false, 'not implemented')
@@ -334,6 +325,11 @@ func draw_unit_attack_range(_unit: Unit, _attack: Attack) -> void:
 
 ## Draws the cells in target aoe.
 func draw_unit_attack_target(_unit: Unit, _attack: Attack, _target: Array[Vector2], _rotation: Array[float]) -> void:
+	assert(false, 'not implemented')
+
+
+## Clears overlays.
+func clear_overlays(_mask: int = ALL_OVERLAYS) -> void:
 	assert(false, 'not implemented')
 
 

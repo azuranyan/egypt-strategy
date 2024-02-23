@@ -481,90 +481,72 @@ func remove_map_object(map_object: MapObject) -> void:
 	#level.remove_object(map_object)
 	level.map.remove_child(map_object)
 
-
-## Draws overlays.
-func draw_overlay(_cells: PackedVector2Array, _overlay: Overlay) -> void:
-	# TODO yes i know this is stupid, but i need the debugging info
-	# for this so i want them to be separate for now
-	var overlays := {
-		Overlay.PATHABLE: level.pathing_overlay,
-		Overlay.ATTACK_RANGE: level.attack_range_overlay,
-		Overlay.TARGET_SHAPE: level.target_shape_overlay, 
-		Overlay.PATH: level.unit_path,
-	}
-
-	for overlay in overlays:
-		if _overlay == overlay:
-			overlays[overlay].set_cells(_cells)
-		else:
-			overlays[overlay].erase_cells(_cells)
 	
-	
-## Clears overlays.
-func clear_overlays(overlay_mask: int = PATHABLE_MASK | ATTACK_RANGE_MASK | TARGET_SHAPE_MASK | PATH_MASK) -> void:
-	if overlay_mask & (1 << Overlay.PATHABLE):
-		level.pathing_overlay.clear()
-	if overlay_mask & (1 << Overlay.ATTACK_RANGE):
-		level.attack_range_overlay.clear()
-	if overlay_mask & (1 << Overlay.TARGET_SHAPE):
-		level.target_shape_overlay.clear()
-	if overlay_mask & (1 << Overlay.PATH):
-		level.unit_path.clear()
-		
-	level.map.pathing_painter.visible = false
-	
-
-## Draws the unit path.
-func draw_unit_path(unit: Unit, cell: Vector2) -> void:
-	clear_overlays(PATH_MASK)
-	level.unit_path.initialize(unit.get_pathable_cells(true))
-	level.unit_path.draw(unit.cell(), cell)
-
-
-var used_cells := [
-	PackedVector2Array(),
-	PackedVector2Array(),
-	PackedVector2Array(),
-	PackedVector2Array(),
-]
-
 ## Draws the pathable cells.
 func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
-	clear_overlays(PATHABLE_MASK)
+	level.pathing_overlay.clear()
 	var color := TileOverlay.TileColor.RED if use_alt_color else TileOverlay.TileColor.GREEN
 	var cells := unit.get_placeable_cells()
 	level.pathing_overlay.set_cells(cells, color)
-	used_cells[Overlay.PATHABLE].clear()
-	used_cells[Overlay.PATHABLE].append_array(cells)
 
 
-func draw_non_pathable_cells(unit: Unit) -> void:
+## Draws non pathable cells that aren't solely units.
+func draw_unit_non_pathable_cells(unit: Unit) -> void:
+	level.map.pathing_painter.clear()
+	# color everything
 	for x in world().map_size.x:
 		for y in world().map_size.y:
 			level.map.pathing_painter.set_cell(0, Vector2(x, y), 0, Vector2i(TileOverlay.TileColor.BLACK, 0))
-	for cell in unit.get_pathable_cells():
+	
+	# erase pathable cells
+	var pathable_cells := Util.flood_fill(unit.cell(), 20, world_bounds(), _is_pathable_non_unit_cell.bind(unit))
+	for cell in pathable_cells:
 		level.map.pathing_painter.erase_cell(0, cell)
 	level.map.pathing_painter.z_index = 0
 	level.map.pathing_painter.visible = true
+
+
+func _is_pathable_non_unit_cell(cell: Vector2, unit: Unit) -> bool:
+	for pathable in get_pathables_at(cell):
+		if pathable.pathing_group != Map.PathingGroup.UNIT and not pathable.is_pathable(unit):
+			return false
+	return true
 	
 
 ## Draws the cells that can be reached by specified attack.
 func draw_unit_attack_range(unit: Unit, attack: Attack) -> void:
-	clear_overlays(ATTACK_RANGE_MASK)
+	level.attack_range_overlay.clear()
 	var cells := unit.attack_range_cells(attack)
 	level.attack_range_overlay.set_cells(cells, TileOverlay.TileColor.RED)
-	used_cells[Overlay.ATTACK_RANGE].clear()
-	used_cells[Overlay.ATTACK_RANGE].append_array(cells)
 
 
 ## Draws the cells in target aoe.
 func draw_unit_attack_target(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
-	clear_overlays(TARGET_SHAPE_MASK)
-	used_cells[Overlay.TARGET_SHAPE].clear()
+	level.target_shape_overlay.clear()
 	for i in target.size():
 		var cells := unit.attack_target_cells(attack, target[i], rotation[i])
 		level.target_shape_overlay.set_cells(cells, TileOverlay.TileColor.BLUE)
-	used_cells[Overlay.TARGET_SHAPE].append_array(level.target_shape_overlay.get_used_cells_by_color(TileOverlay.TileColor.BLUE))
+
+
+## Draws the unit path.
+func draw_unit_path(unit: Unit, cell: Vector2) -> void:
+	level.unit_path.clear()
+	level.unit_path.initialize(unit.get_pathable_cells(true))
+	level.unit_path.draw(unit.cell(), cell)
+
+
+## Clears overlays.
+func clear_overlays(mask: int = ALL_OVERLAYS) -> void:
+	if mask & PLACEABLE_CELLS == mask:
+		level.pathing_overlay.clear()
+	if mask & NON_PLACEABLE_CELLS == mask:
+		level.map.pathing_painter.clear()
+	if mask & ATTACK_RANGE == mask:
+		level.attack_range_overlay.clear()
+	if mask & TARGET_SHAPE == mask:
+		level.target_shape_overlay.clear()
+	if mask & UNIT_PATH == mask:
+		level.unit_path.clear()
 
 
 ## Sets the camera target. If target are either [Unit] or [Node2D],
@@ -741,9 +723,9 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 	await set_camera_target(unit)
 
 	if on_turn() == ai():
-		draw_overlay(unit.get_pathable_cells(true), Battle.Overlay.PATHABLE)
+		draw_unit_placeable_cells(unit, true)
 		await get_tree().create_timer(0.5).timeout
-		clear_overlays(1 << Battle.Overlay.PATHABLE)
+		clear_overlays(PLACEABLE_CELLS)
 		
 	await unit.walk_towards(target)
 
@@ -782,7 +764,7 @@ func generate_actions(unit: Unit) -> Array[UnitAction]:
 	_get_attack_actions_in_range(unit, unit.basic_attack(), re)
 	_get_attack_actions_in_range(unit, unit.special_attack(), re)
 	
-	for cell in unit.get_pathable_cells(true):
+	for cell in unit.get_PLACEABLE_CELLS(true):
 		if cell == unit.cell():
 			continue
 		# add unit move to new location action
