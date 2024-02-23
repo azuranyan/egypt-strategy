@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://mmt7kfrybnfi"]
+[gd_scene load_steps=31 format=3 uid="uid://mmt7kfrybnfi"]
 
 [ext_resource type="Texture2D" uid="uid://dla7kpvvg4cf6" path="res://scenes/battle/data/Test_Map_Mockup_V8_HD.png" id="1_a1ld6"]
 [ext_resource type="Script" path="res://scenes/battle/hud/hud.gd" id="1_kh8gv"]
@@ -75,6 +75,27 @@ _data = {
 "RESET": SubResource("Animation_eb6rr"),
 "show_attack_banner": SubResource("Animation_5a12m")
 }
+
+[sub_resource type="InputEventAction" id="InputEventAction_sbjjd"]
+action = &"rest"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_g6q02"]
+events = [SubResource("InputEventAction_sbjjd")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_1a0xl"]
+action = &"fight"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_ps2hm"]
+events = [SubResource("InputEventAction_1a0xl")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_espvc"]
+action = &"deify"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_2icrb"]
+events = [SubResource("InputEventAction_espvc")]
 
 [sub_resource type="LabelSettings" id="LabelSettings_m3l50"]
 font = ExtResource("11_nda56")
@@ -282,6 +303,7 @@ offset_top = 72.0
 offset_right = 320.0
 offset_bottom = 203.0
 theme = ExtResource("2_2bpvx")
+shortcut = SubResource("Shortcut_g6q02")
 icon = ExtResource("8_kq64v")
 icon_alignment = 1
 
@@ -315,6 +337,7 @@ offset_top = 72.0
 offset_right = 460.0
 offset_bottom = 203.0
 theme = ExtResource("2_2bpvx")
+shortcut = SubResource("Shortcut_ps2hm")
 icon = ExtResource("9_7iq2f")
 icon_alignment = 1
 
@@ -348,6 +371,7 @@ offset_top = 72.0
 offset_right = 600.0
 offset_bottom = 203.0
 theme = ExtResource("2_2bpvx")
+shortcut = SubResource("Shortcut_2icrb")
 icon = ExtResource("10_r1sxg")
 icon_alignment = 1
 

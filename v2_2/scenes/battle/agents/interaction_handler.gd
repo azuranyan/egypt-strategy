@@ -279,7 +279,7 @@ func handle_move_cursor(event) -> bool:
 func handle_select_unit(event) -> bool:
 	# for now only mouse can directly select unit
 	# this should be changed via focus group or better controller support (e.g. unit list for deployed units)
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and get_hovered_unit():
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and interactable.can_select(get_hovered_unit()):
 		set_mouse_input_mode(true)
 		interactable.interact_select_unit(get_hovered_unit())
 		return true

@@ -486,7 +486,7 @@ func remove_map_object(map_object: MapObject) -> void:
 func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
 	level.pathing_overlay.clear()
 	var color := TileOverlay.TileColor.RED if use_alt_color else TileOverlay.TileColor.GREEN
-	var cells := unit.get_placeable_cells()
+	var cells := unit.get_pathable_cells(true)
 	level.pathing_overlay.set_cells(cells, color)
 
 
@@ -537,15 +537,15 @@ func draw_unit_path(unit: Unit, cell: Vector2) -> void:
 
 ## Clears overlays.
 func clear_overlays(mask: int = ALL_OVERLAYS) -> void:
-	if mask & PLACEABLE_CELLS == mask:
+	if (mask & PLACEABLE_CELLS) == PLACEABLE_CELLS:
 		level.pathing_overlay.clear()
-	if mask & NON_PLACEABLE_CELLS == mask:
+	if (mask & NON_PLACEABLE_CELLS) == NON_PLACEABLE_CELLS:
 		level.map.pathing_painter.clear()
-	if mask & ATTACK_RANGE == mask:
+	if (mask & ATTACK_RANGE) == ATTACK_RANGE:
 		level.attack_range_overlay.clear()
-	if mask & TARGET_SHAPE == mask:
+	if (mask & TARGET_SHAPE) == TARGET_SHAPE:
 		level.target_shape_overlay.clear()
-	if mask & UNIT_PATH == mask:
+	if (mask & UNIT_PATH) == UNIT_PATH:
 		level.unit_path.clear()
 
 

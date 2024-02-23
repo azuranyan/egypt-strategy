@@ -23,24 +23,38 @@ enum {
 @export var interaction_handler: InteractionHandler
 
 var battle: Battle
-var spawn_points: Array[SpawnPoint]
-var state: int = STATE_NONE
-var ghost: Ghost
+var state: int = STATE_NONE:
+	set(value):
+		state = value
+		if not is_node_ready():
+			await ready
+		%State/ValueLabel.text = ['STATE_NONE', 'STATE_PREP_STANDBY', 'STATE_BATTLE_STANDBY', 'STATE_BATTLE_SELECTING_MOVE', 'STATE_BATTLE_SELECTING_TARGET'][state]
 
-var drag_prev_selected_unit: Unit
+var spawn_points: Array[SpawnPoint]
+
 var selected_unit: Unit
+
 var rotated_unit: Unit
 var dragged_unit: Unit
-
-var active_attack: Attack
-var multicast_targets: Array[Vector2]
-var multicast_rotations: Array[float]
-
+var drag_prev_selected_unit: Unit
 var unit_drag_start: Vector2
 var unit_drag_offset: Vector2
 
+# attack
+var active_attack: Attack:
+	set(value):
+		active_attack = value
+		if not is_node_ready():
+			await ready
+		%ActiveAttack/ValueLabel.text = active_attack.name if active_attack else '<null>'
+var multicast_targets: Array[Vector2]
+var multicast_rotations: Array[float]
+var last_target_cell: Vector2
+
+# 
 var alt_held := false
 var undo_stack: Array[Action] = []
+var ghost: Ghost
 
 
 func _initialize():
@@ -51,6 +65,10 @@ func _initialize():
 	battle.hud().prep_unit_list.unit_released.connect(_on_prep_unit_released)
 	battle.hud().prep_unit_list.unit_dragged.connect(_on_prep_unit_dragged)
 	battle.hud().prep_unit_list.cancelled.connect(_on_prep_cancelled)
+
+	battle.hud().rest_button.pressed.connect(_on_rest_button_pressed)
+	battle.hud().fight_button.pressed.connect(_on_fight_button_pressed)
+	battle.hud().deify_button.pressed.connect(_on_deify_button_pressed)
 
 	spawn_points = battle.get_spawn_points(SpawnPoint.Type.PLAYER)
 
@@ -135,34 +153,37 @@ func interact_end():
 ## Cancels current interaction.
 func interact_cancel():
 	update_message_box()
-	if not undo_stack.is_empty() and undo_stack.back() is UnitMoveAction:
-		interact_undo()
-		return
 
-	if dragged_unit:
-		interact_stop_drag_unit()
-		return
+	match state:
+		STATE_PREP_STANDBY, STATE_BATTLE_STANDBY:
+			if dragged_unit:
+				interact_stop_drag_unit()
+				return
+		
+			if rotated_unit:
+				interact_stop_rotate_unit()
+				return
 
-	if rotated_unit:
-		interact_stop_rotate_unit()
-		return
+			if selected_unit:
+				interact_select_unit(null)
+				return
 
-	if active_attack:
-		interact_select_attack(null)
-		return
+		STATE_BATTLE_SELECTING_MOVE:
+			if not undo_stack.is_empty() and undo_stack.back() is UnitMoveAction:
+				interact_undo()
+			else:
+				interact_select_unit(null)
+			return
 
-	if selected_unit:
-		interact_select_unit(null)
-		return
+		STATE_BATTLE_SELECTING_TARGET:
+			if not multicast_targets.is_empty():
+				multicast_targets.pop_back()
+				multicast_rotations.pop_back()
+				battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, multicast_rotations)
 
-	var hovered_unit := interaction_handler.get_hovered_unit()
-	if hovered_unit:
-		if not battle.is_battle_phase() and can_reposition(hovered_unit):
-			interact_remove_unit(hovered_unit)
-		else:
-			pass # do nothing
-	else:
-		undo_action()
+			if multicast_targets.is_empty():
+				interact_select_attack(null)
+				interact_select_unit(selected_unit)
 
 
 ## Undo's action.
@@ -179,7 +200,7 @@ func interact_undo():
 func interact_start_rotate_unit(unit: Unit):
 	update_message_box()
 	rotated_unit = unit
-	select_unit(unit)
+	interact_select_unit(unit, false)
 	battle.clear_overlays(Battle.PLACEABLE_CELLS)
 
 
@@ -187,7 +208,7 @@ func interact_start_rotate_unit(unit: Unit):
 func interact_stop_rotate_unit():
 	update_message_box()
 	rotated_unit = null
-	select_unit(null)
+	interact_select_unit(null, false)
 
 
 ## Rotates the unit to face the target cell.
@@ -284,36 +305,48 @@ func interact_remove_unit(unit: Unit):
 
 ## Moves pointer.
 func interact_move_pointer(screen_pos: Vector2):
-	#update_message_box()
-	
-	update_cursor_mode()
+	var unit := interaction_handler.get_hovered_unit()
 
-	if interaction_handler.has_hovered_unit() and state != STATE_BATTLE_SELECTING_MOVE:
-		interact_move_cursor(interaction_handler.get_hovered_unit().cell())
+	battle.level.cursor.unit_mode = unit and not rotated_unit and not dragged_unit and can_select(unit)
+
+	if can_select(unit):
+		interact_move_cursor(unit.cell())
 	else:
 		interact_move_cursor(battle.screen_to_cell(screen_pos))
 
 
-func update_cursor_mode():
-	var unit := interaction_handler.get_hovered_unit()
-	battle.level.cursor.unit_mode = unit and not rotated_unit and not dragged_unit and state != STATE_BATTLE_SELECTING_MOVE
-
-
 ## Moves the cursor to the specified position.
 func interact_move_cursor(cell: Vector2):
-	#update_message_box()
 	battle.set_cursor_pos(cell)
 	match state:
 		STATE_BATTLE_SELECTING_MOVE:
-			battle.draw_unit_path(selected_unit, cell)
+			if selected_unit.can_move():
+				battle.draw_unit_path(selected_unit, cell)
 
 		STATE_BATTLE_SELECTING_TARGET:
-			if active_attack.melee:
-				selected_unit.face_towards(cell)
-				var attack_cell: Vector2 = selected_unit.cell() + Map.DIRECTIONS[selected_unit.get_heading()] * selected_unit.get_attack_range(active_attack)
-				battle.set_cursor_pos(attack_cell)
-			
+			multicast_targets[-1] = cell
+			multicast_rotations[-1] = 0
+			last_target_cell = fix_melee_targeting(selected_unit, active_attack, multicast_targets, multicast_rotations, last_target_cell)
+
 			battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, multicast_rotations)
+
+
+## Fixes melee targeting. This should definitely be a method for unit. Fix this later.
+func fix_melee_targeting(unit: Unit, attack: Attack, target: Array[Vector2], _rotation: Array[float], last_valid_target_cell: Vector2) -> Vector2:
+	if active_attack.melee:
+		var facing_cell := target[-1]
+
+		# this is to avoid weird spazz when hovering over self on melee
+		if facing_cell == unit.cell():
+			unit.face_towards(last_valid_target_cell)
+		else:
+			unit.face_towards(facing_cell)
+		
+		# reposition target to the proper cell
+		target[-1] = unit.cell() + Map.DIRECTIONS[unit.get_heading()] * unit.attack_range(attack)
+		battle.set_cursor_pos(target[-1])
+
+	return target[-1]
 
 
 ## Selects the cell.
@@ -325,72 +358,117 @@ func interact_select_cell(cell: Vector2):
 			interact_select_unit(battle.get_unit_at(cell))
 
 		STATE_BATTLE_SELECTING_MOVE:
-			if cell in selected_unit.get_placeable_cells():
-				push_undo_action(UnitMoveAction.new(selected_unit, cell))
+			if selected_unit.can_move():
+				if cell in selected_unit.get_placeable_cells():
+					push_undo_action(UnitMoveAction.new(selected_unit, cell))
+				else:
+					Game.play_error_sound()
+					update_message_box('Cannot move there.')
 			else:
-				Game.play_error_sound()
-				update_message_box('Cannot move there.')
+				interact_select_unit(null)
 
 		STATE_BATTLE_SELECTING_TARGET:
 			interact_select_target(cell)
 
 
 ## Selects the unit.
-func interact_select_unit(unit: Unit):
+func interact_select_unit(unit: Unit, draw_overlays := true):
 	update_message_box()
 
-	battle.clear_overlays(Battle.PLACEABLE_CELLS)
-	battle.clear_overlays(Battle.NON_PLACEABLE_CELLS)
-	battle.clear_overlays(Battle.UNIT_PATH)
+	# select (or deselect) unit
+	interaction_handler.select_unit(unit)
+	selected_unit = unit
+
+	clear_targeting()
+	if draw_overlays:
+		battle.clear_overlays()
+	
+	# deselect unit
 	if not unit:
-		deselect_unit()
+		if battle.is_battle_phase():
+			change_state(STATE_BATTLE_STANDBY)
+		else:
+			change_state(STATE_PREP_STANDBY)
 		return
-		
+	
+	# update cursor and overlays
 	battle.set_cursor_pos(unit.cell())
-
-	if state == STATE_BATTLE_SELECTING_TARGET:
-		interact_select_target(unit.cell())
+	if draw_overlays:
+		draw_unit_overlays(unit)
+	
+	# if we can move, make sure to switch to states
+	if battle.is_battle_phase():
+		if unit.is_player_owned() and unit.can_act():
+			change_state(STATE_BATTLE_SELECTING_MOVE)
+		else:
+			change_state(STATE_BATTLE_STANDBY)
 	else:
-		if unit.cell() != Map.OUT_OF_BOUNDS:
-			if unit != dragged_unit and unit != rotated_unit and unit.can_move():
-				battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
+		change_state(STATE_PREP_STANDBY)
 
-			battle.draw_unit_non_pathable_cells(unit)
 
-			if battle.is_battle_phase() and unit.is_player_owned() and unit.can_move():
-				battle.draw_unit_path(unit, unit.cell())
-		select_unit(unit)
+## Clears unit targeting.
+func clear_targeting():
+	# reset targeting and overlays
+	multicast_targets = [battle.get_cursor_pos()]
+	multicast_rotations = [0]
+
+
+## Draws unit overlays.
+func draw_unit_overlays(unit: Unit, attack: Attack = null):
+	# border edges are always drawn
+	# TODO maybe put this in config
+	battle.draw_unit_non_pathable_cells(unit)
+
+	if attack:
+		battle.draw_unit_attack_range(unit, attack)
+
+	# skips drawing pathable and paths on invalid state
+	if unit.cell() == Map.OUT_OF_BOUNDS or state == STATE_BATTLE_SELECTING_TARGET:
+		return
+	
+	# only draw pathable cells when not in any interactions
+	if unit != dragged_unit and unit != rotated_unit and unit.can_move():
+		battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
+	
+	# state includes both attack and move so make sure to only draw if unit can move
+	if state == STATE_BATTLE_SELECTING_MOVE and can_reposition(unit):
+		battle.draw_unit_path(unit, unit.cell())
 
 
 ## Selects the attack.
 func interact_select_attack(attack: Attack):
 	update_message_box()
-	# 	_select_unit(unit)
-	# 	multicast_targets.clear()
-	# 	multicast_rotations.clear()
-	# 	if attack:
-	# 		battle.draw_unit_attack_range(unit, attack)
-	# 		state = STATE_BATTLE_SELECTING_TARGET
-	# 	active_attack = attack
 
-
-	# func execute() -> bool:
-
-	# 	get_attack_button().set_pressed_no_signal(true)
-	# 	Battle.instance().draw_unit_attack_range(unit, attack)
-	# 	return attack != null
+	# allow regrabbing focus
+	if active_attack:
+		get_attack_button(selected_unit, active_attack).release_focus()
 		
-	# func undo():
-	# 	get_attack_button().set_pressed_no_signal(false)
-	# 	Battle.instance().clear_overlays(Battle.ATTACK_RANGE_MASK)
+	if attack:
+		get_attack_button(selected_unit, attack).grab_focus()
 
-	# func get_attack_button() -> Button:
-	# 	if attack == unit.special_attack():
-	# 		return Battle.instance().hud().deify_button
-	# 	else:
-	# 		if attack != unit.basic_attack():
-	# 			push_error('invalid attack')
-	# 		return Battle.instance().hud().fight_button
+	# prevent flickering when spammed
+	if active_attack == attack:
+		return
+	
+	# update attack
+	active_attack = attack
+	clear_targeting()
+	state = STATE_BATTLE_SELECTING_TARGET if attack else STATE_BATTLE_SELECTING_MOVE
+
+	# update overlays
+	battle.clear_overlays()
+	draw_unit_overlays(selected_unit, attack)
+
+
+## Returns the attack button.
+func get_attack_button(unit: Unit, attack: Attack) -> Button:
+	if attack == unit.special_attack():
+		return Battle.instance().hud().deify_button
+	else:
+		if attack != unit.basic_attack():
+			push_error('invalid attack')
+		return Battle.instance().hud().fight_button
+
 
 ## Selects the attack target.
 func interact_select_target(cell: Vector2):
@@ -423,29 +501,6 @@ func interact_select_target(cell: Vector2):
 		# 	agent.multicast_rotations.pop_back()
 		# 	Battle.instance().clear_overlays(Battle.TARGET_SHAPE_MASK)
 
-
-func select_unit(unit: Unit):
-	if selected_unit == unit:
-		return
-	if selected_unit:
-		deselect_unit()
-	if unit:
-		interaction_handler.select_unit(unit)
-		if battle.is_battle_phase() and unit.is_player_owned() and unit.can_move():
-			change_state(STATE_BATTLE_SELECTING_MOVE)
-	selected_unit = unit
-
-
-func deselect_unit():
-	if not selected_unit:
-		return
-	interaction_handler.select_unit(null)
-	multicast_targets.clear()
-	multicast_rotations.clear()
-	if battle.is_battle_phase():
-		change_state(STATE_BATTLE_STANDBY)
-	selected_unit = null
-	
 
 ##################################################################################################################
 #endregion Interactions
@@ -559,7 +614,8 @@ func can_reposition(unit: Unit) -> bool:
 	return (unit
 		and unit.is_player_owned()
 		and not unit.has_meta('preplaced')
-		and battle.on_turn() == empire)
+		and battle.on_turn() == empire
+		and unit.can_move())
 
 
 func can_rotate(unit: Unit) -> bool:
@@ -568,6 +624,16 @@ func can_rotate(unit: Unit) -> bool:
 		and not unit.has_meta('preplaced')
 		and battle.on_turn() == empire)
 
+
+func can_select(unit: Unit) -> bool:
+	if not (unit and unit.is_selectable()):
+		return false
+	if state == STATE_BATTLE_SELECTING_TARGET:
+		return false
+	if state == STATE_BATTLE_SELECTING_MOVE:
+		return not selected_unit.can_move()
+	return true
+		
 
 func is_hero_deployed() -> bool:
 	for unit in Game.get_empire_units(empire):
@@ -597,8 +663,19 @@ func _on_prep_cancelled(unit: Unit):
 	assert(unit == dragged_unit)
 	interact_stop_drag_unit()
 	prep_remove_unit(unit)
-	 
 	get_viewport().set_input_as_handled() # stop event from propagating to _unhandled_input
+
+
+func _on_rest_button_pressed():
+	pass # TODO
+
+
+func _on_fight_button_pressed():
+	interact_select_attack(selected_unit.basic_attack())
+
+	
+func _on_deify_button_pressed():
+	interact_select_attack(selected_unit.special_attack())
 
 
 ## Base class for undoable actions.
@@ -757,7 +834,7 @@ class UnitMoveAction extends Action:
 		Battle.instance().clear_overlays(Battle.UNIT_PATH)
 		agent.change_state(STATE_NONE)
 		await Battle.instance().unit_action_move(unit, target)
-		agent.change_state(STATE_BATTLE_STANDBY)
+		agent.change_state(STATE_BATTLE_SELECTING_MOVE)
 		if unit.can_attack():
 			agent.interact_select_unit(unit)
 

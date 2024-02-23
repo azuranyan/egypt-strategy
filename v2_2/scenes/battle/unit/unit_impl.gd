@@ -523,7 +523,7 @@ func can_attack() -> bool:
 
 ## Returns true if this unit can act.
 func can_act() -> bool:
-	return can_move() # if you can at least move, you can act
+	return can_move() or can_attack()
 	
 
 ## Returns true if this unit has taken any actions.
