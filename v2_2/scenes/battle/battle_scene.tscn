@@ -1,8 +1,6 @@
-[gd_scene load_steps=20 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=18 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
-[ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="2_yi0k6"]
-[ext_resource type="Script" path="res://scenes/battle/attack/debug_print_effect.gd" id="3_7rp7p"]
 [ext_resource type="Script" path="res://scenes/battle/unhandled_input_listener.gd" id="4_0x7je"]
 [ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
 [ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
@@ -210,13 +208,6 @@ shadow_offset = Vector2(0, 0)
 
 [node name="BattleScene" type="CanvasLayer"]
 script = ExtResource("1_ty2dt")
-
-[node name="AttackSystem" type="Node" parent="."]
-script = ExtResource("2_yi0k6")
-minimum_attack_time = 2.0
-
-[node name="DebugPrintEffect" type="Node" parent="AttackSystem"]
-script = ExtResource("3_7rp7p")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

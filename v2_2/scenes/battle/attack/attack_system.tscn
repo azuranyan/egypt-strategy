@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://f1wax26p15ed"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="1_x58b2"]
+[ext_resource type="Script" path="res://scenes/battle/attack/attack_effect_handler.gd" id="2_xk3uo"]
+
+[sub_resource type="GDScript" id="GDScript_1tivj"]
+script/source = "extends AttackEffectHandler
+
+
+func is_handler(attack_effect: AttackEffect) -> bool:
+	return attack_effect is DebugPrintEffect
+
+
+func execute(state: AttackState, attack_effect: AttackEffect, target: Unit) -> void:
+	if not OS.is_debug_build():
+		return
+	print(attack_effect.format.format({
+		attack = state.attack,
+		user = state.user,
+		target = target,
+		target_cell = state.target_cells,
+		target_rotation = state.target_rotations,
+		target_units = state.target_units,
+	}))
+"
+
+[node name="AttackSystem" type="Node" node_paths=PackedStringArray("null_effect_handler")]
+script = ExtResource("1_x58b2")
+minimum_attack_time = 2.0
+null_effect_handler = NodePath("NullEffectHandler")
+
+[node name="NullEffectHandler" type="Node" parent="."]
+script = ExtResource("2_xk3uo")
+
+[node name="DebugPrintEffect" type="Node" parent="."]
+script = SubResource("GDScript_1tivj")

@@ -22,6 +22,12 @@ signal turn_started(empire: Empire)
 ## Emitted when an empire's turn ended.
 signal turn_ended(empire: Empire)
 
+## Emitted when attack sequence is started.
+signal attack_sequence_started(state: AttackState)
+
+## Emitted when attack sequence has ended.
+signal attack_sequence_ended()
+
 
 ## Bitflag for pathable cells overlay.
 const PLACEABLE_CELLS := 1
@@ -403,7 +409,7 @@ func unit_action_move(_unit: Unit, _target: Vector2) -> void:
 
 
 ## Unit executes attack.
-func unit_action_attack(_unit: Unit, _attack: Attack, _target: PackedVector2Array, _rotation: PackedFloat64Array) -> void:
+func unit_action_attack(_unit: Unit, _attack: Attack, _target: Array[Vector2], _rotation: Array[float]) -> void:
 	assert(false, 'not implemented')
 
 

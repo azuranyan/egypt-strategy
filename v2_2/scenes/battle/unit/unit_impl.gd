@@ -83,6 +83,7 @@ const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_ob
 
 
 var map_object: UnitMapObject
+var attachments := {}
 
 @onready var driver = $UnitDriver
 
@@ -103,6 +104,9 @@ func reset(initial_state: State):
 	clear_status_effects()
 	set_position(Map.OUT_OF_BOUNDS)
 	set_heading(Map.Heading.EAST)
+	set_has_attacked(false)
+	set_has_moved(false)
+	set_turn_done(false)
 	if is_alive():
 		_state = State.IDLE
 		
@@ -229,6 +233,11 @@ func is_enemy(other: Unit) -> bool:
 func is_ally(other: Unit) -> bool:
 	return (other != self) and (other.get_empire() == self.get_empire())
 	
+
+## Returns true if another unit is self.
+func is_self(other: Unit) -> bool:
+	return other == self
+
 	
 ## Returns true if this unit is player owned.
 func is_player_owned() -> bool:
@@ -324,6 +333,17 @@ func attack_range_cells(attack: Attack) -> PackedVector2Array:
 func attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
 	return attack.get_target_cells(target, target_rotation)
 	
+
+## Returns an array of units in the target aoe.
+func attack_target_units(attack: Attack, target_cell: Vector2, target_rotation: float) -> Array[Unit]:
+	var cells := attack.get_target_cells(target_cell, target_rotation)
+	var arr: Array[Unit] = []
+	for c in cells:
+		var u := Battle.instance().get_unit_at(c)
+		if u:
+			arr.append(u)
+	return arr
+
 	
 ## Set to true or false to override special unlock, or null for default rules.
 func set_special_unlocked(value: Variant) -> void:
@@ -465,6 +485,8 @@ func is_valid_target() -> bool:
 
 ## Returns true if unit can path over cell.
 func is_pathable(_cell: Vector2) -> bool:
+	if _cell == Map.OUT_OF_BOUNDS:
+		return false
 	for pathable in Battle.instance().get_pathables_at(_cell):
 		if not pathable.is_pathable(self):
 			return false
@@ -478,6 +500,18 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
+func play_animation(anim_name: String):
+	const ANIM_STATES := {
+		attack = State.ATTACKING,
+		idle = State.IDLE,
+		walking = State.WALKING,
+		hurt = State.HURT,
+		dying = State.DYING,
+		dead = State.DEAD,
+	}
+	map_object.unit_model.state = ANIM_STATES.get(anim_name, State.IDLE)
+
+
 ## Returns true if unit has moved.
 func has_moved() -> bool:
 	return _has_moved
@@ -637,13 +671,60 @@ func revive() -> void:
 	
 	
 ## Multicasts the attack on target cell.
-func use_attack(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
-	print('attack!')
+func use_attack(attack: Attack, target_cells: Array[Vector2], target_rotations: Array[float]) -> void:
+	await execute_attack(AttackState.create_attack_state(self, attack, target_cells, target_rotations))
+
+	
+## Executes the attack.
+func execute_attack(attack_state: AttackState) -> void:
+	UnitEvents.attack_started.emit(self, attack_state)
+
+	# we officially set our state to attacking but the actual animation
+	# that will play will depend on attack.user_animation
+	var old_state := _state
+	set_state(State.ATTACKING)
+
+	# execute attack
+	await AttackSystem.execute_attack(attack_state)
+
+	set_state(old_state)
+	UnitEvents.attack_finished.emit(self)
 #endregion Unit Actions
 
 
 ## Returns this unit's map object, or [code]null[/code] if unfielded.
 func get_map_object() -> MapObject:
+	return map_object
+
+
+## Attaches a [Node] to this object.
+func attach(node: Node, target: StringName) -> void:
+	attachments[node] = find_attachment_point(target)
+	attachments[node].add_child(node)
+
+
+## Detaches a [Node] from this object.
+func detach(node: Node) -> void:
+	var attachment_point: Node = attachments.get(node)
+	if attachment_point:
+		attachment_point.remove_child(node)
+		attachments.erase(node)
+
+
+## Finds an attachment point by name.
+func find_attachment_point(target: StringName) -> Node:
+	var stack := [map_object]
+
+	while stack.size() > 0:
+		var current = stack.pop_back()
+
+		if current.name.to_snake_case() == target:
+			return current
+
+		for child in current.get_children():
+			if child is Node2D:
+				stack.push_back(child)
+				
 	return map_object
 
 

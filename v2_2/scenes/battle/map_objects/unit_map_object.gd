@@ -243,6 +243,8 @@ func _on_unit_damaged(_unit: Unit, amount: int, source: Variant):
 
 
 func _on_unit_turn_flags_changed(_unit: Unit):
+	if _unit != unit:
+		return
 	%EndTurnIcon.visible = _unit.is_turn_done()
 
 	

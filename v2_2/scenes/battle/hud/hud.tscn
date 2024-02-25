@@ -21,7 +21,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Overlay/AttackBanner:modulate")
+tracks/0/path = NodePath("Overlay/Control/AttackBanner:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -48,7 +48,7 @@ resource_name = "show_attack_banner"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Overlay/AttackBanner:modulate")
+tracks/0/path = NodePath("Overlay/Control/AttackBanner:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -337,6 +337,7 @@ offset_top = 72.0
 offset_right = 460.0
 offset_bottom = 203.0
 theme = ExtResource("2_2bpvx")
+keep_pressed_outside = true
 shortcut = SubResource("Shortcut_ps2hm")
 icon = ExtResource("9_7iq2f")
 icon_alignment = 1
@@ -371,6 +372,7 @@ offset_top = 72.0
 offset_right = 600.0
 offset_bottom = 203.0
 theme = ExtResource("2_2bpvx")
+keep_pressed_outside = true
 shortcut = SubResource("Shortcut_2icrb")
 icon = ExtResource("10_r1sxg")
 icon_alignment = 1
@@ -555,17 +557,21 @@ autowrap_mode = 3
 [node name="PrepUnitList" parent="Control" instance=ExtResource("12_nfnju")]
 layout_mode = 1
 
-[node name="Overlay" type="Control" parent="."]
-layout_mode = 1
+[node name="Overlay" type="CanvasLayer" parent="."]
+layer = 5
+metadata/_edit_lock_ = true
+
+[node name="Control" type="Control" parent="Overlay"]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-metadata/_edit_lock_ = true
 
-[node name="TurnBanner" type="Control" parent="Overlay"]
+[node name="TurnBanner" type="Control" parent="Overlay/Control"]
+unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(484, 58)
 layout_mode = 1
@@ -582,7 +588,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("14_joq1b")
 
-[node name="ColorRect" type="ColorRect" parent="Overlay/TurnBanner"]
+[node name="ColorRect" type="ColorRect" parent="Overlay/Control/TurnBanner"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -592,7 +598,7 @@ grow_vertical = 2
 color = Color(0.937255, 0.901961, 0.870588, 1)
 metadata/_edit_group_ = true
 
-[node name="OnTurnLabel" type="Label" parent="Overlay/TurnBanner/ColorRect"]
+[node name="OnTurnLabel" type="Label" parent="Overlay/Control/TurnBanner/ColorRect"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -605,7 +611,8 @@ label_settings = SubResource("LabelSettings_n4l44")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AttackBanner" type="Control" parent="Overlay"]
+[node name="AttackBanner" type="Control" parent="Overlay/Control"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 5
@@ -616,8 +623,9 @@ offset_top = 53.0
 offset_right = 508.0
 offset_bottom = 118.0
 grow_horizontal = 2
+metadata/_edit_group_ = true
 
-[node name="TextureRect" type="TextureRect" parent="Overlay/AttackBanner"]
+[node name="TextureRect" type="TextureRect" parent="Overlay/Control/AttackBanner"]
 self_modulate = Color(0.937255, 0.901961, 0.870588, 1)
 layout_mode = 1
 anchors_preset = 15
@@ -629,7 +637,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("GradientTexture2D_1en02")
 
-[node name="AttackLabel" type="RichTextLabel" parent="Overlay/AttackBanner"]
+[node name="AttackLabel" type="RichTextLabel" parent="Overlay/Control/AttackBanner"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

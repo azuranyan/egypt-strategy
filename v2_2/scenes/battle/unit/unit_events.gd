@@ -32,7 +32,7 @@ signal turn_flags_changed(unit: Unit)
 signal action_selected(unit: Unit, action: UnitAction) ## Emitted when unit has selected an action.
 signal walking_started(unit: Unit, start: Vector2, end: Vector2) ## Emitted when a unit starts walking.
 signal walking_finished(unit: Unit) ## Emitted when a unit finishes walking.
-signal attack_started(unit: Unit, st: AttackState) ## Emitted when unit begins an attack.
+signal attack_started(unit: Unit, attack_state: AttackState) ## Emitted when unit begins an attack.
 signal attack_finished(unit: Unit) ## Emitted when unit finishes an attack.
 #endregion Unit Actions Signals
 

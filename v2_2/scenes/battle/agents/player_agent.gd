@@ -18,9 +18,17 @@ enum {
 	STATE_BATTLE_SELECTING_TARGET,
 }
 
-
-@export var undo_stack_size := 99
+## The interaction handler for this agent.
 @export var interaction_handler: InteractionHandler
+
+@export_group("Config")
+
+## The maximum stack size of the undo stack.
+@export var undo_stack_size := 99
+
+## When true, pressing cancel will immediately undoes the move, otherwise unit selection is cancelled first.
+@export var enable_undo_after_move := true
+
 
 var battle: Battle
 var state: int = STATE_NONE:
@@ -48,10 +56,9 @@ var active_attack: Attack:
 			await ready
 		%ActiveAttack/ValueLabel.text = active_attack.name if active_attack else '<null>'
 var multicast_targets: Array[Vector2]
-var multicast_rotations: Array[float]
-var last_target_cell: Vector2
+var mutlicast_rotations: Array[float]
 
-# 
+var last_target_cell: Vector2
 var alt_held := false
 var undo_stack: Array[Action] = []
 var ghost: Ghost
@@ -178,6 +185,11 @@ func interact_cancel():
 				undo_action()
 
 		STATE_BATTLE_SELECTING_MOVE:
+			if not enable_undo_after_move:
+				if selected_unit:
+					interact_select_unit(null)
+					return
+
 			if not undo_stack.is_empty() and undo_stack.back() is UnitMoveAction:
 				interact_undo()
 			else:
@@ -187,8 +199,8 @@ func interact_cancel():
 		STATE_BATTLE_SELECTING_TARGET:
 			if not multicast_targets.is_empty():
 				multicast_targets.pop_back()
-				multicast_rotations.pop_back()
-				battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, multicast_rotations)
+				mutlicast_rotations.pop_back()
+				battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, mutlicast_rotations)
 
 			if multicast_targets.is_empty():
 				interact_select_attack(null)
@@ -334,15 +346,15 @@ func interact_move_cursor(cell: Vector2):
 
 		STATE_BATTLE_SELECTING_TARGET:
 			multicast_targets[-1] = cell
-			multicast_rotations[-1] = 0
-			last_target_cell = fix_melee_targeting(selected_unit, active_attack, multicast_targets, multicast_rotations, last_target_cell)
+			mutlicast_rotations[-1] = 0
+			last_target_cell = fix_melee_targeting(selected_unit, active_attack, multicast_targets, mutlicast_rotations, last_target_cell)
 
-			battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, multicast_rotations)
+			battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, mutlicast_rotations)
 
 
 ## Fixes melee targeting. This should definitely be a method for unit. Fix this later.
 func fix_melee_targeting(unit: Unit, attack: Attack, target: Array[Vector2], _rotation: Array[float], last_valid_target_cell: Vector2) -> Vector2:
-	if active_attack.melee:
+	if attack.melee:
 		var facing_cell := target[-1]
 
 		# this is to avoid weird spazz when hovering over self on melee
@@ -384,6 +396,9 @@ func interact_select_cell(cell: Vector2):
 func interact_select_unit(unit: Unit, draw_overlays := true):
 	update_message_box()
 
+	if selected_unit:
+		selected_unit.get_map_object().highlight = UnitMapObject.Highlight.NONE
+
 	# select (or deselect) unit
 	interaction_handler.select_unit(unit)
 	selected_unit = unit
@@ -400,6 +415,8 @@ func interact_select_unit(unit: Unit, draw_overlays := true):
 			change_state(STATE_PREP_STANDBY)
 		return
 	
+	selected_unit.get_map_object().highlight = UnitMapObject.Highlight.NORMAL
+
 	# update cursor and overlays
 	battle.set_cursor_pos(unit.cell())
 	if draw_overlays:
@@ -419,15 +436,11 @@ func interact_select_unit(unit: Unit, draw_overlays := true):
 func clear_targeting():
 	# reset targeting and overlays
 	multicast_targets = [battle.get_cursor_pos()]
-	multicast_rotations = [0]
+	mutlicast_rotations = [0]
 
 
 ## Draws unit overlays.
 func draw_unit_overlays(unit: Unit, attack: Attack = null):
-	# border edges are always drawn
-	# TODO maybe put this in config
-	battle.draw_unit_non_pathable_cells(unit)
-
 	if attack:
 		battle.draw_unit_attack_range(unit, attack)
 
@@ -435,6 +448,10 @@ func draw_unit_overlays(unit: Unit, attack: Attack = null):
 	if unit.cell() == Map.OUT_OF_BOUNDS or state == STATE_BATTLE_SELECTING_TARGET:
 		return
 	
+	# border edges are always drawn
+	# TODO maybe put this in config
+	battle.draw_unit_non_pathable_cells(unit)
+
 	# only draw pathable cells when not in any interactions
 	if unit != dragged_unit and unit != rotated_unit and unit.can_move():
 		battle.draw_unit_placeable_cells(unit, not unit.is_player_owned())
@@ -450,10 +467,10 @@ func interact_select_attack(attack: Attack):
 
 	# allow regrabbing focus
 	if active_attack:
-		get_attack_button(selected_unit, active_attack).release_focus()
+		Battle.instance().hud().set_selected_attack(null)
 		
 	if attack:
-		get_attack_button(selected_unit, attack).grab_focus()
+		Battle.instance().hud().set_selected_attack(attack)
 
 	# prevent flickering when spammed
 	if active_attack == attack:
@@ -468,47 +485,53 @@ func interact_select_attack(attack: Attack):
 	battle.clear_overlays()
 	draw_unit_overlays(selected_unit, attack)
 
-
-## Returns the attack button.
-func get_attack_button(unit: Unit, attack: Attack) -> Button:
-	if attack == unit.special_attack():
-		return Battle.instance().hud().deify_button
-	else:
-		if attack != unit.basic_attack():
-			push_error('invalid attack')
-		return Battle.instance().hud().fight_button
+	if attack:
+		multicast_targets[-1] = selected_unit.cell() + Map.DIRECTIONS[selected_unit.get_heading()] * selected_unit.attack_range(attack)
+		battle.set_cursor_pos(multicast_targets[-1])
 
 
 ## Selects the attack target.
 func interact_select_target(cell: Vector2):
 	update_message_box()
-	# var err := battle.check_unit_attack(selected_unit, active_attack, cell, 0)
-	# if err == Battle.OK:
-	# 	push_undo_action(SelectTargetAction.new(selected_unit, active_attack, cell, 0))
-	# 	if active_attack.multicast <= 0 or multicast_targets.size() > active_attack.multicast:
-	# 		pass # TODO
-	# else:
-	# 	const message := {
-	# 		Battle.SPECIAL_NOT_UNLOCKED: "Ability not unlocked.",
-	# 		Battle.INSIDE_MIN_RANGE: "Target inside minimum range.",
-	# 		Battle.OUT_OF_RANGE: "Target outside range.",
-	# 		Battle.NO_TARGET: "No target found.",
-	# 		Battle.INVALID_TARGET: "Invalid target.",
-	# 	}
-	# 	Game.play_error_sound()
-	# 	update_message_box(message.get(err, ""))
+	# TODO target, rotation then -> multicast_target/rotation
+	multicast_targets[-1] = cell
+	var rotation := mutlicast_rotations[-1]
+
+	# check if target is valid
+	var err := battle.check_unit_attack(selected_unit, active_attack, cell, rotation)
+
+	if err == Battle.OK:
+		# add to multicast
+		multicast_targets.push_back(Vector2.ZERO)
+		mutlicast_rotations.push_back(0)
+		battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, mutlicast_rotations)
+
+		# execute attack
+		if multicast_targets.size() - 1 > active_attack.multicast:
+			multicast_targets.pop_back()
+			mutlicast_rotations.pop_back()
+			use_attack(selected_unit, active_attack, multicast_targets, mutlicast_rotations)
+	else:
+		const message := {
+			Battle.SPECIAL_NOT_UNLOCKED: "Ability not unlocked.",
+			Battle.INSIDE_MIN_RANGE: "Target inside minimum range.",
+			Battle.OUT_OF_RANGE: "Target outside range.",
+			Battle.NO_TARGET: "No target found.",
+			Battle.INVALID_TARGET: "Invalid target.",
+		}
+		Game.play_error_sound()
+		update_message_box(message.get(err, ""))
 
 
-		# func execute() -> bool:
-		# 	agent.multicast_targets.push_back(target)
-		# 	agent.multicast_rotations.push_back(rotation)
-		# 	Battle.instance().draw_unit_attack_target(unit, attack, agent.multicast_targets, agent.multicast_rotations)
-		# 	return true
+func use_attack(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]):
+	battle.clear_overlays()
+	clear_undo_stack()
+	interact_select_attack(null)
+	interact_select_unit(null)
+	state = STATE_NONE
+	await battle.unit_action_attack(unit, attack, target, rotation)
+	state = STATE_BATTLE_STANDBY
 	
-		# func undo():
-		# 	agent.multicast_targets.pop_back()
-		# 	agent.multicast_rotations.pop_back()
-		# 	Battle.instance().clear_overlays(Battle.TARGET_SHAPE_MASK)
 
 
 ##################################################################################################################

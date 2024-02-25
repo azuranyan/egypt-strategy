@@ -103,6 +103,7 @@ libraries = {
 "": SubResource("AnimationLibrary_etagh")
 }
 autoplay = "RESET"
+speed_scale = 1.6
 
 [node name="Shadow" type="Node2D" parent="."]
 unique_name_in_owner = true

@@ -190,6 +190,9 @@ func _real_battle_main():
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
 
 				for u in Game.get_empire_units(on_turn()):
+					u.set_has_attacked(false)
+					u.set_has_moved(false)
+					u.set_turn_done(false)
 					u.tick_status_effects()
 
 				turn_started.emit(on_turn())
@@ -696,6 +699,9 @@ func check_unit_attack(unit: Unit, attack: Attack, target: Vector2, rotation: fl
 	
 ## Executes unit action.
 func do_action(unit: Unit, action: UnitAction) -> void:
+	if not action:
+		push_error('no action')
+		return
 	print('<Action: %s; %s; %s; %s; %s>' % [unit.display_name(), action.cell, action.attack, action.target, action.rotation])
 	# allow move in place as do nothing
 	if not action.is_move and not action.is_attack or action.is_move and action.cell == unit.cell():
@@ -709,7 +715,8 @@ func do_action(unit: Unit, action: UnitAction) -> void:
 
 ## Unit does nothing and ends their turn.
 func unit_action_pass(unit: Unit) -> void:
-	unit.set_is_done(true)
+	unit.set_turn_done(true)
+	hud().set_selected_unit(unit)
 
 	last_acting_unit = unit
 	check_for_battle_end()
@@ -728,10 +735,11 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 		clear_overlays(PLACEABLE_CELLS)
 		
 	await unit.walk_towards(target)
+	unit.set_has_moved(true)
 
 	await set_camera_target(null)
+	hud().set_selected_unit.call_deferred(unit)
 	hud().show()
-	unit.set_has_moved(true)
 
 	last_acting_unit = unit
 	check_for_battle_end()
@@ -740,22 +748,26 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 
 ## Unit executes attack.
 @warning_ignore("redundant_await")
-func unit_action_attack(unit: Unit, attack: Attack, target: PackedVector2Array, rotation: PackedFloat64Array) -> void:
+func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
 	hud().show_attack_banner(attack)
 	var centroid := Util.centroid(target)
 	await set_camera_target(level.map.world.as_global(centroid))
+	set_camera_target(world().as_global(centroid))
 
 	await unit.use_attack(attack, target, rotation)
-
 	await set_camera_target(unit)
-	hud().hide_attack_banner()
 	unit.set_has_attacked(true)
+	unit.set_turn_done(true)
+
+	set_camera_target(unit)
+	hud().set_selected_unit(null)
+	hud().hide_attack_banner()
 
 	last_acting_unit = unit
 	check_for_battle_end()
 	await wait_for_death_animations()
 
-		
+
 ## Generates an array of all possible actions.
 func generate_actions(unit: Unit) -> Array[UnitAction]:
 	var re: Array[UnitAction] = []
@@ -764,7 +776,7 @@ func generate_actions(unit: Unit) -> Array[UnitAction]:
 	_get_attack_actions_in_range(unit, unit.basic_attack(), re)
 	_get_attack_actions_in_range(unit, unit.special_attack(), re)
 	
-	for cell in unit.get_PLACEABLE_CELLS(true):
+	for cell in unit.get_placeable_cells():
 		if cell == unit.cell():
 			continue
 		# add unit move to new location action
@@ -798,7 +810,7 @@ func _get_move_attack_actions_in_range(unit: Unit, cell: Vector2, attack: Attack
 		return
 	var original_pos := unit.get_position()
 	unit.set_position(cell)
-	for t in unit.get_cells_in_range(attack):
+	for t in unit.attack_range_cells(attack):
 		for r in ROTATIONS:
 			var action := UnitAction.new(true, cell, true, attack, t, r)
 			if not _is_action_present(action, dest) and check_unit_attack(unit, attack, t, r) == OK:

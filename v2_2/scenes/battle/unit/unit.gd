@@ -140,6 +140,12 @@ func is_ally(_other: Unit) -> bool:
 	assert(false, 'not implemented')
 	return false
 	
+
+## Returns true if another unit is self.
+func is_self(_other: Unit) -> bool:
+	assert(false, 'not implemented')
+	return false
+
 	
 ## Returns true if this unit is player owned.
 func is_player_owned() -> bool:
@@ -237,6 +243,12 @@ func attack_target_cells(_attack: Attack, _target: Vector2, _target_rotation: fl
 	assert(false, 'not implemented')
 	return []
 	
+
+## Returns an array of units in the target aoe.
+func attack_target_units(_attack: Attack, _target_cell: Vector2, _target_rotation: float) -> Array[Unit]:
+	assert(false, 'not implemented')
+	return []
+
 	
 ## Set to true or false to override special unlock, or null for default rules.
 func set_special_unlocked(_value: Variant) -> void:
@@ -369,6 +381,11 @@ func is_placeable(_cell: Vector2) -> bool:
 
 
 #region Unit Actions
+## Plays an animation.
+func play_animation(_anim_name: String) -> void:
+	assert(false, 'not implemented')
+
+	
 ## Returns true if unit has moved.
 func has_moved() -> bool:
 	assert(false, 'not implemented')
@@ -479,9 +496,14 @@ func kill() -> void:
 func revive() -> void:
 	assert(false, 'not implemented')
 	
-	
-## Multicasts the attack on target cell.
-func use_attack(_attack: Attack, _cells: PackedVector2Array, _rotations: PackedFloat64Array) -> void:
+
+## Uses the attack on the targeted cells.
+func use_attack(_attack: Attack, _target_cells: Array[Vector2], _target_rotations: Array[float]) -> void:
+	assert(false, 'not implemented')
+
+
+## Executes the attack.
+func execute_attack(_attack_state: AttackState):
 	assert(false, 'not implemented')
 #endregion Unit Actions
 
@@ -491,3 +513,12 @@ func get_map_object() -> MapObject:
 	assert(false, 'not implemented')
 	return null
 	
+
+## Attaches a [Node] to this object.
+func attach(_node: Node, _target: StringName) -> void:
+	assert(false, 'not implemented')
+
+
+## Detaches a [Node] from this object.
+func detach(_node: Node) -> void:
+	assert(false, 'not implemented')

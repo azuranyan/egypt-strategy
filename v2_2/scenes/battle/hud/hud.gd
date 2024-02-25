@@ -3,6 +3,7 @@ extends Control
 
 
 var _selected_unit: Unit
+var _selected_attack: Attack
 
 # top panel
 @onready var menu_button: Button = $Control/MenuButton
@@ -13,8 +14,8 @@ var _selected_unit: Unit
 @onready var message_box = $Control/MessageBox
 @onready var objectives_panel = $Control/ObjectivesPanel
 @onready var prep_unit_list: UnitList = $Control/PrepUnitList
-@onready var turn_banner = $Overlay/TurnBanner
-@onready var attack_banner = $Overlay/AttackBanner
+@onready var turn_banner = %TurnBanner
+@onready var attack_banner = %AttackBanner
 
 
 # bottom panel
@@ -118,6 +119,41 @@ func clear_selected_unit():
 	character_panel.hide()
 	_selected_unit = null
 	
+
+## Sets the selected attack.
+func set_selected_attack(attack: Attack):
+	clear_selected_attack()
+	if not attack:
+		return
+	# TODO finish this function:
+	# - attack button must be toggleable
+	# - selecting attack toggles it
+	# - once toggled, will show attack info and lock it
+	# - quick info via focusing still works, but should not change attack info once toggled
+	var button := get_attack_button(_selected_unit, attack)
+	if button:
+		button.grab_focus()
+	_selected_attack = null
+		
+
+## Clears the selected attack.
+func clear_selected_attack():
+	deify_button.release_focus()
+	fight_button.release_focus()
+	rest_button.release_focus()
+	hide_info_box()
+	_selected_attack = null
+
+
+## Returns the attack button.
+func get_attack_button(unit: Unit, attack: Attack) -> Button:
+	if attack == unit.special_attack():
+		return deify_button
+	elif attack != unit.basic_attack():
+		return fight_button
+	else:
+		return null
+
 	
 ## Shows the turn banner for a certain duration.
 func show_turn_banner(duration: float = 1):
@@ -131,12 +167,15 @@ func show_turn_banner(duration: float = 1):
 	
 ## Shows the attack banner.
 func show_attack_banner(attack: Attack):
+	if $AnimationPlayer.is_playing():
+		push_error('still playing')
 	Util.bb_big_caps(%AttackLabel, attack.name, {
 		font_size = 40,
 		font = preload("res://scenes/data/fonts/Rakkas-Regular.ttf"),
 		big_font_size = 50,
 	})
 	attack_banner.modulate = Color.TRANSPARENT
+	$Control.modulate = Color.WHITE
 	$AnimationPlayer.play('show_attack_banner')
 	attack_banner.show()
 	await $AnimationPlayer.animation_finished
@@ -145,6 +184,9 @@ func show_attack_banner(attack: Attack):
 	
 ## Hides the attack banner.
 func hide_attack_banner():
+	if not attack_banner.visible:
+		return
+	attack_banner.modulate = Color.WHITE
 	$Control.modulate = Color.TRANSPARENT
 	$AnimationPlayer.play_backwards('show_attack_banner')
 	$Control.show()
@@ -166,6 +208,7 @@ func show_message(message: String, duration: float = -1):
 
 ## Displays the list of missions.
 func set_missions(missions: Array[VictoryCondition]):
+	clear_missions()
 	_set_objective_list(%MissionContainer, %MissionSample, missions)
 	
 	
@@ -176,6 +219,7 @@ func clear_missions():
 			
 ## Displays the list of bonus goals.
 func set_bonus_goal(bonus_goals: Array[VictoryCondition]):
+	clear_bonus_goals()
 	_set_objective_list(%BonusGoalContainer, %BonusGoalSample, bonus_goals)
 	if bonus_goals.is_empty():
 		%BonusGoalPanel.hide()
