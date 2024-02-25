@@ -6,8 +6,6 @@
 [node name="PlayerAgent" type="Node" node_paths=PackedStringArray("interaction_handler")]
 script = ExtResource("1_av1s7")
 interaction_handler = NodePath("InteractionHandler")
-undo_stack_size = null
-enable_undo_after_move = null
 
 [node name="InteractionHandler" type="Node" parent="." node_paths=PackedStringArray("interactable")]
 script = ExtResource("2_3ia01")

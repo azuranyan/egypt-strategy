@@ -40,6 +40,10 @@ var level: Level
 var agents: Dictionary
 
 
+func _ready() -> void:
+	UnitEvents.damaged.connect(_on_unit_damaged)
+
+
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
 func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
@@ -646,7 +650,7 @@ func check_unit_move(unit: Unit, cell: Vector2) -> int:
 		
 	if Util.cell_distance(unit.cell(), cell) > unit.get_stat(&'mov'):
 		return OUT_OF_RANGE
-		
+	
 	return OK
 
 
@@ -676,6 +680,8 @@ func check_unit_attack(unit: Unit, attack: Attack, target: Vector2, rotation: fl
 		
 	var targets := 0
 	var has_valid_target := false
+	if attack.melee:
+		rotation = Map.to_facing(unit.get_heading()) - PI/2
 	for offs in attack.target_shape:
 		var m := Transform2D()
 		var t := m.translated(offs).rotated(rotation) * Vector2.ZERO + target
@@ -826,3 +832,8 @@ func is_valid_action(action: UnitAction, unit: Unit) -> bool:
 		return false
 	return unit.can_act()
 #endregion Actions
+
+
+func _on_unit_damaged(_unit: Unit, amount: int, _source: Variant) -> void:
+	if amount > 0:
+		get_active_battle_scene().shake_camera()

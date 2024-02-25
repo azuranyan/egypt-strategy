@@ -79,6 +79,10 @@ func _ready():
 		UnitEvents.state_changed.connect(_on_unit_state_changed)
 		UnitEvents.stat_changed.connect(_on_unit_stat_changed)
 		UnitEvents.damaged.connect(_on_unit_damaged)
+		UnitEvents.healed.connect(_on_unit_healed)
+		UnitEvents.status_effect_added.connect(_on_unit_status_effect_added)
+		UnitEvents.status_effect_removed.connect(_on_unit_status_effect_removed)
+		UnitEvents.status_effect_ticked.connect(_on_unit_status_effect_ticked)
 		UnitEvents.turn_flags_changed.connect(_on_unit_turn_flags_changed)
 	initialize(null)
 	assert(unit_model != null)
@@ -232,14 +236,19 @@ func _on_unit_damaged(_unit: Unit, amount: int, source: Variant):
 	if _unit != unit:
 		return
 	var color := Color.WHITE
-	if source == &'PSN':
+	if Util.is_equal(source, &'PSN'):
 		color = Color(0.949, 0.29, 0.949)
-	elif source == &'VUL':
+	elif Util.is_equal(source, &'VUL'):
 		color = Color(0.949, 0.949, 0.29)
 	else:
-		#camera.get_node("AnimationPlayer").play('shake') # battle will do the shake
 		color = Color(0.949, 0.29, 0.392)
 	play_floating_number(abs(amount), color)
+
+
+func _on_unit_healed(_unit: Unit, amount: int, _source: Variant):
+	if _unit != unit:
+		return
+	play_floating_number(abs(amount), Color('#71f253'))
 
 
 func _on_unit_turn_flags_changed(_unit: Unit):
@@ -248,4 +257,32 @@ func _on_unit_turn_flags_changed(_unit: Unit):
 	%EndTurnIcon.visible = _unit.is_turn_done()
 
 	
-	
+func _on_unit_status_effect_added(_unit: Unit, effect: StringName, _duration: int):
+	if _unit != unit:
+		return
+	get_status_effect_icon(effect).visible = true
+
+
+func _on_unit_status_effect_removed(_unit: Unit, effect: StringName):
+	if _unit != unit:
+		return
+	get_status_effect_icon(effect).visible = false
+
+
+func _on_unit_status_effect_ticked(_unit: Unit, _effect: StringName, _duration: int):
+	if _unit != unit:
+		return
+	pass # do something about it
+
+
+func get_status_effect_icon(effect: StringName) -> TextureRect:
+	match effect:
+		&'PSN':
+			return %PSNIcon
+		&'BLK':
+			return %BLKIcon
+		&'STN':
+			return %STNIcon
+		&'VUL':
+			return %VULIcon
+	return null

@@ -1,3 +1,4 @@
+class_name AttackSystem
 extends Node
 
 
@@ -13,12 +14,24 @@ signal attack_finished
 var handlers := {}
 
 
+## Returns the attack system instance.
+static func instance() -> AttackSystem:
+	assert(Game.attack_system != null)
+	return Game.attack_system
+
+
 ## Executes an attack.
 func execute_attack(state: AttackState) -> void:
 	attack_started.emit()
 
 	var timer := get_tree().create_timer(minimum_attack_time)
 	state.user.play_animation(state.attack.user_animation)
+
+	if state.attack.include_user:
+		state.target_cells.push_front(state.user.cell())
+		state.target_rotations.push_front(0)
+		state.target_units.push_front([state.user] as Array[Unit])
+		state.target_count += 1
 
 	for i in state.target_count:
 		apply_target_effects(state, i)
@@ -29,27 +42,32 @@ func execute_attack(state: AttackState) -> void:
 	if timer.time_left > 0:
 		await timer.timeout
 
-	state.user.play_animation('idle')
+	# todo this is using UnitImpl functions
+	state.user.set_state(Unit.State.IDLE)
 	for i in state.target_count:
 		for ts: Array[Unit] in state.target_units:
 			for t in ts:
-				t.play_animation('idle')
+				t.set_state(Unit.State.IDLE)
 
 	attack_finished.emit()
 
 
 ## Applies attack effects to the target units.
 func apply_target_effects(state: AttackState, target_index: int) -> void:
-	var process_effects := func(effects: Array[AttackEffect], filter: Callable):
-		for effect in effects:
-			for t in state.target_units[target_index]:
-				if filter.call(t):
-					dispatch_effect(state, target_index, effect, t)
+	process_effects.call(state, target_index, state.attack.self_effects, state.user.is_self)
+	process_effects.call(state, target_index, state.attack.ally_effects, state.user.is_ally)
+	process_effects.call(state, target_index, state.attack.enemy_effects, state.user.is_enemy)
 
-	process_effects.call(state.attack.self_effects, state.user.is_self)
-	process_effects.call(state.attack.ally_effects, state.user.is_ally)
-	process_effects.call(state.attack.enemy_effects, state.user.is_enemy)
 
+## Processes an attack effect.
+func process_effects(state: AttackState, target_index: int, effects: Array[AttackEffect], filter: Callable) -> void:
+	for effect in effects:
+		if not effect:
+			continue
+		for t in state.target_units[target_index]:
+			if filter.call(t):
+				dispatch_effect(state, target_index, effect, t)
+				
 
 @warning_ignore("redundant_await")
 ## Dispatches a single instance of attack to a unit.

@@ -11,3 +11,6 @@ extends AttackEffect
 
 ## The name of the target node to spawn this effect on. Defaults to the unit origin if not found.
 @export var target: StringName
+
+## If true, the sprite will be drawn over the unit.
+@export var draw_over_unit: bool = true

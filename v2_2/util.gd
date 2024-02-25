@@ -42,7 +42,12 @@ static func is_f6(_node: Node) -> bool:
 	# 	return node.get_tree().current_scene.scene_file_path != ProjectSettings.get_setting("application/run/main_scene")
 	return false
 	
+
+## Type safe equality check.
+static func is_equal(a, b) -> bool:
+	return typeof(a) == typeof(b) and a == b
 	
+
 ## Returns true a is closer than b from c.[br]
 ## Can be used with [code]is_closer.bind(start)[/code] for comparing two points.
 static func is_closer(a: Vector2, b: Vector2, c: Vector2) -> bool:

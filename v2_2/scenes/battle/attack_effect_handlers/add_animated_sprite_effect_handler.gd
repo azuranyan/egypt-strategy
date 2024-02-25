@@ -12,6 +12,8 @@ func execute(state: AttackState, target_index: int, attack_effect: AttackEffect,
 	var anim := AnimatedSprite2D.new()
 	anim.sprite_frames = attack_effect.sprite_frames
 	anim.animation = attack_effect.animation
+	if attack_effect.draw_over_unit:
+		anim.z_index += 1
 	target.attach(anim, attack_effect.target)
 	anim.play()
 	await anim.animation_finished

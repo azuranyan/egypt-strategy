@@ -192,7 +192,7 @@ offset_bottom = 519.0
 script = ExtResource("17_wovx7")
 adjacent = [NodePath("../../TerritoryButton/Zetennu"), NodePath("../../TerritoryButton6/Satayi"), NodePath("../../TerritoryButton8/Medjed\'s Beacon")]
 maps = Array[PackedScene]([ExtResource("19_mec2q")])
-_unit_list = PackedStringArray("cultist_axe", "cultist_sword", "cultist_priest")
+_unit_list = PackedStringArray("cultist_axe", "cultist_axe", "cultist_sword", "cultist_sword", "cultist_spear", "cultist_priest")
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("16_0hx7d")]
 offset_left = 1088.0

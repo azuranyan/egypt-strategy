@@ -41,6 +41,9 @@ var available_scenes: Dictionary
 ## Reference to the [Battle] system.
 var battle: Battle
 
+## Reference to the [AttackSystem].
+var attack_system: AttackSystem
+
 ## Reference to the [Dialog] aka event system.
 var dialog: Variant
 
@@ -88,6 +91,11 @@ func _ready():
 	battle.name = 'Battle'
 	add_child(battle)
 	battle.owner = self
+
+	attack_system = load('res://scenes/battle/attack_system.tscn').instantiate()
+	attack_system.name = 'AttackSystem'
+	add_child(attack_system)
+	attack_system.owner = self
 
 	audio_stream_player = AudioStreamPlayer2D.new()
 	add_child(audio_stream_player)

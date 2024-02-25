@@ -24,4 +24,4 @@ func execute(state: AttackState, target_index: int, attack_effect: AttackEffect,
 		if roll >= chances[i].x and roll < chances[i].y:
 			entry = attack_effect.effects[i]
 	
-	await entry.effect.execute(state, target_index, attack_effect, target)
+	await AttackSystem.instance().dispatch_effect(state, target_index, entry.effect, target)

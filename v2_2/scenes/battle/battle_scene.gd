@@ -121,3 +121,7 @@ func battle_result_message(result: BattleResult) -> String:
 				return 'Territory Surrendered.'
 	return ''
 	
+
+## Shakes the camera.
+func shake_camera() -> void:
+	camera.get_node('AnimationPlayer').play('shake')

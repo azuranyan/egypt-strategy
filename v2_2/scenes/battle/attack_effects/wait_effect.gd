@@ -5,7 +5,7 @@ extends AttackEffect
 
 
 ## The type of wait effect.
-@export_enum('duration', 'signal') var type: String:
+@export_enum('duration', 'signal') var type: String = 'duration':
 	set(value):
 		type = value
 		notify_property_list_changed()

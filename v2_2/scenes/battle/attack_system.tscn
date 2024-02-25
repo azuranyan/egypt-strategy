@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bq4nhgbc7w0kr"]
+[gd_scene load_steps=19 format=3 uid="uid://bq4nhgbc7w0kr"]
 
 [ext_resource type="Script" path="res://scenes/battle/attack_system.gd" id="1_6vmsv"]
 [ext_resource type="SpriteFrames" uid="uid://qa2cwjttcrf5" path="res://scenes/battle/attack_effects/data/default_effects.tres" id="2_stmnk"]
@@ -6,8 +6,10 @@
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/debug_print_effect_handler.gd" id="4_w1mws"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/add_animated_sprite_effect_handler.gd" id="5_2nk82"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/backstab_effect_handler.gd" id="5_4gnlu"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/add_status_effect_handler.gd" id="5_lfr1c"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/charge_effect_handler.gd" id="6_waejk"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/damage_effect_handler.gd" id="7_706s6"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/conditional_effect_handler.gd" id="7_gycgq"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/heal_effect_handler.gd" id="9_35waw"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/knockback_effect_handler.gd" id="10_1ubuh"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/move_effect_handler.gd" id="11_ertuk"]
@@ -17,8 +19,10 @@
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/sequence_effect_handler.gd" id="15_uk25h"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effect_handlers/wait_effect_handler.gd" id="16_e2r1o"]
 
-[node name="AttackSystem" type="Node"]
+[node name="AttackSystem" type="Node" node_paths=PackedStringArray("null_effect_handler")]
 script = ExtResource("1_6vmsv")
+minimum_attack_time = 1.4
+null_effect_handler = NodePath("NullEffectHandler")
 
 [node name="DefaultEffectsPreview" type="AnimatedSprite2D" parent="."]
 position = Vector2(-3, 0)
@@ -31,8 +35,14 @@ script = ExtResource("2_xk3uo")
 [node name="AddAnimatedSpriteEffectHandler" type="Node" parent="."]
 script = ExtResource("5_2nk82")
 
+[node name="AddStatusEffectHandler" type="Node" parent="."]
+script = ExtResource("5_lfr1c")
+
 [node name="BackstabEffectHandler" type="Node" parent="."]
 script = ExtResource("5_4gnlu")
+
+[node name="ConditionalEffectHandler" type="Node" parent="."]
+script = ExtResource("7_gycgq")
 
 [node name="ChargeEffectHandler" type="Node" parent="."]
 script = ExtResource("6_waejk")

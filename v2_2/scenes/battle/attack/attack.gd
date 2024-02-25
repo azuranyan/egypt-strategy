@@ -45,6 +45,11 @@ enum {
 ## Melee targeting mode.
 @export var melee: bool
 
+## Automatically include user in the target units.
+## This will cause the user to be hit once with the self_effects.
+## If set to true and the user is also included in the target units, will cause it to hit twice.
+@export var include_user: bool
+
 ## Attack target flags.
 @export_flags("Self:1", "Ally:2", "Enemy:4") var target_flags: int = TARGET_ENEMY
 

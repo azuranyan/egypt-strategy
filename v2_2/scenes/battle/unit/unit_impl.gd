@@ -331,12 +331,14 @@ func attack_range_cells(attack: Attack) -> PackedVector2Array:
 
 ## Returns an array of cells in the target aoe.
 func attack_target_cells(attack: Attack, target: Vector2, target_rotation: float) -> PackedVector2Array:
+	if attack.melee:
+		target_rotation = Map.to_facing(get_heading()) - PI/2
 	return attack.get_target_cells(target, target_rotation)
 	
 
 ## Returns an array of units in the target aoe.
 func attack_target_units(attack: Attack, target_cell: Vector2, target_rotation: float) -> Array[Unit]:
-	var cells := attack.get_target_cells(target_cell, target_rotation)
+	var cells := attack_target_cells(attack, target_cell, target_rotation)
 	var arr: Array[Unit] = []
 	for c in cells:
 		var u := Battle.instance().get_unit_at(c)
@@ -393,7 +395,7 @@ func tick_status_effects() -> void:
 		_status_effects[effect] -= 1
 		if _status_effects[effect] <= 0:
 			expired_effects.append(effect)
-		UnitEvents.status_effect_ticked.emit(self, effect)
+		UnitEvents.status_effect_ticked.emit(self, effect, _status_effects[effect])
 	for effect in expired_effects:
 		remove_status_effect(effect)
 	
@@ -485,7 +487,7 @@ func is_valid_target() -> bool:
 
 ## Returns true if unit can path over cell.
 func is_pathable(_cell: Vector2) -> bool:
-	if _cell == Map.OUT_OF_BOUNDS:
+	if not Battle.instance().world_bounds().has_point(_cell):
 		return false
 	for pathable in Battle.instance().get_pathables_at(_cell):
 		if not pathable.is_pathable(self):
@@ -631,11 +633,17 @@ func take_damage(amount: int, source: Variant) -> void:
 	# emit more specific signal
 	UnitEvents.damaged.emit(self, amount, source)
 	
+	# TODO play_animation_effect workaround
+	var old_model_state := map_object.unit_model.state
+
 	# hurt animation
 	var old_state := _state
 	set_state(State.HURT)
 	await map_object.unit_model.animation_finished
 	set_state(old_state)
+
+	# TODO play_animation_effect workaround
+	map_object.unit_model.state = old_model_state
 	
 	# die
 	if get_stat(&'hp') <= 0:
@@ -685,7 +693,7 @@ func execute_attack(attack_state: AttackState) -> void:
 	set_state(State.ATTACKING)
 
 	# execute attack
-	await AttackSystem.execute_attack(attack_state)
+	await AttackSystem.instance().execute_attack(attack_state)
 
 	set_state(old_state)
 	UnitEvents.attack_finished.emit(self)

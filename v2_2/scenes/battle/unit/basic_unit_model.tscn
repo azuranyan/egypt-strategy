@@ -23,8 +23,7 @@ position = Vector2(-4, -76)
 position = Vector2(0, -38)
 scale = Vector2(0.575, 0.575)
 sprite_frames = ExtResource("2_kix1i")
-animation = &"front_idle"
-frame_progress = 1.0
+animation = &"back_attack"
 
 [node name="MouseDetector" type="Area2D" parent="."]
 

@@ -13,7 +13,7 @@ func execute(state: AttackState, target_index: int, attack_effect: AttackEffect,
 	if attack_effect.speed == 0:
 		state.user.set_position(new_pos)
 	else:
-		var duration: float = attack_effect.speed/state.user.get_position().distance_to(new_pos)
+		var duration: float = state.user.get_position().distance_to(new_pos)/attack_effect.speed
 		var tween := create_tween()
 		tween.tween_property(target.get_map_object(), 'map_position', new_pos, duration)
 

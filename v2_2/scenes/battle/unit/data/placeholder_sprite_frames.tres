@@ -138,7 +138,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("2_pesp0")
 }],
-"loop": true,
+"loop": false,
 "name": &"back_idle",
 "speed": 5.0
 }, {

@@ -348,7 +348,6 @@ func interact_move_cursor(cell: Vector2):
 			multicast_targets[-1] = cell
 			mutlicast_rotations[-1] = 0
 			last_target_cell = fix_melee_targeting(selected_unit, active_attack, multicast_targets, mutlicast_rotations, last_target_cell)
-
 			battle.draw_unit_attack_target(selected_unit, active_attack, multicast_targets, mutlicast_rotations)
 
 
@@ -389,7 +388,8 @@ func interact_select_cell(cell: Vector2):
 				interact_select_unit(null)
 
 		STATE_BATTLE_SELECTING_TARGET:
-			interact_select_target(cell)
+			last_target_cell = fix_melee_targeting(selected_unit, active_attack, multicast_targets, mutlicast_rotations, last_target_cell)
+			interact_select_target(last_target_cell)
 
 
 ## Selects the unit.
@@ -486,8 +486,10 @@ func interact_select_attack(attack: Attack):
 	draw_unit_overlays(selected_unit, attack)
 
 	if attack:
-		multicast_targets[-1] = selected_unit.cell() + Map.DIRECTIONS[selected_unit.get_heading()] * selected_unit.attack_range(attack)
-		battle.set_cursor_pos(multicast_targets[-1])
+		if attack.melee:
+			multicast_targets[-1] = selected_unit.cell() + Map.DIRECTIONS[selected_unit.get_heading()] * selected_unit.attack_range(attack)
+			battle.set_cursor_pos(multicast_targets[-1])
+		battle.draw_unit_attack_target(selected_unit, attack, multicast_targets, mutlicast_rotations)
 
 
 ## Selects the attack target.
