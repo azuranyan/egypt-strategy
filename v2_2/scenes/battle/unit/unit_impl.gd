@@ -226,7 +226,7 @@ func set_empire(empire: Empire) -> void:
 	
 ## Returns true if another unit is an enemy.
 func is_enemy(other: Unit) -> bool:
-	return not is_ally(other)
+	return (other != self) and (other.get_empire() != self.get_empire())
 	
 	
 ## Returns true if another unit is an ally.

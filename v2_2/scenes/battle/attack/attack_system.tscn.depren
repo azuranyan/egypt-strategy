@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://f1wax26p15ed"]
 
-[ext_resource type="Script" path="res://scenes/battle/attack/attack_system.gd" id="1_x58b2"]
+[ext_resource type="Script" path="res://scenes/battle/attack_system.gd" id="1_x58b2"]
 [ext_resource type="Script" path="res://scenes/battle/attack/attack_effect_handler.gd" id="2_xk3uo"]
 
 [sub_resource type="GDScript" id="GDScript_1tivj"]

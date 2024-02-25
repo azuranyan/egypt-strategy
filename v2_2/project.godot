@@ -22,7 +22,7 @@ Persistent="*res://scenes/common/persistent.gd"
 SceneManager="*res://scene_manager.gd"
 SaveManager="*res://save_manager.gd"
 UnitEvents="*res://scenes/battle/unit/unit_events.gd"
-AttackSystem="*res://scenes/battle/attack/attack_system.tscn"
+AttackSystem="*res://scenes/battle/attack_system.tscn"
 Game="*res://game.gd"
 
 [display]

@@ -683,7 +683,7 @@ func check_unit_attack(unit: Unit, attack: Attack, target: Vector2, rotation: fl
 		if not u:
 			continue
 		targets += 1
-		if ((attack.target_flags & 1) and self == u
+		if ((attack.target_flags & 1) and unit.is_self(u)
 			or (attack.target_flags & 2) and unit.is_ally(u)
 			or (attack.target_flags & 4) and unit.is_enemy(u)):
 			has_valid_target = true

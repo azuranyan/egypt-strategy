@@ -523,6 +523,7 @@ func interact_select_target(cell: Vector2):
 		update_message_box(message.get(err, ""))
 
 
+@warning_ignore("redundant_await")
 func use_attack(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]):
 	battle.clear_overlays()
 	clear_undo_stack()
@@ -860,6 +861,7 @@ class UnitMoveAction extends Action:
 		target = _target
 		state = unit.save_state()
 
+	@warning_ignore("redundant_await")
 	func execute():
 		assert(agent.state == STATE_BATTLE_SELECTING_MOVE)
 		agent.selected_unit = null
