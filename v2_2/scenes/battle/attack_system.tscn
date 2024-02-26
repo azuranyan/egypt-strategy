@@ -21,7 +21,7 @@
 
 [node name="AttackSystem" type="Node" node_paths=PackedStringArray("null_effect_handler")]
 script = ExtResource("1_6vmsv")
-minimum_attack_time = 1.4
+minimum_attack_time = 1.2
 null_effect_handler = NodePath("NullEffectHandler")
 
 [node name="DefaultEffectsPreview" type="AnimatedSprite2D" parent="."]

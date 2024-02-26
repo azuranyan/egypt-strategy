@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://bpgc3ekatrfo6"]
 
 [ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_26ksc"]
-[ext_resource type="Resource" uid="uid://b4o7ju1g3bra2" path="res://units/ishtar/ishtar_magic.tres" id="1_cbkc0"]
-[ext_resource type="Resource" uid="uid://de5soqmslvwca" path="res://units/ishtar/ishtar_long_range.tres" id="3_hdy5t"]
+[ext_resource type="Resource" uid="uid://b4o7ju1g3bra2" path="res://units/ishtar/ishtar_magic_missile.tres" id="1_cbkc0"]
+[ext_resource type="Resource" uid="uid://de5soqmslvwca" path="res://units/ishtar/ishtar_magic.tres" id="1_nhstk"]
 
 [resource]
 script = ExtResource("1_26ksc")
@@ -24,6 +24,5 @@ stat_growth_2 = {
 "mov": 1,
 "rng": 0
 }
-basic_attack = ExtResource("1_cbkc0")
-special_attack = ExtResource("3_hdy5t")
-
+basic_attack = ExtResource("1_nhstk")
+special_attack = ExtResource("1_cbkc0")

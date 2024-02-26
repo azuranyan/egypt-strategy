@@ -24,7 +24,7 @@ enum {
 ## Description args for formatting.
 @export var description_args: Dictionary
 
-@export_subgroup('Effect')
+@export_group('Casting')
 
 ## UnitState animation played for the user.
 @export var user_animation: String = 'attack'
@@ -32,27 +32,36 @@ enum {
 ## Allows the attack to be queued more than once.
 @export var multicast: int
 
+## Maximum range of the attack.
+@export var max_range: int = -1
+
+## Minimum range of the attack.
+@export var min_range: int
+
+@export_group('Effects')
+
+## Automatically include user in the target units causing [member self_effects] to
+## trigger immediately. If set to true and the user is also included in the target
+## units, will cause it to trigger again.
+@export var include_user: bool
+
 ## List of attack effects.
 @export var self_effects: Array[AttackEffect] = []
 
 ## List of attack effects.
-@export var enemy_effects: Array[AttackEffect] = []
-
-## List of attack effects.
 @export var ally_effects: Array[AttackEffect] = []
 
-@export_subgroup('Targeting')
+## List of attack effects.
+@export var enemy_effects: Array[AttackEffect] = []
 
-## Shape of the targeting cursor.
+@export_group('Targeting')
+
+## Shape of the targeted area.
 @export var target_shape: Array[Vector2i] = [Vector2i(0, 0)]
 
-## Melee targeting mode.
+## Melee targeting mode. Melee attacks cannot be rotated and can only target
+## [member max_range] in the direction the unit is facing.
 @export var melee: bool
-
-## Automatically include user in the target units.
-## This will cause the user to be hit once with the self_effects.
-## If set to true and the user is also included in the target units, will cause it to hit twice.
-@export var include_user: bool
 
 ## Attack target flags.
 @export_flags("Self:1", "Ally:2", "Enemy:4") var target_flags: int = TARGET_ENEMY
@@ -60,13 +69,7 @@ enum {
 ## Whether rotation is allowed.
 @export var allow_rotation: bool
 
-## Range of the attack.
-@export var max_range: int = -1
 
-## Minimum range of the attack.
-@export var min_range: int
-
-	
 ## Returns true if attack is multicast.
 func is_multicast() -> bool:
 	return multicast > 0

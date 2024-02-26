@@ -4,6 +4,8 @@ extends AttackEffect
 ## Represents an effect that executes a list of effects in sequence.
 
 
-# TODO change this so it's much nicer to edit as a table.
-## The list of effects and their weights.
-@export var effects: Array[RandomEffectEntry]
+## The effects to be chosen in random.
+@export var effects: Array[AttackEffect]
+
+## The weights of the effects.
+@export var effect_weights: Array[float]

@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://8gp5w174r76j"]
 
 [ext_resource type="Resource" uid="uid://cmv06wyvg0mm" path="res://units/placeholder/basic_melee.tres" id="1_pserv"]
-[ext_resource type="Resource" uid="uid://dokspd24u3mo6" path="res://units/placeholder/special_attack.tres" id="3_dhehh"]
 [ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="3_gyjdn"]
+[ext_resource type="Resource" uid="uid://b17ojfspfspve" path="res://units/placeholder/basic_ranged.tres" id="3_rmpne"]
 [ext_resource type="PackedScene" uid="uid://diawd3fxwy2cy" path="res://scenes/battle/unit/basic_unit_model.tscn" id="4_acqmv"]
 
 [resource]
@@ -27,4 +27,4 @@ stat_growth_2 = {
 "rng": 0
 }
 basic_attack = ExtResource("1_pserv")
-special_attack = ExtResource("3_dhehh")
+special_attack = ExtResource("3_rmpne")

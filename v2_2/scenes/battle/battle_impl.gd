@@ -187,7 +187,7 @@ func _real_battle_main():
 				_next_state = State.TURN_START
 
 			State.TURN_START:
-				if last_acting_unit:
+				if is_instance_valid(last_acting_unit):
 					await set_camera_target(last_acting_unit.get_map_object().position)
 				get_active_battle_scene().hud_visibility_control.show()
 				await hud().show_turn_banner(1)

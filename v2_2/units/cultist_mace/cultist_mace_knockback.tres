@@ -1,20 +1,46 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=2 format=3 uid="uid://h688s6x0t0o6"]
+[gd_resource type="Resource" script_class="Attack" load_steps=11 format=3 uid="uid://h688s6x0t0o6"]
 
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_animated_sprite_effect.gd" id="1_qev4q"]
 [ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="1_xmgfu"]
+[ext_resource type="SpriteFrames" uid="uid://qa2cwjttcrf5" path="res://scenes/battle/attack_effects/data/default_effects.tres" id="2_xnv4r"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/play_animation_effect.gd" id="3_r3kp8"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/damage_effect.gd" id="4_u1cd2"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/knockback_effect.gd" id="5_eneas"]
+
+[sub_resource type="Resource" id="Resource_bwnkh"]
+script = ExtResource("1_qev4q")
+sprite_frames = ExtResource("2_xnv4r")
+animation = &"basic_damage"
+target = &"body"
+draw_over_unit = true
+
+[sub_resource type="Resource" id="Resource_ym2ek"]
+script = ExtResource("3_r3kp8")
+animation = &"hurt"
+
+[sub_resource type="Resource" id="Resource_kdmfk"]
+script = ExtResource("4_u1cd2")
+amount = 1
+stat = "none"
+
+[sub_resource type="Resource" id="Resource_5su64"]
+script = ExtResource("5_eneas")
+distance = 1
 
 [resource]
 script = ExtResource("1_xmgfu")
 name = "Knockback"
-description = ""
+description = "Hits the enemy with such force it pushes them back."
+description_args = {}
 user_animation = "attack"
 multicast = 0
 self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
-enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_bwnkh"), SubResource("Resource_ym2ek"), SubResource("Resource_kdmfk"), SubResource("Resource_5su64")])
 ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 melee = true
-targeting = 4
+include_user = false
+target_flags = 4
 allow_rotation = false
 max_range = -1
 min_range = 0
-
