@@ -11,6 +11,7 @@ format = "{user} effect {target}"
 script = ExtResource("2_exbvb")
 name = "Special Attack"
 description = "Description"
+description_args = {}
 user_animation = "attack"
 multicast = 0
 self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])

@@ -1,0 +1,217 @@
+[gd_scene load_steps=9 format=3 uid="uid://t3wfofdlp4c5"]
+
+[ext_resource type="Texture2D" uid="uid://ck03hqx5x7dh2" path="res://scenes/overworld/data/star-filled.svg" id="1_4b4dq"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_5e8eq"]
+[ext_resource type="Script" path="res://scenes/strategy_room/unit_info_card.gd" id="1_oemr1"]
+[ext_resource type="Texture2D" uid="uid://dei0k2jtdml5u" path="res://scenes/overworld/data/star.svg" id="2_kmbo0"]
+[ext_resource type="PackedScene" uid="uid://kq1wdgrlo1cv" path="res://scenes/strategy_room/stat_line.tscn" id="3_bbdyj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ur1ag"]
+content_margin_left = 20.0
+content_margin_top = 4.0
+content_margin_right = 20.0
+bg_color = Color(0, 0, 0, 0.27451)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_abl4x"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+draw_center = false
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.368627)
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_luk4m"]
+
+[node name="UnitInfoCard" type="VBoxContainer"]
+offset_left = 1278.0
+offset_top = 52.0
+offset_right = 1848.0
+offset_bottom = 605.0
+theme = ExtResource("1_5e8eq")
+theme_override_constants/separation = 5
+script = ExtResource("1_oemr1")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ur1ag")
+
+[node name="NameLabel" type="Label" parent="PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 32
+text = "Alara"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Details" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Details"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Details/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AvatarLabel" type="Label" parent="Details/VBoxContainer/Header/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Avatar of Horus"
+
+[node name="TitleLabel" type="Label" parent="Details/VBoxContainer/Header/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Boastful Bird God"
+
+[node name="StarContainer" type="HBoxContainer" parent="Details/VBoxContainer/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Star1" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("1_4b4dq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star2" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_kmbo0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star3" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_kmbo0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Body" type="PanelContainer" parent="Details/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_abl4x")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Details/VBoxContainer/Body"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Attacks" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="BasicAttackContainer" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Basic Attack"
+
+[node name="Label4" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
+modulate = Color(0.568627, 1.84706, 0.686275, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 2
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
+layout_mode = 2
+
+[node name="BasicAttackButton" type="Button" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/HBoxContainer5"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+toggle_mode = true
+button_group = SubResource("ButtonGroup_luk4m")
+text = "Fakeaway Shot"
+flat = true
+
+[node name="SpecialAttackContainer" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label3" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Special Attack"
+
+[node name="SpecialUnlockLabel" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
+unique_name_in_owner = true
+modulate = Color(0.568627, 1.84706, 0.686275, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Unlock!"
+horizontal_alignment = 2
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
+layout_mode = 2
+
+[node name="SpecialAttackButton" type="Button" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/HBoxContainer6"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+toggle_mode = true
+button_group = SubResource("ButtonGroup_luk4m")
+text = "Fakeaway Shot"
+flat = true
+
+[node name="StatLines" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatLine1" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+layout_mode = 2
+size_flags_vertical = 3
+stat = &"maxhp"
+custom_stat_text = "HP"
+stat_value = 2
+stat_modifier_value = 2
+
+[node name="StatLine2" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+layout_mode = 2
+size_flags_vertical = 3
+stat = &"dmg"
+
+[node name="StatLine3" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+layout_mode = 2
+size_flags_vertical = 3
+stat = &"rng"
+custom_stat_text = "Range"
+
+[node name="StatLine4" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+layout_mode = 2
+size_flags_vertical = 3
+stat = &"mov"
+custom_stat_text = "Move"

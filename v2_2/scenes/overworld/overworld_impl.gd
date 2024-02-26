@@ -20,12 +20,16 @@ var _ai_decision_function: Callable
 
 var _should_end: bool
 
+var new_event: StringName
+
+
 
 func _ready():
 	add_to_group('game_event_listeners')
 	set_ai_decision_function(null)
 
 	empire_defeated.connect(func(_e): if should_summon_boss(): summon_boss())
+	DialogueEvents.instance().new_event_unlocked.connect(func(ev): new_event = ev)
 	
 	
 func on_new_save(save: SaveState):
@@ -231,6 +235,12 @@ func _cont_wait_for_battle_result() -> void:
 func _cont_wait_for_defeat_events() -> void:
 	empire_defeated.emit(_defeated_empires.back())
 	await Game.wait_for_resume()
+	if new_event:
+		# TODO ugly handling
+		var ev := new_event
+		new_event = &''
+		DialogueEvents.instance().play_event(ev)
+		return 
 	return next(_cont_turn_end)
 	
 	

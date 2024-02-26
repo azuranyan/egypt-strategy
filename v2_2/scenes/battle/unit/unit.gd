@@ -209,7 +209,7 @@ func set_bond(_value: int) -> void:
 	
 
 ## Returns the bond level.
-func get_bond() -> bool:
+func get_bond() -> int:
 	assert(false, 'not implemented')
 	return false
 	

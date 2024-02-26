@@ -1,32 +1,88 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=6 format=3 uid="uid://drsecgj7cg1ne"]
+[gd_resource type="Resource" script_class="Attack" load_steps=21 format=3 uid="uid://drsecgj7cg1ne"]
 
 [ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="1_2q4pf"]
 [ext_resource type="Script" path="res://scenes/battle/attack_effects/debug_print_effect.gd" id="1_av2c0"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/heal_effect.gd" id="2_ndrat"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/damage_effect.gd" id="3_drxhf"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/play_animation_effect.gd" id="3_xqh4v"]
+[ext_resource type="Script" path="res://resource_property_access.gd" id="4_puoac"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_animated_sprite_effect.gd" id="5_acitn"]
+[ext_resource type="SpriteFrames" uid="uid://qa2cwjttcrf5" path="res://scenes/battle/attack_effects/data/default_effects.tres" id="6_22k37"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_status_effect.gd" id="7_yn5ql"]
 
 [sub_resource type="Resource" id="Resource_w8lms"]
 script = ExtResource("1_av2c0")
-format = "{user} effect {target}"
+format = "ALLY {user} effect {target}"
+
+[sub_resource type="Resource" id="Resource_1n1dh"]
+script = ExtResource("2_ndrat")
+amount = 1
+stat = "none"
+stat_multiplier = 0.0
+
+[sub_resource type="Resource" id="Resource_d8tj3"]
+script = ExtResource("3_drxhf")
+amount = 2
+stat = "damage"
+stat_multiplier = 1.0
+
+[sub_resource type="Resource" id="Resource_im52h"]
+script = ExtResource("4_puoac")
+resource = SubResource("Resource_d8tj3")
+property = &"amount"
+
+[sub_resource type="Resource" id="Resource_lkaxd"]
+script = ExtResource("4_puoac")
+resource = SubResource("Resource_d8tj3")
+property = &"stat_multiplier"
+
+[sub_resource type="Resource" id="Resource_8lytb"]
+script = ExtResource("3_xqh4v")
+animation = &"hurt"
 
 [sub_resource type="Resource" id="Resource_sg6we"]
 script = ExtResource("1_av2c0")
-format = "{user} effect {target}"
+format = "ENEMY {user} effect {target}"
+
+[sub_resource type="Resource" id="Resource_j233w"]
+script = ExtResource("5_acitn")
+sprite_frames = ExtResource("6_22k37")
+animation = &"basic_damage"
+target = &"grab_point"
+draw_over_unit = true
 
 [sub_resource type="Resource" id="Resource_n4vjy"]
 script = ExtResource("1_av2c0")
-format = "{user} effect {target}"
+format = "SELF {user} effect {target}"
+
+[sub_resource type="Resource" id="Resource_yoy5p"]
+script = ExtResource("2_ndrat")
+amount = 0
+stat = "hp"
+stat_multiplier = 1.0
+
+[sub_resource type="Resource" id="Resource_0smpg"]
+script = ExtResource("7_yn5ql")
+effect = "BLK"
+_duration = -1
 
 [resource]
 script = ExtResource("1_2q4pf")
 name = "Attack"
-description = "Deals damage from range."
+description = "Deals {base_damage} damage plus {stat_damage}x DMG from range."
+description_args = {
+"base_damage": SubResource("Resource_im52h"),
+"stat_damage": SubResource("Resource_lkaxd")
+}
 user_animation = "attack"
 multicast = 0
-self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_n4vjy")])
-enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_sg6we")])
-ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_w8lms")])
-target_shape = Array[Vector2i]([Vector2i(0, 0)])
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_n4vjy"), SubResource("Resource_yoy5p"), SubResource("Resource_0smpg")])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_8lytb"), SubResource("Resource_sg6we"), SubResource("Resource_j233w"), SubResource("Resource_d8tj3")])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_w8lms"), SubResource("Resource_1n1dh")])
+target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)])
 melee = false
-target_flags = 4
+include_user = true
+target_flags = 7
 allow_rotation = false
-max_range = -1
-min_range = 0
+max_range = 10
+min_range = 1

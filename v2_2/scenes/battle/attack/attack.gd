@@ -1,3 +1,4 @@
+@tool
 class_name Attack
 extends Resource
 
@@ -17,8 +18,11 @@ enum {
 ## Display name of the attack.
 @export var name: String
 
-## Flavor text description.
+## Unformatted flavor text description. Use [method get_formatted_description] for formatted description.
 @export_multiline var description: String
+
+## Description args for formatting.
+@export var description_args: Dictionary
 
 @export_subgroup('Effect')
 
@@ -103,3 +107,11 @@ func get_target_cells(target: Vector2, target_rotation: float) -> PackedVector2A
 ## Returns the name of this attack.
 func _to_string() -> String:
 	return name
+
+
+## Returns formatted description.
+func get_formatted_description(env := {}) -> String:
+	var combined_args := description_args.duplicate()
+	combined_args.merge(env, false)
+	var colored_description := description.replace('{', '[color=#111111]{').replace('}', '}[/color]')
+	return colored_description.format(combined_args)

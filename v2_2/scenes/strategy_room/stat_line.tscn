@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://kq1wdgrlo1cv"]
+
+[ext_resource type="Script" path="res://scenes/strategy_room/stat_line.gd" id="1_67pq6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htud3"]
+draw_center = false
+
+[node name="StatLine1" type="PanelContainer"]
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_htud3")
+script = ExtResource("1_67pq6")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatNameLabel" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "HP"
+
+[node name="StatValueLabel" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "0"
+horizontal_alignment = 2
+
+[node name="StatModifierLabel" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+modulate = Color(0.568627, 1.84706, 0.686275, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18

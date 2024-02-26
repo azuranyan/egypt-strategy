@@ -305,7 +305,7 @@ func set_bond(value: int) -> void:
 
 
 ## Returns the bond level.
-func get_bond() -> bool:
+func get_bond() -> int:
 	return _bond
 	
 	
