@@ -20,7 +20,7 @@ const TILE_COLORS := {
 
 ## List of conditional pathing. 
 ## If the default pathing rules need to be overridden, set [code]pathing_group[/code] to [code]Map.Pathing.None[/code]
-@export var conditions: Array[PathingCondition]
+@export var conditions: Array[PathingCondition] = [DefaultPathingCondition.new()]
 
 ## Whether this 
 @export var enabled: bool = true

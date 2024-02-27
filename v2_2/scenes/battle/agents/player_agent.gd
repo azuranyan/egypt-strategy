@@ -135,6 +135,8 @@ func _exit_state(_st: int):
 
 ## Starts the battle.
 func interact_start_battle():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	if not is_hero_deployed():
 		Game.create_pause_dialog('%s required.' % empire.leader_name(), 'Confirm', '')
@@ -144,12 +146,16 @@ func interact_start_battle():
 
 ## Ends the battle.
 func interact_quit():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	battle.show_forfeit_dialog()
 
 	
 ## Ends the turn (or prep phase).
 func interact_end():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	if not battle.is_battle_phase():
 		interact_start_battle()
@@ -159,6 +165,8 @@ func interact_end():
 
 ## Cancels current interaction.
 func interact_cancel():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 
 	match state:
@@ -209,6 +217,8 @@ func interact_cancel():
 
 ## Undo's action.
 func interact_undo():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	if dragged_unit: interact_stop_drag_unit()
 	if rotated_unit: interact_stop_rotate_unit()
@@ -219,6 +229,8 @@ func interact_undo():
 
 ## Starts unit rotate interaction.
 func interact_start_rotate_unit(unit: Unit):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	rotated_unit = unit
 	interact_select_unit(unit, false)
@@ -227,6 +239,8 @@ func interact_start_rotate_unit(unit: Unit):
 
 ## Stops unit rotate interaction.
 func interact_stop_rotate_unit():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	rotated_unit = null
 	interact_select_unit(null, false)
@@ -234,12 +248,16 @@ func interact_stop_rotate_unit():
 
 ## Rotates the unit to face the target cell.
 func interact_rotate_unit(target_cell: Vector2):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	rotated_unit.face_towards(target_cell)
 
 
 ## Starts unit drag interaction.
 func interact_start_drag_unit(unit: Unit):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	var from_unit_list := unit.get_position() == Map.OUT_OF_BOUNDS
 
@@ -259,6 +277,8 @@ func interact_start_drag_unit(unit: Unit):
 
 ## Stops unit drag interaction.
 func interact_stop_drag_unit():
+	if state == STATE_NONE:
+		return
 	update_message_box()
 
 	remove_ghost()
@@ -279,6 +299,8 @@ func interact_stop_drag_unit():
 
 ## Moves the unit.
 func interact_drag_unit(screen_pos: Vector2):
+	if state == STATE_NONE:
+		return
 	dragged_unit.set_global_position(battle.screen_to_global(screen_pos) - unit_drag_offset)
 	battle.set_cursor_pos(dragged_unit.cell())
 
@@ -294,6 +316,8 @@ func interact_drag_unit(screen_pos: Vector2):
 	
 ## Adds unit to play.
 func interact_place_unit(unit: Unit, cell: Vector2):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	var old_pos := unit.cell()
 	if is_spawn_cell(cell):
@@ -319,6 +343,8 @@ func interact_place_unit(unit: Unit, cell: Vector2):
 
 ## Removes unit from play.
 func interact_remove_unit(unit: Unit):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	if unit:
 		push_undo_action(RemoveUnitAction.new(unit))
@@ -326,6 +352,8 @@ func interact_remove_unit(unit: Unit):
 
 ## Moves pointer.
 func interact_move_pointer(screen_pos: Vector2):
+	if state == STATE_NONE:
+		return
 	var unit := interaction_handler.get_hovered_unit()
 
 	battle.level.cursor.unit_mode = unit and not rotated_unit and not dragged_unit and can_select(unit)
@@ -338,6 +366,8 @@ func interact_move_pointer(screen_pos: Vector2):
 
 ## Moves the cursor to the specified position.
 func interact_move_cursor(cell: Vector2):
+	if state == STATE_NONE:
+		return
 	battle.set_cursor_pos(cell)
 	match state:
 		STATE_BATTLE_SELECTING_MOVE:
@@ -371,6 +401,8 @@ func fix_melee_targeting(unit: Unit, attack: Attack, target: Array[Vector2], _ro
 
 ## Selects the cell.
 func interact_select_cell(cell: Vector2):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	battle.set_cursor_pos(cell)
 	match state:
@@ -394,6 +426,8 @@ func interact_select_cell(cell: Vector2):
 
 ## Selects the unit.
 func interact_select_unit(unit: Unit, draw_overlays := true):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 
 	if selected_unit:
@@ -463,6 +497,8 @@ func draw_unit_overlays(unit: Unit, attack: Attack = null):
 
 ## Selects the attack.
 func interact_select_attack(attack: Attack):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 
 	# allow regrabbing focus
@@ -494,6 +530,8 @@ func interact_select_attack(attack: Attack):
 
 ## Selects the attack target.
 func interact_select_target(cell: Vector2):
+	if state == STATE_NONE:
+		return
 	update_message_box()
 	# TODO target, rotation then -> multicast_target/rotation
 	multicast_targets[-1] = cell

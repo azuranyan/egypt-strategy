@@ -2,6 +2,9 @@ class_name Util
 ## Collection of utility functions that doesnt belong anywhere else.
 
 
+
+
+
 ## Simple do nothing function.
 static func do_nothing():
 	pass
@@ -108,28 +111,15 @@ static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
 	
 	
 ## Simple flood fill algorithm.
-static func flood_fill(cell: Vector2, max_distance: float, rect: Rect2, condition: Callable = func(_br): return true) -> PackedVector2Array:
-	var dest = PackedVector2Array()
-	
-	# for degen case where int <= 0 we skip
-	if max_distance > 0:
-		var stack := [cell]
-		
-		while not stack.is_empty():
-			var p: Vector2 = stack.pop_back()
-			
-			dest.append(p)
-			
-			for direction in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-				var q: Vector2 = p + direction
-				
-				if q in stack:
-					continue
-					
-				if q not in dest and rect.has_point(q) and cell_distance(q, cell) <= max_distance and condition.call(q):
-					stack.append(q)
-					
-	return dest
+static func flood_fill(cell: Vector2, rect: Rect2, max_dist: float, condition: Callable = Util.always_true) -> PackedVector2Array:
+	if max_dist> 0:
+		return CSUtil.FloodFill(cell, rect, max_dist, condition)
+	return []
+
+
+## A simple function that always returns true.
+static func always_true(_dummy) -> bool:
+	return true
 
 
 ## Returns the cell distance between two cells.

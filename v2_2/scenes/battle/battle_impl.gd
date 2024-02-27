@@ -500,6 +500,11 @@ func draw_unit_placeable_cells(unit: Unit, use_alt_color := false) -> void:
 	level.pathing_overlay.set_cells(cells, color)
 
 
+
+## horrible workaround until custom callables are supported in c# modules.
+var _bound_non_pathable_unit: Unit
+
+
 ## Draws non pathable cells that aren't solely units.
 func draw_unit_non_pathable_cells(unit: Unit) -> void:
 	level.map.pathing_painter.clear()
@@ -509,16 +514,17 @@ func draw_unit_non_pathable_cells(unit: Unit) -> void:
 			level.map.pathing_painter.set_cell(0, Vector2(x, y), 0, Vector2i(TileOverlay.TileColor.BLACK, 0))
 	
 	# erase pathable cells
-	var pathable_cells := Util.flood_fill(unit.cell(), 20, world_bounds(), _is_pathable_non_unit_cell.bind(unit))
+	_bound_non_pathable_unit = unit
+	var pathable_cells := Util.flood_fill(unit.cell(), world_bounds(), 20, _is_pathable_non_unit_cell)
 	for cell in pathable_cells:
 		level.map.pathing_painter.erase_cell(0, cell)
 	level.map.pathing_painter.z_index = 0
 	level.map.pathing_painter.visible = true
 
 
-func _is_pathable_non_unit_cell(cell: Vector2, unit: Unit) -> bool:
+func _is_pathable_non_unit_cell(cell: Vector2) -> bool:
 	for pathable in get_pathables_at(cell):
-		if pathable.pathing_group != Map.PathingGroup.UNIT and not pathable.is_pathable(unit):
+		if pathable.pathing_group != Map.PathingGroup.UNIT and not pathable.is_pathable(_bound_non_pathable_unit):
 			return false
 	return true
 	

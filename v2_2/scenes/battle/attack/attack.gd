@@ -91,7 +91,15 @@ func get_cells_in_range(cell: Vector2, unit_range: int) -> PackedVector2Array:
 			Vector2(cell.x - _range, cell.y),
 		]
 	else:
-		return Util.flood_fill(cell, _range, Util.bounds(Vector2(12, 12)))
+		var cells := Util.flood_fill(cell, Battle.instance().world_bounds(), _range)
+		if min_range > 0:
+			var re := PackedVector2Array()
+			for c in cells:
+				if Util.cell_distance(cell, c) > min_range:
+					re.append(c)
+			return re
+		else:
+			return cells
 
 
 ## Returns an array of cells in the target aoe.

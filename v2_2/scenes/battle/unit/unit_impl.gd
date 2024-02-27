@@ -626,12 +626,18 @@ func pathfind_to(target: Vector2) -> PackedVector2Array:
 
 ## Returns an array of cells this unit can path through.
 func get_pathable_cells(use_mov_stat := false) -> PackedVector2Array:
-	return Util.flood_fill(cell(), _stats.mov if use_mov_stat else 20, Game.battle.world_bounds(), is_pathable)
+	var max_dist: int = _stats.mov if use_mov_stat else 20
+	return CSUtil.FloodFill(cell(), Battle.instance().world_bounds(), max_dist, is_pathable)
 	
+
+func return_true(_a) -> bool:
+	return true
+
 
 ## Returns an array of cells this unit can be placed on.
 func get_placeable_cells() -> PackedVector2Array:
-	return Util.flood_fill(cell(), _stats.mov, Game.battle.world_bounds(), is_placeable)
+	#return CSUtil.FloodFill(cell(), _stats.mov, Battle.instance().world_bounds(), return_true)
+	return Util.flood_fill(cell(), Game.battle.world_bounds(), _stats.mov, is_placeable)
 	
 
 ## Makes unit take damage.
