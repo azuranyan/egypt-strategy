@@ -20,8 +20,12 @@ signal mouse_exited()
 signal clicked(mouse_pos: Vector2, button_index: int, pressed: bool)
 
 
+## The list of animations that cannot not be overridden.
+const PRIORITY_ANIMATIONS := [Unit.State.ATTACKING, Unit.State.WALKING, Unit.State.DYING, Unit.State.DEAD]
+
+
 ## The state of this model.
-@export var state := Unit.State.IDLE:
+@export var state: Unit.State:
 	set(value):
 		state = value
 		if not is_node_ready():
@@ -31,6 +35,8 @@ signal clicked(mouse_pos: Vector2, button_index: int, pressed: bool)
 ## Which direction this unit is facing.
 @export var heading: Map.Heading:
 	set(value):
+		if heading == value:
+			return
 		heading = value
 		if not is_node_ready():
 			await ready
@@ -57,6 +63,7 @@ signal clicked(mouse_pos: Vector2, button_index: int, pressed: bool)
 @export var grab_point: Node2D
 
 var _mouse_button_mask := 0
+var _state_override := Unit.State.INVALID
 
 
 func _ready():
@@ -78,8 +85,31 @@ func _emit_animation_finished():
 
 ## Updates the animation to match the current state.
 func update_animation():
-	sprite.play(get_animation_name(state))
+	if state in PRIORITY_ANIMATIONS or _state_override == Unit.State.INVALID:
+		sprite.play(get_animation_name(state))
 	
+
+## Plays the animation directly. Won't work if a priority animation is playing.
+func play_animation_override(anim_name: String):
+	const ANIM_STATES := {
+		attack = Unit.State.ATTACKING,
+		idle = Unit.State.IDLE,
+		walking = Unit.State.WALKING,
+		hurt = Unit.State.HURT,
+		dying = Unit.State.DYING,
+		dead = Unit.State.DEAD,
+	}
+	if state not in PRIORITY_ANIMATIONS:
+		_state_override = ANIM_STATES.get(anim_name, Unit.State.IDLE)
+		sprite.play(get_animation_name(_state_override))
+
+
+## Stops the animation override.
+func stop_animation_override():
+	if _state_override:
+		_state_override = Unit.State.INVALID
+		update_animation()
+
 	
 ## Returns the animation name for a given state.
 func get_animation_name(_state: Unit.State) -> StringName:

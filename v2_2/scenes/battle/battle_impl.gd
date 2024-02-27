@@ -194,9 +194,6 @@ func _real_battle_main():
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
 
 				for u in Game.get_empire_units(on_turn()):
-					u.set_has_attacked(false)
-					u.set_has_moved(false)
-					u.set_turn_done(false)
 					u.tick_status_effects()
 
 				turn_started.emit(on_turn())
@@ -210,8 +207,14 @@ func _real_battle_main():
 				clear_overlays()
 				
 				for u in Game.get_empire_units(on_turn()):
+					# idle heal
 					if not u.has_taken_action():
 						u.restore_health(get_config_value('idle_heal_value'), self)
+
+					# reset flags
+					u.set_has_attacked(false)
+					u.set_has_moved(false)
+					u.set_turn_done(false)
 
 				var empire: Empire = _turn_queue.pop_front()
 				turn_ended.emit(empire)

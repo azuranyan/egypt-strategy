@@ -13,15 +13,16 @@ animation = &"basic_damage"
 target = &"body"
 draw_over_unit = true
 
-[sub_resource type="Resource" id="Resource_7qms1"]
-script = ExtResource("3_x06qy")
-animation = &"hurt"
-
 [sub_resource type="Resource" id="Resource_al0lh"]
 script = ExtResource("4_0263h")
 amount = 0
 stat = "damage"
 stat_multiplier = 1.0
+
+[sub_resource type="Resource" id="Resource_7qms1"]
+script = ExtResource("3_x06qy")
+animation = &"hurt"
+hold_condition = 2
 
 [resource]
 script = ExtResource("2_0g5i5")
@@ -35,7 +36,7 @@ min_range = 0
 include_user = false
 self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
 ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
-enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_pa1q2"), SubResource("Resource_7qms1"), SubResource("Resource_al0lh")])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_pa1q2"), SubResource("Resource_al0lh"), SubResource("Resource_7qms1")])
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
 melee = true
 target_flags = 4

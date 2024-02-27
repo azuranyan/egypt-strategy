@@ -34,6 +34,7 @@ func execute_attack(state: AttackState) -> void:
 		state.target_count += 1
 
 	for i in state.target_count:
+		state.target_index = i
 		apply_target_effects(state, i)
 
 	while state.active_effects_count > 0:
@@ -41,13 +42,6 @@ func execute_attack(state: AttackState) -> void:
 
 	if timer.time_left > 0:
 		await timer.timeout
-
-	# todo this is using UnitImpl functions
-	state.user.set_state(Unit.State.IDLE)
-	for i in state.target_count:
-		for ts: Array[Unit] in state.target_units:
-			for t in ts:
-				t.set_state(Unit.State.IDLE)
 
 	attack_finished.emit()
 

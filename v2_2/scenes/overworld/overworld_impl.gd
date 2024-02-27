@@ -220,10 +220,13 @@ func _cont_wait_for_battle_result() -> void:
 	await get_active_overworld_scene().show_battle_result_banner(result)
 	
 	if result.loser().is_defeated():
-		# transfer units
-		result.winner().hero_units.append_array(result.loser().hero_units)
-		result.winner().units.append_array(result.loser().units)
-		result.loser().units.clear()
+		# TODO clean this shit up 
+		while result.loser().hero_units.size() > 0:
+			var unit_id: int = result.loser().hero_units.pop_front()
+			Game.load_unit(unit_id).set_empire(result.winner())
+		while result.loser().units.size() > 0:
+			var unit_id: int = result.loser().units.pop_front()
+			Game.load_unit(unit_id).set_empire(result.winner())
 
 		_defeated_empires.append(result.loser())
 		return next(_cont_wait_for_defeat_events)

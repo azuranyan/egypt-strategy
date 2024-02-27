@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://djs5r2dgf3cj3"]
+[gd_scene load_steps=5 format=3 uid="uid://djs5r2dgf3cj3"]
 
 [ext_resource type="Script" path="res://tools/unit_viewer.gd" id="1_2y7qc"]
 [ext_resource type="PackedScene" uid="uid://dxsegbop5pwxa" path="res://tools/character_info_panel.tscn" id="1_nex0y"]
 [ext_resource type="PackedScene" uid="uid://b0q80qar3n8ho" path="res://tools/unit_type_panel.tscn" id="3_g7s6x"]
+[ext_resource type="PackedScene" uid="uid://c3c8en8k23kxo" path="res://scenes/common/key_value_label.tscn" id="4_ha0t1"]
 
 [node name="UnitViewer" type="Control"]
 layout_mode = 3
@@ -54,7 +55,43 @@ offset_right = 34.0
 offset_bottom = 36.0
 text = ">"
 
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 227.0
+offset_top = 414.0
+offset_right = 596.0
+offset_bottom = 613.0
+
+[node name="IDLabel" parent="VBoxContainer" instance=ExtResource("4_ha0t1")]
+unique_name_in_owner = true
+layout_mode = 2
+key = "ID:"
+value = "None"
+
+[node name="CurrentOwnerLabel" parent="VBoxContainer" instance=ExtResource("4_ha0t1")]
+unique_name_in_owner = true
+layout_mode = 2
+key = "Current Owner:"
+value = "None"
+
+[node name="StateLabel" parent="VBoxContainer" instance=ExtResource("4_ha0t1")]
+unique_name_in_owner = true
+layout_mode = 2
+key = "State:"
+value = "false"
+
+[node name="FieldedLabel" parent="VBoxContainer" instance=ExtResource("4_ha0t1")]
+unique_name_in_owner = true
+layout_mode = 2
+key = "Fielded:"
+value = "false"
+
+[node name="SelectableLabel" parent="VBoxContainer" instance=ExtResource("4_ha0t1")]
+unique_name_in_owner = true
+layout_mode = 2
+key = "Selectable:"
+value = "false"
+
 [connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]
 [connection signal="pressed" from="HideButton" to="." method="_on_hide_button_pressed"]
 [connection signal="pressed" from="ShowButton" to="." method="_on_show_button_pressed"]
-

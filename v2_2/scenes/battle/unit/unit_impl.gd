@@ -84,6 +84,7 @@ const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_ob
 
 var map_object: UnitMapObject
 var attachments := {}
+var state_stack: Array[State] = []
 
 @onready var driver = $UnitDriver
 
@@ -96,6 +97,7 @@ func _init(__id: int = 0, __chara_id: StringName = &'', __chara: CharacterInfo =
 	
 	
 func reset(initial_state: State):
+	state_stack.clear()
 	set_state(initial_state)
 	var _base := base_stats()
 	for stat in _base:
@@ -116,7 +118,16 @@ func set_state(new_state: State):
 	_state = new_state
 	UnitEvents.state_changed.emit(self, old_state, new_state)
 
+
+func push_state(new_state: State) -> void:
+	state_stack.push_back(_state)
+	set_state(new_state)
+
+
+func pop_state():
+	set_state(state_stack.pop_back())
 	
+
 func sync_map_position(old: Vector2, new: Vector2):
 	_map_position = new
 	UnitEvents.position_changed.emit(self, old, new)
@@ -221,6 +232,13 @@ func get_empire() -> Empire:
 func set_empire(empire: Empire) -> void:
 	var old := _empire
 	_empire = empire
+	# TODO this is a hack
+	if old:
+		old.hero_units.erase(id())
+		old.units.erase(id())
+	if empire:
+		empire.units.append(id())
+		empire.hero_units.append(id())
 	UnitEvents.empire_changed.emit(self, old, empire)
 	
 	
@@ -503,15 +521,7 @@ func is_placeable(_cell: Vector2) -> bool:
 
 #region Unit Actions
 func play_animation(anim_name: String):
-	const ANIM_STATES := {
-		attack = State.ATTACKING,
-		idle = State.IDLE,
-		walking = State.WALKING,
-		hurt = State.HURT,
-		dying = State.DYING,
-		dead = State.DEAD,
-	}
-	map_object.unit_model.state = ANIM_STATES.get(anim_name, State.IDLE)
+	map_object.unit_model.play_animation_override(anim_name)
 
 
 ## Returns true if unit has moved.
@@ -572,12 +582,11 @@ func walk_towards(target: Vector2) -> void:
 	if is_walking():
 		stop_walking()
 	var start := _map_position
-	var old_state := _state
-	set_state(State.WALKING)
+	push_state(State.WALKING)
 	UnitEvents.walking_started.emit(self, start, target)
 	if target != cell():
 		await driver.start_driver(pathfind_to(target))
-	set_state(old_state)
+	pop_state()
 	UnitEvents.walking_finished.emit(self)
 
 
@@ -633,17 +642,10 @@ func take_damage(amount: int, source: Variant) -> void:
 	# emit more specific signal
 	UnitEvents.damaged.emit(self, amount, source)
 	
-	# TODO play_animation_effect workaround
-	var old_model_state := map_object.unit_model.state
-
 	# hurt animation
-	var old_state := _state
-	set_state(State.HURT)
+	push_state(State.HURT)
 	await map_object.unit_model.animation_finished
-	set_state(old_state)
-
-	# TODO play_animation_effect workaround
-	map_object.unit_model.state = old_model_state
+	pop_state()
 	
 	# die
 	if get_stat(&'hp') <= 0:
@@ -689,13 +691,12 @@ func execute_attack(attack_state: AttackState) -> void:
 
 	# we officially set our state to attacking but the actual animation
 	# that will play will depend on attack.user_animation
-	var old_state := _state
-	set_state(State.ATTACKING)
+	push_state(State.ATTACKING)
 
 	# execute attack
 	await AttackSystem.instance().execute_attack(attack_state)
 
-	set_state(old_state)
+	pop_state()
 	UnitEvents.attack_finished.emit(self)
 #endregion Unit Actions
 

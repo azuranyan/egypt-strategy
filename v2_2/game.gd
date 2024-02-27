@@ -386,6 +386,7 @@ func load_state(save: SaveState):
 		unit_registry[unit.id()] = unit
 		get_node('Units').add_child(unit)
 		unit.add_to_group(ALL_UNITS_GROUP)
+		UnitEvents.created.emit(unit)
 		
 	# dispatch event
 	get_tree().call_group('game_event_listeners', 'on_load', save)

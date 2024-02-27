@@ -29,6 +29,9 @@ var target_units: Array = [[] as Array[Unit]]
 ## A count of all active effects.
 var active_effects_count := 0
 
+## The index of the current target iteration.
+var target_index := 0
+
 
 ## Creates an attack state.
 @warning_ignore("shadowed_variable")

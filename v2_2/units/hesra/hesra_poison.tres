@@ -16,6 +16,7 @@ draw_over_unit = true
 [sub_resource type="Resource" id="Resource_hfblf"]
 script = ExtResource("3_1f5d1")
 animation = &"hurt"
+hold_condition = 2
 
 [sub_resource type="Resource" id="Resource_8mjpu"]
 script = ExtResource("4_qsphy")
