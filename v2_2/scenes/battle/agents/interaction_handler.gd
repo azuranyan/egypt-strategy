@@ -31,18 +31,20 @@ func _ready():
 
 	set_battle_remote_unhandled_input_handler(self)
 
+	BattleEvents.battle_scene_exiting.connect(func():
+		set_process_unhandled_input(false)
+		set_physics_process(false)
+	)
 
-func _enter_tree():
-	assert(Game._interaction_handler == null)
-	Game._interaction_handler = self
 
-
-func _exit_tree():
-	assert(Game._interaction_handler == self)
-	Game._interaction_handler = null
+func _exit_tree() -> void:
+	set_battle_remote_unhandled_input_handler(null)
 
 
 func _unhandled_input(event: InputEvent):
+	if _is_battle_scene_not_running_workaround():
+		return
+
 	event = Battle.instance().world().make_input_local(event)
 
 	if event is InputEventKey and event.keycode == KEY_ALT:
@@ -58,7 +60,14 @@ func _unhandled_input(event: InputEvent):
 			return
 
 
+func _is_battle_scene_not_running_workaround() -> bool:
+	return not is_instance_valid(Battle.instance().level)
+
+
 func _physics_process(_delta):
+	if _is_battle_scene_not_running_workaround():
+		return
+
 	# issue: unhandled_input is handled before physics input (aka model detectors)
 	# https://www.reddit.com/r/godot/comments/zpy38w/advice_for_raycasting_on_input/
 
@@ -100,7 +109,10 @@ func _notification(what) -> void:
 
 
 func set_battle_remote_unhandled_input_handler(node: Node):
-	Battle.instance().get_active_battle_scene().get_node('%UnhandledInputListener').remote_path = node.get_path() if is_instance_valid(node) else NodePath('')
+	if Battle.instance() and Battle.instance().get_active_battle_scene():
+		Battle.instance().get_active_battle_scene().get_node('%UnhandledInputListener').remote_path = node.get_path() if is_instance_valid(node) else NodePath('')
+	else:
+		push_warning('attempt to set unhandled input handler without active battle scene')
 
 
 func has_hovered_unit() -> bool:

@@ -1,12 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://cw2mvcntu38p2"]
+[gd_scene load_steps=5 format=3 uid="uid://cw2mvcntu38p2"]
 
 [ext_resource type="Script" path="res://scenes/debug/overlay.gd" id="1_3d83f"]
 [ext_resource type="PackedScene" uid="uid://djs5r2dgf3cj3" path="res://tools/unit_viewer.tscn" id="2_117x8"]
 [ext_resource type="PackedScene" uid="uid://dphluso4iln0n" path="res://tools/scene_panel.tscn" id="3_maf6d"]
+[ext_resource type="PackedScene" uid="uid://c3c8en8k23kxo" path="res://scenes/common/key_value_label.tscn" id="4_k5g1l"]
 
 [node name="Overlay" type="CanvasLayer"]
 process_mode = 3
-layer = 50
+layer = 128
 script = ExtResource("1_3d83f")
 
 [node name="QuitButton" type="Button" parent="."]
@@ -71,8 +72,18 @@ text = "Print orphan nodes"
 
 [node name="ScenePanel" parent="." instance=ExtResource("3_maf6d")]
 
+[node name="CurrentContextState" parent="." instance=ExtResource("4_k5g1l")]
+offset_left = 750.0
+offset_top = 922.0
+offset_right = 981.0
+offset_bottom = 945.0
+key = "overworld"
+value = "state"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.1
+
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="PrintOrphanNodesButton" to="." method="_on_button_pressed"]
-

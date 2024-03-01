@@ -25,4 +25,7 @@ func _ready():
 
 
 func _unhandled_input(event):
-	_remote_node._unhandled_input(event)
+	if is_instance_valid(_remote_node):
+		_remote_node._unhandled_input(event)
+	else:
+		push_error('invalid node')

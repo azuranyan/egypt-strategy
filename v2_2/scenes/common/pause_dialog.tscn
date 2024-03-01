@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://bsl86s6bgqn56"]
 
-[ext_resource type="Script" path="res://scenes/battle/hud/pause_dialog.gd" id="1_3k774"]
+[ext_resource type="Script" path="res://scenes/common/pause_dialog.gd" id="1_3k774"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="2_7lf54"]
 [ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="3_8nqcp"]
 
@@ -43,7 +43,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.345098)
 
 [node name="Panel" type="PanelContainer" parent="."]
-anchors_preset = -1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

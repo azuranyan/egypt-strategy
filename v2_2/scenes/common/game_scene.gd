@@ -52,8 +52,6 @@ func scene_call(scene_name: StringName, kwargs := {}) -> void:
 		SceneManager.scenes[scene_name],
 		kwargs.get('transition', 'fade_to_black'),
 		kwargs,
-		kwargs.get('continuation_method', &''),
-		kwargs.get('continuation_data', {})
 	)
 	
 	

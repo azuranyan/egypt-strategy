@@ -5,6 +5,18 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+## Emitted when game is about to save state.
+signal saving_state
+
+## Emitted when game is about to load state.
+signal loading_state
+
+
+## Emitted on new game start.
+signal new_game_started
+
+
+
 const ALL_UNITS_GROUP := &'all_units'
 
 ## Alive unit mask for [method get_empire_units].
@@ -28,12 +40,26 @@ const VALID_TARGET_MASK := ALIVE_MASK | FIELDED_MASK | SELECTABLE_MASK
 ## All units mask for [method get_empire_units].
 const ALL_UNITS_MASK := ~0
 
+## The group for game event listeners.
+const GAME_EVENT_LISENERS_GROUP: StringName = 'game_event_listeners'
 
-## Reference to the [Overworld] system.
-var overworld: Overworld
+
+
+enum SaveError {
+	SAVE_ERROR = -1,
+	NO_ERROR = 0,
+	
+}
+
 
 ## Record of unit id and unit.
 var unit_registry: Dictionary
+
+## The next unit id.
+var _next_unit_id: int
+
+## Reference to the [Overworld] system.
+var overworld: Overworld
 
 ## Record of playable scenes and whether they've been checked once.
 var available_scenes: Dictionary
@@ -51,29 +77,10 @@ var audio_stream_player: AudioStreamPlayer2D
 
 var _suspended: bool
 
-var _pause_count: int
-
-var _interaction_handler
-
-
-
-## Returns the last selected unit.
-func get_selected_unit() -> Unit:
-	if is_instance_valid(_interaction_handler):
-		return _interaction_handler.get_selected_unit()
-	return null
-	
-
-## Selects a unit.
-func select_unit(unit: Unit):
-	if is_instance_valid(_interaction_handler):
-		_interaction_handler.select_unit(unit)
-
-
-## Deselects a unit.
-func deselect_unit(unit: Unit = get_selected_unit()):
-	if is_instance_valid(_interaction_handler):
-		_interaction_handler.deselect_unit(unit)
+var _pause_count: int:
+	set(value):
+		_pause_count = value
+		get_tree().paused = _pause_count > 0
 
 
 func _ready():
@@ -81,12 +88,7 @@ func _ready():
 	node.name = 'Units'
 	add_child(node)
 	node.owner = self
-	
-	overworld = load("res://scenes/overworld/overworld_impl.gd").new()
-	overworld.name = 'Overworld'
-	add_child(overworld)
-	overworld.owner = self
-	
+
 	battle = load('res://scenes/battle/battle_impl.gd').new()
 	battle.name = 'Battle'
 	add_child(battle)
@@ -162,7 +164,7 @@ func delay_function(callable: Callable, delay: float, argv := []) -> Variant:
 		await timer.timeout
 	timer.queue_free()
 	return rv
-	
+
 	
 ## Returns the viewport size.
 func get_viewport_size() -> Vector2:
@@ -174,45 +176,47 @@ func get_viewport_size() -> Vector2:
 
 
 #region Unit
+
 ## Creates a new unit.
-func create_unit(save: SaveState, chara_id: StringName, empire: Empire = null) -> Unit:
-	# load unit data
+func create_unit(empire: Empire, chara_id: StringName) -> Unit:
 	var chara := get_character_info(chara_id)
 	var unit_type := get_unit_type(chara_id)
-	assert(chara != null, 'placeholder chara not found')
-	assert(unit_type != null, 'placeholder unit_type expected')
 
-	# don't use preload to prevent a cascading error when UnitImpl
-	# fails to compile and avoid circular dependencies.
+	var is_placeholder := chara == preload("res://units/placeholder/chara.tres")
+	var data := {
+		id = _next_unit_id,
+		display_name = chara_id.capitalize() if is_placeholder else chara.name,
+		display_icon = chara.portrait,
+		chara_id = chara_id,
+		chara = chara,
+		unit_type = unit_type,
+		empire = empire,
+		hero = empire.leader_id == chara_id,
+	}
+	_next_unit_id += 1
+	return _create_unit_from_data(data, false)
+
+
+func _create_unit_from_data(data: Dictionary, from_save_data: bool) -> Unit:
+	# don't use preload to prevent a errors when UnitImpl fails to compile
 	var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
-	var unit_id := save.next_unit_id
 
-	# we can't pass args to instantate so we do it this way
-	var data = unit.save_state()
-	data.id = unit_id
-	if chara != preload("res://units/placeholder/chara.tres"):
-		data.display_name = chara.name
-	else:
-		data.display_name = chara_id.capitalize()
-	data.display_icon = chara.portrait
-	data.chara_id = chara_id
-	data.chara = chara
-	data.unit_type = unit_type
-	data.empire = empire
+	# load data
+	if not from_save_data:
+		# we can't pass args to instantate so we do it this way
+		var merged_data: Dictionary = unit.save_state()
+		merged_data.merge(data, true)
+		data = merged_data
 	unit.load_state(data)
+	unit.name = '%s_%s' % [unit._chara_id, unit._id]
 	
-	# making it look nice in the remote inspector
-	unit.name = '%s%s' % [chara_id, unit_id]
-	
-	# adding to registry
+	# finalization
 	get_node('Units').add_child(unit)
-	save.units[unit_id] = unit.save_state()
-	save.next_unit_id = unit_id + 1
-	unit_registry[unit_id] = unit
 	unit.add_to_group(ALL_UNITS_GROUP)
+	unit_registry[data.id] = unit
 	UnitEvents.created.emit(unit)
 	return unit
-	
+
 
 ## Loads a unit by id.
 func load_unit(unit_id: int) -> Unit:
@@ -222,12 +226,12 @@ func load_unit(unit_id: int) -> Unit:
 ## Removes the unit.
 func destroy_unit(unit: Unit):
 	if unit.id() not in unit_registry:
-		push_error('destroying unit not in the registry')
+		push_error('unit not in the registry')
 		return
 
 	UnitEvents.destroying.emit(unit)
-	unit.remove_from_group('all_units')
 	unit_registry.erase(unit.id())
+	unit.remove_from_group('all_units')
 	get_node('Units').remove_child(unit)
 	unit.queue_free()
 	
@@ -287,7 +291,7 @@ func play_error_sound():
 ## Creates a pause dialog.
 func create_pause_dialog(message: String, confirm: String, cancel: String, background := true) -> PauseDialog:
 	# avoid circular ref(!!)
-	var pause = load('res://scenes/battle/hud/pause_dialog.tscn').instantiate()
+	var pause = load('res://scenes/common/pause_dialog.tscn').instantiate()
 	get_tree().root.add_child(pause)
 	pause.background = background
 	pause.open_dialog(message, confirm, cancel)
@@ -333,20 +337,77 @@ func capture_screenshot(size: Vector2i) -> Texture:
 	return ImageTexture.create_from_image(img)
 	
 
-## Creates a new save data.
-func create_new_data() -> SaveState:
-	print('[Game] Creating new save.')
+## Starts a new game.
+func start_new_game():
+	print('[Game] Starting new game.')
+
+	_cleanup()
+
+	_create_subsystems()
+	var err := overworld.load_new_state()
+	if err != Overworld.NO_ERROR:
+		push_error(err)
+		return
+	# battle.load_new_state()
+
+	# start the actual start of the game
+	#overworld.start_overworld_cycle()
+	SceneManager.call_scene(SceneManager.scenes.overworld, 'fade_to_black')
+	
+
+func _create_subsystems():
+	overworld = load("res://scenes/overworld/overworld.gd").new()
+	overworld.name = 'Overworld'
+	add_child(overworld)
+	overworld.owner = self
+
+
+## Returns a copy of the game's current state.
+func save_state() -> SaveState:
+	saving_state.emit()
+	
 	var save := _create_save()
-	get_tree().call_group('game_event_listeners', 'on_new_save', save)
 	
-	# TODO currently a hack, change this to the real start point later
-	var fr := SceneStackFrame.new()
-	fr.scene_path = SceneManager.scenes.overworld # TODO main event
-	fr.scene = null # this will be loaded in later (hopefully)
-	save.scene_stack = [fr]
+	# save unit state
+	for unit in unit_registry.values():
+		save.units[unit.id()] = unit.save_state()
+	save.next_unit_id = _next_unit_id
+
+	# save subsystems
+	save.overworld_data = overworld.save_state()
+	# save.battle_data = battle.save_state()
+	save.scene_manager_data = SceneManager.save_state()
+
+	# TODO old dispatch system
+	get_tree().call_group('game_event_listeners', 'on_save', save)
+
 	return save
+
+	
+## Changes the game state.
+func load_state(save: SaveState) -> void:
+	loading_state.emit()
+	
+	_cleanup()
+	
+	# load unit state
+	for data in save.units.values():
+		_create_unit_from_data(data, true)
+	_next_unit_id = save.next_unit_id
+	
+	_create_subsystems()
+	overworld.load_state(save)
+
+	SceneManager.load_state(save)
+	await SceneManager.transition_finished
+	
+	# battle.load_state(save)
 	
 	
+	# TODO old dispatch system
+	get_tree().call_group('game_event_listeners', 'on_load', save)
+
+
 func _create_save() -> SaveState:
 	var save := SaveState.new()
 	save.version = '0.1'
@@ -355,44 +416,14 @@ func _create_save() -> SaveState:
 	save.timestamp = Time.get_datetime_dict_from_system()
 	return save
 	
-	
-## Returns a copy of the game's current state.
-func save_state() -> SaveState:
-	print('[Game] Saving state.')
-	var save := _create_save()
-	
-	# we created this unit so we know it's a UnitImpl
-	for unit in unit_registry.values():
-		save.units[unit.id()] = unit.save_state()
-		
-	# dispatch event
-	get_tree().call_group('game_event_listeners', 'on_save', save)
-	
-	return save
-	
 
-## Changes the game state.
-func load_state(save: SaveState):
-	print('[Game] Loading state.')
-	
+## Wipes the current game state.
+func _cleanup() -> void:
 	for u in unit_registry.values():
 		destroy_unit(u)
-		
-	# load them again as UnitImpl's
-	for data in save.units.values():
-		var unit = load('res://scenes/battle/unit/unit_impl.tscn').instantiate()
-		unit.load_state(data)
-		unit.name = '%s%s' % [unit._chara_id, unit.id()]
-		unit_registry[unit.id()] = unit
-		get_node('Units').add_child(unit)
-		unit.add_to_group(ALL_UNITS_GROUP)
-		UnitEvents.created.emit(unit)
-		
-	# dispatch event
-	get_tree().call_group('game_event_listeners', 'on_load', save)
-	
-	# TODO hack
-	overworld.start_overworld_cycle()
-	
 
+	_next_unit_id = 0
+	if overworld:
+		overworld.free()
+		overworld = null
 

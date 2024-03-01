@@ -39,8 +39,8 @@ extends Resource
 ## The record of spawned units.
 @export var units: Dictionary
 
-## Scene stack.
-@export var scene_stack: Array[SceneStackFrame]
+## Scene manager data.
+@export var scene_manager_data: Dictionary
 
 ## Generic data.
 @export var data: Dictionary

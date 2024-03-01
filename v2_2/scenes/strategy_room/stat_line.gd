@@ -52,6 +52,7 @@ func get_stat_string() -> String:
 
 func render_stat(unit: Unit) -> void:
 	stat_value = unit.base_stats()[stat]
+	stat_modifier_value = 0
 
 
 func render_stat_growth(unit: Unit) -> void:

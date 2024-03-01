@@ -28,6 +28,7 @@ border_width_bottom = 2
 border_color = Color(0, 0, 0, 0.368627)
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_luk4m"]
+allow_unpress = true
 
 [node name="UnitInfoCard" type="VBoxContainer"]
 offset_left = 1278.0

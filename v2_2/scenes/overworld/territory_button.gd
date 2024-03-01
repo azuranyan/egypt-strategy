@@ -2,155 +2,185 @@
 class_name TerritoryButton
 extends Control
 
-signal attack_pressed(button)
-signal rest_pressed(button)
-signal train_pressed(button)
+
+signal attack_pressed(button: TerritoryButton)
+signal rest_pressed(button: TerritoryButton)
+signal train_pressed(button: TerritoryButton)
 
 
+## List of adjacent territories.
+@export var adjacent: Array[TerritoryButton]
+
+## List of maps to load.
+@export var maps: Array[PackedScene]:
+	set(value):
+		maps = value
+		update_configuration_warnings()
+
+## Unit names. Count can be given by doing [code]name:count[/code].
+@export var _unit_list: PackedStringArray
+
+## Whether to connect this territory to the boss when it's spawned.
+@export var connect_to_boss: bool
+
+@export_group("Internal")
+
+## The empire node.
+@export var empire_node: EmpireNode
+
+## Makes it so the button stays highlighteded.
+var locked: bool
+
+## Sets the button highlighteded state.
+var highlighted: bool:
+	set(value):
+		highlighted = value
+		if not is_node_ready():
+			await ready
+		scale = Vector2.ONE * 1.08 if highlighted else Vector2.ONE
+		
+var _territory: Territory
+var _empire: Empire
+var _adjacent_to_player: bool
+
+
+## Group node containin the button connections.
 @onready var connections = $Connections
 
 
-var territory_node: TerritoryNode
-var locked: bool
-var highlight: bool:
-	set(value):
-		highlight = value
-		if not is_node_ready():
-			await ready
-		scale = Vector2.ONE * 1.08 if highlight else Vector2.ONE
-		
+func _ready() -> void:
+	update_territory_name(name)
+	update_configuration_warnings()
 
-var _territory: Territory
+	renamed.connect(func(): update_territory_name(name))
 
-
-func _ready():
-	_remove_null_territory()
-	for child in get_children():
-		if child is TerritoryNode:
-			territory_node = child
-	if not territory_node:
-		territory_node = preload("res://scenes/overworld/null_territory.tscn").instantiate() as TerritoryNode
-		territory_node.set_meta('NullTerritory', true)
-		add_child(territory_node)
-		# this avoids pushing the error when it's the og scene in the editor
-		if not Util.is_scene_root(self):
-			push_error('"%s" (%s) using NullTerritory (not assigned)' % [name, self])
-	update_territory_name(territory_node.name)
+	if not Engine.is_editor_hint():
+		OverworldEvents.territory_owner_changed.connect(update_owner_empire)
+		OverworldEvents.empire_adjacency_updated.connect(update_player_adjacent)
+		OverworldEvents.empire_unit_list_updated.connect(update_avatars_present)
+		OverworldEvents.empire_force_rating_updated.connect(update_force_strength)
 
 
-func _exit_tree():
-	request_ready()
-	# TODO if connections show funky duplicating behaviour, just remove them here
-	_remove_null_territory()
-	territory_node = null
+## Returns the unit entries.
+func get_unit_entries() -> Dictionary:
+	assert(not Engine.is_editor_hint(), "can't use in editor")
+	var arr := {}
+	for u in _unit_list:
+		var split := u.rsplit(':', true, 1)
+		var unit_name := split[0].strip_edges()
+		var unit_count := split[1].strip_edges().to_int() if split.size() > 1 else 1
+		arr[unit_name] = unit_count
+	return arr
 
 
-func _remove_null_territory():
-	for child in get_children():
-		if child.has_meta('NullTerritory'):
-			child.queue_free()
-	
-	
 ## Initializes this button with territory.
-func initialize(t: Territory):
-	_territory = t
-	close_panel(t)
-	create_connections()
-	
-	update_territory_name(t.name)
-	var empire := Game.overworld.get_territory_owner(t)
-	%Portrait.texture = empire.leader.portrait
-	%HomeIcon.visible = empire.home_territory == t
-	
-	var heroes: Array[String] = []
-	for u in empire.hero_units:
-		heroes.append(Game.load_unit(u).display_name())
-		if empire.is_player_owned():
-			%AvatarsPresentLabel.text = 'Avatars Present: %s' % ', '.join(heroes)
-		else:
-			%EnemyLeadersLabel.text = 'Enemy Leaders: %s' % ', '.join(heroes)
-				
+func initialize(data: Dictionary) -> void:
+	_territory = data.territory
+	update_territory_name(_territory.name)
+	update_owner_empire(_territory, null, data.empire)
+	_adjacent_to_player = data.adjacent_to_player
+	update_avatars_present(data.empire, data.empire_units)
+	update_force_strength(data.empire, data.empire.force_rating)
+	close_panel()
+
+		
+## Updates the territory name.
+func update_territory_name(territory_name: String) -> void:
+	Util.bb_big_caps(%NameLabel, territory_name, {font_size = 18})
+	if name == territory_name:
+		return
+	name = territory_name
+
+
+## Updates the empire.
+func update_owner_empire(territory: Territory, _old_owner: Empire, new_owner: Empire) -> void:
+	if territory != _territory:
+		return
+	_empire = new_owner
+	%Portrait.texture = _empire.leader.portrait
+	%HomeIcon.visible = _empire.home_territory == _territory
+
+
+## Updates the adjacency.
+@warning_ignore("shadowed_variable")
+func update_player_adjacent(empire: Empire, adjacent: Array[Territory]) -> void:
 	if empire.is_player_owned():
+		_adjacent_to_player = _territory in adjacent
+
+
+## Updates the avatars present.
+func update_avatars_present(empire: Empire, units: Array[Unit]) -> void:
+	if empire != _empire:
+		return
+		
+	var hero_names := PackedStringArray()
+	for unit in units:
+		if unit.is_hero():
+			hero_names.append(unit.display_name())
+
+	if empire.is_player_owned():
+		%AvatarsPresentLabel.text = 'Avatars Present: ' + ', '.join(hero_names)
+	else:
+		%EnemyLeadersLabel.text = 'Enemy Leaders: ' + ', '.join(hero_names)
+
+
+## Updates the force strength.
+func update_force_strength(empire: Empire, rating: float) -> void:
+	if empire != _empire:
+		return
+	if _empire.is_player_owned():
 		%PlayerForceStrengthLabel.text = '(stub)'
 	else:
-		var force_strength: String = 'Force Strength: %s' % _force_string(_force_rating(empire))
-		if OS.is_debug_build():
-			force_strength += ' (%s)' % snappedf(_force_rating(empire), 0.01)
-		%EnemyForceStrengthLabel.text = force_strength
-		
+		if is_nan(rating):
+			%EnemyForceStrengthLabel.text = 'Force Strength: N/A'
+		else:
+			var force_strength: String = 'Force Strength: %s' % _force_string(rating)
+			if OS.is_debug_build():
+				force_strength += ' (%s)' % snappedf(rating, 0.01)
+			%EnemyForceStrengthLabel.text = force_strength
 
-func update_territory_name(territory_name: String):
-	Util.bb_big_caps(%NameLabel, territory_name, {font_size = 18})
-	
 
-func _get_force_strength_old(e: Empire) -> String: # TODO update force strength
-	var total_combined_maxhp := 0
-	var total_combined_hp := 0
-	for u in e.units:
-		total_combined_maxhp += Game.load_unit(u).get_stat('maxhp')
-		total_combined_hp += Game.load_unit(u).get_stat('hp')
-		
-	var hp_ratio := float(total_combined_hp)/total_combined_maxhp
-	if hp_ratio >= 1:
-		return 'Full'
-	if hp_ratio >= 0.7:
-		return 'Hurt'
-	if hp_ratio >= 0.3:
-		return 'Low'
-	return 'Critical'
-	
-	
-func _force_rating(e: Empire) -> float:
-	var player_empire := Game.overworld.player_empire()
-	var enemy_stats := _get_empire_combined_unit_stat(e, &'maxhp') + _get_empire_combined_unit_stat(e, &'dmg')
-	var player_stats := _get_empire_combined_unit_stat(player_empire, &'maxhp') + _get_empire_combined_unit_stat(player_empire, &'dmg')
-	return float(enemy_stats)/player_stats
-	
-	
-func _force_string(rating: float) -> String:
-	if rating > 2:
+func _force_string(ratio: float) -> String:
+	if ratio > 2:
 		return 'Dangerous'
-	if rating >= 1.5:
+	if ratio >= 1.5:
 		return 'Formidable'
-	if rating >= 1.2:
+	if ratio >= 1.2:
 		return 'Strong'
-	if rating >= 0.8:
+	if ratio >= 0.8:
 		return 'Moderate'
-	if rating >= 0.5:
+	if ratio >= 0.5:
 		return 'Fair'
 	return 'Weak'
 	
-	
-func _get_empire_combined_unit_stat(e: Empire, stat: StringName) -> int:
-	if e.units.size() == 0:
-		return 0
-	return e.units.map(func(u): return Game.load_unit(u).get_stat(stat)).reduce(func(a, b): return a + b)
-	
-	
-func open_panel(t: Territory):
-	var player := Game.overworld.get_territory_owner(t).is_player_owned()
-	%PlayerPanel.visible = player
-	%EnemyPanel.visible = not player
-	%AttackButton.visible = Game.overworld.player_empire().is_adjacent_territory(t)
-	z_index = 1
-	
 
-func close_panel(_t: Territory):
+## Opens the interactive panel.
+func open_panel(show_attack_button: bool) -> void:
+	%PlayerPanel.visible = _empire.is_player_owned()
+	%EnemyPanel.visible = not _empire.is_player_owned()
+	%AttackButton.visible = show_attack_button
+	z_index = 1
+
+
+## Opens the interactive panel.
+func close_panel() -> void:
 	%PlayerPanel.hide()
 	%EnemyPanel.hide()
 	z_index = 0
 	
 	
-func create_connections():
+## Creates connections to buttons.
+func create_connections(buttons: Array[TerritoryButton]) -> void:
 	remove_connections()
-	for adj in territory_node.adjacent:
+	for btn in buttons:
 		var conn := preload("res://scenes/overworld/connection.tscn").instantiate() as TerritoryConnection
 		conn.point_a = global_position
-		conn.point_b = adj.get_parent().global_position
+		conn.point_b = btn.global_position
 		connections.add_child(conn)
 		
 	
-func remove_connections():
+## Removes all connections.
+func remove_connections() -> void:
 	while connections.get_child_count() > 0:
 		# not ideal but meh
 		var child := connections.get_child(0)
@@ -158,46 +188,51 @@ func remove_connections():
 		child.queue_free()
 	
 
-func _on_detector_mouse_entered():
+func _get_configuration_warnings() -> PackedStringArray:
+	if maps.is_empty():
+		return ['no maps assigned']
+	return []
+	
+
+func _on_detector_mouse_entered() -> void:
 	$Glow.visible = true
 	$Connections.visible = true
-	highlight = true
+	highlighted = true
 
 
-func _on_detector_mouse_exited():
+func _on_detector_mouse_exited() -> void:
 	$Glow.visible = false
 	$Connections.visible = false
 	if not locked:
-		highlight = false
+		highlighted = false
 
 
-func _on_detector_gui_input(_event):
+func _on_detector_gui_input(_event) -> void:
 	# TODO
 	pass # Replace with function body.
 
 
-func _on_detector_focus_entered():
+func _on_detector_focus_entered() -> void:
 	locked = true
-	highlight = true
-	open_panel(_territory)
+	highlighted = true
+	open_panel(_adjacent_to_player)
 
 
-func _on_detector_focus_exited():
+func _on_detector_focus_exited() -> void:
 	locked = false
 	# has to be done this way because pressing the button takes the
 	# focus from the detector and if we close the panel during that
 	# the button won't actually be pressed
 	if not (%AttackButton.is_hovered() or %RestButton.is_hovered()):
-		highlight = false
-		close_panel(_territory)
+		highlighted = false
+		close_panel()
 
 
-func _on_attack_button_pressed():
-	close_panel(_territory)
+func _on_attack_button_pressed() -> void:
+	close_panel()
 	attack_pressed.emit(self)
 
 
-func _on_rest_button_pressed():
-	close_panel(_territory)
+func _on_rest_button_pressed() -> void:
+	close_panel()
 	rest_pressed.emit(self)
-

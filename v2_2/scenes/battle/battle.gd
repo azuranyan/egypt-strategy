@@ -1,32 +1,5 @@
-class_name Battle extends Node
-
-	
-## Emitted when the battle enters scene. [b]Cannot be suspended.[/b]
-signal battle_started(attacker: Empire, defender: Empire, territory: Territory, map_id: int)
-
-## Emitted when the battle exits. [b]Cannot be suspended.[/b]
-signal battle_ended(result: BattleResult)
-
-## Emitted right before player prep phase starts.
-signal player_prep_phase
-
-## Emitted when a new cycle starts.
-signal cycle_started(cycle: int)
-
-## Emitted when a cycle ends.
-signal cycle_ended(cycle: int)
-
-## Emitted when an empire's turn started.
-signal turn_started(empire: Empire)
-
-## Emitted when an empire's turn ended.
-signal turn_ended(empire: Empire)
-
-## Emitted when attack sequence is started.
-signal attack_sequence_started(state: AttackState)
-
-## Emitted when attack sequence has ended.
-signal attack_sequence_ended()
+class_name Battle
+extends Node
 
 
 ## Bitflag for pathable cells overlay.
@@ -84,6 +57,12 @@ enum {
 	
 	## Target unit does not meet requirements.
 	INVALID_TARGET,
+
+	## Target is occupied by another unit.
+	ALREADY_OCCUPIED,
+
+	## Target is not pathable.
+	NOT_PATHABLE,
 }
 
 
@@ -100,7 +79,7 @@ func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _
 	
 	
 ## Stops the battle cycle.
-func stop_battle() -> void:
+func stop_battle(_result_value: int = BattleResult.CANCELLED) -> void:
 	assert(false, 'not implemented')
 
 

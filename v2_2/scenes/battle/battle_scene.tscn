@@ -1,11 +1,10 @@
-[gd_scene load_steps=21 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=20 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
 [ext_resource type="Script" path="res://scenes/battle/unhandled_input_listener.gd" id="4_0x7je"]
 [ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
 [ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="6_i7shf"]
-[ext_resource type="PackedScene" uid="uid://cgiu5x8itr8ah" path="res://scenes/battle/hud/pause_menu.tscn" id="6_tryo3"]
 [ext_resource type="PackedScene" uid="uid://c1i2yiwf08gqj" path="res://scenes/battle/battle_result_screen.tscn" id="8_6a2cn"]
 
 [sub_resource type="Gradient" id="Gradient_nf1a3"]
@@ -382,9 +381,6 @@ grow_vertical = 2
 pivot_offset = Vector2(402, 90)
 text = "BATTLE START"
 label_settings = SubResource("LabelSettings_y8vo3")
-
-[node name="PauseMenu" parent="." instance=ExtResource("6_tryo3")]
-visible = false
 
 [node name="BattleResultScreen" parent="." instance=ExtResource("8_6a2cn")]
 visible = false

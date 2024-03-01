@@ -31,7 +31,7 @@ bg_color = Color(0.188235, 0.188235, 0.188235, 1)
 
 [node name="AttackCard" type="PanelContainer"]
 offset_right = 260.0
-offset_bottom = 248.0
+offset_bottom = 288.0
 theme = ExtResource("1_l21vi")
 script = ExtResource("1_qbsf4")
 
@@ -127,6 +127,7 @@ text = "1x"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_fonts/normal_font = ExtResource("5_j8bb0")
 bbcode_enabled = true
 text = "Deals [color=#111111]2[/color] damage plus [color=#111111]1[/color]x DMG from range."

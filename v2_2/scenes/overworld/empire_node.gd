@@ -3,36 +3,41 @@ class_name EmpireNode
 extends Node
 ## Serves as a marker for creating empires on the editor.
 
+
+## The type of the empire.
 @export var type: Empire.Type = Empire.Type.RANDOM
 
+## Preset leader.
 @export var leader_id: StringName:
 	set(value):
+		if leader_id == value:
+			return
 		leader_id = value
-		if not is_node_ready():
-			await ready
-		var dir := "res://units/".path_join(leader_id)
-		leader = null
-		hero_unit = null
-		if leader_id and DirAccess.dir_exists_absolute(dir):
-			leader = load(dir.path_join('chara.tres'))
-			hero_unit = load(dir.path_join('unit_type.tres'))
+		leader = Game.get_character_info(leader_id)
+		hero_unit = Game.get_unit_type(leader_id)
 		update_configuration_warnings()
+		
 
 @export_group("Territory")
 
 @export var base_aggression: float
 
-@export var home_territory_node: TerritoryNode:
+@export var home_territory: TerritoryButton:
 	set(value):
-		if home_territory_node == value:
-			return
-		if home_territory_node and home_territory_node.empire_node:
-			home_territory_node.empire_node = null
-		home_territory_node = value
-		if home_territory_node and home_territory_node.empire_node != self:
-			home_territory_node.empire_node = self
-		notify_property_list_changed()
+		# remove the old connection
+		if home_territory:
+			home_territory.empire_node = null
 
+		# nullify existing connections
+		if value and value.empire_node:
+			value.empire_node.home_territory = null
+
+		home_territory = value
+
+		# update new connection
+		if home_territory:
+			home_territory.empire_node = self
+			
 @export_group("Internal")
 
 @export var leader: CharacterInfo
@@ -44,12 +49,10 @@ extends Node
 func get_empire() -> Empire:
 	assert(not Engine.is_editor_hint(), "can't use in editor")
 	return Game.overworld.get_empire_by_leader(leader)
-	
+
 
 func _get_configuration_warnings() -> PackedStringArray:
-	var arr := PackedStringArray()
-	if not leader:
-		arr.append('cannot find leader chara.tres')
-	if not hero_unit:
-		arr.append('cannot find leader unit_type.tres')
-	return arr
+	if leader.get_meta('placeholder', false):
+		return ['leader_id not found.']
+	return []
+	

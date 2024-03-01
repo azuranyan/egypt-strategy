@@ -35,18 +35,28 @@ enum State {
 @export var _next_state: State
 
 
-var last_acting_unit: Unit
+var last_acting_empire_unit: Dictionary
 var level: Level
 var agents: Dictionary
+var _is_running: bool
+
+var forfeit_dialog: PauseDialog
+var pause_menu: BattlePauseMenu
 
 
 func _ready() -> void:
 	UnitEvents.damaged.connect(_on_unit_damaged)
+	BattleEvents.start_battle_requested.connect(start_battle)
+	BattleEvents.stop_battle_requested.connect(stop_battle)
 
 
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
 func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
+	if is_running():
+		push_error('battle already running!')
+		return
+
 	# initialize context
 	self._attacker = _attacker
 	self._defender = _defender
@@ -59,7 +69,7 @@ func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _
 	
 	self._quick = not _attacker.is_player_owned() and not _defender.is_player_owned()
 	self._battle_phase = false
-	self._next_state = State.STANDBY
+	self._next_state = State.INVALID
 	
 	# do battle
 	if _quick:
@@ -69,38 +79,91 @@ func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _
 	
 	
 func _quick_battle():
-	battle_started.emit(_attacker, _defender, _territory, _map_id)
-	print("Entering quick battle.")
-	# TODO randomize or simulate the victor
-	_result_value = BattleResult.ATTACKER_VICTORY
-	battle_ended.emit(get_battle_result())
+	_is_running = true
+	BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
+	
+	# add variance
+	var atk := Overworld.instance().calculate_empire_force_rating(_attacker) * randf_range(0.9, 1.1)
+	var def := Overworld.instance().calculate_empire_force_rating(_defender) * randf_range(0.9, 1.1)
+	var result := atk/def + 0.05
+
+	var power_difference := absf(atk - def)
+	var withdraw_chance := clampf(power_difference/(atk + def), 0.1, 0.9)
+	var withdraw := randf() < withdraw_chance
+
+	if result > 1.0:
+		if withdraw:
+			_result_value = BattleResult.DEFENDER_WITHDRAW
+		else:
+			_result_value = BattleResult.ATTACKER_VICTORY
+	else:
+		if withdraw:
+			_result_value = BattleResult.ATTACKER_WITHDRAW
+		else:
+			_result_value = BattleResult.DEFENDER_VICTORY
+
+	# fixes waiting signals after process frame
+	await get_tree().process_frame
+	_is_running = false
+	BattleEvents.battle_ended.emit(get_battle_result())
 	
 	
 func _real_battle():
-	print("Entering real battle.")
+	await _load_battle_scene()
+
+	await _real_battle_main()
+
+	await _unload_battle_scene()
+
+
+func _load_battle_scene() -> void:
+	_is_running = true
+	BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
 	SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
-	await SceneManager.transition_finished
+
+	await SceneManager.scene_ready
+
+	# hud
 	hud().menu_button.pressed.connect(show_pause_menu)
+
+	# level
 	level = get_active_battle_scene().level
-	
 	_distribute_units()
 	_field_units()
-		
-	# initialize agents and ai placement
+
+	# agents
 	create_agent(_attacker)
 	create_agent(_defender)
 
-	# do battle
-	await _real_battle_main()
+	# TODO
+	start_prep_phase(ai())
 
+	# done
+	BattleEvents.battle_scene_pre_enter.emit()
+
+	await SceneManager.transition_finished
+	_next_state = State.STANDBY
+
+
+func _unload_battle_scene() -> void:
+	# agents
 	for agent in agents.values():
 		agent.queue_free()
 	agents.clear()
 	
+	# level
 	_unfield_units()
+	last_acting_empire_unit.clear()
+	level = null
+
+	# hud
+	hud().menu_button.pressed.disconnect(show_pause_menu)
 
 	SceneManager.scene_return('fade_to_black')
-		
+	await SceneManager.transition_finished
+	_is_running = false
+	BattleEvents.battle_ended.emit(get_battle_result())
+
 
 func _distribute_units():
 	print("[Battle] Redistributing units.")
@@ -109,19 +172,27 @@ func _distribute_units():
 			continue
 
 		if u.empire_id.is_empty():
-			print('[Battle] Pre-placed unit missing `empire_id`.')
+			push_warning('[Battle] Pre-placed unit missing `empire_id`, removing.')
 			u.queue_free()
 			continue
 
-		var empire := Game.overworld.get_empire_by_chara_id(u.empire_id)
-		if empire:
-			#u.set_meta("preplaced", true)
-			#Game.create_unit(null, 
-			#spawn_unit(u.unit_type, empire, {map_unit=u, map_position=u.map_position})
-			push_error('not implemented')
-			pass
-		u.queue_free()
+		var chara_id: StringName = u.empire_id
+		var empire: Empire
+		if chara_id == '$ai':
+			empire = ai()
+		elif chara_id == '$player':
+			empire = player()
+		else:
+			empire = Overworld.instance().get_empire_by_leader_id(chara_id)
 
+		if not empire:
+			push_warning('[Battle] Empire `%s` not found, removing.' % chara_id)
+			u.queue_free()
+			continue
+		
+		u.set_meta('preplaced', true)
+		Game.create_unit(empire, chara_id)
+		
 	
 func _field_units():
 	UnitEvents.state_changed.connect(_on_unit_state_changed)
@@ -149,7 +220,13 @@ func _on_unit_death(_unit: Unit):
 	
 
 func _real_battle_main():
-	while true:
+	BattleEvents.battle_scene_entered.emit()
+
+	await start_prep_phase(player())
+	if not _should_end:
+		_next_state = State.BATTLE_START
+
+	while not _should_end:
 		if check_for_battle_end():
 			_next_state = State.BATTLE_END
 
@@ -158,20 +235,7 @@ func _real_battle_main():
 				push_error('invalid state')
 			
 			State.STANDBY:
-				_next_state = State.AI_PREP
-
-			State.AI_PREP:
-				_turn_queue = [ai()]
-				await agents[on_turn()].prepare_units()
-				_next_state = State.PLAYER_PREP
-
-			State.PLAYER_PREP:
-				_turn_queue = [player()]
-				hud().update()
-				player_prep_phase.emit()
-				await agents[on_turn()].prepare_units()
-				battle_started.emit(_attacker, _defender, _territory, _map_id)
-				_next_state = State.BATTLE_START
+				_next_state = State.STANDBY
 
 			State.BATTLE_START:
 				hud().hide()
@@ -183,12 +247,11 @@ func _real_battle_main():
 			State.CYCLE_START:
 				_turn_queue = [_attacker, _defender]
 
-				cycle_started.emit(_turns)
+				BattleEvents.cycle_started.emit(_turns)
 				_next_state = State.TURN_START
 
 			State.TURN_START:
-				if is_instance_valid(last_acting_unit):
-					await set_camera_target(last_acting_unit.get_map_object().position)
+				await pan_to_last_acting_unit(on_turn())
 				get_active_battle_scene().hud_visibility_control.show()
 				await hud().show_turn_banner(1)
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
@@ -196,7 +259,7 @@ func _real_battle_main():
 				for u in Game.get_empire_units(on_turn()):
 					u.tick_status_effects()
 
-				turn_started.emit(on_turn())
+				BattleEvents.turn_started.emit(on_turn())
 				_next_state = State.ON_TURN
 
 			State.ON_TURN:
@@ -217,24 +280,34 @@ func _real_battle_main():
 					u.set_turn_done(false)
 
 				var empire: Empire = _turn_queue.pop_front()
-				turn_ended.emit(empire)
+				BattleEvents.turn_ended.emit(empire)
 				if _turn_queue.is_empty():
 					_next_state = State.CYCLE_END
 				else:
 					_next_state = State.TURN_START
 
 			State.CYCLE_END:
-				cycle_ended.emit(_turns) 
+				BattleEvents.cycle_ended.emit(_turns) 
 				_turns += 1
 				_next_state = State.CYCLE_START
 
 			State.BATTLE_END:
-				battle_ended.emit(get_battle_result())
+				BattleEvents.battle_ended.emit(get_battle_result())
 				if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
 					await get_active_battle_scene().show_battle_results()
 				_next_state = State.INVALID
 				break
 		
+		await get_tree().process_frame
+	BattleEvents.battle_scene_exiting.emit()
+
+
+func pan_to_last_acting_unit(empire: Empire) -> void:
+	if empire in last_acting_empire_unit:
+		var unit: Unit = last_acting_empire_unit[empire]
+		if is_instance_valid(unit):
+			await set_camera_target(unit.get_map_object().position)
+
 	
 ## Checks for battle end.
 func check_for_battle_end() -> bool:
@@ -243,7 +316,7 @@ func check_for_battle_end() -> bool:
 
 	var result := evaluate_battle_result()
 	if not result.is_none():
-		stop_battle()
+		stop_battle(result.value)
 	
 	if _should_end or should_end_turn(on_turn()):
 		agents[on_turn()].end_turn()
@@ -293,17 +366,19 @@ func end_battle(result_value: int):
 	
 	
 ## Stops the battle cycle.
-func stop_battle() -> void:
+func stop_battle(result_value: int = BattleResult.CANCELLED) -> void:
 	if not is_running():
 		return
 	
+	_result_value = result_value
 	_should_end = true
+	if on_turn():
+		agents[on_turn()].force_end()
 	
 
 ## Returns true if the battle is running.
 func is_running() -> bool:
-	# a small hack to get the current overworld scene
-	return get_tree().current_scene is BattleScene
+	return _is_running
 	
 	
 ## Returns true if battle should end.
@@ -611,14 +686,26 @@ func hud() -> BattleHUD:
 
 
 func show_pause_menu() -> void:
-	get_active_battle_scene().pause_menu.show()
+	hide_pause_menu()
+	pause_menu = preload("res://scenes/battle/hud/pause_menu.tscn").instantiate()
+	get_active_battle_scene().add_child(pause_menu)
+	pause_menu.resume_button.pressed.connect(hide_pause_menu)
+	pause_menu.forfeit_button.pressed.connect(show_forfeit_dialog)
+	pause_menu.forfeit_button.disabled = player() == defender()
+	pause_menu.save_button.pressed.connect(_stub.bind('save'))
+	pause_menu.save_button.disabled = not saving_allowed()
+	pause_menu.load_button.pressed.connect(_stub.bind('load'))
+	pause_menu.settings_button.pressed.connect(_stub.bind('settings'))
+	pause_menu.quit_to_title_button.pressed.connect(_stub.bind('quit_to_title'))
 
 
 func hide_pause_menu() -> void:
-	get_active_battle_scene().pause_menu.hide()
+	if is_instance_valid(pause_menu):
+		pause_menu.close()
 
 
-var forfeit_dialog: PauseDialog
+func _stub(msg: String) -> void:
+	print('stub ', msg)
 
 
 func show_forfeit_dialog() -> void:
@@ -628,11 +715,13 @@ func show_forfeit_dialog() -> void:
 		forfeit_dialog = Game.create_pause_dialog("Cancel Attack?", 'Yes', 'No')
 	else:
 		forfeit_dialog = Game.create_pause_dialog("Forfeit?", 'Confirm', 'Cancel')
-		forfeit_dialog.confirm_button.disabled = player() == defender()
 	
 	var forfeit_confirm: bool = await forfeit_dialog.closed
 	if not forfeit_confirm:
 		return
+
+	# is there a way to better do this? 
+	hide_pause_menu()
 	
 	if not is_battle_phase():
 		end_battle(BattleResult.CANCELLED)
@@ -660,6 +749,12 @@ func check_unit_move(unit: Unit, cell: Vector2) -> int:
 	if Util.cell_distance(unit.cell(), cell) > unit.get_stat(&'mov'):
 		return OUT_OF_RANGE
 	
+	if is_occupied(cell, unit):
+		return ALREADY_OCCUPIED
+
+	if not cell in unit.get_pathable_cells():
+		return NOT_PATHABLE
+
 	return OK
 
 
@@ -733,7 +828,7 @@ func unit_action_pass(unit: Unit) -> void:
 	unit.set_turn_done(true)
 	hud().set_selected_unit(unit)
 
-	last_acting_unit = unit
+	last_acting_empire_unit[unit.get_empire()] = unit
 	check_for_battle_end()
 	await wait_for_death_animations()
 
@@ -742,6 +837,8 @@ func unit_action_pass(unit: Unit) -> void:
 @warning_ignore("redundant_await")
 func unit_action_move(unit: Unit, target: Vector2) -> void:
 	hud().hide()
+	get_active_battle_scene().camera.drag_horizontal_enabled = false
+	get_active_battle_scene().camera.drag_horizontal_enabled = false
 	await set_camera_target(unit)
 
 	if on_turn() == ai():
@@ -753,10 +850,12 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 	unit.set_has_moved(true)
 
 	await set_camera_target(null)
+	get_active_battle_scene().camera.drag_horizontal_enabled = true # should be push
+	get_active_battle_scene().camera.drag_horizontal_enabled = true
 	hud().set_selected_unit.call_deferred(unit)
 	hud().show()
 
-	last_acting_unit = unit
+	last_acting_empire_unit[unit.get_empire()] = unit
 	check_for_battle_end()
 	await wait_for_death_animations()
 
@@ -766,8 +865,8 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
 	hud().show_attack_banner(attack)
 	var centroid := Util.centroid(target)
-	await set_camera_target(level.map.world.as_global(centroid))
-	set_camera_target(world().as_global(centroid))
+	await set_camera_target(world().as_global(centroid))
+	#set_camera_target(world().as_global(centroid))
 
 	await unit.use_attack(attack, target, rotation)
 	await set_camera_target(unit)
@@ -778,7 +877,7 @@ func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], rota
 	hud().set_selected_unit(null)
 	hud().hide_attack_banner()
 
-	last_acting_unit = unit
+	last_acting_empire_unit[unit.get_empire()] = unit
 	check_for_battle_end()
 	await wait_for_death_animations()
 
@@ -843,6 +942,16 @@ func is_valid_action(action: UnitAction, unit: Unit) -> bool:
 #endregion Actions
 
 
+func start_prep_phase(empire: Empire) -> void:
+	_turn_queue = [empire]
+	hud().update()
+	BattleEvents.prep_phase_started.emit(empire)
+	await agents[empire].prepare_units()
+	BattleEvents.prep_phase_ended.emit(empire)
+	_turn_queue = []
+
+
 func _on_unit_damaged(_unit: Unit, amount: int, _source: Variant) -> void:
 	if amount > 0:
 		get_active_battle_scene().shake_camera()
+

@@ -372,7 +372,7 @@ anchors_preset = -1
 offset_left = 1045.0
 offset_top = 103.0
 offset_right = 1305.0
-offset_bottom = 395.0
+offset_bottom = 393.0
 grow_horizontal = 0
 
 [node name="UnitInfoCard" parent="Control" instance=ExtResource("7_0c7x5")]
@@ -382,7 +382,7 @@ layout_mode = 0
 offset_left = 1316.0
 offset_top = 53.0
 offset_right = 1851.0
-offset_bottom = 395.0
+offset_bottom = 393.0
 pivot_offset = Vector2(604, 342)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
@@ -391,9 +391,10 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 51.0
-offset_top = -231.0
-offset_right = 710.0
+offset_left = 26.0
+offset_top = -204.0
+offset_right = 685.0
+offset_bottom = 27.0
 grow_vertical = 0
 mouse_filter = 2
 alignment = 1
@@ -404,5 +405,18 @@ layout_mode = 2
 mouse_filter = 2
 bbcode_enabled = true
 fit_content = true
+
+[node name="PanelContainer" type="PanelContainer" parent="Control"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 849.0
+offset_right = 521.0
+offset_bottom = 896.0
+
+[node name="TooltipLabel" type="Label" parent="Control/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Inspect units."
 
 [connection signal="pressed" from="Control/BackButton" to="." method="_on_back_button_pressed"]

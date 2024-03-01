@@ -25,6 +25,9 @@ const UnitMapObjectScene := preload("res://scenes/battle/map_objects/unit_map_ob
 ## The scale of the unit model.
 @export var _model_scale: Vector2 = Vector2.ONE
 
+## [constant true] for hero units.
+@export var _hero: bool
+
 @export_group("State")
 
 ## The owner of this unit.
@@ -232,16 +235,14 @@ func get_empire() -> Empire:
 func set_empire(empire: Empire) -> void:
 	var old := _empire
 	_empire = empire
-	# TODO this is a hack
-	if old:
-		old.hero_units.erase(id())
-		old.units.erase(id())
-	if empire:
-		empire.units.append(id())
-		empire.hero_units.append(id())
 	UnitEvents.empire_changed.emit(self, old, empire)
 	
 	
+## Returns true if this unit is a hero unit.
+func is_hero() -> bool:
+	return _hero
+
+
 ## Returns true if another unit is an enemy.
 func is_enemy(other: Unit) -> bool:
 	return (other != self) and (other.get_empire() != self.get_empire())
@@ -606,11 +607,12 @@ func pathfind_to(target: Vector2) -> PackedVector2Array:
 	if target == cell():
 		return [target]
 
-	var pathable_cells := get_pathable_cells(false)
+	var pathable_cells := get_pathable_cells(true)
 
+	# this feature is nice but it sometimes causes diff pathing from unit_path
 	# append the target in pathable list so we can path to it
-	if target not in pathable_cells:
-		pathable_cells.append(target)
+	# if target not in pathable_cells:
+	# 	pathable_cells.append(target)
 
 	# pathfind
 	var pathfinder := PathFinder.new(map_object.world, pathable_cells)
@@ -627,17 +629,12 @@ func pathfind_to(target: Vector2) -> PackedVector2Array:
 ## Returns an array of cells this unit can path through.
 func get_pathable_cells(use_mov_stat := false) -> PackedVector2Array:
 	var max_dist: int = _stats.mov if use_mov_stat else 20
-	return CSUtil.FloodFill(cell(), Battle.instance().world_bounds(), max_dist, is_pathable)
+	return Util.flood_fill(cell(), Battle.instance().world_bounds(), max_dist, is_pathable)
 	
-
-func return_true(_a) -> bool:
-	return true
-
 
 ## Returns an array of cells this unit can be placed on.
 func get_placeable_cells() -> PackedVector2Array:
-	#return CSUtil.FloodFill(cell(), _stats.mov, Battle.instance().world_bounds(), return_true)
-	return Util.flood_fill(cell(), Game.battle.world_bounds(), _stats.mov, is_placeable)
+	return Util.flood_fill(cell(), Battle.instance().world_bounds(), _stats.mov, is_placeable)
 	
 
 ## Makes unit take damage.
@@ -755,6 +752,7 @@ func save_state() -> Dictionary:
 		unit_type = _unit_type,
 		model_scale = _model_scale,
 		empire = _empire,
+		hero = _hero,
 		behavior = _behavior,
 		state = _state,
 		has_attacked = _has_attacked,
@@ -782,6 +780,7 @@ func load_state(data: Dictionary):
 	_unit_type = data.unit_type
 	_model_scale = data.model_scale
 	_empire = data.empire
+	_hero = data.hero
 	_behavior = data.behavior
 	#_state = data.state
 	set_state(data.state)

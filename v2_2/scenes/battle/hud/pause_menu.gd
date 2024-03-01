@@ -2,6 +2,9 @@ class_name BattlePauseMenu
 extends Control
 
 
+var _opened := false
+
+
 @onready var resume_button := %ResumeButton
 @onready var forfeit_button := %ForfeitButton
 @onready var save_button := %SaveButton
@@ -11,30 +14,25 @@ extends Control
 
 
 func _ready():
-	hide()
+	Game.push_pause()
+	resume_button.grab_focus()
+	_opened = true
 	
 	
-func _input(event):
-	if Engine.is_editor_hint():
+func close():
+	if not _opened:
 		return
-		
+	Game.pop_pause()
+	if get_viewport().gui_get_focus_owner():
+		get_viewport().gui_get_focus_owner().release_focus()
+	queue_free()
+
+
+func _input(event):
 	if event.is_action_pressed('cancel') and visible:
-		hide()
+		close()
 		get_viewport().set_input_as_handled()
 
 
-func _on_visibility_changed():
-	if not is_node_ready():
-		return
-	if visible:
-		Game.push_pause()
-		resume_button.grab_focus()
-		%SaveButton.disabled = Game.battle and not Game.battle.saving_allowed()
-	else:
-		Game.pop_pause()
-		if get_viewport().gui_get_focus_owner():
-			get_viewport().gui_get_focus_owner().release_focus()
-		
-
 func _on_resume_button_pressed():
-	hide()
+	close()

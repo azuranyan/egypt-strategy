@@ -56,25 +56,25 @@ y_sort_enabled = true
 script = ExtResource("6_f7xbd")
 
 [node name="SpawnPoint1" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(1, 9)
+map_position = Vector2(3, 7)
 
 [node name="SpawnPoint2" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(4, 10)
+map_position = Vector2(4, 9)
 
 [node name="SpawnPoint3" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(6, 0)
+map_position = Vector2(7, 4)
 
 [node name="SpawnPoint4" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(10, 2)
+map_position = Vector2(9, 4)
 
 [node name="SpawnPoint5" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(5, 10)
+map_position = Vector2(5, 9)
 
 [node name="SpawnPoint6" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(6, 10)
+map_position = Vector2(6, 9)
 
 [node name="SpawnPoint7" parent="SpawnPoints" instance=ExtResource("7_4daum")]
-map_position = Vector2(10, 7)
+map_position = Vector2(8, 8)
 
 [node name="SpawnPoint8" parent="SpawnPoints" instance=ExtResource("7_4daum")]
 modulate = Color(0, 0, 1, 0.2)

@@ -25,8 +25,8 @@ func _ready():
 
 	hide()
 	if type == Type.PLAYER:
-		Game.battle.player_prep_phase.connect(show)
+		BattleEvents.prep_phase_started.connect(show.unbind(1))
+		
 		# we dont get to hide again if player quits before starting battle,
 		# but it's fine cos we'll get unloaded together with the map anyway
-		Game.battle.battle_started.connect(func(_a, _d, _t, _m): hide())
-		
+		BattleEvents.prep_phase_ended.connect(hide.unbind(1))

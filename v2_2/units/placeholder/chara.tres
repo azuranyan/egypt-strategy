@@ -11,3 +11,4 @@ avatar = "Avatar of Placeholding"
 title = "The placeholdiest"
 map_color = Color(0, 1, 0, 1)
 portrait = ExtResource("1_8thv1")
+metadata/placeholder = true

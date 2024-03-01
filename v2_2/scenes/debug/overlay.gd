@@ -2,9 +2,29 @@ class_name TestOverlay
 extends CanvasLayer
 
 
+@onready var current_context_label = $CurrentContextState
+
+
 func _ready():
 	refresh_load_button()
 	
+	$Timer.timeout.connect(update)
+	$Timer.start()
+
+
+func update():
+	if get_tree().current_scene is OverworldScene:
+		# cant use name because duplicates are garbled due to name mangling
+		# e.g. when loading the same state
+		current_context_label.key = 'Overworld' 
+		current_context_label.value = Overworld.instance()._next_state
+	elif get_tree().current_scene is BattleImpl:
+		current_context_label.key = 'Battle'
+		current_context_label.value = BattleImpl.State.find_key(BattleImpl.instance().state)
+	else:
+		current_context_label.key = get_tree().current_scene.get_script().get_path()
+		current_context_label.value = ''
+
 
 func _on_load_button_pressed():
 	Game.load_state(SaveManager.load_from_slot(save_slot()))

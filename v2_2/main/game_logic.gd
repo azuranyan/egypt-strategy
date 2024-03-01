@@ -3,18 +3,19 @@ extends Node
 
 
 func _ready():
-	Game.overworld.started.connect(func(): print('Overworld started!'))
-	Game.overworld.ended.connect(func(): print('Overworld ended!'))
+	OverworldEvents.overworld_scene_entered.connect(func(): print('Overworld started!'))
+	OverworldEvents.overworld_scene_exiting.connect(func(): print('Overworld ended!'))
 	
-	Game.overworld.cycle_started.connect(func(count): print('Cycle %s started' % count))
-	Game.overworld.cycle_ended.connect(func(count): print('Cycle %s ended' % count))
+	OverworldEvents.cycle_started.connect(func(count): print('Cycle %s started' % count))
+	OverworldEvents.cycle_ended.connect(func(count): print('Cycle %s ended' % count))
 	
-	Game.overworld.turn_started.connect(func(empire): print('%s turn started' % empire.leader_id))
-	Game.overworld.turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_id))
+	OverworldEvents.turn_started.connect(func(empire): print('%s turn started' % empire.leader_id))
+	OverworldEvents.turn_ended.connect(func(empire): print('%s turn ended' % empire.leader_id))
 
-	Game.battle.battle_started.connect(func(_a, _d, _t, _m): print('Battle Started'))
-	Game.battle.battle_ended.connect(show_parsed_result)
-	Game.overworld.empire_defeated.connect(empire_defeated)
+	OverworldEvents.empire_defeated.connect(empire_defeated)
+	
+	BattleEvents.battle_started.connect(func(_a, _d, _t, _m): print('Battle Started'))
+	BattleEvents.battle_ended.connect(show_parsed_result)
 
 
 func show_parsed_result(result: BattleResult):

@@ -39,13 +39,15 @@ func _ready():
 	%AttackInfoPanel.hide()
 	hide()
 	character_panel.hide()
-	Game.battle.player_prep_phase.connect(_on_player_prep_phase)
-	Game.battle.turn_started.connect(_on_turn_started)
+	BattleEvents.prep_phase_started.connect(_on_prep_phase_started)
+	BattleEvents.turn_started.connect(_on_turn_started)
 
 	UnitEvents.selected.connect(_on_unit_selected)
 	
 	
-func _on_player_prep_phase():
+func _on_prep_phase_started(empire: Empire):
+	if not empire.is_player_owned():
+		return
 	for u in Game.get_empire_units(Game.battle.player(), Game.ALL_UNITS_MASK):
 		prep_unit_list.add_unit(u)
 	update()
@@ -344,6 +346,9 @@ func _on_hide_attack_info_timer_timeout():
 	%AttackInfoPanel.hide()
 
 
-func _on_unit_selected(_unit: Unit, _is_selected: bool):
-	set_selected_unit(Game.get_selected_unit())
+func _on_unit_selected(unit: Unit, is_selected: bool):
+	if is_selected:
+		set_selected_unit(unit)
+	else:
+		set_selected_unit(null)
 	

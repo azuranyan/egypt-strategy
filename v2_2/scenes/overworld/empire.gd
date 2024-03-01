@@ -29,17 +29,14 @@ enum Type {
 ## The list of territories owned by this empire.
 @export var territories: Array[Territory]
 
-## List of hero units this empire owns. Slot 0 is the empire's own unique unit.
-@export var hero_units: Array[int]
-
-## The list of units this empire owns.
-@export var units: Array[int]
-
 ## This empires current level of aggression.
 @export var aggression: float
 
 ## How much hp units have when battling.
 @export var hp_multiplier: float = 1
+
+## This empire force rating.
+@export var force_rating: float = 0.0
 
 
 ## Returns true if empire is player owned.
@@ -81,8 +78,3 @@ func is_adjacent_territory(territory: Territory) -> bool:
 ## Returns an array of adjacent territories.
 func get_adjacent(territory_list: Array[Territory]) -> Array[Territory]:
 	return territory_list.filter(is_adjacent_territory)
-
-
-## Returns true if the empire is is_defeated.
-func is_defeated() -> bool:
-	return territories.is_empty()

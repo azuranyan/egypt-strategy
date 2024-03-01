@@ -111,4 +111,3 @@ wait_time = 2.1
 one_shot = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-

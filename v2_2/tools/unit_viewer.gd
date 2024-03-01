@@ -28,12 +28,10 @@ func _ready():
 func add_unit(unit: Unit) -> void:
 	var idx := unit_list.add_item(unit.chara().name)
 	_index_to_unit.insert(idx, unit)
-	print(unit.display_name(), ' @%d created at %d' % [unit.id(), idx])
 
 
 func remove_unit(unit: Unit) -> void:
 	var idx: int = _index_to_unit.find(unit)
-	print(unit.display_name(), ' @%d destroyed at %d' % [unit.id(), idx])
 	_index_to_unit.remove_at(idx)
 	unit_list.remove_item(idx)
 	

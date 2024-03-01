@@ -39,7 +39,7 @@ func scene_exit():
 
 
 func _on_start_button_pressed():
-	Game.load_state(Game.create_new_data())
+	Game.start_new_game()
 
 
 func _on_continue_button_pressed():

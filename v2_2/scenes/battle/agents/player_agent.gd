@@ -411,7 +411,7 @@ func interact_select_cell(cell: Vector2):
 
 		STATE_BATTLE_SELECTING_MOVE:
 			if selected_unit.can_move():
-				if cell in selected_unit.get_placeable_cells():
+				if battle.check_unit_move(selected_unit, cell) == 0:
 					push_undo_action(UnitMoveAction.new(selected_unit, cell))
 				else:
 					Game.play_error_sound()

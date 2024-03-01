@@ -129,6 +129,12 @@ func set_empire(_empire: Empire) -> void:
 	assert(false, 'not implemented')
 	
 	
+## Returns true if this unit is a hero unit.
+func is_hero() -> bool:
+	assert(false, 'not implemented')
+	return false
+
+
 ## Returns true if another unit is an enemy.
 func is_enemy(_other: Unit) -> bool:
 	assert(false, 'not implemented')

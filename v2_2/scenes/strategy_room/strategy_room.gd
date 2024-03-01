@@ -1,8 +1,13 @@
 extends GameScene
 
 
+## Only allows unit inspection and doesn't play scenes and show new events.
+@export var inspect_mode: bool
+
+
 var selected_unit: Unit
 var units: Dictionary
+var play_event_id: StringName
 
 
 @onready var strategy_room_label = %StrategyRoomLabel
@@ -30,19 +35,29 @@ func _ready():
 	unit_info_card.special_attack_button_toggled.connect(_on_unit_info_card_special_attack_button_toggled)
 
 
-func _unhandled_input(event):
+func _unhandled_input(event)-> void:
 	if event.is_action_pressed("ui_cancel"):
 		scene_return()
 
 	
-func scene_enter(_kwargs := {}) -> void:
-	print('enter strategy room')
+func scene_enter(kwargs := {}) -> void:
+	inspect_mode = kwargs.inspect_mode
 	unit_list.clear()
+	%TooltipLabel.text = 'Inspect units.' if inspect_mode else 'View unit scenes.'
 	for unit in Game.get_empire_units(Game.overworld.player_empire(), Game.ALL_UNITS_MASK):
-		print(unit)
-		var icon := load('res://scenes/data/exclamation_mark.svg') if DialogueEvents.instance().has_new_character_event(unit.chara()) else null
+		var icon: Texture2D 
+		if not inspect_mode and Dialogue.instance().has_new_character_event(unit.chara()):
+			icon = load('res://scenes/data/exclamation_mark.svg')
+		else:
+			icon = null
 		var idx := unit_list.add_item(unit.display_name(), icon)
 		units[idx] = unit
+	OverworldEvents.strategy_room_opened.emit(inspect_mode)
+	play_event_id = ''
+
+
+func scene_exit() -> void:
+	OverworldEvents.strategy_room_closed.emit(play_event_id)
 
 
 func change_unit(unit: Unit) -> void:
@@ -66,7 +81,8 @@ func change_unit(unit: Unit) -> void:
 
 
 func open_unit(unit: Unit) -> void:
-	unit_info_card.render_unit(unit, DialogueEvents.instance().has_new_character_event(unit.chara()))
+	var show_unit_growth := not inspect_mode and Dialogue.instance().has_new_character_event(unit.chara())
+	unit_info_card.render_unit(unit, show_unit_growth)
 	character_portrait.texture = unit.chara().portrait
 	$AnimationPlayer.play('show')
 	
@@ -82,20 +98,22 @@ func _on_unit_list_item_selected(idx: int) -> void:
 
 func _on_unit_list_item_activated(idx: int) -> void:
 	change_unit(units[idx])
+	if inspect_mode:
+		return
+		
 	var chara := selected_unit.chara()
 
-	if not DialogueEvents.instance().has_character_events(chara):
+	if not Dialogue.instance().has_character_events(chara):
 		return
 
-	var should_play := false
-	if DialogueEvents.instance().has_new_character_event(chara):
-		should_play = await Game.create_pause_dialog("View %s's\nlatest scene?" % chara, 'Confirm', 'Cancel').closed
+	if Dialogue.instance().has_new_character_event(chara):
+		var should_play: bool = await Game.create_pause_dialog("View %s's\nlatest scene?" % chara, 'Confirm', 'Cancel').closed
+		if should_play:
+			play_event_id = Dialogue.instance().get_character_event(chara)
+			scene_return()
 	else:
-		should_play = await Game.create_pause_dialog("%s has no\nnew scenes." % chara, 'View Anyway', 'Cancel').closed
+		Game.create_pause_dialog("%s has no\nnew scenes." % chara, 'Confirm', '')
 		
-	if should_play:
-		DialogueEvents.instance().play_character_event(chara)
-
 	
 func _on_unit_info_card_basic_attack_button_toggled(toggle: bool) -> void:
 	if toggle:

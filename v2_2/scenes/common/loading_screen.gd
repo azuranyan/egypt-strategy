@@ -56,8 +56,8 @@ func is_midpoint_finished() -> bool:
 
 
 func _transition_midpoint() -> void:
-	transition_midpoint.emit(_animation_name)
 	_midpoint_finished = true
+	transition_midpoint.emit(_animation_name)
 
 
 func _on_timer_timeout():

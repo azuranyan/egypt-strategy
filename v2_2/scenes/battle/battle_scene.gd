@@ -9,7 +9,6 @@ signal _ctc
 @onready var hud: BattleHUD = $HUDVisibilityControl/HUD
 @onready var hud_visibility_control := $HUDVisibilityControl
 @onready var battle_start_banner := $BattleStartBanner
-@onready var pause_menu := $PauseMenu
 @onready var battle_result_screen = $BattleResultScreen
 
 @onready var viewport: Viewport = %Viewport
@@ -18,24 +17,20 @@ signal _ctc
 
 func _ready():
 	viewport.canvas_cull_mask &= ~(1 << 9)
-	pause_menu.forfeit_button.pressed.connect(Game.battle.show_forfeit_dialog)
 		
 
 func _unhandled_input(event):
-	if event.is_action_pressed('ui_accept'):
-		show_battle_results()
-		get_viewport().set_input_as_handled()
-		
 	if event.is_action_pressed('cancel'):
-		if Game.battle.is_battle_phase():
-			pause_menu.show()
+		if Battle.instance().is_battle_phase():
+			Battle.instance().show_pause_menu()
 		else:
-			Game.battle.show_forfeit_dialog()
+			Battle.instance().show_forfeit_dialog()
+			Battle.instance().show_forfeit_dialog()
 		get_viewport().set_input_as_handled()
 	
 
 func scene_enter(_kwargs := {}):
-	level.load_map(Game.battle.territory().maps[Game.battle.map_id()])
+	level.load_map(Battle.instance().territory().maps[Battle.instance().map_id()])
 	
 	
 func scene_exit():
@@ -87,7 +82,7 @@ func show_battle_start():
 	
 ## Displays the battle result.
 func show_battle_results():
-	var result := Game.battle.get_battle_result()
+	var result := Battle.instance().get_battle_result()
 	var message := battle_result_message(result)
 	var won := result.player_won()
 	if message == '':
