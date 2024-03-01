@@ -67,7 +67,7 @@ func call_scene(content_path: String, transition: String, kwargs := {}) -> void:
 ## Pops the current scene from the stack and restores the previous scene.
 func scene_return(transition: String, kwargs := {}) -> void:
 	await _wait_for_transition_finish()
-	if _scene_stack.size() <= 1:
+	if _scene_stack.is_empty():
 		push_error('scene_return(): scene stack empty!')
 		get_tree().quit()
 		return
@@ -248,9 +248,7 @@ func save_state() -> Dictionary:
 	}
 	
 	
-func load_state(save: SaveState):
-	var data := save.scene_manager_data
-	
+func load_state(data: Dictionary):
 	_scene_stack.assign(data.scene_stack)
 	_current_frame = data.current_frame
 

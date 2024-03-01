@@ -77,7 +77,7 @@ func force_end():
 		
 ## Returns the agent name.
 func agent_name() -> String:
-	return "<BaseAgent:%s" % empire.leader_id
+	return "<%s:%s>" % [get_script().get_path().get_file().get_basename(), empire.leader_id]
 	
 	
 ## Called on initialize.

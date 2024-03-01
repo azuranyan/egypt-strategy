@@ -35,6 +35,8 @@ enum State {
 @export var _next_state: State
 
 
+var _waiting_for: String
+var _battle_scene
 var last_acting_empire_unit: Dictionary
 var level: Level
 var agents: Dictionary
@@ -48,34 +50,94 @@ func _ready() -> void:
 	UnitEvents.damaged.connect(_on_unit_damaged)
 	BattleEvents.start_battle_requested.connect(start_battle)
 	BattleEvents.stop_battle_requested.connect(stop_battle)
+	SceneManager.scene_ready.connect(_on_scene_ready)
+
+
+func save_state() -> Dictionary:
+	return {
+		attacker = _attacker,
+		defender = _defender,
+		territory = _territory,
+		map_id = _map_id,
+		turns = _turns,
+		turn_queue = _turn_queue.duplicate(),
+		should_end = _should_end,
+		result_value = _result_value,
+		quick = _quick,
+		battle_phase = _battle_phase,
+		dying_units = _dying_units,
+		next_state = _next_state,
+		last_acting_empire_unit = last_acting_empire_unit,
+	}
+
+
+func load_state(data: Dictionary) -> void:
+	_attacker = data.attacker
+	_defender = data.defender
+	_territory = data.territory
+	_map_id = data.map_id
+	_turns = data.turns
+	_turn_queue.assign(data.turn_queue)
+	_should_end = data.should_end
+	_result_value = data.result_value
+	_quick = data.quick
+	_battle_phase = data.battle_phase
+	_dying_units = data.dying_units
+	_next_state = data.next_state
+	last_acting_empire_unit = data.last_acting_empire_unit
+	_is_running = false
+
+
+func _on_scene_ready(node: Node) -> void:
+	# this will make it so it's null when a diff scene is loaded
+	_battle_scene = node as BattleScene
+
+	# important to check if we're already running cos we may have been paused
+	# and waiting for the stack to return to our scene
+	if _battle_scene and not is_running():
+		_real_battle_main.call_deferred()
 
 
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
-func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
+func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, map_id_: int) -> void:
 	if is_running():
 		push_error('battle already running!')
 		return
 
 	# initialize context
-	self._attacker = _attacker
-	self._defender = _defender
-	self._territory = _territory
-	self._map_id = _map_id
+	_attacker = attacker_
+	_defender = defender_
+	_territory = territory_
+	_map_id = map_id_
 	
-	self._turns = 0
-	self._should_end = false
-	self._result_value = BattleResult.NONE
+	_turns = 0
+	_should_end = false
+	_result_value = BattleResult.NONE
 	
-	self._quick = not _attacker.is_player_owned() and not _defender.is_player_owned()
-	self._battle_phase = false
-	self._next_state = State.INVALID
-	
+	_quick = not _attacker.is_player_owned() and not _defender.is_player_owned()
+	_battle_phase = false
+	_next_state = State.INVALID
+
+	# these will be replaced later anyway but just leave it here for peace of mind
+	assert(_battle_scene == null)
+	_battle_scene = null
+
 	# do battle
 	if _quick:
 		_quick_battle.call_deferred()
 	else:
-		_real_battle.call_deferred()
+		BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
+		SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
+	
+		var end := func():
+			_unload_battle_scene()
+			SceneManager.scene_return('fade_to_black')
+			await SceneManager.transition_finished
+			_is_running = false
+			BattleEvents.battle_ended.emit(get_battle_result())
+
+		BattleEvents.battle_scene_exiting.connect(end, CONNECT_ONE_SHOT)
 	
 	
 func _quick_battle():
@@ -107,22 +169,9 @@ func _quick_battle():
 	_is_running = false
 	BattleEvents.battle_ended.emit(get_battle_result())
 	
-	
-func _real_battle():
-	await _load_battle_scene()
-
-	await _real_battle_main()
-
-	await _unload_battle_scene()
-
 
 func _load_battle_scene() -> void:
 	_is_running = true
-	BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
-	SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
-
-	await SceneManager.scene_ready
-
 	# hud
 	hud().menu_button.pressed.connect(show_pause_menu)
 
@@ -158,11 +207,6 @@ func _unload_battle_scene() -> void:
 
 	# hud
 	hud().menu_button.pressed.disconnect(show_pause_menu)
-
-	SceneManager.scene_return('fade_to_black')
-	await SceneManager.transition_finished
-	_is_running = false
-	BattleEvents.battle_ended.emit(get_battle_result())
 
 
 func _distribute_units():
@@ -220,9 +264,14 @@ func _on_unit_death(_unit: Unit):
 	
 
 func _real_battle_main():
+	_waiting_for = '_load_battle_scene'
+	await _load_battle_scene()
+	_waiting_for = ''
 	BattleEvents.battle_scene_entered.emit()
 
+	_waiting_for = 'start_prep_phase'
 	await start_prep_phase(player())
+	_waiting_for = ''
 	if not _should_end:
 		_next_state = State.BATTLE_START
 
@@ -239,7 +288,9 @@ func _real_battle_main():
 
 			State.BATTLE_START:
 				hud().hide()
+				_waiting_for = '_battle_scene.show_battle_start'
 				await get_active_battle_scene().show_battle_start()
+				_waiting_for = ''
 				hud().show()
 				_battle_phase = true
 				_next_state = State.CYCLE_START
@@ -251,9 +302,13 @@ func _real_battle_main():
 				_next_state = State.TURN_START
 
 			State.TURN_START:
+				_waiting_for = 'pan_to_last_acting_unit'
 				await pan_to_last_acting_unit(on_turn())
+				_waiting_for = ''
 				get_active_battle_scene().hud_visibility_control.show()
+				_waiting_for = '_hud.show_turn_banner'
 				await hud().show_turn_banner(1)
+				_waiting_for = ''
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
 
 				for u in Game.get_empire_units(on_turn()):
@@ -263,7 +318,9 @@ func _real_battle_main():
 				_next_state = State.ON_TURN
 
 			State.ON_TURN:
+				_waiting_for = '%s.start_turn' % agents[on_turn()].agent_name()
 				await agents[on_turn()].start_turn()
+				_waiting_for = ''
 				_next_state = State.TURN_END
 
 			State.TURN_END:
@@ -294,10 +351,12 @@ func _real_battle_main():
 			State.BATTLE_END:
 				BattleEvents.battle_ended.emit(get_battle_result())
 				if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
+					_waiting_for = 'get_active_battle_scene().show_battle_results'
 					await get_active_battle_scene().show_battle_results()
+					_waiting_for = ''
 				_next_state = State.INVALID
 				break
-		
+				
 		await get_tree().process_frame
 	BattleEvents.battle_scene_exiting.emit()
 
@@ -341,8 +400,7 @@ func wait_for_death_animations():
 
 ## Returns the active overworld scene. Kind of a hack, but yes.
 func get_active_battle_scene() -> BattleScene:
-	assert(is_running(), 'overworld not running!')
-	return get_tree().current_scene
+	return _battle_scene
 	
 	
 ## Creates the agent for the empire.

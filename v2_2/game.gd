@@ -89,15 +89,11 @@ func _ready():
 	add_child(node)
 	node.owner = self
 
-	battle = load('res://scenes/battle/battle_impl.gd').new()
-	battle.name = 'Battle'
-	add_child(battle)
-	battle.owner = self
-
 	attack_system = load('res://scenes/battle/attack_system.tscn').instantiate()
 	attack_system.name = 'AttackSystem'
-	add_child(attack_system)
+	add_child(attack_system, true)
 	attack_system.owner = self
+
 
 	audio_stream_player = AudioStreamPlayer2D.new()
 	add_child(audio_stream_player)
@@ -358,8 +354,13 @@ func start_new_game():
 func _create_subsystems():
 	overworld = load("res://scenes/overworld/overworld.gd").new()
 	overworld.name = 'Overworld'
-	add_child(overworld)
+	add_child(overworld, true)
 	overworld.owner = self
+
+	battle = load('res://scenes/battle/battle_impl.gd').new()
+	battle.name = 'Battle'
+	add_child(battle, true)
+	battle.owner = self
 
 
 ## Returns a copy of the game's current state.
@@ -375,7 +376,7 @@ func save_state() -> SaveState:
 
 	# save subsystems
 	save.overworld_data = overworld.save_state()
-	# save.battle_data = battle.save_state()
+	save.battle_data = battle.save_state()
 	save.scene_manager_data = SceneManager.save_state()
 
 	# TODO old dispatch system
@@ -396,9 +397,10 @@ func load_state(save: SaveState) -> void:
 	_next_unit_id = save.next_unit_id
 	
 	_create_subsystems()
-	overworld.load_state(save)
+	overworld.load_state(save.overworld_data)
+	battle.load_state(save.battle_data)
 
-	SceneManager.load_state(save)
+	SceneManager.load_state(save.scene_manager_data)
 	await SceneManager.transition_finished
 	
 	# battle.load_state(save)
@@ -423,7 +425,11 @@ func _cleanup() -> void:
 		destroy_unit(u)
 
 	_next_unit_id = 0
+
+	if battle:
+		battle.free()
+		battle = null
+
 	if overworld:
 		overworld.free()
 		overworld = null
-

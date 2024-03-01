@@ -31,13 +31,7 @@ enum {
 
 
 var battle: Battle
-var state: int = STATE_NONE:
-	set(value):
-		state = value
-		if not is_node_ready():
-			await ready
-		%State/ValueLabel.text = ['STATE_NONE', 'STATE_PREP_STANDBY', 'STATE_BATTLE_STANDBY', 'STATE_BATTLE_SELECTING_MOVE', 'STATE_BATTLE_SELECTING_TARGET'][state]
-
+var state: int = STATE_NONE
 var spawn_points: Array[SpawnPoint]
 
 var selected_unit: Unit
@@ -364,11 +358,19 @@ func interact_move_pointer(screen_pos: Vector2):
 		interact_move_cursor(battle.screen_to_cell(screen_pos))
 
 
+func get_interactable_bounds() -> Rect2:
+	return Rect2(-4, -4, battle.world().map_size.x + 8, battle.world().map_size.y + 8)
+
 ## Moves the cursor to the specified position.
 func interact_move_cursor(cell: Vector2):
 	if state == STATE_NONE:
 		return
+	
+	if not get_interactable_bounds().has_point(cell):
+		return
+
 	battle.set_cursor_pos(cell)
+
 	match state:
 		STATE_BATTLE_SELECTING_MOVE:
 			if selected_unit.can_move():
@@ -629,6 +631,10 @@ func set_mouse_input_mode(mouse_input_mode: bool):
 	var camera = battle.get_active_battle_scene().camera # hack
 	camera.drag_horizontal_enabled = mouse_input_mode
 	camera.drag_vertical_enabled = mouse_input_mode
+	if mouse_input_mode:
+		battle.set_camera_target(null)
+	else: # todo haxx
+		battle.set_camera_target(battle.get_active_battle_scene().level.cursor)
 
 
 ## Places a unit ghost at position.
@@ -915,6 +921,7 @@ class UnitMoveAction extends Action:
 	func undo():
 		unit.load_state(state)
 		agent.interact_select_unit(unit)
+		Battle.instance().set_camera_target(unit.get_global_position())
 
 	func type_tag() -> String:
 		return 'move'

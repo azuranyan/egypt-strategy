@@ -18,9 +18,13 @@ func update():
 		# e.g. when loading the same state
 		current_context_label.key = 'Overworld' 
 		current_context_label.value = Overworld.instance()._next_state
-	elif get_tree().current_scene is BattleImpl:
+	elif get_tree().current_scene is BattleScene:
 		current_context_label.key = 'Battle'
-		current_context_label.value = BattleImpl.State.find_key(BattleImpl.instance().state)
+		var state_string: StringName = BattleImpl.State.find_key(BattleImpl.instance()._next_state)
+		if BattleImpl.instance()._waiting_for:
+			current_context_label.value = state_string + ' (' + BattleImpl.instance()._waiting_for + ')'
+		else:
+			current_context_label.value = state_string
 	else:
 		current_context_label.key = get_tree().current_scene.get_script().get_path()
 		current_context_label.value = ''

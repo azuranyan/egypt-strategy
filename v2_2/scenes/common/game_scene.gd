@@ -96,7 +96,7 @@ class StackUnwinder extends Object:
 	
 	func unwind(idx: int, kwargs := {}) -> void:
 		# skip and pop until last item
-		for i in range(SceneManager._scene_stack.size() - 1, idx + 1, -1):
+		for i in range(SceneManager._scene_stack.size() - 1, idx, -1):
 			SceneManager.scene_return('skip')
 			await SceneManager.transition_finished
 		

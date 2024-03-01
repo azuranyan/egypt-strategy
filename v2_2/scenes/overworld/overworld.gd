@@ -313,10 +313,8 @@ func save_state() -> Dictionary:
 
 
 ## Called when it's time to load.
-func load_state(save: SaveState):
+func load_state(data: Dictionary):
 	_set_initialized(false)
-	var data := save.overworld_data
-
 	_territories.assign(data.territories)
 	_boss_adjacent_territories.assign(data.boss_adjacent_territories)
 	_empires.assign(data.empires)
