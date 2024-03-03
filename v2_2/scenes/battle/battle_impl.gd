@@ -35,7 +35,7 @@ enum State {
 @export var _next_state: State
 
 
-var _waiting_for: String
+var _waiting_for: StringName
 var _battle_scene
 var last_acting_empire_unit: Dictionary
 var level: Level
@@ -263,15 +263,18 @@ func _on_unit_death(_unit: Unit):
 	_death_animations_finished.emit()
 	
 
-func _real_battle_main():
-	_waiting_for = '_load_battle_scene'
-	await _load_battle_scene()
+## 
+func _call_and_wait(callable: Callable, argv: Array = [], tag: StringName = '') -> void:
+	_waiting_for = callable.get_method() if tag.is_empty() else tag
+	await callable.callv(argv)
 	_waiting_for = ''
+
+
+func _real_battle_main():
+	await _call_and_wait(_load_battle_scene)
 	BattleEvents.battle_scene_entered.emit()
 
-	_waiting_for = 'start_prep_phase'
-	await start_prep_phase(player())
-	_waiting_for = ''
+	await _call_and_wait(start_prep_phase, [player()])
 	if not _should_end:
 		_next_state = State.BATTLE_START
 
@@ -288,9 +291,7 @@ func _real_battle_main():
 
 			State.BATTLE_START:
 				hud().hide()
-				_waiting_for = '_battle_scene.show_battle_start'
-				await get_active_battle_scene().show_battle_start()
-				_waiting_for = ''
+				await _call_and_wait(get_active_battle_scene().show_battle_start)
 				hud().show()
 				_battle_phase = true
 				_next_state = State.CYCLE_START
@@ -302,13 +303,11 @@ func _real_battle_main():
 				_next_state = State.TURN_START
 
 			State.TURN_START:
-				_waiting_for = 'pan_to_last_acting_unit'
-				await pan_to_last_acting_unit(on_turn())
-				_waiting_for = ''
+				await _call_and_wait(pan_to_last_acting_unit, [on_turn()])
+
 				get_active_battle_scene().hud_visibility_control.show()
-				_waiting_for = '_hud.show_turn_banner'
-				await hud().show_turn_banner(1)
-				_waiting_for = ''
+				await _call_and_wait(hud().show_turn_banner)
+
 				get_active_battle_scene().hud_visibility_control.visible = on_turn().is_player_owned()
 
 				for u in Game.get_empire_units(on_turn()):
@@ -318,9 +317,7 @@ func _real_battle_main():
 				_next_state = State.ON_TURN
 
 			State.ON_TURN:
-				_waiting_for = '%s.start_turn' % agents[on_turn()].agent_name()
-				await agents[on_turn()].start_turn()
-				_waiting_for = ''
+				await _call_and_wait(agents[on_turn()].start_turn, [], '%s::start_turn' % agents[on_turn()].agent_name())
 				_next_state = State.TURN_END
 
 			State.TURN_END:
@@ -351,9 +348,7 @@ func _real_battle_main():
 			State.BATTLE_END:
 				BattleEvents.battle_ended.emit(get_battle_result())
 				if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
-					_waiting_for = 'get_active_battle_scene().show_battle_results'
-					await get_active_battle_scene().show_battle_results()
-					_waiting_for = ''
+					await _call_and_wait(get_active_battle_scene().show_battle_results)
 				_next_state = State.INVALID
 				break
 				
@@ -705,7 +700,9 @@ func clear_overlays(mask: int = ALL_OVERLAYS) -> void:
 func set_camera_target(target: Variant) -> void:
 	var final_pos := _camera_target_position(target)
 	get_active_battle_scene().set_camera_target(target)
-	while get_active_battle_scene().camera.position != final_pos:
+
+	# BUG when game stops running, but has already freed the resources
+	while get_active_battle_scene() and get_active_battle_scene().camera.position != final_pos:
 		await get_tree().process_frame
 
 
@@ -895,21 +892,26 @@ func unit_action_pass(unit: Unit) -> void:
 @warning_ignore("redundant_await")
 func unit_action_move(unit: Unit, target: Vector2) -> void:
 	hud().hide()
-	get_active_battle_scene().camera.drag_horizontal_enabled = false
-	get_active_battle_scene().camera.drag_horizontal_enabled = false
 	await set_camera_target(unit)
 
 	if on_turn() == ai():
 		draw_unit_placeable_cells(unit, true)
 		await get_tree().create_timer(0.5).timeout
 		clear_overlays(PLACEABLE_CELLS)
-		
+	
+	# TODO this doesn't work anyway because above set_camera_target doesn't
+	# wait for panning to finish going to target unit
+	get_active_battle_scene().camera.drag_horizontal_enabled = false
+	get_active_battle_scene().camera.drag_vertical_enabled = false
+	get_active_battle_scene().camera.position_smoothing_enabled = false
 	await unit.walk_towards(target)
+	get_active_battle_scene().camera.drag_horizontal_enabled = true
+	get_active_battle_scene().camera.drag_vertical_enabled = true
+	get_active_battle_scene().camera.position_smoothing_enabled = true
+
 	unit.set_has_moved(true)
 
 	await set_camera_target(null)
-	get_active_battle_scene().camera.drag_horizontal_enabled = true # should be push
-	get_active_battle_scene().camera.drag_horizontal_enabled = true
 	hud().set_selected_unit.call_deferred(unit)
 	hud().show()
 
@@ -922,22 +924,23 @@ func unit_action_move(unit: Unit, target: Vector2) -> void:
 @warning_ignore("redundant_await")
 func unit_action_attack(unit: Unit, attack: Attack, target: Array[Vector2], rotation: Array[float]) -> void:
 	hud().show_attack_banner(attack)
+	var old_pos := unit.get_position()
 	var centroid := Util.centroid(target)
 	await set_camera_target(world().as_global(centroid))
-	#set_camera_target(world().as_global(centroid))
 
 	await unit.use_attack(attack, target, rotation)
 	await set_camera_target(unit)
 	unit.set_has_attacked(true)
 	unit.set_turn_done(true)
 
-	set_camera_target(unit)
+	await set_camera_target(unit)
 	hud().set_selected_unit(null)
 	hud().hide_attack_banner()
 
 	last_acting_empire_unit[unit.get_empire()] = unit
 	check_for_battle_end()
 	await wait_for_death_animations()
+	await set_camera_target(old_pos)
 
 
 ## Generates an array of all possible actions.

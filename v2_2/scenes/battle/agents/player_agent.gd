@@ -43,12 +43,7 @@ var unit_drag_start: Vector2
 var unit_drag_offset: Vector2
 
 # attack
-var active_attack: Attack:
-	set(value):
-		active_attack = value
-		if not is_node_ready():
-			await ready
-		%ActiveAttack/ValueLabel.text = active_attack.name if active_attack else '<null>'
+var active_attack: Attack
 var multicast_targets: Array[Vector2]
 var mutlicast_rotations: Array[float]
 

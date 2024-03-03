@@ -11,10 +11,8 @@ signal saving_state
 ## Emitted when game is about to load state.
 signal loading_state
 
-
 ## Emitted on new game start.
 signal new_game_started
-
 
 
 const ALL_UNITS_GROUP := &'all_units'
@@ -70,8 +68,8 @@ var battle: Battle
 ## Reference to the [AttackSystem].
 var attack_system: AttackSystem
 
-## Reference to the [Dialog] aka event system.
-var dialog: Variant
+## Reference to the [Dialogue] system.
+var dialogue: Dialogue
 
 var audio_stream_player: AudioStreamPlayer2D
 
@@ -355,12 +353,14 @@ func _create_subsystems():
 	overworld = load("res://scenes/overworld/overworld.gd").new()
 	overworld.name = 'Overworld'
 	add_child(overworld, true)
-	overworld.owner = self
 
 	battle = load('res://scenes/battle/battle_impl.gd').new()
 	battle.name = 'Battle'
 	add_child(battle, true)
-	battle.owner = self
+	
+	dialogue = load('res://scenes/dialogue/dialogue.gd').new()
+	dialogue.name = 'Dialogue'
+	add_child(dialogue, true)
 
 
 ## Returns a copy of the game's current state.
@@ -377,6 +377,7 @@ func save_state() -> SaveState:
 	# save subsystems
 	save.overworld_data = overworld.save_state()
 	save.battle_data = battle.save_state()
+	save.dialogue_data = dialogue.save_state()
 	save.scene_manager_data = SceneManager.save_state()
 
 	# TODO old dispatch system
@@ -399,12 +400,10 @@ func load_state(save: SaveState) -> void:
 	_create_subsystems()
 	overworld.load_state(save.overworld_data)
 	battle.load_state(save.battle_data)
+	dialogue.load_state(save.dialogue_data)
 
 	SceneManager.load_state(save.scene_manager_data)
 	await SceneManager.transition_finished
-	
-	# battle.load_state(save)
-	
 	
 	# TODO old dispatch system
 	get_tree().call_group('game_event_listeners', 'on_load', save)
@@ -433,3 +432,7 @@ func _cleanup() -> void:
 	if overworld:
 		overworld.free()
 		overworld = null
+
+	if dialogue:
+		dialogue.free()
+		dialogue = null
