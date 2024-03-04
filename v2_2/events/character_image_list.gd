@@ -41,6 +41,7 @@ func create_image_from_tags(tags: PackedStringArray) -> Sprite2D:
 	# add dummy parent for proper scaling
 	var parent := Node2D.new()
 	parent.add_child(image)
+	parent.set_meta('tags', tags)
 	return parent
 
 

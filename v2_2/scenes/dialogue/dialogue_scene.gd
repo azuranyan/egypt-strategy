@@ -106,8 +106,13 @@ func update_dialogue() -> void:
 	if not is_node_ready():
 		await ready
 	
-	character_label.visible = not _dialogue_line.character.is_empty()
-	character_label.text = tr(_dialogue_line.character)
+	if _dialogue_line.character:
+		if Director.is_character_shown(_dialogue_line.character):
+			Director.show_character(_dialogue_line.character, Director.KEEP_POSITION, _dialogue_line.tags)
+		character_label.text = tr(_dialogue_line.character)
+		character_label.show()
+	else:
+		character_label.hide()
 
 	dialogue_label.hide()
 	dialogue_label.dialogue_line = _dialogue_line

@@ -1,20 +1,31 @@
-extends CanvasLayer
+extends Node
 
 
 const CharacterImageList := preload('res://events/character_image_list.gd')
 
-const KEEP_POSITION := Vector2(9102, 3121)
+const FADE_TO_BLACK := 'fade_to_black'
+const FADE_FROM_BLACK := 'fade_from_black'
+const FADE_IN := 'fade_in'
+const FADE_OUT := 'fade_out'
+const SLIDE_TO_LEFT := 'slide_to_left'
+const SLIDE_TO_RIGHT := 'slide_to_right'
+const SLIDE_FROM_LEFT := 'slide_from_left'
+const SLIDE_FROM_RIGHT := 'slide_from_right'
+const SLIDE_TO:= 'slide_to'
+const SCALE_IN := 'scale_in'
+const SCALE_OUT := 'scale_out'
 
-enum {
-	FADE_TO_BLACK,
-	FADE_FROM_BLACK,
-	FADE_IN,
-	FADE_OUT,
-	SLIDE_FROM_LEFT,
-	SLIDE_FROM_RIGHT,
-	SCALE_IN,
-	SCALE_OUT,
-}
+const LEFT := Vector2(0.25, 1.0)
+const RIGHT := Vector2(0.75, 1.0)
+const CENTER := Vector2(0.5, 1.0)
+const OFFSCREEN_LEFT := Vector2(-0.5, 1.0)
+const OFFSCREEN_RIGHT := Vector2(1.5, 1.0)
+
+const KEEP_POSITION := Vector2(9102, 3121)
+const KEEP_TAGS: PackedStringArray = []
+
+const DEFAULT_POSITION := CENTER
+const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
 
 
 var image_registry := {}
@@ -51,8 +62,13 @@ func _cleanup(cache_images := true) -> void:
 			image.queue_free()
 
 
+## Returns true if the character is shown.
+func is_character_shown(chara: String) -> bool:
+	return get_shown_character_image(chara) != null
+
+
 ## Returns the first image of character.
-func get_shown_character_image(chara: String) -> Sprite2D:
+func get_shown_character_image(chara: String) -> Node2D:
 	for c in shown_images:
 		if c.name.begins_with(chara + '_'):
 			return c
@@ -60,19 +76,31 @@ func get_shown_character_image(chara: String) -> Sprite2D:
 
 
 ## Shows the character at position.
-func show_character(chara: String, pos: Vector2, tags: Variant = CharacterImageList.DEFAULT_TAGS, with := '') -> void:
-	if not tags is PackedStringArray:
-		tags = [tags]
-
-	var image_name := ImageLibrary.get_image_name(chara, tags)
+func show_character(chara: String, pos := KEEP_POSITION, tags := KEEP_TAGS, with := '') -> void:
+	# check if there's already a shown image
 	var shown_image := get_shown_character_image(chara)
 
 	if pos == KEEP_POSITION:
-		pos = shown_image.position if shown_image else Vector2.ZERO
+		if shown_image:
+			pos = shown_image.position
+		else:
+			pos = DEFAULT_POSITION
+
+	if tags == KEEP_TAGS:
+		if shown_image:
+			tags = shown_image.get_meta('tags')
+		else:
+			tags = DEFAULT_TAGS
+	elif not tags is PackedStringArray:
+		tags = [tags]
+
+	# this was working last time, now it can't fucking infer again
+	var image_name: String = ImageLibrary.get_image_name(chara, tags)
 
 	# if the image is already shown, just update its position
 	if shown_image and shown_image.name == image_name:
-		show_image(shown_image, pos, with)
+		if pos != shown_image.position:
+			await show_image(shown_image, pos, with)
 		return 
 	
 	if shown_image:
@@ -94,7 +122,7 @@ func show_character(chara: String, pos: Vector2, tags: Variant = CharacterImageL
 	# add child
 	add_child(image)
 	shown_images.append(image)
-	show_image(image, pos, with)
+	await show_image(image, pos, with)
 
 
 ## Hides the character image.
@@ -105,9 +133,50 @@ func hide_character(chara: String, with := '') -> void:
 
 
 ## Shows the image.
-func show_image(image: Node2D, pos: Vector2, _with: String) -> void:
-	image.position = pos
+func show_image(image: Node2D, pos: Vector2, with: String) -> void:
+	var tween := create_tween()
 	image.show()
+	match with:
+		FADE_TO_BLACK:
+			image.modulate = Color.WHITE
+			tween.tween_property(image, 'modulate', Color(0.0, 0.0, 0.0, 0.0), 0.4)
+		FADE_FROM_BLACK:
+			image.modulate = Color(0.0, 0.0, 0.0, 0.0)
+			tween.tween_property(image, 'modulate', Color.WHITE, 0.4)
+		FADE_IN:
+			image.modulate = Color.TRANSPARENT
+			tween.tween_property(image, 'modulate', Color.WHITE, 0.4)
+		FADE_OUT:
+			image.modulate = Color.WHITE
+			tween.tween_property(image, 'modulate', Color.TRANSPARENT, 0.4)
+		SLIDE_FROM_LEFT:
+			image.position = norm_to_pos(OFFSCREEN_LEFT)
+			tween.tween_property(image, 'position', pos, 0.4)
+		SLIDE_FROM_RIGHT:
+			image.position = norm_to_pos(OFFSCREEN_RIGHT)
+			tween.tween_property(image, 'position', pos, 0.4)
+		SLIDE_TO_LEFT:
+			image.position = pos
+			tween.tween_property(image, 'position', OFFSCREEN_LEFT, 0.4)
+		SLIDE_TO_RIGHT:
+			image.position = pos
+			tween.tween_property(image, 'position', OFFSCREEN_RIGHT, 0.4)
+		SLIDE_TO:
+			tween.tween_property(image, 'position', pos, 0.4)
+		SCALE_IN:
+			image.scale = Vector2.ZERO
+			tween.tween_property(image, 'scale', Vector2.ONE, 0.4)
+		SCALE_OUT:
+			image.scale = Vector2.ONE
+			tween.tween_property(image, 'scale', Vector2.ZERO, 0.4)
+		_:
+			image.modulate = Color.WHITE
+			image.position = pos
+			image.scale = Vector2.ONE
+			tween.stop()
+			tween = null
+	if tween:
+		await tween.finished
 
 
 ## Hides the image.
@@ -130,7 +199,7 @@ func cache_and_remove_from_scene(image: Node2D) -> Node2D:
 
 
 ## Returns the cached image or null if not found.
-func retrieve_and_remove_from_cache(image_name: String) -> Sprite2D:
+func retrieve_and_remove_from_cache(image_name: String) -> Node2D:
 	var image := cached_images.get_node_or_null(image_name)
 	if image:
 		cached_images.remove_child(image)
@@ -144,17 +213,6 @@ func replace_character(old_chara: String, new_chara: String, exit_with := '', en
 ## Applies a transition to the whole scene.
 func transition(transition: String) -> void:
 	print('transition ', transition)
-
-   
-func str_to_pos(s: String) -> Vector2:
-	const STRVAL := {
-		left = Vector2(0.25, 1.0),
-		right = Vector2(0.75, 1.0),
-		center = Vector2(0.5, 1.0),
-		offscreen_left = Vector2(-0.5, 1.0),
-		offscreen_right = Vector2(1.5, 1.0),
-	}
-	return norm_to_pos(STRVAL.get(s, Vector2(0.5, 1.0)))
 
 
 func norm_to_pos(v: Vector2) -> Vector2:

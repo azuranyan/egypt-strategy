@@ -52,6 +52,7 @@ images = [NodePath("red")]
 position = Vector2(114.19, -113)
 scale = Vector2(0.669508, 0.669508)
 texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("default")
 
 [node name="red" type="Sprite2D" parent="nnivx"]
 modulate = Color(1, 0.639216, 0.639216, 1)

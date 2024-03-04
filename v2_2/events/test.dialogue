@@ -3,19 +3,20 @@ using Director
 ~ start
 
 set background = 'firefly'
-do show_character("nnivx", str_to_pos('left'))
+do show_character("nnivx", norm_to_pos(LEFT), DEFAULT_TAGS, SLIDE_FROM_LEFT)
 nnivx: [[Hello|Hey]].
 
 nnivx: Check out the awesome new features, would you like to know more?
 - Yes
-	nnivx: Like this! i can turn [do show_character("nnivx", KEEP_POSITION, 'red')]red!
-	nnivx: Or something like this, [do show_character("nnivx", str_to_pos('right'))]wazoom!
+	nnivx [#red]: Like this! I can turn red!
+	nnivx: Or something like this, [do show_character("nnivx", norm_to_pos(RIGHT), KEEP_TAGS, SLIDE_TO)]wazoom!
 	nnivx: Too bad im too lazy to document them, so...
 	=>< features
 - No
 	nnivx: Alright that's good! cos i can't list them all here.
 	
 nnivx: I'm not sure what to do past this point.
+do show_character("nnivx", KEEP_POSITION, KEEP_TAGS, SLIDE_TO_RIGHT)
 
 => END
 
