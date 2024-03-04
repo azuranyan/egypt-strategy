@@ -22,7 +22,7 @@ func render_unit(unit: Unit, show_growth: bool) -> void:
 
 	# bond level
 	for i in %StarContainer.get_child_count():
-		if i <= unit.get_bond():
+		if i < unit.get_bond():
 			%StarContainer.get_child(i).texture = load('res://scenes/overworld/data/star-filled.svg')
 		else:
 			%StarContainer.get_child(i).texture = load('res://scenes/overworld/data/star.svg')

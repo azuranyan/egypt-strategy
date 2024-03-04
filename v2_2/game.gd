@@ -186,6 +186,9 @@ func create_unit(empire: Empire, chara_id: StringName) -> Unit:
 		unit_type = unit_type,
 		empire = empire,
 		hero = empire.leader_id == chara_id,
+
+		# special is only available for player units
+		special_unlock = -1 if empire.is_player_owned() else 0,
 	}
 	_next_unit_id += 1
 	return _create_unit_from_data(data, false)
@@ -235,7 +238,7 @@ func destroy_unit(unit: Unit):
 ## For getting the exact unit, use `load_unit` instead.
 func get_unit_by_chara_id(chara_id: StringName) -> Unit:
 	for u in unit_registry:
-		if unit_registry[u].chara_id == chara_id:
+		if unit_registry[u].chara_id() == chara_id:
 			return unit_registry[u]
 	return null
 
@@ -357,6 +360,7 @@ func start_new_game():
 	# start the actual start of the game
 	#overworld.start_overworld_cycle()
 	SceneManager.call_scene(SceneManager.scenes.overworld, 'fade_to_black')
+	game_started.emit()
 	
 
 func _create_subsystems():
@@ -417,6 +421,7 @@ func load_state(save: SaveState) -> void:
 	
 	# TODO old dispatch system
 	get_tree().call_group('game_event_listeners', 'on_load', save)
+	game_started.emit()
 
 
 func _create_save() -> SaveState:

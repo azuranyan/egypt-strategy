@@ -58,6 +58,12 @@ func id() -> int:
 	return 0
 
 
+## Returns the character id.
+func chara_id() -> StringName:
+	assert(false, 'not implemented')
+	return ''
+	
+
 ## The character representing this unit.
 func chara() -> CharacterInfo:
 	assert(false, 'not implemented')

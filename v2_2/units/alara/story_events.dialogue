@@ -1,7 +1,9 @@
+using Director
+
 ~ story_event_1
 
 set background = "res://events/dungeon_entrance.jpg"
-do show_character("Alara", norm_to_screen(LEFT))
+do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event one complete!
 
@@ -10,7 +12,7 @@ Alara: Event one complete!
 ~ story_event_2
 
 set background = "res://events/dungeon_entrance.jpg"
-do show_character("Alara", norm_to_screen(LEFT))
+do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event two complete!
 Alara: Stats up!
@@ -18,7 +20,7 @@ Alara: Stats up!
 ~ story_event_3
 
 set background = "res://events/dungeon_entrance.jpg"
-do show_character("Alara", norm_to_screen(LEFT))
+do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event three complete, MAX BOND!
 Alara: Special unlocked!

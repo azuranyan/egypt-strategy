@@ -131,6 +131,14 @@ func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, m
 		SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
 	
 		var end := func():
+			# show the battle result banner. kinda awkward that it's here but oh well.
+			if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
+				await _call_and_wait(get_active_battle_scene().show_battle_results)
+
+			# give out the rewards
+			_update_unit_bonds(get_battle_result())
+
+			# return from the scene
 			_unload_battle_scene()
 			SceneManager.scene_return('fade_to_black')
 			await SceneManager.transition_finished
@@ -147,13 +155,14 @@ func _quick_battle():
 	# add variance
 	var atk := Overworld.instance().calculate_empire_force_rating(_attacker) * randf_range(0.9, 1.1)
 	var def := Overworld.instance().calculate_empire_force_rating(_defender) * randf_range(0.9, 1.1)
-	var result := atk/def + 0.05
+	var roll := atk/def + 0.05
 
+	# scale it so enemy is more likely to withdraw the bigger the power gap is
 	var power_difference := absf(atk - def)
 	var withdraw_chance := clampf(power_difference/(atk + def), 0.1, 0.9)
 	var withdraw := randf() < withdraw_chance
 
-	if result > 1.0:
+	if roll > 1.0:
 		if withdraw:
 			_result_value = BattleResult.DEFENDER_WITHDRAW
 		else:
@@ -167,8 +176,26 @@ func _quick_battle():
 	# fixes waiting signals after process frame
 	await get_tree().process_frame
 	_is_running = false
-	BattleEvents.battle_ended.emit(get_battle_result())
-	
+
+	var result := get_battle_result()
+	_update_unit_bonds(result)
+	BattleEvents.battle_ended.emit(result)
+
+
+func _update_unit_bonds(result: BattleResult) -> void:
+	if result.value == BattleResult.NONE or result.value == BattleResult.CANCELLED:
+		return
+	# TODO what if the winner gets many territories after battle end like in
+	# defeat on home territory capture?
+	var winner := result.winner()
+	if winner.is_player_owned():
+		for unit in Game.get_empire_units(winner):
+			if unit.is_alive():
+				unit.set_bond(unit.get_bond() + 1)
+	else:
+		for unit in Game.get_empire_units(winner):
+			unit.set_bond(unit.get_bond() + 1)
+
 
 func _load_battle_scene() -> void:
 	_is_running = true
@@ -263,7 +290,8 @@ func _on_unit_death(_unit: Unit):
 	_death_animations_finished.emit()
 	
 
-## 
+## Calls the function and waits for it.
+## Keeps track of the name of the function we're waiting for for debugging purposes.
 func _call_and_wait(callable: Callable, argv: Array = [], tag: StringName = '') -> void:
 	_waiting_for = callable.get_method() if tag.is_empty() else tag
 	await callable.callv(argv)
@@ -280,7 +308,8 @@ func _real_battle_main():
 
 	while not _should_end:
 		if check_for_battle_end():
-			_next_state = State.BATTLE_END
+			_next_state = State.INVALID
+			break
 
 		match _next_state:
 			State.INVALID:
@@ -344,15 +373,9 @@ func _real_battle_main():
 				BattleEvents.cycle_ended.emit(_turns) 
 				_turns += 1
 				_next_state = State.CYCLE_START
-
-			State.BATTLE_END:
-				BattleEvents.battle_ended.emit(get_battle_result())
-				if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
-					await _call_and_wait(get_active_battle_scene().show_battle_results)
-				_next_state = State.INVALID
-				break
 				
 		await get_tree().process_frame
+	
 	BattleEvents.battle_scene_exiting.emit()
 
 

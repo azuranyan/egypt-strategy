@@ -28,13 +28,9 @@ BattleEvents="*res://scenes/battle/battle_events.gd"
 DialogueEvents="*res://scenes/dialogue/dialogue_events.gd"
 Game="*res://game.gd"
 CSUtil="*res://CSUtil.cs"
-DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 ImageLibrary="*res://events/image_library.tscn"
 Director="*res://scenes/dialogue/director.gd"
-
-[dialogue_manager]
-
-general/balloon_path="res://scenes/dialogue/Balloon.tscn"
+DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 
 [display]
 

@@ -102,7 +102,7 @@ func refresh_event_queue() -> bool:
 			continue
 		event_queue.append(event_id)
 	event_queue.sort_custom(func(a, b): return event_registry[a].priority > event_registry[b].priority)
-	return old_event_queue == event_queue
+	return old_event_queue != event_queue
 	
 
 ## Returns true if this character has character events.

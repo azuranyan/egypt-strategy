@@ -147,6 +147,11 @@ func id() -> int:
 	return _id
 
 
+## Returns the character id.
+func chara_id() -> StringName:
+	return _chara_id
+	
+
 ## The character representing this unit.
 func chara() -> CharacterInfo:
 	return _chara
@@ -176,11 +181,12 @@ func model_scale() -> Vector2:
 func base_stats() -> Dictionary:
 	var re := _unit_type.stats.duplicate()
 	if _bond >= 1:
-		for stat in _stats:
+		for stat in _unit_type.stat_growth_1:
 			re[stat] += _unit_type.stat_growth_1[stat]
 	if _bond >= 2:
-		for stat in _stats:
+		for stat in _unit_type.stat_growth_2:
 			re[stat] += _unit_type.stat_growth_2[stat]
+	re[&'hp'] = re.maxhp
 	return re
 #endregion Unit Attributes
 
@@ -319,7 +325,7 @@ func set_stat(stat: StringName, value: int) -> void:
 	
 ## Sets the bond level of this unit.
 func set_bond(value: int) -> void:
-	_bond = value
+	_bond = clampi(value, 0, 3)
 	UnitEvents.bond_changed.emit(self)
 
 

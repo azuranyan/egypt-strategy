@@ -15,7 +15,11 @@ func check_requirements(seen_events: Array[StringName]) -> bool:
 
 func check_conditions() -> bool:
 	var unit := Game.get_unit_by_chara_id(chara_id)
-	return (unit and unit.get_bond() > event_index) and super.check_conditions()
+
+	# bond is also used for levelling npc stats so we need to make this check
+	var is_player_unit := unit and unit.is_player_owned()
+	var is_unlocked := unit.get_bond() > event_index
+	return is_player_unit and is_unlocked and super.check_conditions()
 
 
 func check_prerequisite_event(seen_events: Array[StringName]) -> bool:

@@ -432,12 +432,12 @@ func _overworld_main() -> void:
 			# This makes it so the player can choose a different strategy room scene, however
 			# new events will not be skipped and still be forced to play.
 			'post_turn':
-				var allow_strategy_room := on_turn().is_player_owned() and _new_event.is_empty()
-				var strategy_room: bool = await get_active_overworld_scene().show_battle_result_banner(Battle.instance().get_battle_result(), allow_strategy_room)
-
 				if _new_event:
 					_next_state = 'process_new_event'
 				else:
+					var allow_strategy_room := on_turn().is_player_owned() and _new_event.is_empty()
+					var strategy_room: bool = await get_active_overworld_scene().show_battle_result_banner(Battle.instance().get_battle_result(), allow_strategy_room)
+
 					if strategy_room:
 						SceneManager.call_scene(SceneManager.scenes.strategy_room, 'fade_to_black', {inspect_mode=false})
 						var event_id: StringName = await OverworldEvents.strategy_room_closed
@@ -446,9 +446,9 @@ func _overworld_main() -> void:
 						
 						if event_id:
 							DialogueEvents.start_event_requested.emit(event_id)
-							await DialogueEvents.queue_ended
+							await DialogueEvents.event_ended
 
-				_next_state = 'turn_end'
+					_next_state = 'turn_end'
 				
 			# Immediately processes the new event and waits for it to end.
 			# Abandoning the game here will cause it to return to this point and restart
@@ -456,7 +456,7 @@ func _overworld_main() -> void:
 			'process_new_event':
 				assert(not _new_event.is_empty(), 'no new event to process!')
 				DialogueEvents.start_event_requested.emit(_new_event)
-				await DialogueEvents.queue_ended
+				await DialogueEvents.event_ended
 				_new_event = ''
 				_next_state = 'turn_end'
 

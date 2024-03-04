@@ -252,6 +252,7 @@ shadow_size = 4
 shadow_color = Color(0, 0, 0, 0.498039)
 
 [node name="BattleResultScreen" type="CanvasLayer"]
+layer = 2
 script = ExtResource("1_jycyy")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
