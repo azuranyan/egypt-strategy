@@ -1,13 +1,25 @@
+using Director
+
 ~ start
 
-Nathan: [[Hi|Hello|Howdy]], this is some dialogue.
-Nathan: Here are some choices.
-- First one
-	Nathan: You picked the first one.
-- Second one
-	Nathan: You picked the second one.
-- Start again => start
-- End the conversation => END
-Nathan: For more information see the online documentation.
+set background = 'firefly'
+do show_character("nnivx", str_to_pos('left'))
+nnivx: [[Hello|Hey]].
+
+nnivx: Check out the awesome new features, would you like to know more?
+- Yes
+	nnivx: Like this! i can turn [do show_character("nnivx", KEEP_POSITION, 'red')]red!
+	nnivx: Or something like this, [do show_character("nnivx", str_to_pos('right'))]wazoom!
+	nnivx: Too bad im too lazy to document them, so...
+	=>< features
+- No
+	nnivx: Alright that's good! cos i can't list them all here.
+	
+nnivx: I'm not sure what to do past this point.
+
+=> END
+
+~ features
+nnivx: Does this work?
 
 => END

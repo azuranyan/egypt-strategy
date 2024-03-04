@@ -229,6 +229,7 @@ thickness = 2
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a0wfj"]
 
 [node name="DialogueScene" type="CanvasLayer"]
+layer = 5
 script = ExtResource("1_s5hh1")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -236,6 +237,9 @@ libraries = {
 "": SubResource("AnimationLibrary_6fqxv")
 }
 speed_scale = 4.2
+
+[node name="CanvasGroup" type="CanvasGroup" parent="."]
+position = Vector2(0, -2)
 
 [node name="Balloon" type="Control" parent="."]
 layout_mode = 3
@@ -419,6 +423,7 @@ metadata/_edit_group_ = true
 [node name="ResponsesMenu" type="VBoxContainer" parent="Balloon/MarginContainer" node_paths=PackedStringArray("response_template")]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/separation = 32
 alignment = 1
 script = ExtResource("8_k34y8")
 response_template = NodePath("Button")

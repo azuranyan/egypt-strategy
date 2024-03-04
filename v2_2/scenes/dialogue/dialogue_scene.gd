@@ -175,7 +175,7 @@ func _on_balloon_gui_input(event: InputEvent) -> void:
 
 func _on_mutated(_mutation: Dictionary) -> void:
 	_waiting_for_input = false
-	get_tree().create_timer(0.1).timeout.connect(hide_dialogue)
+	#get_tree().create_timer(0.1).timeout.connect(hide_dialogue)
 
 
 func _on_menu_button_pressed() -> void:
