@@ -34,7 +34,7 @@ func register_event(event: StoryEvent, chara: CharacterInfo = null) -> void:
 	
 	_add_event(state)
 	if chara:
-		_add_character_event(event.id, chara)
+		_add_character_event(event.event_id, chara)
 
 
 func _add_character_event(event_id: StringName, chara: CharacterInfo) -> void:

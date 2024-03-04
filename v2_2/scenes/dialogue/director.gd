@@ -11,7 +11,7 @@ const SLIDE_TO_LEFT := 'slide_to_left'
 const SLIDE_TO_RIGHT := 'slide_to_right'
 const SLIDE_FROM_LEFT := 'slide_from_left'
 const SLIDE_FROM_RIGHT := 'slide_from_right'
-const SLIDE_TO:= 'slide_to'
+const SLIDE_TO := 'slide_to'
 const SCALE_IN := 'scale_in'
 const SCALE_OUT := 'scale_out'
 

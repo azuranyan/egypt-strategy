@@ -230,6 +230,16 @@ func destroy_unit(unit: Unit):
 	unit.queue_free()
 	
 	
+## Returns the first unit with given chara id.
+## Do note that there can be multiple units with the same `chara_id`.
+## For getting the exact unit, use `load_unit` instead.
+func get_unit_by_chara_id(chara_id: StringName) -> Unit:
+	for u in unit_registry:
+		if unit_registry[u].chara_id == chara_id:
+			return unit_registry[u]
+	return null
+
+
 ## Returns the empire units.
 func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
 	var arr: Array[Unit] = []
