@@ -2,7 +2,11 @@ class_name CharacterStoryEvent
 extends StoryEvent
 
 
-## The id of the character associated with this story event.
+## The id of the character associated with this story event.[br]
+##
+## Note that we only ever check for basic requirements like unit bond and player ownership.
+## If `chara_id` is the player's hero unit, make sure that their bond is only increased
+## when appropriate (story unlocks).
 @export var chara_id: StringName
 
 ## The index of the story event, representing when they are available depending on the bond level.
@@ -16,10 +20,10 @@ func check_requirements(seen_events: Array[StringName]) -> bool:
 func check_conditions() -> bool:
 	var unit := Game.get_unit_by_chara_id(chara_id)
 
-	# bond is also used for levelling npc stats so we need to make this check
-	var is_player_unit := unit and unit.is_player_owned()
-	var is_unlocked := unit.get_bond() > event_index
-	return is_player_unit and is_unlocked and super.check_conditions()
+	return (unit != null # unit must exist
+		and unit.is_player_owned() # be owned by player
+		and unit.get_bond() > event_index # has enough bond
+		and super.check_conditions()) # has special conditions fulfilled
 
 
 func check_prerequisite_event(seen_events: Array[StringName]) -> bool:
@@ -30,8 +34,7 @@ func check_prerequisite_event(seen_events: Array[StringName]) -> bool:
 			var event := Dialogue.instance().get_event(id) as CharacterStoryEvent
 			if not event:
 				continue
-
-			if event.chara_id == chara_id and event.event_index == event.event_index - 1:
+			if event.chara_id == chara_id and event.event_index == event_index - 1:
 				return true
 
 		return false

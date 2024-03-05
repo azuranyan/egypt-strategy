@@ -183,16 +183,33 @@ func _quick_battle():
 
 
 func _update_unit_bonds(result: BattleResult) -> void:
+	# ignore when no results
 	if result.value == BattleResult.NONE or result.value == BattleResult.CANCELLED:
 		return
-	# TODO what if the winner gets many territories after battle end like in
-	# defeat on home territory capture?
+	
+	# only attacking gets you a bond point on victory
+	if result.defender_won():
+		return
+
 	var winner := result.winner()
 	if winner.is_player_owned():
-		for unit in Game.get_empire_units(winner):
-			if unit.is_alive():
-				unit.set_bond(unit.get_bond() + 1)
+		# player units have stricter bond levelling
+		for unit in Game.get_empire_units(winner, Game.ALL_UNITS_MASK):
+			# exclude units not fielded
+			if not unit.is_fielded(): continue
+
+			# exclude units not in play
+			if unit.is_standby(): continue
+
+			# exclude units not surviving the battle *not necessary cos death mechanics put them to standby
+			if not unit.is_alive(): continue
+
+			# exclude player hero unit
+			if unit.chara_id() == Overworld.instance().player_empire().leader_id: continue
+
+			unit.set_bond(unit.get_bond() + 1)
 	else:
+		# ai units just level up everyone
 		for unit in Game.get_empire_units(winner):
 			unit.set_bond(unit.get_bond() + 1)
 

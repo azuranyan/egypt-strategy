@@ -181,9 +181,11 @@ func model_scale() -> Vector2:
 func base_stats() -> Dictionary:
 	var re := _unit_type.stats.duplicate()
 	if _bond >= 1:
+		pass # TODO what do we do on bond 1?
+	if _bond >= 2:
 		for stat in _unit_type.stat_growth_1:
 			re[stat] += _unit_type.stat_growth_1[stat]
-	if _bond >= 2:
+	if _bond >= 3:
 		for stat in _unit_type.stat_growth_2:
 			re[stat] += _unit_type.stat_growth_2[stat]
 	re[&'hp'] = re.maxhp
@@ -383,7 +385,7 @@ func set_special_unlocked(value: Variant) -> void:
 ## Returns true if unit special is unlocked.
 func is_special_unlocked() -> bool:
 	if _special_unlock == -1:
-		return _bond >= 2
+		return _bond >= 3
 	return bool(_special_unlock)
 	
 	

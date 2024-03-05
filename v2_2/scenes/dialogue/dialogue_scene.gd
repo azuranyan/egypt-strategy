@@ -1,5 +1,5 @@
 class_name DialogueScene
-extends CanvasLayer
+extends Control
 
 
 ## Emitted when the dialogue is started.
@@ -7,6 +7,9 @@ signal dialogue_started
 
 ## Emitted when the dialogue is finished.
 signal dialogue_finished
+
+## Emitted when the dialogue line has changed.
+signal dialogue_line_changed(dialogue_line: DialogueLine)
 
 ## Emitted when the dialogue box is shown or hidden.
 signal shown(value: bool)
@@ -36,6 +39,7 @@ var _dialogue_line: DialogueLine:
 
 		_dialogue_line = value
 		update_dialogue()
+		dialogue_line_changed.emit(_dialogue_line)
 		
 
 @onready var balloon: Control = $Balloon
@@ -107,8 +111,6 @@ func update_dialogue() -> void:
 		await ready
 	
 	if _dialogue_line.character:
-		if Director.is_character_shown(_dialogue_line.character):
-			Director.show_character(_dialogue_line.character, Director.KEEP_POSITION, _dialogue_line.tags)
 		character_label.text = tr(_dialogue_line.character)
 		character_label.show()
 	else:

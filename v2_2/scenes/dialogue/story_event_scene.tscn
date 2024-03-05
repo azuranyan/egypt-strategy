@@ -1,0 +1,70 @@
+[gd_scene load_steps=4 format=3 uid="uid://brikuwut5uo7e"]
+
+[ext_resource type="Script" path="res://scenes/dialogue/story_event_scene.gd" id="1_vxdlj"]
+[ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_27n7i"]
+[ext_resource type="PackedScene" uid="uid://dxa0y5yfedk8s" path="res://scenes/dialogue/dialogue_scene.tscn" id="3_nwrdr"]
+
+[node name="StoryEventScene" type="CanvasLayer" node_paths=PackedStringArray("cached_images", "black_bars", "character_images", "dialogue_scene")]
+layer = 5
+script = ExtResource("1_vxdlj")
+cached_images = NodePath("CachedImages")
+black_bars = [NodePath("BlackBars/TopBar"), NodePath("BlackBars/BottomBar")]
+character_images = NodePath("Characters")
+dialogue_scene = NodePath("DialogueScene")
+
+[node name="CachedImages" type="Node2D" parent="."]
+process_mode = 4
+visible = false
+
+[node name="BackgroundFill" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_lock_ = true
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_27n7i")
+metadata/_edit_lock_ = true
+
+[node name="BlackBars" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="ColorRect" parent="BlackBars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BottomBar" type="ColorRect" parent="BlackBars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 1)
+
+[node name="Characters" type="Node2D" parent="."]
+
+[node name="DialogueScene" parent="." instance=ExtResource("3_nwrdr")]

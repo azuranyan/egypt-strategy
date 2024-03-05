@@ -2,11 +2,14 @@ class_name Dialogue
 extends Node
 
 
-const DIALOGUE_SCENE := preload("res://scenes/dialogue/dialogue_scene.tscn")
+const StoryDirector := preload("res://scenes/dialogue/story_director.gd")
+const ImageLibrary := preload("res://events/image_library.gd")
 
+
+var image_library: ImageLibrary
 
 var current_event_id: StringName
-var current_dialogue_scene: DialogueScene = null
+var current_director: StoryDirector
 var is_playing_queue: bool
 
 var event_registry: Dictionary
@@ -19,6 +22,10 @@ static func instance() -> Dialogue:
 
 
 func _ready() -> void:
+	image_library = preload('res://events/image_library.tscn').instantiate()
+	add_child(image_library)
+	image_library.name = 'ImageLibrary'
+
 	DialogueEvents.start_event_requested.connect(_on_start_event_requested)
 	DialogueEvents.stop_event_requested.connect(_on_stop_event_requested)
 
@@ -113,6 +120,8 @@ func has_character_events(chara: CharacterInfo) -> bool:
 ## Returns true if there are new character events.
 ## This requires [method refresh_event_queue] to have been called first.
 func has_new_character_event(chara: CharacterInfo) -> bool:
+	if not has_character_events(chara):
+		return false
 	for evq in event_queue:
 		for evc in character_events[chara]:
 			if evq == evc:
@@ -129,25 +138,43 @@ func get_character_event(chara: CharacterInfo, index := -1) -> StringName:
 func start_event(event_id: StringName, extra_game_states := []) -> void:
 	stop_event()
 
-	var scene := DIALOGUE_SCENE.instantiate()
-	var event := get_event(event_id)
-	scene.dialogue_started.connect(func(): DialogueEvents.event_started.emit(event_id))
-	scene.dialogue_finished.connect(stop_event)
-	add_child(scene)
+	# create the scene and add it to the *root*
+	var scene := preload('res://scenes/dialogue/story_event_scene.tscn').instantiate()
+	scene.name = 'StoryEventScene'
+	get_tree().root.add_child(scene)
 
+	# create the director and add it to the under the *director*
+	var director := StoryDirector.new()
+	director.story_event_scene = scene
+	director.image_library = image_library
+	director.name = 'StoryDirector'
+	add_child(director)
+
+	# setup our own references
 	current_event_id = event_id
-	current_dialogue_scene = scene
-	scene.start(event.dialog_resource, event.start, extra_game_states)
-	# TODO scene manager add unmanaged
+	current_director = director
+
+	# finish up dialogue scene
+	scene.dialogue_scene.dialogue_started.connect(func(): DialogueEvents.event_started.emit(event_id))
+	scene.dialogue_scene.dialogue_finished.connect(stop_event)
+
+	# start the scene
+	var event := get_event(event_id)
+	var script_env := [
+		director,
+	]
+	scene.dialogue_scene.start(event.dialog_resource, event.start, script_env + extra_game_states)
 
 
 ## Forcefully stops current ongoing event.
 func stop_event() -> void:
-	if current_dialogue_scene:
+	if current_director:
 		var event_id := current_event_id
 		current_event_id = ''
-		current_dialogue_scene.queue_free()
-		current_dialogue_scene = null
+		current_director.story_event_scene.queue_free()
+		current_director.queue_free()
+		current_director = null
+		mark_event_as_completed(event_id)
 		DialogueEvents.event_ended.emit(event_id)
 
 

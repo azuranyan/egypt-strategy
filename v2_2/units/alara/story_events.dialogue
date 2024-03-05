@@ -1,28 +1,26 @@
-using Director
-
 ~ story_event_1
-
 set background = "res://events/dungeon_entrance.jpg"
 do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event one complete!
-
 => END	
 
-~ story_event_2
 
+
+~ story_event_2
 set background = "res://events/dungeon_entrance.jpg"
 do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event two complete!
 Alara: Stats up!
+=> END	
+
+
 
 ~ story_event_3
-
 set background = "res://events/dungeon_entrance.jpg"
 do show_character("Alara", norm_to_pos(LEFT))
 
 Alara: Event three complete, MAX BOND!
 Alara: Special unlocked!
-
 => END	

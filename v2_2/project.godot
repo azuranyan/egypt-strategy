@@ -28,8 +28,6 @@ BattleEvents="*res://scenes/battle/battle_events.gd"
 DialogueEvents="*res://scenes/dialogue/dialogue_events.gd"
 Game="*res://game.gd"
 CSUtil="*res://CSUtil.cs"
-ImageLibrary="*res://events/image_library.tscn"
-Director="*res://scenes/dialogue/director.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 
 [display]

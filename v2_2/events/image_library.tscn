@@ -19,7 +19,7 @@ fill_to = Vector2(0, 1)
 
 [node name="ImageLibrary" type="CanvasLayer" node_paths=PackedStringArray("placeholder")]
 script = ExtResource("1_4t4mq")
-placeholder = NodePath("PlaceholderCharacter")
+placeholder = NodePath("PlaceholderOrigin/PlaceholderCharacter")
 
 [node name="DungeonEntrance" type="Sprite2D" parent="."]
 position = Vector2(957, 539)
@@ -33,9 +33,13 @@ position = Vector2(960, 540)
 texture = SubResource("GradientTexture2D_fiusu")
 metadata/_edit_lock_ = true
 
-[node name="PlaceholderCharacter" type="Sprite2D" parent="."]
-position = Vector2(493, 1248)
+[node name="PlaceholderOrigin" type="Node2D" parent="."]
+position = Vector2(453, 1080)
 scale = Vector2(0.893946, 0.893946)
+
+[node name="PlaceholderCharacter" type="Sprite2D" parent="PlaceholderOrigin"]
+position = Vector2(44.7455, 187.931)
+scale = Vector2(1, 1)
 texture = ExtResource("3_kyvek")
 offset = Vector2(0, -581.035)
 

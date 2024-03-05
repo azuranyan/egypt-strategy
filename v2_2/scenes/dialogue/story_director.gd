@@ -2,6 +2,9 @@ extends Node
 
 
 const CharacterImageList := preload('res://events/character_image_list.gd')
+const StoryEventScene := preload('res://scenes/dialogue/story_event_scene.gd')
+const ImageLibrary := preload('res://events/image_library.gd')
+
 
 const FADE_TO_BLACK := 'fade_to_black'
 const FADE_FROM_BLACK := 'fade_from_black'
@@ -28,50 +31,53 @@ const DEFAULT_POSITION := CENTER
 const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
 
 
-var image_registry := {}
-
-var ui_visible: bool
-
-var auto_show_character: bool
-
-var background: String:
+## The background fill color.
+@export var background_fill: Color = Color.BLACK:
+	set(value):
+		background_fill = value
+		if not is_node_ready():
+			await ready
+		story_event_scene.background_fill.color = value
+		
+## The background texture.
+@export var background: Texture = null:
 	set(value):
 		background = value
-		print('background changed to ', value)
+		if not is_node_ready():
+			await ready
+		story_event_scene.background.texture = value
 
 
-var shown_images: Array[Node2D] = []
+## A reference to the story event scene.
+var story_event_scene: StoryEventScene
 
-var cached_images: Node2D
+## A reference to the image library.
+var image_library: ImageLibrary
+
+## The visibility of the UI.
+var ui_visible: bool:
+	set(value):
+		ui_visible = value
+		if not is_node_ready():
+			await ready
+		story_event_scene.dialogue_scene.visible = value
+
 
 func _ready() -> void:
-	cached_images = Node2D.new()
-	cached_images.name = 'CachedImages'
-	cached_images.hide()
-	add_child(cached_images)
-
-	DialogueEvents.queue_ended.connect(_cleanup)
-
-
-func _cleanup(cache_images := true) -> void:
-	if cache_images:
-		for image in shown_images:
-			cache_and_remove_from_scene(image)
-	else:
-		for image in shown_images:
-			image.queue_free()
+	assert(story_event_scene, '`story_event_scene` should be set before adding to the scene tree.')
+	assert(image_library, '`image_library` should be set before adding to the scene tree.')
+	story_event_scene.dialogue_scene.dialogue_line_changed.connect(_on_dialogue_line_changed)
 
 
 ## Returns true if the character is shown.
 func is_character_shown(chara: String) -> bool:
-	return get_shown_character_image(chara) != null
+	return story_event_scene.has_image(chara)
 
 
 ## Returns the first image of character.
 func get_shown_character_image(chara: String) -> Node2D:
-	for c in shown_images:
-		if c.name.begins_with(chara + '_'):
-			return c
+	if is_character_shown(chara):
+		return story_event_scene.get_character_images(chara)[0]
 	return null
 
 
@@ -88,14 +94,16 @@ func show_character(chara: String, pos := KEEP_POSITION, tags := KEEP_TAGS, with
 
 	if tags == KEEP_TAGS:
 		if shown_image:
-			tags = shown_image.get_meta('tags')
+			if not shown_image.has_meta('tags'):
+				push_error('`tags` not found in image metadata: %s' % shown_image.name)
+			tags = shown_image.get_meta('tags', DEFAULT_TAGS)
 		else:
 			tags = DEFAULT_TAGS
 	elif not tags is PackedStringArray:
 		tags = [tags]
 
 	# this was working last time, now it can't fucking infer again
-	var image_name: String = ImageLibrary.get_image_name(chara, tags)
+	var image_name: String = image_library.get_image_name(chara, tags)
 
 	# if the image is already shown, just update its position
 	if shown_image and shown_image.name == image_name:
@@ -105,23 +113,19 @@ func show_character(chara: String, pos := KEEP_POSITION, tags := KEEP_TAGS, with
 	
 	if shown_image:
 		# if there's already an image shown for the chara, cache it
-		var replaced := cache_and_remove_from_scene(shown_image)
+		var replaced := story_event_scene.cache_and_remove_from_scene(shown_image)
 		if replaced:
 			push_warning('replacing cached image: %s' % replaced.name)
 			replaced.queue_free()
 
-		# then erase it from shown characters
-		shown_images.erase(shown_image)
-	
 	# try loading cached image
-	var image := retrieve_and_remove_from_cache(image_name)
+	var image := story_event_scene.retrieve_and_remove_from_cache(image_name)
 
 	if not image:
-		image = ImageLibrary.create_character_image(chara, tags)
+		image = image_library.create_character_image(chara, tags)
 
 	# add child
-	add_child(image)
-	shown_images.append(image)
+	story_event_scene.add_character_image(chara, image)
 	await show_image(image, pos, with)
 
 
@@ -184,27 +188,6 @@ func hide_image(image: Node2D, _with: String) -> void:
 	image.hide()
 
 
-## Caches the image. Returns replaced image if any.
-func cache_and_remove_from_scene(image: Node2D) -> Node2D:
-	for c in cached_images.get_children():
-		if c.name == image.name:
-			c.replace_by(image)
-			return c
-	
-	# we do it this way so we dont get orphaned nodes
-	if image.get_parent():
-		image.get_parent().remove_child(image)
-	cached_images.add_child(image)
-	return null
-
-
-## Returns the cached image or null if not found.
-func retrieve_and_remove_from_cache(image_name: String) -> Node2D:
-	var image := cached_images.get_node_or_null(image_name)
-	if image:
-		cached_images.remove_child(image)
-	return image
-
 
 func replace_character(old_chara: String, new_chara: String, exit_with := '', enter_with := '') -> void:
 	print('%s exits with %s; %s enters with %s' % [old_chara, exit_with, new_chara, enter_with])
@@ -218,3 +201,8 @@ func transition(transition: String) -> void:
 func norm_to_pos(v: Vector2) -> Vector2:
 	return Game.get_viewport_size() * v
 
+
+func _on_dialogue_line_changed(dialogue_line: DialogueLine) -> void:
+	# if character is shown, update it
+	if dialogue_line.character and is_character_shown(dialogue_line.character):
+		show_character(dialogue_line.character, KEEP_POSITION, dialogue_line.tags)

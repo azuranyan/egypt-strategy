@@ -42,6 +42,9 @@ extends Resource
 ## Scene manager data.
 @export var scene_manager_data: Dictionary
 
+## The battle data.
+@export var dialogue_data: Dictionary
+
 ## Generic data.
 @export var data: Dictionary
 
