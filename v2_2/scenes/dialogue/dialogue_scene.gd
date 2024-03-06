@@ -1,6 +1,8 @@
 class_name DialogueScene
 extends Control
 
+## Emitted when the dialogue recieves a rollback event.
+signal rollback_requested
 
 ## Emitted when the dialogue is started.
 signal dialogue_started
@@ -159,6 +161,11 @@ func is_waiting_for_response() -> bool:
 
 
 func _on_balloon_gui_input(event: InputEvent) -> void:
+	if event.is_action_pressed("dialogue_rollback"):
+		rollback_requested.emit()
+		balloon.accept_event()
+		return
+
 	if dialogue_label.is_typing:
 		var mouse_clicked: bool = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed()
 		var skip_pressed: bool = event.is_action_pressed(SKIP_ACTION)

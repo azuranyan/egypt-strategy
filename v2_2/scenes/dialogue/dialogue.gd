@@ -61,6 +61,13 @@ func get_event(event_id: StringName) -> StoryEvent:
 	return event_registry[event_id].event
 
 
+## Returns the current event.
+func current_event() -> StoryEvent:
+	if current_event_id:
+		return get_event(current_event_id)
+	return null
+
+
 ## Sets the locked state of an event.
 func set_event_locked(event_id: StringName, locked: bool) -> void:
 	event_registry[event_id].locked = locked
@@ -157,6 +164,7 @@ func start_event(event_id: StringName, extra_game_states := []) -> void:
 	# finish up dialogue scene
 	scene.dialogue_scene.dialogue_started.connect(func(): DialogueEvents.event_started.emit(event_id))
 	scene.dialogue_scene.dialogue_finished.connect(stop_event)
+	scene.dialogue_scene.rollback_requested.connect(_on_dialogue_rollback_requested)
 
 	# start the scene
 	var event := get_event(event_id)
@@ -242,3 +250,7 @@ func load_state(save: Dictionary) -> void:
 
 	if current_event_id:
 		start_event(current_event_id)
+
+
+func _on_dialogue_rollback_requested() -> void:
+	current_director.story_event_scene.dialogue_scene.next(current_event().start)
