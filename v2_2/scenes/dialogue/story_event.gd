@@ -3,6 +3,18 @@ extends Resource
 ## A binding structure for story events.
 
 
+enum Context {
+	## The scene is independent and plays on its own.
+	INDEPENDENT,
+	
+	## The scene will play on top of the overworld scene and [Overworld] will be included in the script environment.
+	OVERWORLD,
+
+	## The scene will play on top of the battle scene and [Battle] will be included in the script environment.
+	BATTLE,
+}
+
+
 ## The unique id of the events.
 @export var event_id: StringName
 
@@ -35,6 +47,9 @@ extends Resource
 
 ## Whether the event is transient. Transient events are not saved in the list of completed events.
 @export var transient: bool
+
+## Determines the story context.
+@export var context: Context
 
 
 func check_requirements(seen_events: Array[StringName]) -> bool:

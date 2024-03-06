@@ -61,16 +61,25 @@ func get_character_images(chara: String) -> Array[Node2D]:
 	
 
 ## Shows the black bars.
-func show_black_bars(height: Variant, duration := 0.0) -> void:
+func show_black_bars(height: Variant = null, duration := 0.0) -> void:
 	%TopBar.show()
 	%BottomBar.show()
+	var pixel_height: int
+	if height is int:
+		pixel_height = height
+	elif height is float:
+		pixel_height = roundi(ProjectSettings.get_setting('display/window/size/height')/2 * height)
+	else:
+		pixel_height = roundi(ProjectSettings.get_setting('display/window/size/height')/2 * 0.1)
+
 	if duration <= 0: 
-		%TopBar.custom_minimum_size.y = height
-		%BottomBar.custom_minimum_size.y = height
+		%TopBar.custom_minimum_size.y = pixel_height
+		%BottomBar.custom_minimum_size.y = pixel_height
 	else:
 		var tween := create_tween()
-		tween.tween_property(%TopBar, 'custom_minimum_size', Vector2(0, height), duration)
-		tween.tween_property(%BottomBar, 'custom_minimum_size', Vector2(0, height), duration)
+		tween.tween_property(%TopBar, 'custom_minimum_size', Vector2(0, pixel_height), duration)
+		tween.tween_property(%BottomBar, 'custom_minimum_size', Vector2(0, pixel_height), duration)
+
 
 
 ## Hides the black bars.

@@ -5,6 +5,7 @@ signal _death_animations_finished
 
 enum State {
 	INVALID = -1,
+	INITIALIZATION,
 	STANDBY,
 	AI_PREP,
 	PLAYER_PREP,
@@ -54,6 +55,14 @@ func _ready() -> void:
 
 
 func save_state() -> Dictionary:
+	# save all the unit states
+	var unit_states := {}
+	for unit in get_tree().get_nodes_in_group(Game.ALL_UNITS_GROUP):
+		# not standby, alive, selectable, fielded
+		if not unit.is_valid_target():
+			continue
+		unit_states[unit.id()] = unit.save_state()
+
 	return {
 		attacker = _attacker,
 		defender = _defender,
@@ -68,10 +77,12 @@ func save_state() -> Dictionary:
 		dying_units = _dying_units,
 		next_state = _next_state,
 		last_acting_empire_unit = last_acting_empire_unit,
+		unit_states = unit_states,
 	}
 
 
 func load_state(data: Dictionary) -> void:
+	_is_running = false
 	_attacker = data.attacker
 	_defender = data.defender
 	_territory = data.territory
@@ -85,17 +96,10 @@ func load_state(data: Dictionary) -> void:
 	_dying_units = data.dying_units
 	_next_state = data.next_state
 	last_acting_empire_unit = data.last_acting_empire_unit
-	_is_running = false
 
-
-func _on_scene_ready(node: Node) -> void:
-	# this will make it so it's null when a diff scene is loaded
-	_battle_scene = node as BattleScene
-
-	# important to check if we're already running cos we may have been paused
-	# and waiting for the stack to return to our scene
-	if _battle_scene and not is_running():
-		_real_battle_main.call_deferred()
+	if _next_state != State.INVALID:
+		_is_running = true
+		SceneManager.scene_ready.connect(_load_battle_scene.bind(data).unbind(1), CONNECT_ONE_SHOT)
 
 
 ## Starts the battle cycle.
@@ -104,6 +108,8 @@ func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, m
 	if is_running():
 		push_error('battle already running!')
 		return
+	_is_running = true
+	_next_state = State.INITIALIZATION
 
 	# initialize context
 	_attacker = attacker_
@@ -127,29 +133,27 @@ func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, m
 	if _quick:
 		_quick_battle.call_deferred()
 	else:
-		BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
-		SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
-	
-		var end := func():
-			# show the battle result banner. kinda awkward that it's here but oh well.
-			if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
-				await _call_and_wait(get_active_battle_scene().show_battle_results)
-
-			# give out the rewards
-			_update_unit_bonds(get_battle_result())
-
-			# return from the scene
-			_unload_battle_scene()
-			SceneManager.scene_return('fade_to_black')
-			await SceneManager.transition_finished
-			_is_running = false
-			BattleEvents.battle_ended.emit(get_battle_result())
-
-		BattleEvents.battle_scene_exiting.connect(end, CONNECT_ONE_SHOT)
+		_real_battle.call_deferred()
 	
 	
+func _end_battle(result: BattleResult):
+	# give out the rewards
+	_update_unit_bonds(result)
+
+	# allow at least 1 frame between battle start and end
+	# this fixes signals that happen in the same frame
+	await get_tree().process_frame
+
+	# unload scene if necessary
+	if _battle_scene:
+		_unload_battle_scene()
+		SceneManager.scene_return('fade_to_black')
+
+	_is_running = false
+	BattleEvents.battle_ended.emit(result)
+
+
 func _quick_battle():
-	_is_running = true
 	BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
 	
 	# add variance
@@ -172,53 +176,18 @@ func _quick_battle():
 			_result_value = BattleResult.ATTACKER_WITHDRAW
 		else:
 			_result_value = BattleResult.DEFENDER_VICTORY
-
-	# fixes waiting signals after process frame
-	await get_tree().process_frame
-	_is_running = false
-
-	var result := get_battle_result()
-	_update_unit_bonds(result)
-	BattleEvents.battle_ended.emit(result)
+		
+	# end battle
+	_end_battle(get_battle_result())
 
 
-func _update_unit_bonds(result: BattleResult) -> void:
-	# ignore when no results
-	if result.value == BattleResult.NONE or result.value == BattleResult.CANCELLED:
-		return
-	
-	# only attacking gets you a bond point on victory
-	if result.defender_won():
-		return
-
-	var winner := result.winner()
-	if winner.is_player_owned():
-		# player units have stricter bond levelling
-		for unit in Game.get_empire_units(winner, Game.ALL_UNITS_MASK):
-			# exclude units not fielded
-			if not unit.is_fielded(): continue
-
-			# exclude units not in play
-			if unit.is_standby(): continue
-
-			# exclude units not surviving the battle *not necessary cos death mechanics put them to standby
-			if not unit.is_alive(): continue
-
-			# exclude player hero unit
-			if unit.chara_id() == Overworld.instance().player_empire().leader_id: continue
-
-			unit.set_bond(unit.get_bond() + 1)
-	else:
-		# ai units just level up everyone
-		for unit in Game.get_empire_units(winner):
-			unit.set_bond(unit.get_bond() + 1)
+func _real_battle() -> void:
+	BattleEvents.battle_started.emit(_attacker, _defender, _territory, _map_id)
+	SceneManager.call_scene(SceneManager.scenes.battle, 'fade_to_black')
+	SceneManager.scene_ready.connect(_load_battle_scene.bind({}).unbind(1), CONNECT_ONE_SHOT)
 
 
-func _load_battle_scene() -> void:
-	_is_running = true
-	# hud
-	hud().menu_button.pressed.connect(show_pause_menu)
-
+func _load_battle_scene(saved_state: Dictionary) -> void:
 	# level
 	level = get_active_battle_scene().level
 	_distribute_units()
@@ -228,14 +197,31 @@ func _load_battle_scene() -> void:
 	create_agent(_attacker)
 	create_agent(_defender)
 
-	# TODO
-	start_prep_phase(ai())
+	if saved_state:
+		# restore all the unit states
+		var saved_unit_states: Dictionary = saved_state.unit_states
+		for id in saved_unit_states:
+			Game.load_unit(id).load_state(saved_unit_states[id])
 
-	# done
+		# start the game from where we left off
+		_next_state = saved_state.next_state
+	else:
+		# start ai prep phase
+		start_prep_phase(ai())
+
+		# start the game from the beginning
+		_next_state = State.PLAYER_PREP
+
+	# hud
+	hud().update()
+	hud().menu_button.pressed.connect(show_pause_menu)
+
+	# start other post-load tasks
 	BattleEvents.battle_scene_pre_enter.emit()
 
+	# start the main loop after the transition
 	await SceneManager.transition_finished
-	_next_state = State.STANDBY
+	_real_battle_main()
 
 
 func _unload_battle_scene() -> void:
@@ -316,12 +302,7 @@ func _call_and_wait(callable: Callable, argv: Array = [], tag: StringName = '') 
 
 
 func _real_battle_main():
-	await _call_and_wait(_load_battle_scene)
 	BattleEvents.battle_scene_entered.emit()
-
-	await _call_and_wait(start_prep_phase, [player()])
-	if not _should_end:
-		_next_state = State.BATTLE_START
 
 	while not _should_end:
 		if check_for_battle_end():
@@ -332,6 +313,10 @@ func _real_battle_main():
 			State.INVALID:
 				push_error('invalid state')
 			
+			State.PLAYER_PREP:
+				await _call_and_wait(start_prep_phase, [player()])
+				_next_state = State.BATTLE_START
+
 			State.STANDBY:
 				_next_state = State.STANDBY
 
@@ -393,7 +378,14 @@ func _real_battle_main():
 				
 		await get_tree().process_frame
 	
+	# show the battle result banner
+	if _result_value != BattleResult.CANCELLED and _result_value != BattleResult.NONE:
+		await _call_and_wait(get_active_battle_scene().show_battle_results)
+
+	# start end sequence
 	BattleEvents.battle_scene_exiting.emit()
+	
+	_end_battle(get_battle_result())
 
 
 func pan_to_last_acting_unit(empire: Empire) -> void:
@@ -402,7 +394,39 @@ func pan_to_last_acting_unit(empire: Empire) -> void:
 		if is_instance_valid(unit):
 			await set_camera_target(unit.get_map_object().position)
 
+
+func _update_unit_bonds(result: BattleResult) -> void:
+	# ignore when no results
+	if result.value == BattleResult.NONE or result.value == BattleResult.CANCELLED:
+		return
 	
+	# only attacking gets you a bond point on victory
+	if result.defender_won():
+		return
+
+	var winner := result.winner()
+	if winner.is_player_owned():
+		# player units have stricter bond levelling
+		for unit in Game.get_empire_units(winner, Game.ALL_UNITS_MASK):
+			# exclude units not fielded
+			if not unit.is_fielded(): continue
+
+			# exclude units not in play
+			if unit.is_standby(): continue
+
+			# exclude units not surviving the battle *not necessary cos death mechanics put them to standby
+			if not unit.is_alive(): continue
+
+			# exclude player hero unit
+			if unit.chara_id() == Overworld.instance().player_empire().leader_id: continue
+
+			unit.set_bond(unit.get_bond() + 1)
+	else:
+		# ai units just level up everyone
+		for unit in Game.get_empire_units(winner):
+			unit.set_bond(unit.get_bond() + 1)
+
+
 ## Checks for battle end.
 func check_for_battle_end() -> bool:
 	if not (_next_state > State.PLAYER_PREP):
@@ -1056,3 +1080,7 @@ func _on_unit_damaged(_unit: Unit, amount: int, _source: Variant) -> void:
 	if amount > 0:
 		get_active_battle_scene().shake_camera()
 
+
+func _on_scene_ready(node: Node) -> void:
+	# this will make it so it's null when a diff scene is loaded
+	_battle_scene = node as BattleScene

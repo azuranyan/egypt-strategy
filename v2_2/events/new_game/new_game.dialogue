@@ -1,0 +1,51 @@
+~ intro
+
+set background = load("res://events/dungeon_entrance.jpg")
+
+In the mystical world of Khemia, dozens of gods and goddesses vy for power. Lands have been destroyed and made anew countless times.
+
+As a means to end this destruction, the Creator God designs a contest. He creates a magical artefact, the Eye of the Conqueror, and sends it down to the mortal realm.
+
+The Gods, now forbidden from the realm, must imbue chosen Avatars with their spirits to fight on their behalf. The conqueror of all lands will claim the Eye, and all defeated Avatars must yield their land and loyalty to the victors. *No murder
+
+In a feat of deception, the Dark Serpent, Apophis, seizes the Eye of the Conqueror. Along with her resentful mother, Kauket, she taints the Eye with sinister power. Using this power, she launches her assault on the lands.
+
+Such a heretical, unholy god must never be allowed to rule Khemia. The Sun God Ra descends to the battlefield, aiming to unite the Avatars in a crusade against the Serpent. You awaken to his call and begin your quest.
+
+Can you bring a nation of warring gods to heel? Or will you vanish into the shifting sands?
+
+~ lysandra
+
+# i used gippity to generate some random scene
+
+Lysandra steps into a dimly lit chamber, her footsteps echoing against the stone floor. As she gazes around, a figure emerges from the shadows, their features obscured.
+
+do show_character("Lysandra", norm_to_pos(LEFT), DEFAULT_TAGS, SLIDE_FROM_LEFT)
+
+Lysandra: Who goes there?
+
+The figure steps forward, revealing themselves to be a hooded traveler. Lysandra narrows her eyes, studying the newcomer with caution.
+
+Hooded Traveler: "Fear not, Lady Lysandra. I mean you no harm."
+
+Lysandra's grip on her staff tightens, uncertainty flickering in her eyes. She takes a cautious step back.
+
+Lysandra: "How do you know my name?"
+
+Hooded Traveler: "I have traveled far and wide, gathering tales of valor and heroism. Yours is a name spoken with reverence in every corner of the realm."
+
+Despite her skepticism, Lysandra's curiosity is piqued. She relaxes her stance, allowing a glimmer of trust to flicker in her eyes.
+
+Lysandra: "What brings you to these lands, traveler? Surely you have more than tales to share."
+
+The hooded traveler offers a cryptic smile, their eyes gleaming with hidden knowledge.
+
+Hooded Traveler: "Ah, but tales are often the keys to unlocking destinies, Lady Lysandra. And yours... yours is just beginning."
+
+With a flourish of their cloak, the hooded traveler vanishes into the shadows, leaving Lysandra to ponder their enigmatic words.
+
+Lysandra: "Destiny, hm? Perhaps there is more to my path than meets the eye."
+
+As she turns to leave, a sense of anticipation stirs within her heart, propelling her forward into the unknown.
+
+=> END

@@ -16,13 +16,13 @@ const scene_registry := {
 }
 
 
-func _ready():
+func _ready() -> void:
 	launch_game.call_deferred()
 
 
 ## The actual start point of the game.[br]
 ## This scene will be replaced by the first scene, so no persistent data.
-func launch_game():
+func launch_game() -> void:
 	SceneManager.scenes = scene_registry
 	
 	# initialize run args here

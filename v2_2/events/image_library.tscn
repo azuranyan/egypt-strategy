@@ -39,7 +39,6 @@ scale = Vector2(0.893946, 0.893946)
 
 [node name="PlaceholderCharacter" type="Sprite2D" parent="PlaceholderOrigin"]
 position = Vector2(44.7455, 187.931)
-scale = Vector2(1, 1)
 texture = ExtResource("3_kyvek")
 offset = Vector2(0, -581.035)
 
@@ -56,6 +55,25 @@ texture = ExtResource("2_wv0tn")
 metadata/tags = PackedStringArray("default")
 
 [node name="red" type="Sprite2D" parent="nnivx"]
+modulate = Color(1, 0.639216, 0.639216, 1)
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("red")
+
+[node name="Lysandra" type="Node2D" parent="." node_paths=PackedStringArray("default", "images")]
+position = Vector2(1526, 1080)
+script = ExtResource("2_oxgmx")
+default = NodePath("../nnivx/default")
+images = [NodePath("../nnivx/red")]
+
+[node name="default" type="Sprite2D" parent="Lysandra"]
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("default")
+
+[node name="red" type="Sprite2D" parent="Lysandra"]
 modulate = Color(1, 0.639216, 0.639216, 1)
 position = Vector2(114.19, -113)
 scale = Vector2(0.669508, 0.669508)

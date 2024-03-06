@@ -20,7 +20,7 @@ func get_scene_name(sf: SceneStackFrame) -> StringName:
 	for scene_name in SceneManager.scenes:
 		if SceneManager.scenes[scene_name] == sf.scene_path:
 			return scene_name
-	return '<invalid>'
+	return sf.scene_path
 	
 	
 func top_scene() -> GameScene:

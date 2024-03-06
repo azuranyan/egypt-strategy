@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://bf670hy03k4dp"]
+
+[ext_resource type="Script" path="res://scenes/new_game/new_game_scene.gd" id="1_mtlmk"]
+
+[node name="NewGameScene" type="CanvasLayer"]
+script = ExtResource("1_mtlmk")
+transition_in = null
+transition_out = null
+
+[node name="DummyDialogueScreen" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

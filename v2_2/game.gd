@@ -338,9 +338,10 @@ func quit_game():
 		
 		
 ## Returns a texture of game's screenshot.
-func capture_screenshot(size: Vector2i) -> Texture:
+func capture_screenshot(size: Vector2i = get_viewport_size()) -> Texture:
 	var img := get_viewport().get_texture().get_image()
-	img.resize(size.x, size.y, Image.INTERPOLATE_BILINEAR)
+	if get_viewport().size != size:
+		img.resize(size.x, size.y, Image.INTERPOLATE_BILINEAR)
 	return ImageTexture.create_from_image(img)
 	
 
@@ -357,11 +358,11 @@ func start_new_game():
 		return
 	# battle.load_new_state()
 
-	# start the actual start of the game
-	#overworld.start_overworld_cycle()
-	SceneManager.call_scene(SceneManager.scenes.overworld, 'fade_to_black')
 	game_started.emit()
-	
+
+	# the special new game scene
+	SceneManager.call_scene('res://scenes/new_game/new_game_scene.tscn', 'fade_to_black')
+
 
 func _create_subsystems():
 	overworld = load("res://scenes/overworld/overworld.gd").new()

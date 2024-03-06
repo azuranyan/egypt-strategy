@@ -30,6 +30,10 @@ Game="*res://game.gd"
 CSUtil="*res://CSUtil.cs"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
 
+[dialogue_manager]
+
+general/wrap_lines=true
+
 [display]
 
 window/size/viewport_width=1920
@@ -104,4 +108,4 @@ rest={
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://events/test.dialogue", "res://units/alara/story_events.dialogue")
+locale/translations_pot_files=PackedStringArray("res://events/test.dialogue", "res://units/alara/story_events.dialogue", "res://events/new_game/new_game.dialogue")

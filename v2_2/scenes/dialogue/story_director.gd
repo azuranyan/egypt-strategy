@@ -32,7 +32,7 @@ const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
 
 
 ## The background fill color.
-@export var background_fill: Color = Color.BLACK:
+var background_fill: Color = Color.BLACK:
 	set(value):
 		background_fill = value
 		if not is_node_ready():
@@ -40,13 +40,22 @@ const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
 		story_event_scene.background_fill.color = value
 		
 ## The background texture.
-@export var background: Texture = null:
+var background: Texture = null:
 	set(value):
 		background = value
 		if not is_node_ready():
 			await ready
 		story_event_scene.background.texture = value
 
+var black_bars: bool:
+	set(value):
+		black_bars = value
+		if not is_node_ready():
+			await ready
+		if black_bars:
+			story_event_scene.show_black_bars()
+		else:
+			story_event_scene.hide_black_bars()
 
 ## A reference to the story event scene.
 var story_event_scene: StoryEventScene

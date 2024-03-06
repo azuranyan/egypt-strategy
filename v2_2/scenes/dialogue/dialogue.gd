@@ -162,7 +162,15 @@ func start_event(event_id: StringName, extra_game_states := []) -> void:
 	var event := get_event(event_id)
 	var script_env := [
 		director,
+		Persistent,
+		Preferences,
 	]
+	if event.context == StoryEvent.Context.INDEPENDENT:
+		pass
+	elif event.context == StoryEvent.Context.OVERWORLD:
+		script_env.append(Overworld.instance())
+	elif event.context == StoryEvent.Context.BATTLE:
+		script_env.append(Battle.instance())
 	scene.dialogue_scene.start(event.dialog_resource, event.start, script_env + extra_game_states)
 
 
@@ -230,6 +238,7 @@ func load_state(save: Dictionary) -> void:
 
 	event_registry = save.event_registry
 	character_events = save.character_events
-	event_queue = save.event_queue
+	event_queue.assign(save.event_queue)
 
-	start_event(current_event_id)
+	if current_event_id:
+		start_event(current_event_id)

@@ -40,6 +40,7 @@ func _ready():
 ## Replaces the current scene with a new scene.
 func load_new_scene(content_path: String, transition: String, kwargs := {}) -> void:
 	await _wait_for_transition_finish()
+	_transition_ongoing = true
 
 	# instantiate new frame
 	var frame := SceneStackFrame.new()
@@ -55,13 +56,21 @@ func load_new_scene(content_path: String, transition: String, kwargs := {}) -> v
 ## Loads a new scene and pushes it to the stack.
 func call_scene(content_path: String, transition: String, kwargs := {}) -> void:
 	await _wait_for_transition_finish()
+	_transition_ongoing = true
 
 	if _current_frame:
 		# store current to stack
 		_scene_stack.push_back(_current_frame)
 
+	# instantiate new frame
+	var frame := SceneStackFrame.new()
+	frame.scene_path = content_path
+	frame.scene = null
+	frame.kwargs = kwargs
+	_current_frame = frame
+
 	# load scene
-	load_new_scene(content_path, transition, kwargs)
+	_load_scene(transition)
 	
 	
 ## Pops the current scene from the stack and restores the previous scene.
@@ -71,6 +80,7 @@ func scene_return(transition: String, kwargs := {}) -> void:
 		push_error('scene_return(): scene stack empty!')
 		get_tree().quit()
 		return
+	_transition_ongoing = true
 
 	# restore previous scene
 	_current_frame = _scene_stack.pop_back()
@@ -82,6 +92,7 @@ func scene_return(transition: String, kwargs := {}) -> void:
 
 func _wait_for_transition_finish() -> void:
 	if is_loading():
+		print('waiting for finish')
 		await transition_finished
 		
 	
@@ -97,7 +108,6 @@ func is_loading() -> bool:
 	
 func _load_scene(transition: String) -> void:
 	# initialize transition data
-	_transition_ongoing = true
 	_content_path = _current_frame.scene_path
 	_transition = transition
 	_enter_ready = false

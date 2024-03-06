@@ -780,6 +780,8 @@ func save_state() -> Dictionary:
 	
 ## Loads the unit from data.
 func load_state(data: Dictionary):
+	clear_status_effects()
+
 	_id = data.id
 	_chara_id = data.chara_id
 	_chara = data.chara
@@ -790,16 +792,17 @@ func load_state(data: Dictionary):
 	_empire = data.empire
 	_hero = data.hero
 	_behavior = data.behavior
-	#_state = data.state
 	set_state(data.state)
 	set_has_attacked(data.has_attacked)
 	set_has_moved(data.has_moved)
 	set_turn_done(data.is_turn_done)
-	_selectable = data.selectable
-	_stats = data.stats
-	_bond = data.bond
+	set_selectable(data.selectable)
+	for stat in data.stats:
+		set_stat(stat, data.stats[stat])
+	set_bond(data.bond)
 	_special_unlock = data.special_unlock
-	_status_effects = data.status_effects
+	for eff in data.status_effects:
+		add_status_effect(eff, data.status_effects[eff])
 	#_heading = data.heading
 	set_heading(data.heading)
 	#_map_position = data.map_position
