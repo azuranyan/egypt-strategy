@@ -309,3 +309,5 @@ text = "Territory Won"
 label_settings = SubResource("LabelSettings_lqmxk")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="."]

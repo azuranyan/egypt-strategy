@@ -16,12 +16,13 @@ var _continue := false
 @onready var label = $Control/Banner/Label
 
 
-func _ready():
+func _ready()-> void:
 	hide()
 	set_process_unhandled_input(false)
+	$Timer.timeout.connect(close_result)
 	
 	
-func show_result(text: String, won: bool, wait_for_hide := false):
+func show_result(text: String, won: bool, wait_for_hide := false) -> void:
 	set_process_unhandled_input(true)
 	_continue = false
 	label.text = text
@@ -29,21 +30,30 @@ func show_result(text: String, won: bool, wait_for_hide := false):
 	animation_player.play("show")
 	show()
 	await animation_player.animation_finished
+	$Timer.start()
 	if not _continue:
 		await _resumed
 	animation_player.play("hide")
 	if wait_for_hide:
 		await animation_player.animation_finished
 	#queue_free()
+
+
+func close_result() -> void:
+	if not visible:
+		return
+	animation_player.advance(999)
+	_continue = true
+	_resumed.emit()
+	$Timer.stop()
+
 	
-	
-func _unhandled_input(event):
+func _unhandled_input(event)-> void:
 	if not visible:
 		return
 		
 	if (event is InputEventMouseButton or event is InputEventKey) and event.pressed:
-		animation_player.advance(999)
-		_continue = true
-		_resumed.emit()
+		close_result()
+
 	# block while this is on screen
 	get_viewport().set_input_as_handled()
