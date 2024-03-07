@@ -56,7 +56,8 @@ unique_name_in_owner = true
 modulate = Color(0.513726, 0.784314, 0.568627, 1)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxEmpty_0ia43")
-text = "overworld"
+text = "overworlddasdasdasdasdasdasdasdasdasdasdasd"
+text_overrun_behavior = 3
 
 [node name="CallStackList" type="ItemList" parent="VBoxContainer2"]
 unique_name_in_owner = true

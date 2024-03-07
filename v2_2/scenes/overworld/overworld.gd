@@ -404,6 +404,11 @@ func _overworld_main() -> void:
 			# while the battle is ongoing.
 			'wait_for_battle_result':
 				var result: BattleResult = await BattleEvents.battle_ended
+
+				# TODO workaround, we wait for the transition because battle no longer waits for it
+				if SceneManager.is_loading():
+					await SceneManager.transition_finished
+					
 				if result.value == BattleResult.CANCELLED:
 					_next_state = 'turn_start'
 
