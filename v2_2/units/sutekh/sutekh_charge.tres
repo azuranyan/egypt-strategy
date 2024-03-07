@@ -21,7 +21,7 @@ speed = 0.0
 
 [sub_resource type="Resource" id="Resource_idsg3"]
 script = ExtResource("5_n1rgf")
-amount = 1
+amount = 4
 stat = "none"
 
 [sub_resource type="Resource" id="Resource_s8y22"]

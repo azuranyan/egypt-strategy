@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://dco5tgtv3itkr"]
+
+[ext_resource type="Resource" uid="uid://swp0dyfv05hx" path="res://units/nykara/nykara_vul_debuff.tres" id="1_snlmd"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="2_xrxx5"]
+[ext_resource type="Resource" uid="uid://dle311iatok1o" path="res://units/nykara/nykara_wave.tres" id="3_j0r1h"]
+
+[resource]
+script = ExtResource("2_xrxx5")
+stats = {
+"dmg": 8,
+"maxhp": 16,
+"mov": 2,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 1,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 4,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_snlmd")
+special_attack = ExtResource("3_j0r1h")

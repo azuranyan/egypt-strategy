@@ -7,8 +7,8 @@
 [resource]
 script = ExtResource("1_j75gf")
 stats = {
-"dmg": 2,
-"maxhp": 4,
+"dmg": 8,
+"maxhp": 12,
 "mov": 2,
 "rng": 1
 }
@@ -20,10 +20,9 @@ stat_growth_1 = {
 }
 stat_growth_2 = {
 "dmg": 0,
-"maxhp": 1,
+"maxhp": 4,
 "mov": 0,
 "rng": 0
 }
 basic_attack = ExtResource("1_tgdla")
 special_attack = ExtResource("3_1j4lk")
-

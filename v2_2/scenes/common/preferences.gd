@@ -9,6 +9,8 @@ const SAVE_PATH := 'user://preferences.tscn'
 
 @export var auto_end_turn: bool = false
 
+@export var follow_camera: bool = false
+
 
 func _ready():
 	reload()

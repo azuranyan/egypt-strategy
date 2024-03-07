@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_krnu2")
 stats = {
-"dmg": 2,
-"maxhp": 9,
+"dmg": 8,
+"maxhp": 36,
 "mov": 3,
 "rng": 1
 }

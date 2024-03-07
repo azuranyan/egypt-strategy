@@ -15,7 +15,7 @@ draw_over_unit = true
 
 [sub_resource type="Resource" id="Resource_yujem"]
 script = ExtResource("3_o8mql")
-amount = 1
+amount = 5
 stat = "none"
 stat_multiplier = 0.0
 

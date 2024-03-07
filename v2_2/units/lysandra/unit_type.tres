@@ -7,8 +7,8 @@
 [resource]
 script = ExtResource("1_iggbm")
 stats = {
-"dmg": 2,
-"maxhp": 5,
+"dmg": 8,
+"maxhp": 20,
 "mov": 2,
 "rng": 2
 }
@@ -20,7 +20,7 @@ stat_growth_1 = {
 }
 stat_growth_2 = {
 "dmg": 0,
-"maxhp": 1,
+"maxhp": 4,
 "mov": 0,
 "rng": 0
 }

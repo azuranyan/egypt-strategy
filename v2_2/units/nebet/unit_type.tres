@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_d43rh")
 stats = {
-"dmg": 1,
-"maxhp": 1,
+"dmg": 4,
+"maxhp": 4,
 "mov": 1,
 "rng": 1
 }

@@ -11,7 +11,7 @@
 
 [sub_resource type="Resource" id="Resource_syslf"]
 script = ExtResource("4_qtovi")
-amount = 1
+amount = 2
 stat = "none"
 
 [sub_resource type="Resource" id="Resource_pacu8"]

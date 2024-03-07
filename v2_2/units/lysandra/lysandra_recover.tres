@@ -8,7 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_lrney"]
 script = ExtResource("1_8let3")
-amount = 2
+amount = 8
 stat = "none"
 stat_multiplier = 0.0
 

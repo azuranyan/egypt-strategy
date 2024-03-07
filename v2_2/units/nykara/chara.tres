@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://cn8jgsaijt6n5"]
 
 [ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_a2kb6"]
-[ext_resource type="Texture2D" uid="uid://dc3kv4l03o0gy" path="res://units/nyaraka/NykaraF.png" id="1_a36yk"]
+[ext_resource type="Texture2D" uid="uid://dc3kv4l03o0gy" path="res://units/nykara/NykaraF.png" id="1_a36yk"]
 
 [resource]
 script = ExtResource("1_a2kb6")

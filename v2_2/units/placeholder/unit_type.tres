@@ -9,19 +9,19 @@
 script = ExtResource("3_gyjdn")
 unit_model = ExtResource("4_acqmv")
 stats = {
-"dmg": 1,
-"maxhp": 4,
+"dmg": 4,
+"maxhp": 12,
 "mov": 3,
 "rng": 1
 }
 stat_growth_1 = {
 "dmg": 0,
-"maxhp": 1,
+"maxhp": 4,
 "mov": 0,
 "rng": 0
 }
 stat_growth_2 = {
-"dmg": 1,
+"dmg": 4,
 "maxhp": 0,
 "mov": 0,
 "rng": 0

@@ -267,7 +267,7 @@ scale = Vector2(1e-05, 1e-05)
 mouse_filter = 1
 metadata/_edit_group_ = true
 
-[node name="DialogueBox" type="VBoxContainer" parent="Balloon/ScalePoint"]
+[node name="DialogueBox" type="Control" parent="Balloon/ScalePoint"]
 visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -283,32 +283,38 @@ offset_bottom = 98.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CharacterNamePanel" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/ScalePoint/DialogueBox"]
+layout_mode = 2
+offset_right = 260.0
+offset_bottom = 55.0
+alignment = 1
+
+[node name="CharacterNamePanel" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_7lv4s")
 metadata/_edit_group_ = true
 
-[node name="NegativeMargin" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox/CharacterNamePanel"]
+[node name="NegativeMargin" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer/CharacterNamePanel"]
 layout_mode = 2
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_bottom = 4
 
-[node name="BackgroundPanel" type="Panel" parent="Balloon/ScalePoint/DialogueBox/CharacterNamePanel/NegativeMargin"]
+[node name="BackgroundPanel" type="Panel" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer/CharacterNamePanel/NegativeMargin"]
 layout_mode = 2
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_1va5f")
 
-[node name="MarginContainer" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox/CharacterNamePanel"]
+[node name="MarginContainer" type="MarginContainer" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer/CharacterNamePanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_right = 30
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/ScalePoint/DialogueBox/CharacterNamePanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer/CharacterNamePanel/MarginContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="CharacterLabel" type="RichTextLabel" parent="Balloon/ScalePoint/DialogueBox/CharacterNamePanel/MarginContainer/VBoxContainer"]
+[node name="CharacterLabel" type="RichTextLabel" parent="Balloon/ScalePoint/DialogueBox/VBoxContainer/CharacterNamePanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -327,6 +333,9 @@ autowrap_mode = 0
 
 [node name="Balloon" type="PanelContainer" parent="Balloon/ScalePoint/DialogueBox"]
 layout_mode = 2
+offset_top = 59.0
+offset_right = 1300.0
+offset_bottom = 263.0
 size_flags_vertical = 3
 mouse_filter = 1
 theme = ExtResource("1_7lv4s")
@@ -403,9 +412,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/separator = SubResource("StyleBoxLine_bphdr")
-
-[node name="CenterContainer" type="CenterContainer" parent="Balloon/ScalePoint/DialogueBox"]
-layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="Balloon"]
 layout_mode = 1

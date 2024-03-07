@@ -10,7 +10,7 @@
 
 [sub_resource type="Resource" id="Resource_qp6lr"]
 script = ExtResource("4_pt3cf")
-amount = 1
+amount = 4
 stat = "none"
 
 [sub_resource type="Resource" id="Resource_rpxoy"]

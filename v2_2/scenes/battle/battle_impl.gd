@@ -762,6 +762,8 @@ func clear_overlays(mask: int = ALL_OVERLAYS) -> void:
 ## will be fixed to that position. Setting this to [code]null[/code]
 ## will stop following the previous target node.
 func set_camera_target(target: Variant) -> void:
+	if not Preferences.follow_camera:
+		return
 	var final_pos := _camera_target_position(target)
 	get_active_battle_scene().set_camera_target(target)
 

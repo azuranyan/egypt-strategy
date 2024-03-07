@@ -7,14 +7,14 @@
 [resource]
 script = ExtResource("1_26ksc")
 stats = {
-"dmg": 1,
-"maxhp": 3,
+"dmg": 4,
+"maxhp": 12,
 "mov": 3,
 "rng": 1
 }
 stat_growth_1 = {
 "dmg": 0,
-"maxhp": 1,
+"maxhp": 4,
 "mov": 0,
 "rng": 0
 }
