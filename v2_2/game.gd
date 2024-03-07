@@ -5,6 +5,8 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+signal setting_changed(setting: StringName, value: Variant)
+
 ## Emitted when game is about to save state.
 signal saving_state
 
