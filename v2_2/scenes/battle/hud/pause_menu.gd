@@ -18,6 +18,10 @@ func _ready():
 	resume_button.grab_focus()
 	_opened = true
 	
+
+func _exit_tree() -> void:
+	close()
+
 	
 func close():
 	if not _opened:

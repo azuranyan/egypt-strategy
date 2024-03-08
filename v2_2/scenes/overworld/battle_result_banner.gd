@@ -26,7 +26,7 @@ func show_parsed_result(result: BattleResult, allow_strategy_room: bool) -> bool
 		else:
 			header = 'Region Conquered!'
 		if result.territory == result.loser().home_territory:
-			if Preferences.defeat_if_home_territory_captured:
+			if Game.settings.defeat_if_home_territory_captured:
 				message = "%s has claimed all of %s's territory!" % [result.winner().leader_name(), result.loser().leader_name()]
 			else:
 				message = "%s has claimed %s's home territory!" % [result.winner().leader_name(), result.loser().leader_name()]

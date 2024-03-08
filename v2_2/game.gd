@@ -44,7 +44,6 @@ const ALL_UNITS_MASK := ~0
 const GAME_EVENT_LISENERS_GROUP: StringName = 'game_event_listeners'
 
 
-
 enum SaveError {
 	SAVE_ERROR = -1,
 	NO_ERROR = 0,
@@ -75,6 +74,8 @@ var dialogue: Dialogue
 
 var audio_stream_player: AudioStreamPlayer2D
 
+var settings: Settings
+
 var _suspended: bool
 
 var _pause_count: int:
@@ -84,6 +85,8 @@ var _pause_count: int:
 
 
 func _ready():
+	settings = Settings.new()
+
 	var node := Node.new()
 	node.name = 'Units'
 	add_child(node)
@@ -386,6 +389,8 @@ func save_state() -> SaveState:
 	
 	var save := _create_save()
 	
+	save.settings = settings.duplicate(true)
+
 	# save unit state
 	for unit in unit_registry.values():
 		save.units[unit.id()] = unit.save_state()
@@ -409,6 +414,8 @@ func load_state(save: SaveState) -> void:
 	
 	_cleanup()
 	
+	settings = save.settings
+
 	# load unit state
 	for data in save.units.values():
 		_create_unit_from_data(data, true)

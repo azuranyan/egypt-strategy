@@ -370,9 +370,7 @@ func _overworld_main() -> void:
 				# wait for action
 				var action: Dictionary
 				if on_turn().is_player_owned():
-					get_active_overworld_scene().allow_inputs(true)
 					action = await OverworldEvents.player_action_chosen
-					get_active_overworld_scene().allow_inputs(false)
 				else:
 					action = await Game.delay_function(_ai_decision_function, enemy_action_delay, [on_turn()])
 
@@ -380,7 +378,8 @@ func _overworld_main() -> void:
 				# execute action
 				match action.type:
 					'attack':
-						await get_active_overworld_scene().show_marching_animation(action.attacker, action.defender, action.territory)
+						if Game.settings.show_marching_animations:
+							await get_active_overworld_scene().show_marching_animation(action.attacker, action.defender, action.territory)
 						BattleEvents.start_battle_requested.emit(action.attacker, action.defender, action.territory, action.map_id)
 						_next_state = 'wait_for_battle_result'
 
@@ -408,7 +407,7 @@ func _overworld_main() -> void:
 				# TODO workaround, we wait for the transition because battle no longer waits for it
 				if SceneManager.is_loading():
 					await SceneManager.transition_finished
-					
+
 				if result.value == BattleResult.CANCELLED:
 					_next_state = 'turn_start'
 
@@ -624,7 +623,7 @@ func transfer_territory(new_owner: Empire, territory: Territory) -> void:
 
 	_transfer_territory(old_owner, new_owner, territory)
 
-	if territory == old_owner.home_territory and Preferences.defeat_if_home_territory_captured:
+	if territory == old_owner.home_territory and Game.settings.defeat_if_home_territory_captured:
 		while not old_owner.territories.is_empty():
 			var t: Territory = old_owner.territories.pop_back()
 			_transfer_territory(old_owner, new_owner, t)

@@ -65,6 +65,7 @@ var unit: Unit
 ## A reference to the unit type unit_model. It's here for convenience, [b]do not change.[/b]
 var unit_model: UnitModel
 
+
 # TODO these could be diff components too
 @onready var hp_bar = %HPBar
 
@@ -84,6 +85,7 @@ func _ready():
 		UnitEvents.status_effect_removed.connect(_on_unit_status_effect_removed)
 		UnitEvents.status_effect_ticked.connect(_on_unit_status_effect_ticked)
 		UnitEvents.turn_flags_changed.connect(_on_unit_turn_flags_changed)
+		Game.setting_changed.connect(_on_game_settings_changed)
 	initialize(null)
 	assert(unit_model != null)
 
@@ -101,10 +103,11 @@ func initialize(new_unit: Unit):
 	if new_unit:
 		# initialize ui elements that doesn't change. the unit will reset
 		# after us so we don't have to manually update our stuff
-		$HUD/Label.text = new_unit.display_name()
+		%NameLabel.text = new_unit.display_name()
 		unit_type = new_unit.unit_type()
 		empire_id = new_unit.get_empire().leader_id if new_unit.get_empire() else &''
 		state = new_unit.state()
+		_on_game_settings_changed('unit_hud', Game.settings.unit_hud)
 	else:
 		unit_type = null
 		empire_id = &''
@@ -286,3 +289,25 @@ func get_status_effect_icon(effect: StringName) -> TextureRect:
 		&'VUL':
 			return %VULIcon
 	return null
+
+
+func _on_game_settings_changed(setting: StringName, value: Variant) -> void:
+	if setting != 'unit_hud':
+		return
+	match value:
+		Settings.UnitHUD.FULL:
+			%NameLabel.visible = true
+			%HPBar.visible = true
+			%EndTurnIcon.visible = true
+			%StatusEffectContainer.visible = true
+		Settings.UnitHUD.SIMPLIFIED:
+			%NameLabel.visible = false
+			%HPBar.visible = true
+			%EndTurnIcon.visible = true
+			%StatusEffectContainer.visible = true
+		Settings.UnitHUD.HP_BARS_ONLY:
+			%NameLabel.visible = false
+			%HPBar.visible = true
+			%EndTurnIcon.visible = false
+			%StatusEffectContainer.visible = false
+			

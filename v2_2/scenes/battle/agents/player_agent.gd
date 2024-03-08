@@ -26,9 +26,6 @@ enum {
 ## The maximum stack size of the undo stack.
 @export var undo_stack_size := 99
 
-## When true, pressing cancel will immediately undoes the move, otherwise unit selection is cancelled first.
-@export var enable_undo_after_move := true
-
 
 var battle: Battle
 var state: int = STATE_NONE
@@ -182,7 +179,7 @@ func interact_cancel():
 				undo_action()
 
 		STATE_BATTLE_SELECTING_MOVE:
-			if not enable_undo_after_move:
+			if Game.settings.undo_move_behavior == Settings.UndoMoveBehavior.UNDO_SELECT:
 				if selected_unit:
 					interact_select_unit(null)
 					return

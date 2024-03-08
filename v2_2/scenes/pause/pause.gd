@@ -41,7 +41,9 @@ func _on_load_button_pressed():
 
 
 func _on_settings_button_pressed():
-	pass # Replace with function body.
+	var settings = load('res://scenes/common/settings_scene.tscn').instantiate()
+	get_tree().root.add_child(settings, true)
+	settings.initialize(Game.settings)
 
 
 func _on_save_quit_button_pressed():

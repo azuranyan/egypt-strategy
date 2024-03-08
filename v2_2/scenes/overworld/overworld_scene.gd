@@ -23,6 +23,14 @@ func _ready() -> void:
 	OverworldEvents.turn_ended.connect(update_new_available_scenes)
 	OverworldEvents.territory_adjacency_changed.connect(update_button_connections)
 
+	OverworldEvents.turn_started.connect(func(empire: Empire):
+		allow_inputs(empire.is_player_owned())
+	)
+
+	OverworldEvents.turn_ended.connect(func(_empire: Empire):
+		allow_inputs(false)
+	)
+
 
 ## Returns the territory nodes.
 func get_territory_nodes() -> Array[TerritoryButton]:

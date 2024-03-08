@@ -18,6 +18,9 @@ extends Resource
 
 @export_group('Game Data')
 
+## The game settings.
+@export var settings: Settings
+
 ## A descriptor for where we stopped in-game.
 @export var paused_event: String
 

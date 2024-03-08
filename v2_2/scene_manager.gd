@@ -107,6 +107,7 @@ func is_loading() -> bool:
 	
 	
 func _load_scene(transition: String) -> void:
+	assert(_transition_ongoing)
 	# initialize transition data
 	_content_path = _current_frame.scene_path
 	_transition = transition
@@ -259,6 +260,8 @@ func save_state() -> Dictionary:
 	
 	
 func load_state(data: Dictionary):
+	_transition_ongoing = true
+	
 	_scene_stack.assign(data.scene_stack)
 	_current_frame = data.current_frame
 

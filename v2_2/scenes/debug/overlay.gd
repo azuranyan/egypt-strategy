@@ -2,6 +2,9 @@ class_name TestOverlay
 extends CanvasLayer
 
 
+var locked: bool
+
+
 @onready var current_context_label = $CurrentContextState
 
 
@@ -10,6 +13,12 @@ func _ready():
 	
 	$Timer.timeout.connect(update)
 	$Timer.start()
+	hide()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.keycode == KEY_ALT:
+		visible = event.pressed or locked
 
 
 func update():
@@ -55,3 +64,10 @@ func _on_quit_button_pressed():
 
 func _on_button_pressed():
 	CanvasLayer.print_orphan_nodes()
+
+
+func _on_lock_button_toggled(toggled_on: bool) -> void:
+	locked = toggled_on
+	if not locked:
+		$LockButton.release_focus()
+		visible = Input.is_key_pressed(KEY_ALT)

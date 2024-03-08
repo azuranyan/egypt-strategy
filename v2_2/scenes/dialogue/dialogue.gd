@@ -171,7 +171,7 @@ func start_event(event_id: StringName, extra_game_states := []) -> void:
 	var script_env := [
 		director,
 		Persistent,
-		Preferences,
+		Game.settings,
 	]
 	if event.context == StoryEvent.Context.INDEPENDENT:
 		pass

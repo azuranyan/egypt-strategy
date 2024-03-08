@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Preferences="*res://scenes/common/preferences.gd"
 Persistent="*res://scenes/common/persistent.gd"
 SceneManager="*res://scene_manager.gd"
 SaveManager="*res://save_manager.gd"

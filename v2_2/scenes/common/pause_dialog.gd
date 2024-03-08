@@ -62,6 +62,10 @@ func _input(event):
 		get_viewport().set_input_as_handled()
 
 
+func _exit_tree() -> void:
+	close_dialog()
+
+
 ## Shows dialog.
 func open_dialog(message := default_message, confirm_text := default_confirm_text, cancel_text := default_cancel_text):
 	close_dialog()

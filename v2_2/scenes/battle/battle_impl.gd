@@ -33,7 +33,7 @@ enum State {
 @export var _battle_phase: bool
 
 @export var _dying_units: int
-@export var _next_state: State
+@export var _next_state: State = State.INVALID
 
 
 var _waiting_for: StringName
@@ -444,7 +444,7 @@ func check_for_battle_end() -> bool:
 
 ## Returns true if empire should end turn.
 func should_end_turn(empire: Empire) -> bool:
-	if not Preferences.auto_end_turn:
+	if not Game.settings.auto_end_turn:
 		return false
 	for u in Game.get_empire_units(empire):
 		if u.can_act():
@@ -479,7 +479,8 @@ func create_agent(empire: Empire) -> BattleAgent:
 func end_battle(result_value: int):
 	_result_value = result_value
 	_should_end = true
-	agents[on_turn()].force_end()
+	if on_turn():
+		agents[on_turn()].force_end()
 	
 	
 ## Stops the battle cycle.
@@ -762,8 +763,12 @@ func clear_overlays(mask: int = ALL_OVERLAYS) -> void:
 ## will be fixed to that position. Setting this to [code]null[/code]
 ## will stop following the previous target node.
 func set_camera_target(target: Variant) -> void:
-	if not Preferences.follow_camera:
+	if Game.settings.camera_follow == Settings.CameraFollow.DISABLED:
 		return
+
+	if Game.settings.camera_follow == Settings.CameraFollow.CURSOR_ONLY and not Util.is_equal(target, level.cursor):
+		return
+
 	var final_pos := _camera_target_position(target)
 	get_active_battle_scene().set_camera_target(target)
 
@@ -816,7 +821,11 @@ func show_pause_menu() -> void:
 	pause_menu.save_button.pressed.connect(_stub.bind('save'))
 	pause_menu.save_button.disabled = not saving_allowed()
 	pause_menu.load_button.pressed.connect(_stub.bind('load'))
-	pause_menu.settings_button.pressed.connect(_stub.bind('settings'))
+	pause_menu.settings_button.pressed.connect(func():
+		var settings = load('res://scenes/common/settings_scene.tscn').instantiate()
+		get_tree().root.add_child(settings, true)
+		settings.initialize(Game.settings)
+	)
 	pause_menu.quit_to_title_button.pressed.connect(_stub.bind('quit_to_title'))
 
 
@@ -958,6 +967,7 @@ func unit_action_pass(unit: Unit) -> void:
 @warning_ignore("redundant_await")
 func unit_action_move(unit: Unit, target: Vector2) -> void:
 	hud().hide()
+	
 	await set_camera_target(unit)
 
 	if on_turn() == ai():

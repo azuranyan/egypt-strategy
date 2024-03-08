@@ -2,6 +2,9 @@
 extends CanvasLayer
 
 
+signal closed
+
+
 const SubsettingScene := preload('res://scenes/common/subsetting.tscn')
 
 
@@ -11,10 +14,16 @@ const SubsettingScene := preload('res://scenes/common/subsetting.tscn')
 
 func _ready() -> void:
 	settings_group.hide()
-	if Engine.is_editor_hint() or Util.is_scene_root(self):
+	if Engine.is_editor_hint():
 		var settings := Settings.new()
 		Game.setting_changed.connect(func(name: String, value: Variant): print('%s: %s' % [name, value]))
 		initialize.call_deferred(settings)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed('ui_cancel') or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		closed.emit()
+		queue_free()
 
 
 ## Dynamically generates settings screen.

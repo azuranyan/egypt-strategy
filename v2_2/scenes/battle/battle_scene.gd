@@ -25,7 +25,6 @@ func _unhandled_input(event):
 			Battle.instance().show_pause_menu()
 		else:
 			Battle.instance().show_forfeit_dialog()
-			Battle.instance().show_forfeit_dialog()
 		get_viewport().set_input_as_handled()
 	
 

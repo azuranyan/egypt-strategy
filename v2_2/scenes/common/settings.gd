@@ -2,7 +2,7 @@ class_name Settings
 extends Resource
 
 
-enum CameraFollow {ALWAYS, CURSOR_ONLY}
+enum CameraFollow {DISABLED, ALWAYS, CURSOR_ONLY}
 
 enum UndoMoveBehavior {UNDO_MOVE, UNDO_SELECT}
 
