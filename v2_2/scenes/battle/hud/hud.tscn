@@ -554,6 +554,17 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
+[node name="Mark" type="Label" parent="Control/ObjectivesPanel/BonusGoalPanel/MarginContainer/BonusGoalContainer/BonusGoalSample"]
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_colors/font_outline_color = Color(0.239216, 0.192157, 0.129412, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 8
+text = "✓"
+
 [node name="PrepUnitList" parent="Control" instance=ExtResource("12_nfnju")]
 layout_mode = 1
 

@@ -5,7 +5,10 @@ signal game_started
 signal game_ended
 signal game_resumed
 
+
 signal setting_changed(setting: StringName, value: Variant)
+signal trigger_state_changed(trigger: Trigger, state: bool)
+
 
 ## Emitted when game is about to save state.
 signal saving_state
@@ -177,9 +180,11 @@ func get_viewport_size() -> Vector2:
 #region Unit
 
 ## Creates a new unit.
-func create_unit(empire: Empire, chara_id: StringName) -> Unit:
-	var chara := get_character_info(chara_id)
-	var unit_type := get_unit_type(chara_id)
+func create_unit(empire: Empire, chara_id: StringName, chara: CharacterInfo = null, unit_type: UnitType = null) -> Unit:
+	if chara == null:
+		chara = get_character_info(chara_id)
+	if unit_type == null:
+		unit_type = get_unit_type(chara_id)
 
 	var is_placeholder := chara == preload("res://units/placeholder/chara.tres")
 	var data := {
@@ -239,6 +244,7 @@ func destroy_unit(unit: Unit):
 	
 	
 ## Returns the first unit with given chara id.
+## 
 ## Do note that there can be multiple units with the same `chara_id`.
 ## For getting the exact unit, use `load_unit` instead.
 func get_unit_by_chara_id(chara_id: StringName) -> Unit:
@@ -249,7 +255,7 @@ func get_unit_by_chara_id(chara_id: StringName) -> Unit:
 
 
 ## Returns the empire units.
-func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
+func get_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
 	var arr: Array[Unit] = []
 	for id in unit_registry:
 		var u: Unit = unit_registry[id]
@@ -268,7 +274,40 @@ func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
 				continue
 		arr.append(u)
 	return arr
-	
+
+
+## Returns the empire units.
+## @deprecated
+func get_empire_units(e: Empire, mask := VALID_TARGET_MASK) -> Array[Unit]:
+	return get_units(e, mask)
+
+
+## Returns the hero unit.
+func get_hero_unit(e: Empire) -> Unit:
+	for id in unit_registry:
+		var u: Unit = unit_registry[id]
+		if u.is_hero() and u.get_empire() == e:
+			return u
+	return null
+
+
+## Returns the first unit with matching name.
+func find_unit_by_name(display_name: String) -> Unit:
+	for id in unit_registry:
+		var u: Unit = unit_registry[id]
+		if u.display_name() == display_name:
+			return u
+	return null
+
+
+## Returns the first unit with matching chara id.
+func find_unit_by_chara_id(chara_id: StringName) -> Unit:
+	for id in unit_registry:
+		var u: Unit = unit_registry[id]
+		if u.chara_id() == chara_id:
+			return u
+	return null
+
 
 ## Returns the character info for given unit name.
 func get_character_info(unit_name: String) -> CharacterInfo:

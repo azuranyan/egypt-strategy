@@ -35,6 +35,8 @@ const DIRECTIONS: Array[Vector2] = [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, V
 const OUT_OF_BOUNDS := Vector2(69, 69)
 
 
+@export_group("World")
+
 ## The world to use.
 @export var world: World = null:
 	set(value):
@@ -49,13 +51,10 @@ const OUT_OF_BOUNDS := Vector2(69, 69)
 ## How often the changes are updated when world parameters are changed.
 @export var world_update_frequency: float = 0.5
 
+@export_group("Level")
 
 ## For painting custom pathing.
 @export var pathing_painter: TileOverlay
-
-#@export var triggers: Array[Trigger]
-
-@export var victory_conditions: Array[VictoryCondition] = [VictoryCondition.new()]
 
 
 var _world_update_cooldown: float = 0

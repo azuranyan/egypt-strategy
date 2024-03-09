@@ -17,18 +17,18 @@ var territory: Territory
 var map_id: int
 
 
-static func attacker_victory() -> BattleResult:
-	return BattleResult.new(ATTACKER_VICTORY)
+static func empire_victory(empire: Empire) -> int:
+	return ATTACKER_VICTORY if empire == Battle.instance().attacker() else DEFENDER_VICTORY
 
-static func defender_victory() -> BattleResult:
-	return BattleResult.new(DEFENDER_VICTORY)
-	
-static func attacker_withdraw() -> BattleResult:
-	return BattleResult.new(ATTACKER_WITHDRAW)
-	
-static func defender_withdraw() -> BattleResult:
-	return BattleResult.new(DEFENDER_WITHDRAW)
-	
+
+static func empire_defeat(empire: Empire) -> int:
+	return DEFENDER_VICTORY if empire == Battle.instance().attacker() else ATTACKER_VICTORY
+
+
+static func empire_withdraw(empire: Empire) -> int:
+	return ATTACKER_WITHDRAW if empire == Battle.instance().attacker() else DEFENDER_WITHDRAW
+
+
 
 func _init(_value: int, _attacker: Empire = null, _defender: Empire = null, _territory: Territory = null, _map_id: int = 0):
 	# param list was kept like that for compatibility, clean it up later

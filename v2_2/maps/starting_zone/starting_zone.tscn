@@ -1,10 +1,13 @@
-[gd_scene load_steps=23 format=3 uid="uid://c1r233k6re33q"]
+[gd_scene load_steps=25 format=3 uid="uid://c1r233k6re33q"]
 
 [ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_ok0h5"]
-[ext_resource type="Script" path="res://scenes/battle/victory_condition.gd" id="2_mlpt4"]
 [ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="3_6y2y1"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/defeat_all_enemies.gd" id="3_cdw7g"]
+[ext_resource type="Script" path="res://scenes/battle/triggers/all_units_defeated.gd" id="3_kl6gs"]
 [ext_resource type="Texture2D" uid="uid://8e53xrl080tr" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="4_o4n1p"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/no_damage_clear.gd" id="5_6ach7"]
 [ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="5_lepi5"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/defeat_target.gd" id="5_myo41"]
 [ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="6_f7xbd"]
 [ext_resource type="PackedScene" uid="uid://yprjs7acc27b" path="res://scenes/battle/map_objects/static_doodad.tscn" id="7_0h7yf"]
 [ext_resource type="PackedScene" uid="uid://f7wfyvgvuqsf" path="res://scenes/battle/map_objects/spawn_point.tscn" id="7_4daum"]
@@ -22,19 +25,33 @@
 [ext_resource type="Texture2D" uid="uid://cpk1a2prsll3i" path="res://maps/starting_zone/sprites/StartingZoneObj12.png" id="19_4ryph"]
 [ext_resource type="Texture2D" uid="uid://dpp00n16q43ai" path="res://maps/starting_zone/sprites/StartingZoneObj13.png" id="20_14e67"]
 
-[sub_resource type="Resource" id="Resource_x8ok4"]
-script = ExtResource("2_mlpt4")
-
 [node name="StartingZone" type="Node2D" node_paths=PackedStringArray("world", "pathing_painter")]
 y_sort_enabled = true
 script = ExtResource("1_ok0h5")
 world = NodePath("World")
 pathing_painter = NodePath("Painter")
-victory_conditions = Array[ExtResource("2_mlpt4")]([SubResource("Resource_x8ok4")])
 
 [node name="Triggers" type="Node" parent="."]
 
-[node name="VictoryConditions" type="Node" parent="."]
+[node name="AllUnitsDefeatedTrigger" type="Node" parent="Triggers"]
+script = ExtResource("3_kl6gs")
+
+[node name="Missions" type="Node" parent="."]
+
+[node name="DefeatAllEnemiesObjective" type="Node" parent="Missions"]
+script = ExtResource("3_cdw7g")
+
+[node name="DefeatTargetObjective" type="Node" parent="Missions"]
+script = ExtResource("5_myo41")
+target_type = 2
+target_data = null
+objective_type = "Bonus Objective"
+countdown = 1
+
+[node name="NoDamageClearObjective" type="Node" parent="Missions"]
+script = ExtResource("5_6ach7")
+objective_type = "Bonus Objective"
+one_shot = false
 
 [node name="BonusGoals" type="Node" parent="."]
 
@@ -56,43 +73,54 @@ y_sort_enabled = true
 script = ExtResource("6_f7xbd")
 
 [node name="SpawnPoint1" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(819.127, 515.457)
 map_position = Vector2(3, 7)
 
 [node name="SpawnPoint2" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(771.044, 598.978)
 map_position = Vector2(4, 9)
 
 [node name="SpawnPoint3" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(1155.71, 543.297)
 map_position = Vector2(7, 4)
 
 [node name="SpawnPoint4" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(1251.88, 598.978)
 map_position = Vector2(9, 4)
 
 [node name="SpawnPoint5" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(819.127, 626.818)
 map_position = Vector2(5, 9)
 
 [node name="SpawnPoint6" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(867.21, 654.658)
 map_position = Vector2(6, 9)
 
 [node name="SpawnPoint7" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+position = Vector2(1011.46, 682.499)
 map_position = Vector2(8, 8)
 
 [node name="SpawnPoint8" parent="SpawnPoints" instance=ExtResource("7_4daum")]
 modulate = Color(0, 0, 1, 0.2)
+position = Vector2(915.293, 571.138)
 type = 1
 map_position = Vector2(5, 7)
 
 [node name="SpawnPoint9" parent="SpawnPoints" instance=ExtResource("7_4daum")]
 modulate = Color(0, 0, 1, 0.2)
+position = Vector2(963.377, 598.978)
 type = 1
 map_position = Vector2(6, 7)
 
 [node name="SpawnPoint10" parent="SpawnPoints" instance=ExtResource("7_4daum")]
 modulate = Color(0, 0, 1, 0.2)
+position = Vector2(1155.71, 598.978)
 type = 1
 map_position = Vector2(8, 5)
 
 [node name="SpawnPoint11" parent="SpawnPoints" instance=ExtResource("7_4daum")]
 modulate = Color(0, 0, 1, 0.2)
+position = Vector2(1203.79, 571.138)
 type = 1
 map_position = Vector2(8, 4)
 
@@ -107,53 +135,66 @@ metadata/_edit_group_ = true
 metadata/_edit_lock_ = true
 
 [node name="StaticDoodad1" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1540.38, 543.297)
 texture = ExtResource("8_3vl5c")
 map_position = Vector2(11, 0)
 
 [node name="StaticDoodad2" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1011.46, 849.54)
 texture = ExtResource("9_dlfa4")
 map_position = Vector2(11, 11)
 
 [node name="StaticDoodad3" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(963.377, 821.7)
 texture = ExtResource("10_1tiv6")
 map_position = Vector2(10, 11)
 
 [node name="StaticDoodad4" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1492.29, 515.457)
 texture = ExtResource("11_5ebwt")
 map_position = Vector2(10, 0)
 
 [node name="StaticDoodad5" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1107.63, 626.818)
 texture = ExtResource("12_f03uo")
 map_position = Vector2(8, 6)
 
 [node name="StaticDoodad6" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1251.88, 487.617)
 texture = ExtResource("13_n8v6b")
 map_position = Vector2(7, 2)
 
 [node name="StaticDoodad7" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(915.294, 459.777)
 texture = ExtResource("14_npjpy")
 map_position = Vector2(3, 5)
 
 [node name="StaticDoodad8" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(1011.46, 404.096)
 texture = ExtResource("15_ucbvd")
 map_position = Vector2(3, 3)
 
 [node name="StaticDoodad9" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(867.21, 431.937)
 texture = ExtResource("16_r3306")
 map_position = Vector2(2, 5)
 
 [node name="StaticDoodad10" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(722.96, 459.777)
 texture = ExtResource("17_0cdjt")
 map_position = Vector2(1, 7)
 
 [node name="StaticDoodad11" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(578.711, 598.978)
 texture = ExtResource("18_o07kn")
 map_position = Vector2(2, 11)
 
 [node name="StaticDoodad12" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(963.377, 264.895)
 texture = ExtResource("19_4ryph")
 map_position = Vector2(0, 1)
 
 [node name="StaticDoodad13" parent="Doodads" instance=ExtResource("7_0h7yf")]
+position = Vector2(530.627, 571.138)
 texture = ExtResource("20_14e67")
 map_position = Vector2(1, 11)

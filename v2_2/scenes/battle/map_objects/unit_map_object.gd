@@ -30,11 +30,13 @@ const BasicUnitModel := preload("res://scenes/battle/unit/basic_unit_model.tscn"
 			await ready
 		load_unit_model(unit_type.unit_model if unit_type and unit_type.unit_model else BasicUnitModel)
 
-## The empire this unit will be given to.[br]
+## The empire this unit will be given to.
+##
 ## Also understands special strings like [code]$ai[/code] and [code]$player[/code].
 @export var empire_id: StringName
 		
-## The state to show.[br]
+## The state to show.
+##
 ## The game is free to ignore this and reset to idle on load.
 @export var state: Unit.State
 	

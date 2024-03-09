@@ -37,6 +37,7 @@ func register_event(event: StoryEvent, chara: CharacterInfo = null) -> void:
 		chara = chara,
 		locked = event.locked,
 		times_seen = 0,
+		priority = event.priority,
 	}
 	
 	_add_event(state)

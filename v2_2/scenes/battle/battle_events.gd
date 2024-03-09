@@ -57,3 +57,7 @@ signal attack_sequence_ended()
 
 #endregion Cycle Signals
 
+## Emitted when objective is updated.
+signal objective_updated(objective: Objective)
+
+signal objectives_evaluated

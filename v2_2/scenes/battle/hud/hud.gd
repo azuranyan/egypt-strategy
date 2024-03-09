@@ -41,6 +41,10 @@ func _ready():
 	character_panel.hide()
 	BattleEvents.prep_phase_started.connect(_on_prep_phase_started)
 	BattleEvents.turn_started.connect(_on_turn_started)
+	BattleEvents.objective_updated.connect(func(_objective: Objective):
+		set_missions(Battle.instance().missions())
+		set_bonus_goals(Battle.instance().bonus_goals())
+	)
 
 	UnitEvents.selected.connect(_on_unit_selected)
 	
@@ -60,13 +64,11 @@ func _on_turn_started(_empire: Empire):
 func update():
 	show()
 	# mock test
-	var battle_phase := Game.battle.is_battle_phase()
-	var is_player_turn := Game.battle.on_turn().is_player_owned()
-	var is_training := Game.battle.is_training_battle()
-	var missions: Array[VictoryCondition] = Game.battle.missions()
-	var bonus_goals: Array[VictoryCondition] = [
-		VictoryCondition.new(),
-	]
+	var battle_phase := Battle.instance().is_battle_phase()
+	var is_player_turn := Battle.instance().on_turn().is_player_owned()
+	var is_training := Battle.instance().is_training_battle()
+	var missions := Battle.instance().missions()
+	var bonus_goals := Battle.instance().bonus_goals()
 	
 	# top left panel
 	if battle_phase:
@@ -85,7 +87,7 @@ func update():
 	%MissionPanel.visible = true
 	set_missions(missions)
 	%BonusGoalPanel.visible = battle_phase and not is_training
-	set_bonus_goal(bonus_goals)
+	set_bonus_goals(bonus_goals)
 	action_order_button.visible = battle_phase and is_player_turn
 
 
@@ -209,7 +211,7 @@ func show_message(message: String, duration: float = -1):
 
 
 ## Displays the list of missions.
-func set_missions(missions: Array[VictoryCondition]):
+func set_missions(missions: Array[Objective]):
 	clear_missions()
 	_set_objective_list(%MissionContainer, %MissionSample, missions)
 	
@@ -220,7 +222,7 @@ func clear_missions():
 			
 			
 ## Displays the list of bonus goals.
-func set_bonus_goal(bonus_goals: Array[VictoryCondition]):
+func set_bonus_goals(bonus_goals: Array[Objective]):
 	clear_bonus_goals()
 	_set_objective_list(%BonusGoalContainer, %BonusGoalSample, bonus_goals)
 	if bonus_goals.is_empty():
@@ -232,15 +234,34 @@ func clear_bonus_goals():
 	_clear_objective_list(%BonusGoalContainer, %BonusGoalSample)
 			
 			
-func _set_objective_list(container, sample, objectives):
-	for objective: VictoryCondition in objectives:
+func _set_objective_list(container: Control, sample: Control, objectives: Array[Objective]):
+	for objective in objectives:
+		if objective.hidden:
+			continue
+
 		var label: Label = sample.duplicate()
-		label.text = objective.win_description()
+
+		# set the description
+		label.text = objective.description()
+
+		# set the active state
+		if objective.is_active():
+			label.modulate = Color.WHITE
+		else:
+			label.modulate = Color(1, 1, 1, 0.33)
+
+		# set the status
+		if objective.objective_type == 'Bonus Objective':
+			if objective.status() == Objective.Status.NONE:
+				label.get_node("Mark").hide()
+			else:
+				label.get_node("Mark").text = "✓" if objective.status() == Objective.Status.COMPLETED else "✗"
+
 		label.show()
 		container.add_child(label)
 		
 		
-func _clear_objective_list(container, sample):
+func _clear_objective_list(container: Control, sample: Control):
 	for child in container.get_children():
 		if child != sample:
 			child.queue_free()

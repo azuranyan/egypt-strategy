@@ -132,13 +132,13 @@ func map_id() -> int:
 	
 	
 ## Returns the battle missions.
-func missions() -> Array[VictoryCondition]:
+func missions() -> Array[Objective]:
 	assert(false, 'not implemented')
 	return []
 	
 	
 ## Returns the battle bonus goals.
-func bonus_goals() -> Array[VictoryCondition]:
+func bonus_goals() -> Array[Objective]:
 	assert(false, 'not implemented')
 	return []
 
@@ -147,6 +147,12 @@ func bonus_goals() -> Array[VictoryCondition]:
 func on_turn() -> Empire:
 	assert(false, 'not implemented')
 	return null
+	
+
+## Returns the number of cycles.
+func cycle() -> int:
+	assert(false, 'not implemented')
+	return 0
 
 
 ## Returns true if battle is on battle phase.

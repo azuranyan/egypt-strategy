@@ -250,22 +250,27 @@ func _distribute_units():
 			u.queue_free()
 			continue
 
-		var chara_id: StringName = u.empire_id
 		var empire: Empire
-		if chara_id == '$ai':
+		if u.empire_id == '$ai':
 			empire = ai()
-		elif chara_id == '$player':
+		elif u.empire_id == '$player':
 			empire = player()
 		else:
-			empire = Overworld.instance().get_empire_by_leader_id(chara_id)
+			empire = Overworld.instance().get_empire_by_leader_id(u.empire_id)
 
 		if not empire:
-			push_warning('[Battle] Empire `%s` not found, removing.' % chara_id)
+			push_warning('[Battle] Empire `%s` not found, removing.' % u.empire_id)
 			u.queue_free()
 			continue
 		
+		# we just yeet this to the standby
 		u.set_meta('preplaced', true)
-		Game.create_unit(empire, chara_id)
+		# TODO this will cause it to spawn the wrong unit. change to pre-placed unit maybe?
+		push_error("pre placed unit not supported yet")
+		var unit := Game.create_unit(empire, u.empire_id, null, u.unit_type)
+		unit.set_position(u.map_position)
+		unit.set_heading(u.heading)
+		u.map_position = Map.OUT_OF_BOUNDS
 		
 	
 func _field_units():
@@ -535,20 +540,24 @@ func map_id() -> int:
 	
 	
 ## Returns the battle missions.
-func missions() -> Array[VictoryCondition]:
-	return level.map.victory_conditions
+func missions() -> Array[Objective]:
+	return level.missions
 	
 	
 ## Returns the battle bonus goals.
-func bonus_goals() -> Array[VictoryCondition]:
-	assert(false, 'not implemented')
-	return []
+func bonus_goals() -> Array[Objective]:
+	return level.bonus_goals
 
 
 ## Returns the empire currently on turn.
 func on_turn() -> Empire:
 	return null if _turn_queue.is_empty() else _turn_queue.front()
 	
+
+## Returns the number of cycles.
+func cycle() -> int:
+	return _turns
+
 
 ## Returns true if battle is on battle phase.
 func is_battle_phase() -> bool:
@@ -657,10 +666,8 @@ func get_battle_result() -> BattleResult:
 	
 ## Evaluates victory conditions and returns first valid result.
 func evaluate_battle_result() -> BattleResult:
-	for vc in missions():
-		_result_value = vc.evaluate()
-		if _result_value != BattleResult.NONE:
-			break
+	# does not do anything other than allow objectives to be manually polled for results
+	BattleEvents.objectives_evaluated.emit()
 	return get_battle_result()
 	
 

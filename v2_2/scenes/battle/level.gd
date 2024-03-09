@@ -27,7 +27,14 @@ var pathables := []
 ## An array of out of bounds pathable objects.
 var out_of_bounds_pathables: Array[PathableComponent] = []
 
-var unit: Unit
+## A list of active triggers.
+var triggers: Array[Trigger]
+
+## A list of active missions.
+var missions: Array[Objective]
+
+## A list of active bonus goals.
+var bonus_goals: Array[Objective]
 
 
 @onready var cursor := $Cursor
@@ -61,6 +68,11 @@ func load_map(packed_scene: PackedScene) -> bool:
 	map.object_added.connect(add_object)
 	map.object_removed.connect(remove_object)
 	
+	# this has to be done before adding to the map otherwise we'll miss autostart activations.
+	# doing it this way though means we're assuming triggers are only in the map, as part of the battle.
+	# if triggers are used outside of battle, we'll need to change this as well.
+	Game.trigger_state_changed.connect(_on_trigger_state_changed)
+
 	add_child(map)
 	
 	print("[Level] Adding pathing barriers.")
@@ -104,21 +116,15 @@ func _has_barrier(cell: Vector2) -> bool:
 		if obj is Barrier:
 			return true
 	return false
-
-
-func _distribute_units():
-	var evict := []
-	for u in objects:
-		if u is UnitMapObject:
-			evict.append(u)
-	
-
 	
 	
 ## Unloads the map
 func unload_map():
 	if is_instance_valid(map):
 		print('[Level] Unloading map "%s"' % map.scene_file_path)
+		# see above
+		Game.trigger_state_changed.disconnect(_on_trigger_state_changed)
+
 		objects.clear()
 		cells.clear()
 		out_of_bounds.clear()
@@ -234,3 +240,19 @@ func get_bounds() -> Rect2:
 func is_within_bounds(pos: Vector2) -> bool:
 	return pos == Map.OUT_OF_BOUNDS or get_bounds().has_point(pos)
 
+
+func _get_trigger_container(t: Trigger) -> Variant:
+	if t is Objective:
+		if t.objective_type == "Main Objective":
+			return missions
+		else:
+			return bonus_goals
+	else:
+		return triggers
+
+
+func _on_trigger_state_changed(t: Trigger, active: bool) -> void:
+	if active:
+		_get_trigger_container(t).append(t)
+	else:
+		_get_trigger_container(t).erase(t)

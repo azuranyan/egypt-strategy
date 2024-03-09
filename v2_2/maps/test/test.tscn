@@ -2,22 +2,18 @@
 
 [ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_fyf4x"]
 [ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_1pxfs"]
-[ext_resource type="Script" path="res://scenes/battle/victory_condition.gd" id="2_nq2e6"]
 [ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="3_qtici"]
 [ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="4_7feta"]
 [ext_resource type="PackedScene" uid="uid://dgiub7m8fawlq" path="res://scenes/battle/map_objects/unit_map_object.tscn" id="6_1hp1t"]
 [ext_resource type="PackedScene" uid="uid://f7wfyvgvuqsf" path="res://scenes/battle/map_objects/spawn_point.tscn" id="7_wihym"]
 [ext_resource type="PackedScene" uid="uid://bjgmgbp75bsb4" path="res://scenes/battle/map_objects/barrier.tscn" id="8_njobe"]
 
-[sub_resource type="Resource" id="Resource_jtklt"]
-script = ExtResource("2_nq2e6")
 
 [node name="Test" type="Node2D" node_paths=PackedStringArray("world", "pathing_painter")]
 y_sort_enabled = true
 script = ExtResource("1_fyf4x")
 world = NodePath("World")
 pathing_painter = NodePath("TileOverlay")
-victory_conditions = Array[ExtResource("2_nq2e6")]([SubResource("Resource_jtklt")])
 
 [node name="World" parent="." instance=ExtResource("2_1pxfs")]
 z_index = -10
