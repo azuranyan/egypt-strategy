@@ -44,21 +44,72 @@ var _empire: Empire
 var _adjacent_to_player: bool
 
 
-## Group node containin the button connections.
-@onready var connections = $Connections
+## Group node containing the button connections.
+@onready var connections: Node2D = $Connections
+
+@onready var name_label: RichTextLabel = %NameLabel
+@onready var home_icon: TextureRect = %HomeIcon
+@onready var portrait_button: TextureButton = %PortraitButton
+@onready var glow: TextureRect = %Glow
+
+@onready var extended_panel: Control = %ExtendedPanel
+@onready var heroes_label: Label = %HeroesLabel
+@onready var force_strength_label: Label = %ForceStrengthLabel
+@onready var attack_button: Button = %AttackButton
+@onready var train_button: Button = %TrainButton
+@onready var rest_button: Button = %RestButton
+
 
 
 func _ready() -> void:
+	extended_panel.visible = extended_panel.visible and not Engine.is_editor_hint()
 	update_territory_name(name)
 	update_configuration_warnings()
 
+	if Engine.is_editor_hint():
+		return
+
 	renamed.connect(func(): update_territory_name(name))
 
-	if not Engine.is_editor_hint():
-		OverworldEvents.territory_owner_changed.connect(update_owner_empire)
-		OverworldEvents.empire_adjacency_updated.connect(update_player_adjacent)
-		OverworldEvents.empire_unit_list_updated.connect(update_avatars_present)
-		OverworldEvents.empire_force_rating_updated.connect(update_force_strength)
+	OverworldEvents.territory_owner_changed.connect(update_owner_empire)
+	OverworldEvents.empire_adjacency_updated.connect(update_player_adjacent)
+	OverworldEvents.empire_unit_list_updated.connect(update_avatars_present)
+	OverworldEvents.empire_force_rating_updated.connect(update_force_strength)
+
+	portrait_button.mouse_entered.connect(func():
+		glow.visible = true
+		connections.visible = true
+		highlighted = true
+	)
+
+	portrait_button.mouse_exited.connect(func():
+		glow.visible = false
+		connections.visible = false
+		if not locked:
+			highlighted = false
+	)
+
+	portrait_button.focus_entered.connect(func():
+		locked = true
+		highlighted = true
+		open_panel(_adjacent_to_player)
+	)
+
+	portrait_button.focus_exited.connect(func():
+		locked = false
+		# has to be done this way because pressing the button takes the
+		# focus from the detector and if we close the panel during that
+		# the button won't actually be pressed
+		if not (%AttackButton.is_hovered() or %RestButton.is_hovered()):
+			highlighted = false
+			close_panel()
+	)
+
+
+func _exit_tree() -> void:
+	# request_ready() when using tool script so the initial part of the setup gets ran
+	if Engine.is_editor_hint():
+		request_ready()
 
 
 ## Returns the unit entries.
@@ -86,7 +137,7 @@ func initialize(data: Dictionary) -> void:
 		
 ## Updates the territory name.
 func update_territory_name(territory_name: String) -> void:
-	Util.bb_big_caps(%NameLabel, territory_name, {font_size = 18})
+	Util.bb_big_caps(name_label, territory_name, {font_size = 22, font = preload("res://scenes/data/fonts/Rakkas-Regular.ttf")})
 	if name == territory_name:
 		return
 	name = territory_name
@@ -97,8 +148,19 @@ func update_owner_empire(territory: Territory, _old_owner: Empire, new_owner: Em
 	if territory != _territory:
 		return
 	_empire = new_owner
-	%Portrait.texture = _empire.leader.portrait
-	%HomeIcon.visible = _empire.home_territory == _territory
+
+	# update portrait texture
+	portrait_button.texture_normal = _empire.leader.portrait
+	portrait_button.texture_pressed = _empire.leader.portrait
+	portrait_button.texture_hover = _empire.leader.portrait
+
+	# update texture mask
+	var mask := BitMap.new()
+	mask.create_from_image_alpha(_empire.leader.portrait.get_image())
+	portrait_button.texture_click_mask = mask
+	
+	home_icon.visible = _empire.home_territory == _territory
+	%HomeIconGhost.visible = home_icon.visible
 
 
 ## Updates the adjacency.
@@ -112,32 +174,38 @@ func update_player_adjacent(empire: Empire, adjacent: Array[Territory]) -> void:
 func update_avatars_present(empire: Empire, units: Array[Unit]) -> void:
 	if empire != _empire:
 		return
-		
+	
+	# find all hero names
 	var hero_names := PackedStringArray()
 	for unit in units:
 		if unit.is_hero():
 			hero_names.append(unit.display_name())
 
+	# update label
 	if empire.is_player_owned():
-		%AvatarsPresentLabel.text = 'Avatars Present: ' + ', '.join(hero_names)
+		heroes_label.text = 'Avatars Present: ' + ', '.join(hero_names)
 	else:
-		%EnemyLeadersLabel.text = 'Enemy Leaders: ' + ', '.join(hero_names)
+		heroes_label.text = 'Enemy Leaders: ' + ', '.join(hero_names)
 
 
 ## Updates the force strength.
 func update_force_strength(empire: Empire, rating: float) -> void:
 	if empire != _empire:
 		return
+
+	force_strength_label.visible = _empire.is_player_owned()
+
 	if _empire.is_player_owned():
-		%PlayerForceStrengthLabel.text = '(stub)'
+		force_strength_label.text = '(stub)'
 	else:
 		if is_nan(rating):
-			%EnemyForceStrengthLabel.text = 'Force Strength: N/A'
+			force_strength_label.text = 'Force Strength: N/A'
 		else:
 			var force_strength: String = 'Force Strength: %s' % _force_string(rating)
 			if OS.is_debug_build():
 				force_strength += ' (%s)' % snappedf(rating, 0.01)
-			%EnemyForceStrengthLabel.text = force_strength
+			force_strength_label.text = force_strength
+		force_strength_label.show()
 
 
 func _force_string(ratio: float) -> String:
@@ -156,16 +224,16 @@ func _force_string(ratio: float) -> String:
 
 ## Opens the interactive panel.
 func open_panel(show_attack_button: bool) -> void:
-	%PlayerPanel.visible = _empire.is_player_owned()
-	%EnemyPanel.visible = not _empire.is_player_owned()
-	%AttackButton.visible = show_attack_button
-	z_index = 1
+	extended_panel.show()
+	attack_button.visible = show_attack_button
+	train_button.visible = show_attack_button
+	rest_button.visible = not show_attack_button
+	z_index = 2
 
 
 ## Opens the interactive panel.
 func close_panel() -> void:
-	%PlayerPanel.hide()
-	%EnemyPanel.hide()
+	extended_panel.hide()
 	z_index = 0
 	
 	
@@ -194,40 +262,6 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return []
 	
 
-func _on_detector_mouse_entered() -> void:
-	$Glow.visible = true
-	$Connections.visible = true
-	highlighted = true
-
-
-func _on_detector_mouse_exited() -> void:
-	$Glow.visible = false
-	$Connections.visible = false
-	if not locked:
-		highlighted = false
-
-
-func _on_detector_gui_input(_event) -> void:
-	# TODO
-	pass # Replace with function body.
-
-
-func _on_detector_focus_entered() -> void:
-	locked = true
-	highlighted = true
-	open_panel(_adjacent_to_player)
-
-
-func _on_detector_focus_exited() -> void:
-	locked = false
-	# has to be done this way because pressing the button takes the
-	# focus from the detector and if we close the panel during that
-	# the button won't actually be pressed
-	if not (%AttackButton.is_hovered() or %RestButton.is_hovered()):
-		highlighted = false
-		close_panel()
-
-
 func _on_attack_button_pressed() -> void:
 	close_panel()
 	attack_pressed.emit(self)
@@ -236,3 +270,7 @@ func _on_attack_button_pressed() -> void:
 func _on_rest_button_pressed() -> void:
 	close_panel()
 	rest_pressed.emit(self)
+
+func _on_train_button_pressed() -> void:
+	close_panel()
+	train_pressed.emit(self)

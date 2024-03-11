@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://bf670hy03k4dp"]
+[gd_scene load_steps=8 format=3 uid="uid://bf670hy03k4dp"]
 
 [ext_resource type="Script" path="res://scenes/new_game/new_game_scene.gd" id="1_mtlmk"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_ca3p7"]
 [ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_m6web"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="4_rb6bf"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lh0ba"]
 
@@ -82,6 +83,7 @@ layout_mode = 2
 mouse_filter = 1
 theme_override_colors/default_color = Color(0.721569, 0.584314, 0.411765, 1)
 theme_override_constants/outline_size = 12
+theme_override_fonts/normal_font = ExtResource("4_rb6bf")
 theme_override_font_sizes/normal_font_size = 48
 theme_override_font_sizes/bold_font_size = 48
 theme_override_font_sizes/italics_font_size = 48

@@ -35,79 +35,86 @@ offset_bottom = 288.0
 theme = ExtResource("1_l21vi")
 script = ExtResource("1_qbsf4")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Header" type="HBoxContainer" parent="VBoxContainer"]
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="AttackIcon" type="TextureRect" parent="VBoxContainer/Header"]
+[node name="AttackIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("3_n8nwf")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Header"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Header"]
 layout_mode = 2
 
-[node name="AttackNameLabel" type="Label" parent="VBoxContainer/Header/VBoxContainer"]
+[node name="AttackNameLabel" type="Label" parent="MarginContainer/VBoxContainer/Header/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Attack"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Header/VBoxContainer"]
 layout_mode = 2
 
-[node name="SelfLabel" type="Label" parent="VBoxContainer/Header/VBoxContainer/HBoxContainer"]
+[node name="SelfLabel" type="Label" parent="MarginContainer/VBoxContainer/Header/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Self"
 
-[node name="VSeparator" type="VSeparator" parent="VBoxContainer/Header/VBoxContainer/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/Header/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_styles/separator = SubResource("StyleBoxLine_ilroe")
 
-[node name="AllyLabel" type="Label" parent="VBoxContainer/Header/VBoxContainer/HBoxContainer"]
+[node name="AllyLabel" type="Label" parent="MarginContainer/VBoxContainer/Header/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Ally"
 
-[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/Header/VBoxContainer/HBoxContainer"]
+[node name="VSeparator2" type="VSeparator" parent="MarginContainer/VBoxContainer/Header/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_styles/separator = SubResource("StyleBoxLine_ilroe")
 
-[node name="EnemyLabel" type="Label" parent="VBoxContainer/Header/VBoxContainer/HBoxContainer"]
+[node name="EnemyLabel" type="Label" parent="MarginContainer/VBoxContainer/Header/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Enemy"
 
-[node name="Body" type="PanelContainer" parent="VBoxContainer"]
+[node name="Body" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_8d5w5")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Body"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Body"]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="TextureButton" type="PanelContainer" parent="VBoxContainer/Body/VBoxContainer"]
+[node name="TextureButton" type="PanelContainer" parent="MarginContainer/VBoxContainer/Body/VBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_j12yh")
 
-[node name="AttackShapeWidget" parent="VBoxContainer/Body/VBoxContainer/TextureButton" instance=ExtResource("4_lj4wg")]
+[node name="AttackShapeWidget" parent="MarginContainer/VBoxContainer/Body/VBoxContainer/TextureButton" instance=ExtResource("4_lj4wg")]
 unique_name_in_owner = true
 layout_mode = 2
 separation = 2
 active_shape_color = Color(0.596078, 0.160784, 0.168627, 1)
 inactive_shape_color = Color(0.372549, 0.545098, 0.741176, 1)
 
-[node name="MulticastLabel" type="Label" parent="VBoxContainer/Body/VBoxContainer/TextureButton/AttackShapeWidget"]
+[node name="MulticastLabel" type="Label" parent="MarginContainer/VBoxContainer/Body/VBoxContainer/TextureButton/AttackShapeWidget"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 3
@@ -123,7 +130,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "1x"
 
-[node name="AttackDescriptionLabel" type="RichTextLabel" parent="VBoxContainer/Body/VBoxContainer"]
+[node name="AttackDescriptionLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/Body/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2

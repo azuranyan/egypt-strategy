@@ -2,10 +2,13 @@ class_name OverworldScene
 extends GameScene
 
 
+const BattleResultBanner := preload('res://scenes/overworld/battle_result_banner.gd')
+
+
+@export var battle_result_banner_scene: PackedScene
+
+
 var territory_buttons: Array[TerritoryButton]
-
-
-@onready var battle_result_banner = $BattleResultBanner
 
 
 func _ready() -> void:
@@ -128,7 +131,7 @@ func show_marching_animation(attacker: Empire, _defender: Empire, target: Territ
 	
 
 func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) -> bool:
-	var banner := battle_result_banner.duplicate()
+	var banner: BattleResultBanner = battle_result_banner_scene.instantiate()
 	add_child(banner)
 	return await banner.show_parsed_result(result, allow_strategy_room)
 

@@ -48,7 +48,7 @@ var _dialogue_line: DialogueLine:
 @onready var character_label: RichTextLabel = %CharacterLabel
 @onready var dialogue_label: DialogueLabel = %DialogueLabel
 @onready var responses_menu: DialogueResponsesMenu = %ResponsesMenu
-
+@onready var menu_button: Button = %MenuButton
 
 func _ready() -> void:
 	$AnimationPlayer.play("RESET")

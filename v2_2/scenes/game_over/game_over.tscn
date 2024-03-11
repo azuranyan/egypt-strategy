@@ -24,7 +24,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_ovbas")
 
-[node name="ColorRect" type="ColorRect" parent="Control"]
+[node name="Background" type="ColorRect" parent="Control"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.694118)
 
-[node name="TextureRect" type="TextureRect" parent="Control"]
+[node name="TextureRect" type="TextureRect" parent="Control/Background"]
 modulate = Color(1, 1, 1, 0.631373)
 layout_mode = 1
 anchors_preset = 15
@@ -67,7 +68,8 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+[node name="GameOverLabel" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 bbcode_enabled = true
 text = "[center]IT'S BIJOUVER[/center]"
@@ -83,15 +85,18 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="LastCheckpointButton" type="Button" parent="Control/VBoxContainer"]
-custom_minimum_size = Vector2(200, 40)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "Load Checkpoint"
 
 [node name="QuitToTitleButton" type="Button" parent="Control/VBoxContainer"]
-custom_minimum_size = Vector2(200, 40)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "Main Menu"
 
 [connection signal="pressed" from="Control/VBoxContainer/LastCheckpointButton" to="." method="_on_last_checkpoint_button_pressed"]
 [connection signal="pressed" from="Control/VBoxContainer/QuitToTitleButton" to="." method="_on_quit_to_title_button_pressed"]
-

@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dgkr38blo4ueo"]
+[gd_scene load_steps=5 format=3 uid="uid://dgkr38blo4ueo"]
 
 [ext_resource type="Script" path="res://scenes/common/settings_scene.gd" id="1_48hst"]
+[ext_resource type="Theme" uid="uid://bl5ickr0f2gmo" path="res://scenes/data/ui_theme.tres" id="2_4p03v"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1mrd3"]
 bg_color = Color(0.231373, 0.231373, 0.231373, 0.968627)
@@ -32,6 +33,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_4p03v")
 color = Color(0, 0, 0, 0.384314)
 
 [node name="Label" type="Label" parent="."]
@@ -43,6 +45,7 @@ offset_top = 86.0
 offset_right = 31.0
 offset_bottom = 109.0
 grow_horizontal = 2
+theme = ExtResource("2_4p03v")
 theme_override_font_sizes/font_size = 36
 text = "Settings
 "
@@ -58,6 +61,7 @@ offset_right = -486.0
 offset_bottom = -274.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_4p03v")
 
 [node name="Panel" type="Panel" parent="Control"]
 layout_mode = 1

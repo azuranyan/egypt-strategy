@@ -1,9 +1,10 @@
-[gd_scene load_steps=21 format=3 uid="uid://dxa0y5yfedk8s"]
+[gd_scene load_steps=22 format=3 uid="uid://dxa0y5yfedk8s"]
 
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_7lv4s"]
 [ext_resource type="Script" path="res://scenes/dialogue/dialogue_scene.gd" id="1_s5hh1"]
 [ext_resource type="FontFile" uid="uid://daofijf3ycy6k" path="res://scenes/data/fonts/Aleo-VariableFont_wght.ttf" id="2_es5gh"]
 [ext_resource type="FontFile" uid="uid://bfkvgx07nqvy3" path="res://scenes/data/fonts/Aleo-Bold.ttf" id="3_uvdru"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="3_xny64"]
 [ext_resource type="FontFile" uid="uid://cgu0d1fepqdbp" path="res://scenes/data/fonts/Aleo-Italic.ttf" id="4_5rxcn"]
 [ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="5_cauvp"]
 [ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_label.gd" id="7_61jpe"]
@@ -198,7 +199,13 @@ _data = {
 }
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1va5f"]
-bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+bg_color = Color(0.686275, 0.470588, 0.376471, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.431373, 0.270588, 0.243137, 1)
+border_blend = true
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -319,8 +326,10 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 4
+theme_override_colors/default_color = Color(0.976471, 0.960784, 0.952941, 1)
 theme_override_constants/shadow_outline_size = 1
 theme_override_constants/outline_size = 2
+theme_override_fonts/normal_font = ExtResource("3_xny64")
 theme_override_font_sizes/normal_font_size = 36
 theme_override_font_sizes/bold_font_size = 36
 theme_override_font_sizes/italics_font_size = 36
@@ -363,6 +372,7 @@ theme_override_constants/margin_bottom = 10
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 1
+theme_override_colors/default_color = Color(0.431373, 0.270588, 0.243137, 1)
 theme_override_fonts/normal_font = ExtResource("2_es5gh")
 theme_override_fonts/bold_font = ExtResource("3_uvdru")
 theme_override_fonts/italics_font = ExtResource("4_5rxcn")
@@ -437,6 +447,10 @@ script = ExtResource("8_k34y8")
 response_template = NodePath("Button")
 
 [node name="Button" type="Button" parent="Balloon/MarginContainer/ResponsesMenu"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme = ExtResource("1_7lv4s")
+theme_override_colors/font_color = Color(0.529412, 0.329412, 0.278431, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
+theme_override_font_sizes/font_size = 32
 text = "Buttone"

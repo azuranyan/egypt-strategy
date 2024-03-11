@@ -1,19 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://bsl86s6bgqn56"]
+[gd_scene load_steps=6 format=3 uid="uid://bsl86s6bgqn56"]
 
 [ext_resource type="Script" path="res://scenes/common/pause_dialog.gd" id="1_3k774"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="2_7lf54"]
-[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="3_8nqcp"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lok7g"]
-bg_color = Color(0.937255, 0.901961, 0.870588, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-expand_margin_left = 8.0
-expand_margin_top = 8.0
-expand_margin_right = 8.0
-expand_margin_bottom = 8.0
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="3_hs8ta"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_po01f"]
 bg_color = Color(0.937255, 0.901961, 0.870588, 1)
@@ -54,25 +43,33 @@ offset_right = 180.0
 offset_bottom = 90.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_lok7g")
+theme = ExtResource("3_hs8ta")
+theme_type_variation = &"ui"
 
-[node name="Panel2" type="PanelContainer" parent="Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="Panel2" type="PanelContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_po01f")
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/Panel2"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/Panel2"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/Panel2/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/Panel2/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="MessageLabel" type="Label" parent="Panel/Panel2/MarginContainer/VBoxContainer"]
+[node name="MessageLabel" type="Label" parent="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Paused"
@@ -80,24 +77,22 @@ label_settings = SubResource("LabelSettings_jrk2x")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/Panel2/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 50
+theme_override_constants/separation = 40
 alignment = 1
 
-[node name="ConfirmButton" type="Button" parent="Panel/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="ConfirmButton" type="Button" parent="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_8nqcp")
 text = "Confirm"
 
-[node name="CancelButton" type="Button" parent="Panel/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="CancelButton" type="Button" parent="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_8nqcp")
 text = "Cancel"
 
-[connection signal="pressed" from="Panel/Panel2/MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton" to="." method="_on_forfeit_confirm_button_pressed"]
-[connection signal="pressed" from="Panel/Panel2/MarginContainer/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_forfeit_cancel_button_pressed"]
+[connection signal="pressed" from="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton" to="." method="_on_forfeit_confirm_button_pressed"]
+[connection signal="pressed" from="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_forfeit_cancel_button_pressed"]

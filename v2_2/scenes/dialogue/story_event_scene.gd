@@ -1,6 +1,10 @@
 extends CanvasLayer
 
 
+## The pause menu scene.
+const PauseMenuScene := preload("dialogue_menu_scene.tscn")
+
+
 @export_group("Connections")
 
 ## The node containing the cached images.
@@ -23,6 +27,16 @@ extends CanvasLayer
 
 
 var _character_image_map: Dictionary = {}
+
+
+func _ready() -> void:
+	dialogue_scene.menu_button_pressed.connect(open_pause_menu)
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("cancel"):
+		open_pause_menu()
+		get_viewport().set_input_as_handled()
 
 
 ## Adds an image for a character.
@@ -116,4 +130,12 @@ func retrieve_and_remove_from_cache(image_name: String) -> Node2D:
 	if image:
 		cached_images.remove_child(image)
 	return image
+
+
+## Opens the pause menu.
+func open_pause_menu() -> void:
+	if dialogue_scene.menu_button.has_focus():
+		dialogue_scene.menu_button.release_focus()
+	var pause_menu := PauseMenuScene.instantiate()
+	add_child(pause_menu)
 

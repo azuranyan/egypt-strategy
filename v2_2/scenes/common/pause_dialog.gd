@@ -63,6 +63,7 @@ func _input(event):
 
 
 func _exit_tree() -> void:
+	request_ready()
 	close_dialog()
 
 
@@ -77,7 +78,7 @@ func open_dialog(message := default_message, confirm_text := default_confirm_tex
 	cancel_button.text = cancel_text
 	cancel_button.visible = cancel_text != ''
 
-	Game.push_pause()
+	Game.push_pause(self)
 	show()
 
 	# grab focus if we can
@@ -101,7 +102,7 @@ func close_dialog(value: bool = confirm_button.visible and not cancel_button.vis
 		focus_owner.release_focus()
 
 	hide()
-	Game.pop_pause()
+	Game.pop_pause(self)
 	
 	queue_free()
 	closed.emit(value)

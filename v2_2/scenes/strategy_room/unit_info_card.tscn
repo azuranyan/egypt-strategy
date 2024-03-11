@@ -58,114 +58,122 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Details"]
+[node name="MarginContainer" type="MarginContainer" parent="Details"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Details/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer"]
+[node name="Header" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Details/VBoxContainer/Header"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Details/MarginContainer/VBoxContainer/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AvatarLabel" type="Label" parent="Details/VBoxContainer/Header/VBoxContainer"]
+[node name="AvatarLabel" type="Label" parent="Details/MarginContainer/VBoxContainer/Header/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Avatar of Horus"
 
-[node name="TitleLabel" type="Label" parent="Details/VBoxContainer/Header/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="Details/MarginContainer/VBoxContainer/Header/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Boastful Bird God"
 
-[node name="StarContainer" type="HBoxContainer" parent="Details/VBoxContainer/Header"]
+[node name="StarContainer" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Star1" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+[node name="Star1" type="TextureRect" parent="Details/MarginContainer/VBoxContainer/Header/StarContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("1_4b4dq")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Star2" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+[node name="Star2" type="TextureRect" parent="Details/MarginContainer/VBoxContainer/Header/StarContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("2_kmbo0")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Star3" type="TextureRect" parent="Details/VBoxContainer/Header/StarContainer"]
+[node name="Star3" type="TextureRect" parent="Details/MarginContainer/VBoxContainer/Header/StarContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("2_kmbo0")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Body" type="PanelContainer" parent="Details/VBoxContainer"]
+[node name="Body" type="PanelContainer" parent="Details/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_abl4x")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Details/VBoxContainer/Body"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body"]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Attacks" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer"]
+[node name="Attacks" type="VBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="BasicAttackContainer" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks"]
+[node name="BasicAttackContainer" type="VBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
+[node name="Header" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
+[node name="Label3" type="Label" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Basic Attack"
 
-[node name="Label4" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
+[node name="Label4" type="Label" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/Header"]
 modulate = Color(0.568627, 1.84706, 0.686275, 1)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 2
 
-[node name="HBoxContainer5" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
+[node name="HBoxContainer5" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer"]
 layout_mode = 2
 
-[node name="BasicAttackButton" type="Button" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/HBoxContainer5"]
+[node name="BasicAttackButton" type="Button" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/HBoxContainer5"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.960784, 0.827451, 0.564706, 1)
+theme_override_font_sizes/font_size = 22
 toggle_mode = true
 button_group = SubResource("ButtonGroup_luk4m")
 text = "Fakeaway Shot"
 flat = true
 
-[node name="SpecialAttackContainer" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks"]
+[node name="SpecialAttackContainer" type="VBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Header" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
+[node name="Header" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Label3" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
+[node name="Label3" type="Label" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Special Attack"
 
-[node name="SpecialUnlockLabel" type="Label" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
+[node name="SpecialUnlockLabel" type="Label" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/Header"]
 unique_name_in_owner = true
 modulate = Color(0.568627, 1.84706, 0.686275, 1)
 layout_mode = 2
@@ -174,25 +182,26 @@ theme_override_font_sizes/font_size = 18
 text = "Unlock!"
 horizontal_alignment = 2
 
-[node name="HBoxContainer6" type="HBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
+[node name="HBoxContainer6" type="HBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer"]
 layout_mode = 2
 
-[node name="SpecialAttackButton" type="Button" parent="Details/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/HBoxContainer6"]
+[node name="SpecialAttackButton" type="Button" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/HBoxContainer6"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.960784, 0.827451, 0.564706, 1)
+theme_override_font_sizes/font_size = 22
 toggle_mode = true
 button_group = SubResource("ButtonGroup_luk4m")
 text = "Fakeaway Shot"
 flat = true
 
-[node name="StatLines" type="VBoxContainer" parent="Details/VBoxContainer/Body/HBoxContainer"]
+[node name="StatLines" type="VBoxContainer" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="StatLine1" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+[node name="StatLine1" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
 layout_mode = 2
 size_flags_vertical = 3
 stat = &"maxhp"
@@ -200,18 +209,18 @@ custom_stat_text = "HP"
 stat_value = 2
 stat_modifier_value = 2
 
-[node name="StatLine2" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+[node name="StatLine2" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
 layout_mode = 2
 size_flags_vertical = 3
 stat = &"dmg"
 
-[node name="StatLine3" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+[node name="StatLine3" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
 layout_mode = 2
 size_flags_vertical = 3
 stat = &"rng"
 custom_stat_text = "Range"
 
-[node name="StatLine4" parent="Details/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
+[node name="StatLine4" parent="Details/MarginContainer/VBoxContainer/Body/HBoxContainer/StatLines" instance=ExtResource("3_bbdyj")]
 layout_mode = 2
 size_flags_vertical = 3
 stat = &"mov"

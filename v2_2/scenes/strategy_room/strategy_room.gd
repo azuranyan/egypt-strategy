@@ -1,3 +1,4 @@
+@tool
 extends GameScene
 
 
@@ -22,9 +23,13 @@ func _ready():
 	Util.bb_big_caps(strategy_room_label, 'Strategy Room', {
 		font_size = 56,
 		font_color = Color('#efe6de'),
+		font = preload("res://scenes/data/fonts/Rakkas-Regular.ttf"),
 		outline_size = 36,
 	})
-	
+
+	if Engine.is_editor_hint():
+		return
+
 	attack_card.hide()
 
 	unit_list.clear()
@@ -36,6 +41,9 @@ func _ready():
 
 
 func _unhandled_input(event)-> void:
+	if Engine.is_editor_hint():
+		return
+
 	if event.is_action_pressed("ui_cancel"):
 		scene_return()
 

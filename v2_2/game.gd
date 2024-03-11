@@ -81,10 +81,7 @@ var settings: Settings
 
 var _suspended: bool
 
-var _pause_count: int:
-	set(value):
-		_pause_count = value
-		get_tree().paused = _pause_count > 0
+var _pause_nodes: Array[Node]
 
 
 func _ready():
@@ -135,19 +132,22 @@ func has_new_scenes() -> bool:
 	return false
 	
 	
-## Pushes a pause. Pauses the game.
-func push_pause():
-	_pause_count += 1
+## Pauses the game. A node is passed as the key to prevent double pauses.
+func push_pause(node: Node):
+	if node in _pause_nodes:
+		return
+	_pause_nodes.append(node)
 	get_tree().paused = true
 	
 	
-## Pops a pause. Unpauses if pause count is 0.
-func pop_pause():
-	_pause_count -= 1
-	if _pause_count <= 0:
-		_pause_count = 0
+## Pops a key node. Will unpause the game once all keys are popped.
+func pop_pause(node: Node):
+	if node not in _pause_nodes:
+		return
+	_pause_nodes.remove_at(_pause_nodes.rfind(node))
+	if _pause_nodes.is_empty():
 		get_tree().paused = false
-	
+
 
 ## Calls a function with minimum delay time.
 func delay_function(callable: Callable, delay: float, argv := []) -> Variant:

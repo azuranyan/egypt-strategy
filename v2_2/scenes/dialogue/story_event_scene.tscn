@@ -4,13 +4,12 @@
 [ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_27n7i"]
 [ext_resource type="PackedScene" uid="uid://dxa0y5yfedk8s" path="res://scenes/dialogue/dialogue_scene.tscn" id="3_nwrdr"]
 
-[node name="StoryEventScene" type="CanvasLayer" node_paths=PackedStringArray("cached_images", "background_fill", "background", "black_bars", "character_images", "dialogue_scene")]
+[node name="StoryEventScene" type="CanvasLayer" node_paths=PackedStringArray("cached_images", "background_fill", "background", "character_images", "dialogue_scene")]
 layer = 5
 script = ExtResource("1_vxdlj")
 cached_images = NodePath("CachedImages")
 background_fill = NodePath("BackgroundFill")
 background = NodePath("Background")
-black_bars = [NodePath("BlackBars/TopBar"), NodePath("BlackBars/BottomBar")]
 character_images = NodePath("Characters")
 dialogue_scene = NodePath("DialogueScene")
 

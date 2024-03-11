@@ -31,22 +31,8 @@ visible = false
 modulate = Color(1, 1, 1, 0.203922)
 z_index = -10
 
-[node name="Detector" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -60.0
-offset_top = -76.0
-offset_right = 60.0
-offset_bottom = 48.0
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 2
-
 [node name="Glow" type="TextureRect" parent="."]
+unique_name_in_owner = true
 visible = false
 self_modulate = Color(1, 0.745098, 0.309804, 0.878431)
 layout_mode = 1
@@ -64,133 +50,27 @@ grow_vertical = 2
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_lglkw")
 
-[node name="EnemyPanel" type="Panel" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -216.0
-offset_top = 55.0
-offset_right = 216.0
-offset_bottom = 170.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MainPanel" type="Control" parent="."]
+z_index = 1
+layout_mode = 3
+anchors_preset = 0
+offset_left = -139.0
+offset_top = -94.0
+offset_right = 139.0
+offset_bottom = 35.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="EnemyPanel"]
-layout_mode = 2
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 430.0
-offset_bottom = 113.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="EnemyLeadersLabel" type="Label" parent="EnemyPanel/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Enemy Leaders: Alara, Zahra, Tali, Eirene, Sutekh"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="EnemyForceStrengthLabel" type="Label" parent="EnemyPanel/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Force Strength: %s"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AttackButton" type="Button" parent="EnemyPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-offset_left = 115.0
-offset_top = 96.0
-offset_right = 317.0
-offset_bottom = 137.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.521569, 0.0784314, 0.164706, 1)
-theme_override_colors/font_pressed_color = Color(0.521569, 0.0784314, 0.164706, 1)
-theme_override_colors/font_hover_color = Color(0.521569, 0.0784314, 0.164706, 1)
-theme_override_colors/font_focus_color = Color(0.521569, 0.0784314, 0.164706, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.521569, 0.0784314, 0.164706, 1)
-theme_override_font_sizes/font_size = 24
-text = "ATTACK!"
-
-[node name="PlayerPanel" type="Panel" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -216.0
-offset_top = 55.0
-offset_right = 216.0
-offset_bottom = 170.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PlayerPanel"]
-layout_mode = 2
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 430.0
-offset_bottom = 113.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="AvatarsPresentLabel" type="Label" parent="PlayerPanel/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Avatars Present: %s, %s"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PlayerForceStrengthLabel" type="Label" parent="PlayerPanel/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Force Strength: %s"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RestButton" type="Button" parent="PlayerPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-offset_left = 115.0
-offset_top = 96.0
-offset_right = 317.0
-offset_bottom = 137.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.294118, 0.6, 0.160784, 1)
-theme_override_colors/font_pressed_color = Color(0.294118, 0.6, 0.160784, 1)
-theme_override_colors/font_hover_color = Color(0.294118, 0.6, 0.160784, 1)
-theme_override_colors/font_focus_color = Color(0.294118, 0.6, 0.160784, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.294118, 0.6, 0.160784, 1)
-theme_override_font_sizes/font_size = 24
-text = "REST"
-
-[node name="Control2" type="Control" parent="."]
+[node name="CircleBackground" type="Control" parent="MainPanel"]
 layout_mode = 1
 anchors_preset = 0
+offset_left = 139.0
+offset_top = 94.0
+offset_right = 139.0
+offset_bottom = 94.0
 scale = Vector2(0.06, 0.06)
 mouse_filter = 2
+metadata/_edit_lock_ = true
 
-[node name="TextureRect" type="TextureRect" parent="Control2"]
+[node name="TextureRect" type="TextureRect" parent="MainPanel/CircleBackground"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -198,30 +78,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -2157.0
-offset_top = -1246.0
+offset_top = -1262.67
 offset_right = 2157.0
-offset_bottom = 1246.0
+offset_bottom = 1229.33
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_yjkpc")
 
-[node name="Control" type="Control" parent="Control2"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -1326.0
-offset_top = -1538.0
-offset_right = 1286.0
-offset_bottom = 630.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="Portrait" type="TextureRect" parent="Control2/Control"]
+[node name="PortraitButton" type="TextureButton" parent="MainPanel"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -229,39 +94,160 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("3_sc68v")
+texture_normal = ExtResource("3_sc68v")
+texture_pressed = ExtResource("3_sc68v")
+texture_hover = ExtResource("3_sc68v")
+ignore_texture_size = true
 stretch_mode = 5
 
-[node name="HomeIcon" type="TextureRect" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel"]
+layout_mode = 0
+offset_left = -10.0
+offset_top = 124.0
+offset_right = 288.0
+offset_bottom = 174.0
+metadata/_edit_group_ = true
+
+[node name="BackgroundPanelMargin" type="MarginContainer" parent="MainPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundPanel" type="Panel" parent="MainPanel/MarginContainer/BackgroundPanelMargin"]
+layout_mode = 2
+
+[node name="NameMargin" type="MarginContainer" parent="MainPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+metadata/_edit_group_ = true
+
+[node name="CenterContainer" type="HBoxContainer" parent="MainPanel/MarginContainer/NameMargin"]
+layout_mode = 2
+alignment = 1
+
+[node name="HomeIcon" type="TextureRect" parent="MainPanel/MarginContainer/NameMargin/CenterContainer"]
 unique_name_in_owner = true
-visible = false
 modulate = Color(0.52549, 0.329412, 0.294118, 1)
-layout_mode = 0
-offset_left = -135.0
-offset_top = 37.0
-offset_right = -79.0
-offset_bottom = 73.0
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
 texture = ExtResource("5_qhtby")
-expand_mode = 3
+expand_mode = 1
 stretch_mode = 5
 
-[node name="NameLabel" type="RichTextLabel" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="MainPanel/MarginContainer/NameMargin/CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="RichTextLabel" parent="MainPanel/MarginContainer/NameMargin/CenterContainer/CenterContainer"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = -127.0
-offset_top = 35.0
-offset_right = 127.0
-offset_bottom = 84.0
+layout_mode = 2
 mouse_filter = 2
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
+autowrap_mode = 0
 
-[connection signal="focus_entered" from="Detector" to="." method="_on_detector_focus_entered"]
-[connection signal="focus_exited" from="Detector" to="." method="_on_detector_focus_exited"]
-[connection signal="gui_input" from="Detector" to="." method="_on_detector_gui_input"]
-[connection signal="mouse_entered" from="Detector" to="." method="_on_detector_mouse_entered"]
-[connection signal="mouse_exited" from="Detector" to="." method="_on_detector_mouse_exited"]
-[connection signal="pressed" from="EnemyPanel/AttackButton" to="." method="_on_attack_button_pressed"]
-[connection signal="pressed" from="PlayerPanel/RestButton" to="." method="_on_rest_button_pressed"]
+[node name="HomeIconGhost" type="TextureRect" parent="MainPanel/MarginContainer/NameMargin/CenterContainer"]
+unique_name_in_owner = true
+modulate = Color(0.52549, 0.329412, 0.294118, 0)
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("5_qhtby")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ExtendedPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = 55.0
+offset_right = 216.0
+offset_bottom = 170.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="ExtendedPanel"]
+layout_mode = 2
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ExtendedPanel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="HeroesLabel" type="Label" parent="ExtendedPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Enemy Leaders: Alara, Zahra, Talid"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ForceStrengthLabel" type="Label" parent="ExtendedPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Force Strength: %s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="ExtendedPanel"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ExtendedPanel/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -155.0
+offset_top = -20.0
+offset_right = 155.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="AttackButton" type="Button" parent="ExtendedPanel/Control/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.929412, 0.462745, 0.447059, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.956863)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 22
+text = "ATTACK"
+
+[node name="TrainButton" type="Button" parent="ExtendedPanel/Control/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.835294, 0.619608, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.956863)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 22
+text = "TRAIN"
+
+[node name="RestButton" type="Button" parent="ExtendedPanel/Control/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(145, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5264, 0.94, 0.58844, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.956863)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 22
+text = "REST"
+
+[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/TrainButton" to="." method="_on_train_button_pressed"]
+[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/RestButton" to="." method="_on_rest_button_pressed"]

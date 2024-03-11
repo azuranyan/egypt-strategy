@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://wjbxvkl38yg8"]
+[gd_scene load_steps=8 format=3 uid="uid://wjbxvkl38yg8"]
 
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_ubpcv"]
 [ext_resource type="Script" path="res://scenes/overworld/battle_result_banner.gd" id="2_27rhy"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="3_n2ngn"]
 
 [sub_resource type="Animation" id="Animation_5xp3e"]
 length = 0.001
@@ -44,6 +45,7 @@ font_size = 29
 font_color = Color(0.360784, 0.254902, 0.113725, 1)
 
 [node name="BattleResultBanner" type="Control"]
+process_mode = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -97,6 +99,7 @@ offset_bottom = -19.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
 bbcode_enabled = true
 text = "[center][font_size=40][font_size=60]R[/font_size]EGION [font_size=56]C[/font_size]ONQUERED[/font_size][font_size=56]![/font_size][/center]"
 scroll_active = false
@@ -137,7 +140,7 @@ alignment = 1
 
 [node name="StrategyRoomButton" type="Button" parent="Control/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 48)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/HBoxContainer/StrategyRoomButton"]
@@ -153,6 +156,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
 bbcode_enabled = true
 text = "[center][font_size=20][font_size=30]S[/font_size]TRATEGY [font_size=30]R[/font_size]OOM[/font_size][/center]"
 fit_content = true
@@ -161,7 +165,7 @@ autowrap_mode = 0
 
 [node name="ContinueButton" type="Button" parent="Control/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 48)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/HBoxContainer/ContinueButton"]
@@ -177,6 +181,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
 bbcode_enabled = true
 text = "[center][font_size=20][font_size=30]C[/font_size]ONTINUE[/font_size][/center]"
 fit_content = true
