@@ -4,7 +4,7 @@ extends Node
 #region Game Signals
 
 ## Emitted to send a request to start the battle.
-signal start_battle_requested(attacker: Empire, defender: Empire, territory: Territory, map_id: int)
+signal start_battle_requested(data: Dictionary)
 
 ## Emitted to send a request to stop the battle.
 signal stop_battle_requested(result: BattleResult)

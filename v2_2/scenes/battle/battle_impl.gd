@@ -30,6 +30,7 @@ enum State {
 @export var _result_value: int
 
 @export var _quick: bool
+@export var _training: bool
 @export var _battle_phase: bool
 
 @export var _dying_units: int
@@ -104,7 +105,7 @@ func load_state(data: Dictionary) -> void:
 
 ## Starts the battle cycle.
 @warning_ignore("shadowed_variable")
-func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, map_id_: int) -> void:
+func start_battle(data: Dictionary) -> void:
 	if is_running():
 		push_error('battle already running!')
 		return
@@ -112,10 +113,11 @@ func start_battle(attacker_: Empire, defender_: Empire, territory_: Territory, m
 	_next_state = State.INITIALIZATION
 
 	# initialize context
-	_attacker = attacker_
-	_defender = defender_
-	_territory = territory_
-	_map_id = map_id_
+	_attacker = data.attacker
+	_defender = data.defender
+	_territory = data.territory
+	_map_id = data.map_id
+	_training = data.training
 	
 	_turns = 0
 	_should_end = false
@@ -150,6 +152,7 @@ func _end_battle(result: BattleResult):
 		SceneManager.scene_return('fade_to_black')
 
 	_is_running = false
+	print("MOTHERFUCKER WHEN")
 	BattleEvents.battle_ended.emit(result)
 
 
@@ -566,7 +569,7 @@ func is_battle_phase() -> bool:
 
 ## Returns true if this is a training battle.
 func is_training_battle() -> bool:
-	return false
+	return _training
 	
 	
 ## Returns true if this is a quick battle.

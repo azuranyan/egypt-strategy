@@ -136,17 +136,21 @@ func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) 
 	return await banner.show_parsed_result(result, allow_strategy_room)
 
 
-func _on_territory_button_attack_pressed(button: TerritoryButton):
+func _emit_player_attack_action(territory: Territory, training: bool) -> void:
 	var attacker := Overworld.instance().on_turn()
-	var defender := Overworld.instance().get_territory_owner(button._territory)
+	var defender := Overworld.instance().get_territory_owner(territory)
 	OverworldEvents.player_action_chosen.emit({
-		type = 'attack',
+		type = 'train' if training else 'attack',
 		attacker = attacker,
 		defender = defender,
-		territory = button._territory,
+		territory = territory,
 		map_id = 0,
 		source = self,
 	})
+	
+
+func _on_territory_button_attack_pressed(button: TerritoryButton) -> void:
+	_emit_player_attack_action(button._territory, false)
 	
 
 func _on_territory_button_rest_pressed(button: TerritoryButton) -> void:
@@ -154,7 +158,7 @@ func _on_territory_button_rest_pressed(button: TerritoryButton) -> void:
 	
 	
 func _on_territory_button_train_pressed(button: TerritoryButton) -> void:
-	OverworldEvents.player_action_chosen.emit({type='train', territory=button._territory, source = self})
+	_emit_player_attack_action(button._territory, true)
 	
 	
 func _on_strategy_room_button_pressed() -> void:

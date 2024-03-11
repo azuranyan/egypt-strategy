@@ -74,7 +74,7 @@ static func instance() -> Battle:
 
 
 ## Starts the battle cycle.
-func start_battle(_attacker: Empire, _defender: Empire, _territory: Territory, _map_id: int) -> void:
+func start_battle(_data: Dictionary) -> void:
 	assert(false, 'not implemented')
 	
 	

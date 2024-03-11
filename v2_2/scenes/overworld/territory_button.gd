@@ -99,11 +99,16 @@ func _ready() -> void:
 		locked = false
 		# has to be done this way because pressing the button takes the
 		# focus from the detector and if we close the panel during that
-		# the button won't actually be pressed
-		if not (%AttackButton.is_hovered() or %RestButton.is_hovered()):
+		# the button won't actually be pressed. i've yet to come up with
+		# a solution for this, prob better to have toggle and button groups
+		if not (attack_button.is_hovered() or train_button.is_hovered() or rest_button.is_hovered()):
 			highlighted = false
 			close_panel()
 	)
+
+	attack_button.pressed.connect(_on_attack_button_pressed)
+	train_button.pressed.connect(_on_train_button_pressed)
+	rest_button.pressed.connect(_on_rest_button_pressed)
 
 
 func _exit_tree() -> void:

@@ -159,6 +159,7 @@ stretch_mode = 5
 
 [node name="ExtendedPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -247,7 +248,3 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.956863)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 22
 text = "REST"
-
-[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/AttackButton" to="." method="_on_attack_button_pressed"]
-[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/TrainButton" to="." method="_on_train_button_pressed"]
-[connection signal="pressed" from="ExtendedPanel/Control/HBoxContainer/RestButton" to="." method="_on_rest_button_pressed"]

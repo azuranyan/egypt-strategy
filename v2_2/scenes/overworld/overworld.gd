@@ -377,18 +377,20 @@ func _overworld_main() -> void:
 				print(action)
 				# execute action
 				match action.type:
-					'attack':
+					'attack', 'train':
 						if Game.settings.show_marching_animations:
 							await get_active_overworld_scene().show_marching_animation(action.attacker, action.defender, action.territory)
-						BattleEvents.start_battle_requested.emit(action.attacker, action.defender, action.territory, action.map_id)
+						BattleEvents.start_battle_requested.emit({
+							attacker = action.attacker,
+							defender = action.defender, 
+							territory = action.territory,
+							map_id = action.map_id,
+							training = action.type == 'train',
+						})
 						_next_state = 'wait_for_battle_result'
 
 					'rest':
 						on_turn().hp_multiplier = 1.0
-						_next_state = 'turn_end'
-
-					'train':
-						print('TODO train')
 						_next_state = 'turn_end'
 					
 					'strategy':
@@ -402,6 +404,8 @@ func _overworld_main() -> void:
 			# This is a separate state so we can go back here when we close or reload
 			# while the battle is ongoing.
 			'wait_for_battle_result':
+				# FIXME: due to the horrible state management, this signal is called before we get here
+				# therefore resulting in a forever wait
 				var result: BattleResult = await BattleEvents.battle_ended
 
 				# TODO workaround, we wait for the transition because battle no longer waits for it
