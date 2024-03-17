@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3arqfaqnrqb"]
+
+[ext_resource type="Script" path="res://audio_manager.gd" id="1_3rrtc"]
+[ext_resource type="Script" path="res://sound_queue.gd" id="2_iasnk"]
+
+[node name="AudioManager" type="Node" node_paths=PackedStringArray("music_sound_queue", "voice_sound_queue", "sfx_sound_queue", "ui_sound_queue")]
+script = ExtResource("1_3rrtc")
+music_volume = 0.5
+sfx_volume = 0.9
+music_sound_queue = NodePath("MusicSoundQueue")
+voice_sound_queue = NodePath("VoiceSoundQueue")
+sfx_sound_queue = NodePath("SFXSoundQueue")
+ui_sound_queue = NodePath("UISoundQueue")
+
+[node name="MusicSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("AudioStreamPlayer")
+queue_size = 2
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="MusicSoundQueue"]
+bus = &"Music"
+
+[node name="VoiceSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("../UISoundQueue/AudioStreamPlayer")
+queue_size = 3
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="VoiceSoundQueue"]
+bus = &"Voice"
+
+[node name="SFXSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("../UISoundQueue/AudioStreamPlayer")
+queue_size = 20
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SFXSoundQueue"]
+bus = &"SFX"
+
+[node name="UISoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("AudioStreamPlayer")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="UISoundQueue"]
+bus = &"UI"

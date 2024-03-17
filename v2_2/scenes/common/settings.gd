@@ -61,5 +61,6 @@ enum WindowMode {FULLSCREEN, WINDOWED}
 @export_range(0.0, 1.0) var music_volume: float
 @export_range(0.0, 1.0) var voice_volume: float
 @export_range(0.0, 1.0) var sound_effects_volume: float
+@export_range(0.0, 1.0) var ui_volume: float
 #endregion Audio Settings
 

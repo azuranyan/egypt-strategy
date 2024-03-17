@@ -1,8 +1,43 @@
-[gd_scene load_steps=4 format=3 uid="uid://brikuwut5uo7e"]
+[gd_scene load_steps=19 format=3 uid="uid://brikuwut5uo7e"]
 
 [ext_resource type="Script" path="res://scenes/dialogue/story_event_scene.gd" id="1_vxdlj"]
 [ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_27n7i"]
+[ext_resource type="Texture2D" uid="uid://btl3o7glk686f" path="res://events/bb.png" id="3_irbkg"]
 [ext_resource type="PackedScene" uid="uid://dxa0y5yfedk8s" path="res://scenes/dialogue/dialogue_scene.tscn" id="3_nwrdr"]
+[ext_resource type="Texture2D" uid="uid://cyu0qvm88tnj5" path="res://events/aa.png" id="4_w46av"]
+[ext_resource type="Texture2D" uid="uid://dvf3lot6fvpci" path="res://scenes/dialogue/data/tail.svg" id="6_sog1i"]
+[ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="6_w4yux"]
+[ext_resource type="Script" path="res://scenes/dialogue/balloon.gd" id="6_xrti4"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="7_2j0sd"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="7_ii6dy"]
+[ext_resource type="FontFile" uid="uid://bfkvgx07nqvy3" path="res://scenes/data/fonts/Aleo-Bold.ttf" id="8_oqwvv"]
+[ext_resource type="FontFile" uid="uid://cgu0d1fepqdbp" path="res://scenes/data/fonts/Aleo-Italic.ttf" id="9_s5tvh"]
+[ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="10_ge03q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k6oj"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="Gradient" id="Gradient_2kqk0"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w0cdn"]
+gradient = SubResource("Gradient_2kqk0")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5nhbd"]
+bg_color = Color(0, 0, 0, 0.588235)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f616o"]
+bg_color = Color(0, 0, 0, 0.67451)
+border_width_top = 60
+border_color = Color(0, 0, 0, 0)
+border_blend = true
 
 [node name="StoryEventScene" type="CanvasLayer" node_paths=PackedStringArray("cached_images", "background_fill", "background", "character_images", "dialogue_scene")]
 layer = 5
@@ -38,6 +73,7 @@ texture = ExtResource("2_27n7i")
 metadata/_edit_lock_ = true
 
 [node name="BlackBars" type="Control" parent="."]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -68,4 +104,365 @@ color = Color(0, 0, 0, 1)
 
 [node name="Characters" type="Node2D" parent="."]
 
+[node name="Bb" type="Sprite2D" parent="Characters"]
+position = Vector2(396, 665)
+scale = Vector2(0.751, 0.751)
+texture = ExtResource("3_irbkg")
+
+[node name="Bb2" type="Sprite2D" parent="Characters"]
+visible = false
+z_index = 1
+position = Vector2(253, 935)
+scale = Vector2(0.749, 0.749)
+texture = ExtResource("3_irbkg")
+
+[node name="Aa" type="Sprite2D" parent="Characters"]
+visible = false
+position = Vector2(1525, 755)
+scale = Vector2(0.482258, 0.482258)
+texture = ExtResource("4_w46av")
+
+[node name="PlaceholderOrigin" type="Node2D" parent="Characters"]
+z_index = 1
+position = Vector2(250, 1330)
+scale = Vector2(0.893946, 0.893946)
+
+[node name="PlaceholderCharacter" type="Sprite2D" parent="Characters/PlaceholderOrigin"]
+position = Vector2(44.7455, 187.931)
+texture = ExtResource("3_irbkg")
+offset = Vector2(0, -581.035)
+
 [node name="DialogueScene" parent="." instance=ExtResource("3_nwrdr")]
+
+[node name="Balloon" type="PanelContainer" parent="." node_paths=PackedStringArray("dialogue_label", "tail")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 527.0
+offset_top = 160.0
+offset_right = -915.0
+offset_bottom = -822.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1k6oj")
+script = ExtResource("6_xrti4")
+dialogue_label = NodePath("MarginContainer/DialogueLabel")
+tail = NodePath("TailControl/Tail")
+
+[node name="TailControl" type="Control" parent="Balloon"]
+show_behind_parent = true
+layout_mode = 2
+
+[node name="Tail" type="TextureRect" parent="Balloon/TailControl"]
+modulate = Color(0.937255, 0.901961, 0.870588, 1)
+show_behind_parent = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -218.0
+offset_top = -10.0
+offset_right = -186.0
+offset_bottom = 22.0
+grow_horizontal = 2
+texture = ExtResource("6_sog1i")
+expand_mode = 5
+
+[node name="Control" type="Control" parent="Balloon"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon/Control"]
+layout_mode = 1
+offset_left = 41.0
+offset_top = -38.0
+offset_right = 174.0
+offset_bottom = 22.0
+alignment = 2
+
+[node name="CharacterNameLabel" type="RichTextLabel" parent="Balloon/Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/default_color = Color(0.129412, 0.360784, 0.458824, 1)
+theme_override_colors/font_outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_constants/outline_size = 18
+theme_override_fonts/normal_font = ExtResource("7_ii6dy")
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[font_size=40]S[/font_size]OLDIER"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Balloon"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 12
+
+[node name="DialogueLabel" parent="Balloon/MarginContainer" instance=ExtResource("6_w4yux")]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.184314, 0.113725, 0.105882, 1)
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "[center]The coast appears clear,
+[b]Your Radiance[/b].[/center]"
+
+[node name="Balloon3" type="PanelContainer" parent="."]
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 366.0
+offset_top = 722.0
+offset_right = -879.0
+offset_bottom = -256.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1k6oj")
+script = ExtResource("6_xrti4")
+
+[node name="TailControl" type="Control" parent="Balloon3"]
+show_behind_parent = true
+layout_mode = 2
+
+[node name="Tail" type="TextureRect" parent="Balloon3/TailControl"]
+modulate = Color(0.937255, 0.901961, 0.870588, 1)
+show_behind_parent = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -329.5
+offset_top = -50.0
+offset_right = -297.5
+offset_bottom = -18.0
+grow_horizontal = 2
+rotation = 1.57079
+texture = ExtResource("6_sog1i")
+expand_mode = 5
+
+[node name="Control" type="Control" parent="Balloon3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon3/Control"]
+layout_mode = 1
+offset_left = 41.0
+offset_top = -38.0
+offset_right = 174.0
+offset_bottom = 22.0
+alignment = 2
+
+[node name="CharacterNameLabel" type="RichTextLabel" parent="Balloon3/Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/default_color = Color(0.129412, 0.360784, 0.458824, 1)
+theme_override_colors/font_outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_constants/outline_size = 18
+theme_override_fonts/normal_font = ExtResource("7_ii6dy")
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[font_size=40]S[/font_size]OLDIER"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Balloon3"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 12
+
+[node name="DialogueLabel" parent="Balloon3/MarginContainer" instance=ExtResource("6_w4yux")]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.184314, 0.113725, 0.105882, 1)
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "[center]I've been following the map this whole time, but... I think we're lost.[/center]"
+
+[node name="Balloon2" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 759.0
+offset_top = 339.0
+offset_right = -683.0
+offset_bottom = -639.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1k6oj")
+script = ExtResource("6_xrti4")
+
+[node name="TailControl" type="Control" parent="Balloon2"]
+show_behind_parent = true
+layout_mode = 2
+
+[node name="Tail" type="TextureRect" parent="Balloon2/TailControl"]
+modulate = Color(0.937255, 0.901961, 0.870588, 1)
+show_behind_parent = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 233.0
+offset_top = -64.0
+offset_right = 265.0
+offset_bottom = -32.0
+grow_horizontal = 2
+rotation = -1.57079
+texture = ExtResource("6_sog1i")
+expand_mode = 5
+flip_h = true
+
+[node name="Control" type="Control" parent="Balloon2"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Balloon2/Control"]
+layout_mode = 1
+offset_left = 41.0
+offset_top = -38.0
+offset_right = 174.0
+offset_bottom = 22.0
+alignment = 2
+
+[node name="CharacterNameLabel" type="RichTextLabel" parent="Balloon2/Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/default_color = Color(0.121569, 0.678431, 0.635294, 1)
+theme_override_colors/font_outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_constants/outline_size = 18
+theme_override_fonts/normal_font = ExtResource("7_ii6dy")
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[font_size=40]P[/font_size]RIESTESS"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Balloon2"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 12
+
+[node name="DialogueLabel" parent="Balloon2/MarginContainer" instance=ExtResource("6_w4yux")]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.184314, 0.113725, 0.105882, 1)
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "[center]The coast appears clear,
+[b]Your Radiance[/b].[/center]"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_top = 756.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer"]
+modulate = Color(0, 0, 0, 0.588235)
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_w0cdn")
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_5nhbd")
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/PanelContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -611.0
+offset_top = -114.0
+offset_right = 611.0
+offset_bottom = 114.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 36
+theme_override_constants/margin_bottom = 36
+
+[node name="DialogueLabel" parent="MarginContainer/VBoxContainer/PanelContainer/Control/MarginContainer" instance=ExtResource("6_w4yux")]
+modulate = Color(1.2, 1.2, 1.2, 1)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.968627, 0.968627, 0.968627, 1)
+theme_override_colors/font_outline_color = Color(0.0392157, 0.00784314, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "[center]They seem extremely confident in my knowledge of the area. Time to break the news, I guess.
+
+[/center]"
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/PanelContainer/Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -143.0
+offset_top = -25.0
+offset_right = 143.0
+offset_bottom = 38.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.941176, 0.654902, 0.364706, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("7_ii6dy")
+theme_override_font_sizes/font_size = 36
+text = "Some Title"
+horizontal_alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -302.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_f616o")

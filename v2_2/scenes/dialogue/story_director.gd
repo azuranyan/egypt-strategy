@@ -30,6 +30,12 @@ const KEEP_TAGS: PackedStringArray = []
 const DEFAULT_POSITION := CENTER
 const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
 
+enum Mode {
+	BUBBLE,
+	SLIDES,
+	CLASSIC,
+}
+
 
 ## The background fill color.
 var background_fill: Color = Color.BLACK:
@@ -70,6 +76,8 @@ var ui_visible: bool:
 		if not is_node_ready():
 			await ready
 		story_event_scene.dialogue_scene.visible = value
+
+
 
 
 func _ready() -> void:

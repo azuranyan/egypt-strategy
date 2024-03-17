@@ -1,3 +1,4 @@
+@tool
 class_name PlayAnimationEffect
 extends AttackEffect
 ## Represents an effect that plays an animation.
