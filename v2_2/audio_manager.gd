@@ -78,6 +78,11 @@ func play_ui_sound(stream: AudioStream) -> AudioStreamPlayer:
 	return ui_sound_queue.play(stream)
 
 
+## Plays SFX
+func play_sfx(stream: AudioStream) -> AudioStreamPlayer:
+	return sfx_sound_queue.play(stream)
+
+
 ## Adds button sounds to a button.
 func add_button_sounds(button: BaseButton) -> void:
 	if button.has_meta('button_sounds_added'):

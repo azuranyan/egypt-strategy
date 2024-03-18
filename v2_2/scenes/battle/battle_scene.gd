@@ -5,6 +5,23 @@ extends GameScene
 signal _ctc
 
 
+@export_group("Audio")
+@export_group("SFX")
+@export var battle_win_sound := preload("res://scenes/battle/data/audio/Win_Battle.wav")
+@export var battle_lose_sound := preload("res://scenes/battle/data/audio/Lose_Battle.wav")
+
+@export_group("BGM")
+@export var conquest_bgm: AudioStream
+@export var training_bgm: AudioStream
+@export var defense_bgm: AudioStream
+
+# TODO this is a hack and not really the responsibility of this class
+@export var final_battle_bgm: AudioStream
+
+
+var music_player: AudioStreamPlayer
+
+
 @onready var level := %Level
 @onready var hud: BattleHUD = $HUDVisibilityControl/HUD
 @onready var hud_visibility_control := $HUDVisibilityControl
@@ -30,6 +47,19 @@ func _unhandled_input(event):
 
 func scene_enter(_kwargs := {}):
 	level.load_map(Battle.instance().territory().maps[Battle.instance().map_id()])
+
+	# TODO bgm should only play on battle start
+	# play bgm
+	var type := Battle.instance().battle_type()
+	match Battle.instance().battle_type():
+		Battle.Type.TRAINING:
+			music_player = AudioManager.play_music(training_bgm)
+		Battle.Type.DEFENSE:
+			music_player = AudioManager.play_music(defense_bgm)
+		Battle.Type.FINAL_BATTLE:
+			music_player = AudioManager.play_music(final_battle_bgm)
+		Battle.Type.CONQUEST, _:
+			music_player = AudioManager.play_music(conquest_bgm)
 	
 	
 func scene_exit():
@@ -87,6 +117,7 @@ func show_battle_results():
 	if message == '':
 		return
 	battle_result_screen.show()
+	AudioManager.play_sfx(battle_win_sound if won else battle_lose_sound)
 	await battle_result_screen.show_result(message, won)
 	battle_result_screen.hide()
 

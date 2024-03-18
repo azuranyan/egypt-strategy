@@ -1,5 +1,6 @@
 class_name BattleImpl extends Battle
 
+
 signal _death_animations_finished
 
 
@@ -19,10 +20,15 @@ enum State {
 }
 
 
+@export var battle_start_sound := preload("res://scenes/battle/data/audio/Battle_Commences.wav")
+@export var end_turn_sound := preload("res://scenes/battle/data/audio/End_Battle_Turn.wav")
+
+
 @export var _attacker: Empire
 @export var _defender: Empire
 @export var _territory: Territory
 @export var _map_id: int
+@export var _type: Type
 
 @export var _turns: int
 @export var _turn_queue: Array[Empire]
@@ -69,6 +75,7 @@ func save_state() -> Dictionary:
 		defender = _defender,
 		territory = _territory,
 		map_id = _map_id,
+		type = _type,
 		turns = _turns,
 		turn_queue = _turn_queue.duplicate(),
 		should_end = _should_end,
@@ -88,6 +95,7 @@ func load_state(data: Dictionary) -> void:
 	_defender = data.defender
 	_territory = data.territory
 	_map_id = data.map_id
+	_type = data.type
 	_turns = data.turns
 	_turn_queue.assign(data.turn_queue)
 	_should_end = data.should_end
@@ -117,6 +125,7 @@ func start_battle(data: Dictionary) -> void:
 	_defender = data.defender
 	_territory = data.territory
 	_map_id = data.map_id
+	_type = data.type
 	_training = data.training
 	
 	_turns = 0
@@ -152,7 +161,6 @@ func _end_battle(result: BattleResult):
 		SceneManager.scene_return('fade_to_black')
 
 	_is_running = false
-	print("MOTHERFUCKER WHEN")
 	BattleEvents.battle_ended.emit(result)
 
 
@@ -330,6 +338,7 @@ func _real_battle_main():
 
 			State.BATTLE_START:
 				hud().hide()
+				AudioManager.play_sfx(battle_start_sound)
 				await _call_and_wait(get_active_battle_scene().show_battle_start)
 				hud().show()
 				_battle_phase = true
@@ -360,6 +369,8 @@ func _real_battle_main():
 				_next_state = State.TURN_END
 
 			State.TURN_END:
+				AudioManager.play_sfx(end_turn_sound)
+
 				clear_overlays()
 				
 				for u in Game.get_empire_units(on_turn()):
@@ -540,6 +551,11 @@ func territory() -> Territory:
 ## Returns the map id being used.
 func map_id() -> int:
 	return _map_id
+
+
+## Returns the type of the battle.
+func battle_type() -> Type:
+	return _type
 	
 	
 ## Returns the battle missions.

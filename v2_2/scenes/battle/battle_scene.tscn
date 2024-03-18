@@ -1,9 +1,13 @@
-[gd_scene load_steps=20 format=3 uid="uid://d2wdgl38ld0i6"]
+[gd_scene load_steps=24 format=3 uid="uid://d2wdgl38ld0i6"]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
+[ext_resource type="AudioStream" uid="uid://bnhy6gb74ak8h" path="res://audio/music/AE_Golden_Age_FULL_Loop.wav" id="2_46m3i"]
+[ext_resource type="AudioStream" uid="uid://dj1ignkno64mo" path="res://audio/music/AE_Golden_Age_noMel_Loop.wav" id="3_vitwe"]
 [ext_resource type="Script" path="res://scenes/battle/unhandled_input_listener.gd" id="4_0x7je"]
+[ext_resource type="AudioStream" uid="uid://dkcv5gwmkmi6m" path="res://audio/music/AE_Scorpion_King_noMel_Loop.wav" id="4_157p4"]
 [ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
 [ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
+[ext_resource type="AudioStream" uid="uid://cd0cf2ygldpp6" path="res://audio/music/AE_Scorpion_King_FULL_Loop.wav" id="5_y5slx"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="6_i7shf"]
 [ext_resource type="PackedScene" uid="uid://c1i2yiwf08gqj" path="res://scenes/battle/battle_result_screen.tscn" id="8_6a2cn"]
 
@@ -243,6 +247,10 @@ shadow_offset = Vector2(0, 0)
 
 [node name="BattleScene" type="CanvasLayer"]
 script = ExtResource("1_ty2dt")
+conquest_bgm = ExtResource("2_46m3i")
+training_bgm = ExtResource("3_vitwe")
+defense_bgm = ExtResource("4_157p4")
+final_battle_bgm = ExtResource("5_y5slx")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

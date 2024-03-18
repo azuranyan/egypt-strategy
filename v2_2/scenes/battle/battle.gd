@@ -66,6 +66,9 @@ enum {
 }
 
 
+enum Type {CONQUEST, DEFENSE, TRAINING, FINAL_BATTLE}
+
+
 ## This exists because [Game] battle intellisense doesn't work.
 ## This also lets us do additional checks and intercept accesses.
 static func instance() -> Battle:
@@ -129,6 +132,12 @@ func territory() -> Territory:
 func map_id() -> int:
 	assert(false, 'not implemented')
 	return 0
+
+
+## Returns the type of the battle.
+func battle_type() -> Type:
+	assert(false, 'not implemented')
+	return 0 as Type
 	
 	
 ## Returns the battle missions.

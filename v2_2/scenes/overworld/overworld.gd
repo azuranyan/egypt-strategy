@@ -380,12 +380,26 @@ func _overworld_main() -> void:
 					'attack', 'train':
 						if Game.settings.show_marching_animations:
 							await get_active_overworld_scene().show_marching_animation(action.attacker, action.defender, action.territory)
+						
+						# TODO this is an ugly way of doing this but it suffices for now
+						var type: Battle.Type
+						if action.attacker == _player_empire:
+							if action.type == 'train':
+								type = Battle.Type.TRAINING
+							else:
+								type = Battle.Type.CONQUEST
+						if action.defender == _player_empire:
+							type = Battle.Type.DEFENSE
+						if action.defender == _boss_empire:
+							type = Battle.Type.FINAL_BATTLE
+
 						BattleEvents.start_battle_requested.emit({
 							attacker = action.attacker,
 							defender = action.defender, 
 							territory = action.territory,
 							map_id = action.map_id,
 							training = action.type == 'train',
+							type = type,
 						})
 						_next_state = 'wait_for_battle_result'
 
