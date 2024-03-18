@@ -1,8 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dlcfb7plorapm"]
+[gd_scene load_steps=11 format=3 uid="uid://dlcfb7plorapm"]
 
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="1_0k5ue"]
 [ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_n5g87"]
 [ext_resource type="Texture2D" uid="uid://bxip65cj4b43o" path="res://scenes/main_menu/Map_wo_Separators_Color_Filters_Blank.png" id="2_1hkau"]
+[ext_resource type="AudioStream" uid="uid://3a6aw3i25d8l" path="res://audio/music/AE_Royal_Tomb_Short_Loop.wav" id="2_ihef7"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="5_usclm"]
 
 [sub_resource type="Gradient" id="Gradient_ehfxr"]
 offsets = PackedFloat32Array(0.557604, 0.852535, 1)
@@ -32,6 +34,7 @@ fill_to = Vector2(0, 1)
 
 [node name="MainMenu" type="CanvasLayer"]
 script = ExtResource("1_n5g87")
+bgm = ExtResource("2_ihef7")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -208,6 +211,10 @@ theme_override_fonts/font = ExtResource("1_0k5ue")
 theme_override_font_sizes/font_size = 24
 text = "Exit"
 alignment = 0
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("5_usclm")
+buttons = [NodePath("../Control/HBoxContainer/StartButton"), NodePath("../Control/HBoxContainer/ContinueButton"), NodePath("../Control/HBoxContainer/LoadButton"), NodePath("../Control/HBoxContainer/SettingsButton"), NodePath("../Control/HBoxContainer/ExtrasButton"), NodePath("../Control/HBoxContainer/CreditsButton"), NodePath("../Control/HBoxContainer/ExitButton")]
 
 [connection signal="pressed" from="Control/HBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Control/HBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]

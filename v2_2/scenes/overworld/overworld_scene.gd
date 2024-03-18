@@ -7,6 +7,9 @@ const BattleResultBanner := preload('res://scenes/overworld/battle_result_banner
 
 @export var battle_result_banner_scene: PackedScene
 
+@export var bgm: AudioStream
+
+var music_player: AudioStreamPlayer
 
 var territory_buttons: Array[TerritoryButton]
 
@@ -71,6 +74,12 @@ func scene_enter(_kwargs = {}) -> void:
 	update_turn_counter(Overworld.instance().cycle())
 	update_new_available_scenes()
 	allow_inputs(Overworld.instance().on_turn().is_player_owned())
+
+	music_player = AudioManager.play_music(bgm)
+
+
+func scene_exit() -> void:
+	AudioManager.fade_out(music_player)
 
 
 ## Initializes the buttons.

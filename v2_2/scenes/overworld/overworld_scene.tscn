@@ -1,7 +1,8 @@
-[gd_scene load_steps=27 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=29 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
+[ext_resource type="AudioStream" uid="uid://3fbx4g7ex1cs" path="res://audio/music/AE_Royal_Tomb_LessMel_Loop.wav" id="3_rausi"]
 [ext_resource type="Script" path="res://scenes/overworld/empire_node.gd" id="3_rq8ib"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="3_sc2vb"]
 [ext_resource type="Resource" uid="uid://bq47arkapu6hu" path="res://units/lysandra/chara.tres" id="4_ai0xe"]
@@ -22,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="18_l1pmu"]
 [ext_resource type="PackedScene" uid="uid://c1r233k6re33q" path="res://maps/starting_zone/starting_zone.tscn" id="19_mec2q"]
 [ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="24_sxrdq"]
 
 [sub_resource type="Gradient" id="Gradient_n8nx8"]
 interpolation_mode = 2
@@ -56,6 +58,7 @@ shadow_color = Color(0.266667, 0.266667, 0.266667, 1)
 [node name="OverworldScene" type="CanvasLayer"]
 script = ExtResource("1_fqotl")
 battle_result_banner_scene = ExtResource("18_l1pmu")
+bgm = ExtResource("3_rausi")
 
 [node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
 z_index = -10
@@ -315,5 +318,9 @@ grow_vertical = 2
 texture = ExtResource("21_sy7q1")
 expand_mode = 1
 stretch_mode = 4
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("24_sxrdq")
+buttons = [NodePath("../HUD/StrategyRoomButton")]
 
 [connection signal="pressed" from="HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]

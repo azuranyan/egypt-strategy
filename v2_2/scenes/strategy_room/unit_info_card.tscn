@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://t3wfofdlp4c5"]
+[gd_scene load_steps=10 format=3 uid="uid://t3wfofdlp4c5"]
 
 [ext_resource type="Texture2D" uid="uid://ck03hqx5x7dh2" path="res://scenes/overworld/data/star-filled.svg" id="1_4b4dq"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_5e8eq"]
 [ext_resource type="Script" path="res://scenes/strategy_room/unit_info_card.gd" id="1_oemr1"]
 [ext_resource type="Texture2D" uid="uid://dei0k2jtdml5u" path="res://scenes/overworld/data/star.svg" id="2_kmbo0"]
 [ext_resource type="PackedScene" uid="uid://kq1wdgrlo1cv" path="res://scenes/strategy_room/stat_line.tscn" id="3_bbdyj"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="6_afote"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ur1ag"]
 content_margin_left = 20.0
@@ -225,3 +226,7 @@ layout_mode = 2
 size_flags_vertical = 3
 stat = &"mov"
 custom_stat_text = "Move"
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("6_afote")
+buttons = [NodePath("../Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/BasicAttackContainer/HBoxContainer5/BasicAttackButton"), NodePath("../Details/MarginContainer/VBoxContainer/Body/HBoxContainer/Attacks/SpecialAttackContainer/HBoxContainer6/SpecialAttackButton")]

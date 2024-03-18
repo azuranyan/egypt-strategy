@@ -89,22 +89,31 @@ func _ready() -> void:
 			highlighted = false
 	)
 
-	portrait_button.focus_entered.connect(func():
-		locked = true
-		highlighted = true
-		open_panel(_adjacent_to_player)
-	)
-
-	portrait_button.focus_exited.connect(func():
-		locked = false
-		# has to be done this way because pressing the button takes the
-		# focus from the detector and if we close the panel during that
-		# the button won't actually be pressed. i've yet to come up with
-		# a solution for this, prob better to have toggle and button groups
-		if not (attack_button.is_hovered() or train_button.is_hovered() or rest_button.is_hovered()):
-			highlighted = false
+	portrait_button.toggled.connect(func(toggled: bool):
+		locked = toggled
+		highlighted = toggled
+		if toggled:
+			open_panel(_adjacent_to_player)
+		else:
 			close_panel()
 	)
+
+	# portrait_button.focus_entered.connect(func():
+	# 	locked = true
+	# 	highlighted = true
+	# 	open_panel(_adjacent_to_player)
+	# )
+
+	# portrait_button.focus_exited.connect(func():
+	# 	locked = false
+	# 	# has to be done this way because pressing the button takes the
+	# 	# focus from the detector and if we close the panel during that
+	# 	# the button won't actually be pressed. i've yet to come up with
+	# 	# a solution for this, prob better to have toggle and button groups
+	# 	if not (attack_button.is_hovered() or train_button.is_hovered() or rest_button.is_hovered()):
+	# 		highlighted = false
+	# 		close_panel()
+	# )
 
 	attack_button.pressed.connect(_on_attack_button_pressed)
 	train_button.pressed.connect(_on_train_button_pressed)
@@ -232,7 +241,7 @@ func open_panel(show_attack_button: bool) -> void:
 	extended_panel.show()
 	attack_button.visible = show_attack_button
 	train_button.visible = show_attack_button
-	rest_button.visible = not show_attack_button
+	rest_button.visible = not show_attack_button and _empire.is_player_owned()
 	z_index = 2
 
 
@@ -275,6 +284,7 @@ func _on_attack_button_pressed() -> void:
 func _on_rest_button_pressed() -> void:
 	close_panel()
 	rest_pressed.emit(self)
+
 
 func _on_train_button_pressed() -> void:
 	close_panel()

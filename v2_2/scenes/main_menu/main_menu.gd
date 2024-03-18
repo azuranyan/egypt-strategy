@@ -3,6 +3,12 @@ extends GameScene
 signal _close
 
 
+@export var bgm: AudioStream
+
+
+var music_player: AudioStreamPlayer
+
+
 @onready var start_button = $Control/HBoxContainer/StartButton
 @onready var continue_button = $Control/HBoxContainer/ContinueButton
 @onready var load_button = $Control/HBoxContainer/LoadButton
@@ -32,10 +38,13 @@ func scene_enter(_kwargs := {}):
 		count += 1
 	savedir.list_dir_end()
 	load_button.disabled = count <= 0
+
+	music_player = AudioManager.play_music(bgm)
 	
 	
 func scene_exit():
-	pass
+	# TODO it shouldn't be necessary to fade out the music ourselves, also it's really troublesome to call this
+	AudioManager.fade_out(music_player)
 
 
 func _on_start_button_pressed():

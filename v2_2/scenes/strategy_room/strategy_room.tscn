@@ -1,14 +1,15 @@
-[gd_scene load_steps=21 format=3 uid="uid://m6454awul4gx"]
+[gd_scene load_steps=19 format=3 uid="uid://m6454awul4gx"]
 
 [ext_resource type="Script" path="res://scenes/strategy_room/strategy_room.gd" id="1_f8a7s"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_sg0r4"]
+[ext_resource type="Texture2D" uid="uid://becd3mhykth8g" path="res://events/sprites/throne_room/RC_EgyptianPalaceInteriors_(14).jpg" id="3_idqa0"]
 [ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="4_b7ngt"]
 [ext_resource type="Script" path="res://scenes/strategy_room/unit_list_panel.gd" id="4_c4fc5"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="5_uumvb"]
-[ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="6_dnsln"]
 [ext_resource type="FontFile" uid="uid://daofijf3ycy6k" path="res://scenes/data/fonts/Aleo-VariableFont_wght.ttf" id="6_yipoh"]
 [ext_resource type="PackedScene" uid="uid://t3wfofdlp4c5" path="res://scenes/strategy_room/unit_info_card.tscn" id="7_0c7x5"]
 [ext_resource type="PackedScene" uid="uid://1as7qe1f084t" path="res://scenes/strategy_room/attack_card.tscn" id="8_tqsgu"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="10_uyp2m"]
 
 [sub_resource type="Animation" id="Animation_4f5xn"]
 length = 0.001
@@ -143,13 +144,13 @@ _data = {
 }
 
 [sub_resource type="Gradient" id="Gradient_moclt"]
-offsets = PackedFloat32Array(0.0246914, 1)
-colors = PackedColorArray(0.0687983, 0.0687983, 0.0687983, 1, 0.180005, 0.180005, 0.180005, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_hl1kw"]
 gradient = SubResource("Gradient_moclt")
-fill_from = Vector2(0, 1)
-fill_to = Vector2(0, 0)
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kin3n"]
 bg_color = Color(0.937255, 0.901961, 0.870588, 1)
@@ -170,17 +171,6 @@ corner_radius_bottom_left = 4
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i82bf"]
 content_margin_left = 20.0
 draw_center = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yvwfd"]
-bg_color = Color(0.937255, 0.901961, 0.870588, 1)
-
-[sub_resource type="ButtonGroup" id="ButtonGroup_upil2"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_6cd00"]
-font_size = 28
-font_color = Color(0.282353, 0.223529, 0.168627, 1)
-outline_size = 2
-shadow_color = Color(0, 0, 0, 0.72549)
 
 [node name="StrategyRoom" type="CanvasLayer"]
 script = ExtResource("1_f8a7s")
@@ -203,6 +193,20 @@ mouse_filter = 2
 theme = ExtResource("2_sg0r4")
 
 [node name="Background" type="TextureRect" parent="Control"]
+clip_children = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_idqa0")
+expand_mode = 1
+metadata/_edit_lock_ = true
+
+[node name="Vignette" type="TextureRect" parent="Control"]
+modulate = Color(0, 0, 0, 0.619608)
 clip_children = 2
 layout_mode = 1
 anchors_preset = 15
@@ -327,47 +331,6 @@ fixed_icon_size = Vector2i(16, 16)
 item_0/text = "Alara"
 item_1/text = "Lysandra"
 
-[node name="Button" type="Button" parent="Control/UnitListPanel/ScrollContainer/VBoxContainer"]
-visible = false
-custom_minimum_size = Vector2(0, 72)
-layout_direction = 2
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_yvwfd")
-toggle_mode = true
-button_group = SubResource("ButtonGroup_upil2")
-
-[node name="TextureRect" type="TextureRect" parent="Control/UnitListPanel/ScrollContainer/VBoxContainer/Button"]
-layout_mode = 1
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_left = 21.0
-offset_top = 2.0
-offset_right = 113.0
-offset_bottom = -2.0
-grow_vertical = 2
-texture = ExtResource("4_b7ngt")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="Control/UnitListPanel/ScrollContainer/VBoxContainer/Button"]
-layout_mode = 0
-offset_left = 141.0
-offset_top = 12.0
-offset_right = 211.0
-offset_bottom = 47.0
-text = "Alara"
-label_settings = SubResource("LabelSettings_6cd00")
-
-[node name="ExclamationMark" type="TextureRect" parent="Control/UnitListPanel/ScrollContainer/VBoxContainer/Button"]
-layout_mode = 2
-offset_left = 413.0
-offset_top = 47.0
-offset_right = 437.0
-offset_bottom = 71.0
-texture = ExtResource("6_dnsln")
-expand_mode = 1
-stretch_mode = 5
-
 [node name="AttackCard" parent="Control" instance=ExtResource("8_tqsgu")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
@@ -422,5 +385,9 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Inspect units."
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("10_uyp2m")
+buttons = [NodePath("../Control/BackButton"), null]
 
 [connection signal="pressed" from="Control/BackButton" to="." method="_on_back_button_pressed"]

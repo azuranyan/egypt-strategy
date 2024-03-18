@@ -32,11 +32,15 @@ func _ready() -> void:
 
 
 ## Plays the sound of [member audio_stream_player].
-func play(stream: AudioStream) -> void:
+func play(stream: AudioStream) -> AudioStreamPlayer:
+	var stream_player := _queue[_next_index]
+	
 	# if the queue is full, sound will be skipped
-	if _queue[_next_index].playing:
+	if stream_player.playing:
 		return
 	
-	_queue[_next_index].stream = stream
-	_queue[_next_index].play()
+	stream_player.stream = stream
+	stream_player.play()
 	_next_index = (_next_index + 1) % queue_size
+
+	return stream_player
