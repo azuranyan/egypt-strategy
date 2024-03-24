@@ -1,142 +1,264 @@
+@tool
+class_name Balloon
 extends PanelContainer
+## Renders a line of dialogue.
+
+## Emitted when the balloon is opened.
+signal opened
+
+## Emitted when the balloon is closed.
+signal closed
+
+## Emitted when the balloon is finished.
+signal finished
 
 
-@export var show_tail: bool = true
+const DEFAULT_ANIMATION_DURATION: float = 0.3
+
+const DEFAULT_TARGET_OFFSET: Vector2 = Vector2(-69.420, -69.420)
+
+const DEFAULT_SPACING: float = 30
+
+
+## Whether to show the tail or not.
+@export var show_tail: bool = true:
+	set(value):
+		show_tail = value
+		if not is_node_ready():
+			await ready
+		if tail:
+			tail.visible = show_tail
+
+## The action to listen to to continue the dialogue.
 @export var continue_action: StringName
+
+## The action to listen to to skip the dialogue.
 @export var skip_action: StringName
 
-@export_group("Animation")
-@export_range(0, 1) var animation_duration: float
+## Whether to automatically close when finished.
+@export_flags("Close", "Free") var on_finish: int = (1 << 0) | (1 << 1)
+
+## Whether the text should be centered.
+@export var centered_text: bool
+
+## The target node to attach to.
+@export var target: Node2D
+
+## Start opened.
+@export var start_opened: bool
+
 
 @export_group("Connections")
-@export var character_label: RichTextLabel
-@export var dialogue_label: DialogueLabel
-@export var tail: TextureRect
-@export var responses_menu: DialogueResponsesMenu
-#@export var response
 
-
-## The dialogue resource.
-var _resource: DialogueResource
-
-## List of game states passed to us.
-var _temp_game_states: Array
-
-## The current dialogue line.
-var _current_line: DialogueLine:
+@export var character_label_path: NodePath:
 	set(value):
-		_waiting_for_input = false
-		focus_mode = Control.FOCUS_ALL
-		grab_focus()
+		character_label_path = value
+		character_label = get_node_or_null(value) as RichTextLabel
 
-		if not value:
-			queue_free()
-			#dialogue_finished.emit()
-			return
+@export var dialogue_label_path: NodePath:
+	set(value):
+		dialogue_label_path = value
+		dialogue_label = get_node_or_null(value) as DialogueLabel
 
-		_current_line = value
-		update_dialogue()
-		#dialogue_line_changed.emit(_current_line)
+@export var tail_path: NodePath:
+	set(value):
+		tail_path = value
+		tail = get_node_or_null(value) as BalloonTail
+
+var character_label: RichTextLabel
+var dialogue_label: DialogueLabel
+var tail: BalloonTail:
+	set(value):
+		tail = value
+		if tail:
+			tail.visible = show_tail
 
 
-var _waiting_for_input: bool
+var _current_line: DialogueLine
+var _tween: Tween
+var _open: bool
 
 
 func _ready() -> void:
-	update_visuals(0)
+	if Engine.is_editor_hint():
+		return
 
-	visibility_changed.connect(_on_visibility_changed)
+	# does not get called when serialized, so force call them here
+	character_label_path = character_label_path
+	dialogue_label_path = dialogue_label_path
+	tail_path = tail_path
 
-
-## Opens the dialogue balloon.
-func open_balloonrt(dialogue_resource: DialogueResource, title: String, extra_game_states := []) -> void:
-	_temp_game_states = extra_game_states.duplicate()
-	_waiting_for_input = false
-	_resource = dialogue_resource
-	emit_signal.call_deferred('dialogue_started')
-	next(title)
-
-
-func close_balloon() -> void:
-	if _current_line.character:
-		character_label.text = tr(_current_line.character)
-		character_label.show()
+	if start_opened:
+		if character_label:
+			character_label.text = ''
+		if dialogue_label:
+			dialogue_label.text = ''
+		_open = true
 	else:
-		character_label.hide()
+		scale = Vector2.ZERO
+		modulate = Color.TRANSPARENT
+		hide()
+
+	add_to_group('balloons')
 
 
-	# setup dialogue label
+## Types out the dialogue line.
+func play_dialogue_line(dialogue_line: DialogueLine) -> void:
+	if not is_node_ready():
+		await ready
+		
+	# initialize state
+	_current_line = dialogue_line
+	_update_character(dialogue_line)
+	_update_dialogue_label(dialogue_line)
+	
+	# type out
+	if dialogue_line.text:
+		dialogue_label.type_out()
+		await dialogue_label.finished_typing
+	
+	finished.emit()
+	get_tree().call_group("balloon_listeners", '_on_balloon_finished', self)
+
+
+func _update_character(line: DialogueLine) -> void:
+	if tail:
+		tail.visible = show_tail and line.character != ''
+
+	if line.character:
+		if character_label:
+			var chara_name := tr(line.character)
+			var chara_info := Game.get_character_info(line.character)
+
+			character_label.text = chara_name
+			character_label.add_theme_color_override('default_color', chara_info.map_color)
+
+	if character_label:
+		character_label.visible = line.character != ''
+
+
+func _update_dialogue_label(line: DialogueLine) -> void:
+	if not dialogue_label:
+		return
+		
 	dialogue_label.hide()
-	dialogue_label.dialogue_line = _current_line
+	dialogue_label.dialogue_line = line
+	dialogue_label.show()
+
+	if line.text == '':
+		return
+
+	# open balloon if not yet open
+	if not is_open():
+		# force update control, prevents flickering
+		# https://github.com/godotengine/godot/issues/20623
+		scale = Vector2.ZERO
+		modulate = Color.TRANSPARENT
+		show()
+
+		# open balloon next frame
+		var delayed_open := func():
+			pivot_offset = Vector2(0.5, 0.5) * size
+			open()
+		get_tree().process_frame.connect(delayed_open, CONNECT_ONE_SHOT)
+
+	if centered_text:
+		line.text = '[center]%s[/center]' % line.text
 
 
-
-## Shows the next dialogue line.
-func next(next_id: String) -> void:
-	_current_line = await DialogueManager.get_next_current_line(_resource, next_id, _temp_game_states)
-
-
-## Called to update the dialogue.
-func update_dialogue() -> void:
-	if _current_line.character:
-		character_label.text = tr(_current_line.character)
-		character_label.show()
-	else:
+## Clears balloon.
+func clear() -> void:
+	if dialogue_label:
+		dialogue_label.hide()
+	if character_label:
 		character_label.hide()
-
-	dialogue_label.hide()
-	dialogue_label.dialogue_line = _current_line
-
-	responses_menu.hide()
-	responses_menu.responses = _current_line.responses
-
-	# show_dialogue()
-	# dialogue_label.show()
-	# if _current_line.text:
-	# 	dialogue_label.type_out()
-	# 	await dialogue_label.finished_typing
-	
-	# if is_waiting_for_response():
-	# 	balloon.focus_mode = Control.FOCUS_NONE
-	# 	responses_menu.show()
-
-	# elif _current_line.time:
-	# 	var time: float
-	# 	if _current_line.time.is_valid_float():
-	# 		time = _current_line.time.to_float()
-	# 	else:
-	# 		time = _current_line.text.length() * 0.2
-
-	# 	await get_tree().create_timer(time).timeout
-	# 	next(_current_line.next_id)
-	
-	# else:
-	# 	_waiting_for_input = true
-	# 	balloon.focus_mode = Control.FOCUS_ALL
-	# 	balloon.grab_focus()
+	if tail:
+		tail.hide()
 
 
-func update_visuals(duration: float) -> void:
-	# take the new pivot point
-	pivot_offset = Vector2(0.5, 0.5) * size
-	
-	# animate the pop
-	if duration > 0:
-		var tween := create_tween()
-		if visible:
-			tween.tween_property(self, 'modulate', Color.WHITE, duration)
-			tween.tween_property(self, 'scale', Vector2.ONE, duration)
+## Returns true if typing.
+func is_typing() -> bool:
+	return dialogue_label.is_typing
+
+
+## Skips typing.
+func skip_typing() -> void:
+	if dialogue_label.is_typing:
+		dialogue_label.skip_typing()
+
+
+## Opens the balloon.
+func open(animation_duration := DEFAULT_ANIMATION_DURATION, show_again: bool = false) -> void:
+	if _open:
+		if show_again:
+			await close()
 		else:
-			tween.tween_property(self, 'modulate', Color.TRANSPARENT, duration)
-			tween.tween_property(self, 'scale', Vector2.ZERO, duration)
+			return
+	
+	get_tree().call_group("balloon_listeners", "_on_balloon_opened", self)
+	opened.emit()
+	if tail and target:
+		tail.set_target(target)
+	show()
+	if animation_duration > 0:
+		# with animation
+		_force_end_tween()
+
+		_tween = create_tween()
+		_tween.set_ease(Tween.EASE_OUT)
+		_tween.set_trans(Tween.TRANS_BACK)
+		_tween.set_parallel(true)
+
+		_tween.tween_property(self, 'scale', Vector2.ONE, animation_duration)
+		_tween.tween_property(self, 'modulate', Color.WHITE, animation_duration)
+		await _tween.finished
 	else:
-		if visible:
-			modulate = Color.WHITE
-			scale = Vector2.ONE
-		else:
-			modulate = Color.TRANSPARENT
-			scale = Vector2.ZERO
+		# no animation
+		scale = Vector2.ONE
+		modulate = Color.WHITE
+	
+	_open = true
 
 
-func _on_visibility_changed() -> void:
-	update_visuals(animation_duration)
+## Closes the balloon.
+func close(animation_duration := DEFAULT_ANIMATION_DURATION) -> void:
+	if not _open:
+		return
+
+	if animation_duration > 0:
+		# with animation
+		_force_end_tween()
+
+		scale = Vector2.ONE
+		modulate = Color.WHITE
+
+		_tween = create_tween()
+		_tween.set_ease(Tween.EASE_IN)
+		_tween.set_trans(Tween.TRANS_BACK)
+		_tween.set_parallel(true)
+
+		_tween.tween_property(self, 'scale', Vector2.ZERO, animation_duration)
+		_tween.tween_property(self, 'modulate', Color.TRANSPARENT, animation_duration)
+		await _tween.finished
+	else:
+		# no animation
+		scale = Vector2.ZERO
+		modulate = Color.TRANSPARENT
+
+	get_tree().call_group("balloon_listeners", "_on_balloon_closed", self)
+	closed.emit()
+	hide()
+	_open = false
+
+
+func _force_end_tween() -> void:
+	if _tween and _tween.is_running():
+		_tween.pause()
+		_tween.custom_step(9999)
+		_tween.kill()
+		_tween = null
+
+
+## Returns true if the balloon is open.
+func is_open() -> bool:
+	return _open

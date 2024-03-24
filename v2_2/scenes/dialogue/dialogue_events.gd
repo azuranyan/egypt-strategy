@@ -23,3 +23,13 @@ signal event_ended(event_id: StringName)
 
 ## Emitted when new event is added to the queue.
 signal new_event_unlocked(event_id: StringName)
+
+## Emitted when rollback is requested.
+signal rollback_requested(source)
+
+## Emitted when dialogue is continued.
+signal next_requested(source)
+
+signal dialogue_line_started(dialogue_line, balloon)
+
+signal dialogue_line_finished(dialogue_line, balloon)

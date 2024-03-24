@@ -9,6 +9,6 @@ name = "Placeholder"
 gender = "F"
 avatar = "Avatar of Placeholding"
 title = "The placeholdiest"
-map_color = Color(0, 1, 0, 1)
+map_color = Color(0.129412, 0.360784, 0.458824, 1)
 portrait = ExtResource("1_8thv1")
 metadata/placeholder = true

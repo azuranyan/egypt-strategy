@@ -1,7 +1,17 @@
 class_name Util
 ## Collection of utility functions that doesnt belong anywhere else.
 
+enum Interrupt {
+	## Uses the elapsed time of the ongoing tween. This is useful for animating
+	## state back and forth and interrupting halfway.
+	REVERSE,
 
+	## Advances the ongoing tween to the final state.
+	ADVANCE,
+
+	## Just kills the current ongoing tween.
+	IGNORE,
+}
 
 
 
@@ -63,24 +73,32 @@ static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
 	rt.clear()
 	rt.text = ''
 	
-	# does not support centering and no push_center either
+	# does not support centering and no push_center either so we do it like this
 	if props.get('center', true):
 		rt.append_text('[center]')
 	
 	# font
-	var font: Font = props.get('font', rt.get_theme_default_font())
-	var font_size: int = props.get('font_size', rt.get_theme_default_font_size())
-	rt.push_font(font, font_size)
+	var font_size: int
+	if 'font_size' in props:
+		font_size = props.font_size
+	else:
+		var override: int = rt.get('theme_override_font_sizes/normal_font_size')
+		if override:
+			font_size = override
+		else:
+			font_size = rt.get_theme_default_font_size()
+	if 'font' in props:
+		rt.push_font(props.font, props.get('font_size', 0))
 	
 	# misc props
-	if props.has('font_color'): rt.push_color(props.font_color)
-	if props.has('outline_color'): rt.push_outline_color(props.outline_color)
-	if props.has('outline_size'):  rt.push_outline_size(props.outline_size)
+	if 'font_color' in props: rt.push_color(props.font_color)
+	if 'outline_color' in props: rt.push_outline_color(props.outline_color)
+	if 'outline_size' in props:  rt.push_outline_size(props.outline_size)
 	
 	var big_font_size := int(1.5 * font_size)
-	if props.has('ratio'):
+	if 'ratio' in props:
 		big_font_size = props.ratio * font_size
-	if props.has('big_font_size'):
+	if 'big_font_size' in props:
 		big_font_size = props.big_font_size
 	
 	# capitalize
@@ -108,7 +126,14 @@ static func bb_big_caps(rt: RichTextLabel, text: String, props := {}):
 	if props.has('outline_color'): rt.pop()
 	if props.has('outline_color'): rt.pop()
 	if props.has('outline_size'):  rt.pop()
-	
+
+
+## Kills a tween and returns the total elapsed time.
+func interrupt_tween(tween: Tween, interrupt_mode: ) -> float:
+	var duration = tween.get_total_elapsed_time()
+	tween.kill()
+	return duration
+
 	
 ## Simple flood fill algorithm.
 static func flood_fill(cell: Vector2, rect: Rect2, max_dist: float, condition: Callable = Util.always_true) -> PackedVector2Array:

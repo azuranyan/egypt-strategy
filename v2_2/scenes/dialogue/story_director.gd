@@ -41,9 +41,9 @@ enum Mode {
 var background_fill: Color = Color.BLACK:
 	set(value):
 		background_fill = value
-		if not is_node_ready():
-			await ready
-		story_event_scene.background_fill.color = value
+		# if not is_node_ready():
+		# 	await ready
+		# story_event_scene.background_fill.color = value
 		
 ## The background texture.
 var background: Texture = null:
@@ -56,12 +56,12 @@ var background: Texture = null:
 var black_bars: bool:
 	set(value):
 		black_bars = value
-		if not is_node_ready():
-			await ready
-		if black_bars:
-			story_event_scene.show_black_bars()
-		else:
-			story_event_scene.hide_black_bars()
+		# if not is_node_ready():
+		# 	await ready
+		# if black_bars:
+		# 	story_event_scene.show_black_bars()
+		# else:
+		# 	story_event_scene.hide_black_bars()
 
 ## A reference to the story event scene.
 var story_event_scene: StoryEventScene
@@ -73,9 +73,9 @@ var image_library: ImageLibrary
 var ui_visible: bool:
 	set(value):
 		ui_visible = value
-		if not is_node_ready():
-			await ready
-		story_event_scene.dialogue_scene.visible = value
+		# if not is_node_ready():
+		# 	await ready
+		# story_event_scene.dialogue_scene.visible = value
 
 
 

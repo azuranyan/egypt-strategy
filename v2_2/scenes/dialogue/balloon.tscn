@@ -1,0 +1,132 @@
+[gd_scene load_steps=13 format=3 uid="uid://7fyh2oio44oe"]
+
+[ext_resource type="Script" path="res://scenes/dialogue/balloon.gd" id="1_u3p24"]
+[ext_resource type="Script" path="res://scenes/dialogue/balloon_tail.gd" id="2_6htrj"]
+[ext_resource type="Texture2D" uid="uid://dvf3lot6fvpci" path="res://scenes/dialogue/data/tail.svg" id="3_ow1hr"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="4_gdhrj"]
+[ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="5_ldbew"]
+[ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="5_qrpi1"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="6_43s5b"]
+[ext_resource type="FontFile" uid="uid://bfkvgx07nqvy3" path="res://scenes/data/fonts/Aleo-Bold.ttf" id="7_tx151"]
+[ext_resource type="FontFile" uid="uid://cgu0d1fepqdbp" path="res://scenes/data/fonts/Aleo-Italic.ttf" id="8_0g4wy"]
+[ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="9_se6nw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k6oj"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7omr7"]
+
+[node name="Balloon" type="PanelContainer"]
+custom_minimum_size = Vector2(500, 100)
+offset_right = 500.0
+offset_bottom = 102.0
+pivot_offset = Vector2(250, 70.5)
+theme_override_styles/panel = SubResource("StyleBoxFlat_1k6oj")
+script = ExtResource("1_u3p24")
+continue_action = &"ui_accept"
+skip_action = &"ui_cancel"
+centered_text = true
+character_label_path = NodePath("Control/VBoxContainer/CharacterNameLabel")
+dialogue_label_path = NodePath("MarginContainer/DialogueLabel")
+tail_path = NodePath("Tail")
+
+[node name="Tail" type="Control" parent="."]
+show_behind_parent = true
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("2_6htrj")
+tail_facing = 0
+tail_position = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Tail"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Tail/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Tail/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxEmpty_7omr7")
+
+[node name="TextureRect" type="TextureRect" parent="Tail/MarginContainer/HBoxContainer/PanelContainer"]
+unique_name_in_owner = true
+modulate = Color(0.937255, 0.901961, 0.870588, 1)
+show_behind_parent = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("3_ow1hr")
+expand_mode = 1
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+offset_left = 41.0
+offset_top = -38.0
+offset_right = 174.0
+offset_bottom = 22.0
+alignment = 2
+
+[node name="CharacterNameLabel" type="RichTextLabel" parent="Control/VBoxContainer"]
+clip_contents = false
+layout_mode = 2
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.129412, 0.360784, 0.458824, 1)
+theme_override_colors/font_outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_constants/outline_size = 18
+theme_override_fonts/normal_font = ExtResource("4_gdhrj")
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[font_size=40]S[/font_size]OLDIER"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("5_ldbew")
+big_caps = 2
+all_caps = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 12
+
+[node name="DialogueLabel" parent="MarginContainer" instance=ExtResource("5_qrpi1")]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.184314, 0.113725, 0.105882, 1)
+theme_override_fonts/normal_font = ExtResource("6_43s5b")
+theme_override_fonts/bold_font = ExtResource("7_tx151")
+theme_override_fonts/italics_font = ExtResource("8_0g4wy")
+theme_override_fonts/bold_italics_font = ExtResource("9_se6nw")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "[center]The coast appears clear,
+[b]Your Radiance[/b].[/center]
+"
+
+[node name="Control2" type="Control" parent="."]
+layout_mode = 2
