@@ -27,7 +27,7 @@ const DEFAULT_SPACING: float = 30
 		if not is_node_ready():
 			await ready
 		if tail:
-			tail.visible = show_tail
+			tail.visible = target and show_tail
 
 ## The action to listen to to continue the dialogue.
 @export var continue_action: StringName
@@ -42,7 +42,11 @@ const DEFAULT_SPACING: float = 30
 @export var centered_text: bool
 
 ## The target node to attach to.
-@export var target: Node2D
+@export var target: Node2D:
+	set(value):
+		target = value
+		if tail:
+			tail.visible = target and show_tail
 
 ## Start opened.
 @export var start_opened: bool
@@ -71,7 +75,7 @@ var tail: BalloonTail:
 	set(value):
 		tail = value
 		if tail:
-			tail.visible = show_tail
+			tail.visible = target and show_tail
 
 
 var _current_line: DialogueLine
@@ -197,8 +201,9 @@ func open(animation_duration := DEFAULT_ANIMATION_DURATION, show_again: bool = f
 	
 	get_tree().call_group("balloon_listeners", "_on_balloon_opened", self)
 	opened.emit()
-	if tail and target:
-		tail.set_target(target)
+	if target:
+		if tail:
+			tail.set_target(target)
 	show()
 	if animation_duration > 0:
 		# with animation

@@ -24,6 +24,18 @@ const PauseMenuScene := preload("dialogue_menu_scene.tscn")
 ## The balloon scene.
 const BalloonScene := preload("balloon.tscn")
 
+const FADE_TO_BLACK := 'fade_to_black'
+const FADE_FROM_BLACK := 'fade_from_black'
+const FADE_IN := 'fade_in'
+const FADE_OUT := 'fade_out'
+const SLIDE_TO_LEFT := 'slide_to_left'
+const SLIDE_TO_RIGHT := 'slide_to_right'
+const SLIDE_FROM_LEFT := 'slide_from_left'
+const SLIDE_FROM_RIGHT := 'slide_from_right'
+const SLIDE_TO := 'slide_to'
+const SCALE_IN := 'scale_in'
+const SCALE_OUT := 'scale_out'
+
 const LEFT := Vector2(0.25, 1.0)
 const RIGHT := Vector2(0.75, 1.0)
 const CENTER := Vector2(0.5, 1.0)
@@ -35,13 +47,28 @@ const KEEP_TAGS: PackedStringArray = []
 
 const DEFAULT_POSITION := CENTER
 const DEFAULT_TAGS := CharacterImageList.DEFAULT_TAGS
-const DEFAULT_TRANSITION := 'fade'
+const DEFAULT_TRANSITION := FADE_IN
 
 
+## The action used for skipping dialogue.
 @export var skip_action: StringName = 'ui_cancel'
+
+## The action used for continuing dialogue.
+##
+## Pressing with LMB also continues the action.
 @export var continue_action: StringName = 'ui_accept'
+
+## The offset of where the balloons should be spawned relative to the target.
 @export var balloon_target_offset: Vector2 = Vector2(400, -300)
+
+## The vertical spacing between the balloons.
 @export var balloon_v_spacing: float = 20
+
+
+## The image library.
+##
+## The image library contains all the character images and expressions.
+var image_library: ImageLibrary
 
 ## The color of the background fill.
 var background_fill: Color = Color("#0e0e0e"): # mococo
@@ -59,15 +86,15 @@ var background: Texture = null:
 			await ready
 		_background_texture.texture = value
 
-## The visibility of the UI.
+## Whether the ui should be visible or not.
 var ui_visible: bool:
 	set(value):
 		ui_visible = value
 		if not is_node_ready():
 			await ready
-		# TODO a different method of hiding
-		# because visible, modulate are used for animation
-		_dialogue_box.visible = value
+			
+		$UI.visible = value
+		$Overlay.visible = value
 
 ## Whether to wait for the next input.
 var wait_for_input: bool
@@ -79,6 +106,7 @@ var wait_for_response: bool
 var open_balloons: Array[Balloon]
 
 var _resource: DialogueResource
+var _temp_game_states: Array
 
 var _dialogue_line: DialogueLine:
 	set(value):
@@ -91,11 +119,8 @@ var _dialogue_line: DialogueLine:
 		update_dialogue()
 		dialogue_line_changed.emit(_dialogue_line)
 		
-var _temp_game_states: Array
-
 var _black_bars_tween: Tween
 var _character_image_map: Dictionary = {}
-
 
 
 @onready var _cached_images: Node2D = %CachedImages
@@ -125,8 +150,9 @@ func _ready() -> void:
 
 
 func test() -> void:
-	_character_image_map.nnivx = [$Characters/nnivx] as Array[Node2D]
-	_character_image_map.Nathan = [$Characters/Nathan] as Array[Node2D]
+	#_character_image_map.nnivx = [$Characters/nnivx] as Array[Node2D]
+	#_character_image_map.Nathan = [$Characters/Nathan] as Array[Node2D]
+	image_library = preload("res://events/image_library.tscn").instantiate()
 	await get_tree().create_timer(1).timeout
 	var resource := preload("data/test.dialogue")
 	start(resource, 'start')
@@ -175,6 +201,7 @@ func next(next_id: String) -> void:
 func update_dialogue() -> void:
 	if not is_node_ready():
 		await ready
+
 	# setup initial state
 	close_responses_menu()
 	wait_for_input = false
@@ -184,6 +211,10 @@ func update_dialogue() -> void:
 		if close_balloons(true):
 			await balloons_cleared
 
+	# add the characters if they exist
+	if _dialogue_line.character and is_character_shown(_dialogue_line.character):
+		show_character(_dialogue_line.character, KEEP_POSITION, _dialogue_line.tags)
+
 	# play dialogue line
 	_dialogue_box.clear()
 	var balloon := await _get_balloon_for(_dialogue_line)
@@ -192,32 +223,33 @@ func update_dialogue() -> void:
 
 func _get_balloon_for(line: DialogueLine) -> Balloon:
 	# find target character
-	var target := get_shown_character_image(line.character)
-	if target:
-		var head := target.find_child("Head")
-		if head:
-			target = head
-	
-	if line.character and target and target.visible:
+	var target := _get_balloon_target(line.character)
+
+	if line.character and target[0] and target[0].visible:
 		var balloon := BalloonScene.instantiate()
-		balloon.target = target
+		if target[0]:
+			balloon.target = target[1]
+			balloon.z_index = target[0].z_index + 1
+		else:
+			balloon.target = null
+			balloon.z_index = 0
 		%BalloonArea.add_child(balloon)
 		if will_overflow(balloon) and close_balloons(true):
 			await balloons_cleared
 		return balloon
 	else:
-		#_dialogue_box.character_label.set("theme_override_colors/font_outline_color")
-		#Util.bb_big_caps(_dialogue_box.dialogue_label
-			# # if no character label, do "Character: Text" (if we have text to show)
-			# line.text = "[outline_size=%d][outline_color=#%s][color=#%s]%s:[/color][/outline_color][/outline_size] %s" % [
-			# 	12,
-			# 	chara_info.map_color.darkened(0.6).to_html(),
-			# 	chara_info.map_color.to_html(),
-			# 	chara_name,
-			# 	line.text
-			# ]
-
 		return _dialogue_box
+
+
+func _get_balloon_target(chara: String) -> Array[Node2D]:
+	var main_target := get_shown_character_image(chara)
+	var sub_target := main_target
+
+	if main_target:
+		var head := main_target.find_child("Head", true, false) # false because it may not be owned
+		if head:
+			sub_target = head
+	return [main_target, sub_target]
 
 	
 ## Returns true if we should skip typing.
@@ -227,7 +259,7 @@ func should_skip_typing(event: InputEvent) -> bool:
 	return (mouse_clicked or skip_pressed) and is_balloon_typing()
 
 
-## Returns true if there's a balloon typing.
+## Returns true if there's a balloon still typing.
 func is_balloon_typing() -> bool:
 	for balloon: Balloon in get_tree().get_nodes_in_group('balloons'):
 		if balloon.is_typing():
@@ -237,6 +269,7 @@ func is_balloon_typing() -> bool:
 
 ## Skips all currently typing balloons.
 func skip_typing() -> void:
+	# balloons should check if they're actually typing so we can do this
 	get_tree().call_group('balloons', 'skip_typing')
 
 
@@ -285,11 +318,6 @@ func close_balloons(free: bool = false) -> bool:
 	return true
 
 
-## Returns true if adding this balloon will overflow the container.
-func will_overflow(balloon: Balloon) -> bool:
-	return not get_balloon_area().has_point(find_free_balloon_position(balloon, balloon.target, balloon_target_offset, balloon_v_spacing))
-
-
 ## Returns the next valid position for balloon.
 func find_free_balloon_position(balloon: Balloon, target: Node2D, target_offset: Vector2, v_spacing: float) -> Vector2:
 	var tpos := target.global_position
@@ -319,6 +347,11 @@ func find_free_balloon_position(balloon: Balloon, target: Node2D, target_offset:
 	return tpos
 
 
+## Returns true if adding this balloon will overflow the container.
+func will_overflow(balloon: Balloon) -> bool:
+	return not get_balloon_area().has_point(find_free_balloon_position(balloon, balloon.target, balloon_target_offset, balloon_v_spacing))
+
+
 ## Returns the balloon area.
 func get_balloon_area() -> Rect2:
 	return %BalloonArea.get_global_rect()
@@ -332,12 +365,59 @@ func set_balloon_area(rect: Rect2) -> void:
 
 ## Shows the character image.
 func show_character(chara: String, pos := KEEP_POSITION, tags := KEEP_TAGS, transition := DEFAULT_TRANSITION) -> void:
-	pass
+	# check if there's already a shown image
+	var shown_image := get_shown_character_image(chara)
+	
+	if pos == KEEP_POSITION:
+		if shown_image:
+			pos = shown_image.position
+		else:
+			pos = DEFAULT_POSITION
+
+	if tags == KEEP_TAGS:
+		if shown_image:
+			if not shown_image.has_meta('tags'):
+				push_error('`tags` not found in image metadata: %s' % shown_image.name)
+			tags = shown_image.get_meta('tags', DEFAULT_TAGS)
+		else:
+			tags = DEFAULT_TAGS
+	elif not tags is PackedStringArray:
+		tags = [tags]
+
+	# this was working last time, now it can't fucking infer again
+	var image_name := image_library.get_image_name(chara, tags)
+
+	# if the image is already shown, just update its position
+	if shown_image and shown_image.name == image_name:
+		if pos != shown_image.position:
+			await show_image(shown_image, pos, transition)
+		return 
+
+	if shown_image:
+		# if there's already an image shown for the chara, cache it
+		var replaced := cache_and_remove_from_scene(shown_image)
+		if replaced:
+			push_warning('replacing cached image: %s' % replaced.name)
+			replaced.queue_free()
+
+	# try loading cached image
+	var image := retrieve_and_remove_from_cache(image_name)
+
+	if not image:
+		image = image_library.create_character_image(chara, tags)
+
+	image.z_index = 'foreground' in tags
+
+	# add child
+	add_character_image(chara, image)
+	await show_image(image, pos, transition)
 
 
 ## Hides the character image.
 func hide_character(chara: String, transition := DEFAULT_TRANSITION) -> void:
-	pass
+	var image := get_shown_character_image(chara)
+	if image:
+		hide_image(image, transition)
 
 
 ## Returns true if the character is shown.
@@ -354,8 +434,7 @@ func get_shown_character_image(chara: String) -> Node2D:
 
 ## Adds an image for a character.
 func add_character_image(chara: String, image: Node2D) -> void:
-	# add to array, creating array if needed
-	if chara not in _character_image_map:
+	if not has_image(chara):
 		_character_image_map[chara] = [] as Array[Node2D]
 	_character_image_map[chara].append(image)
 
@@ -365,7 +444,7 @@ func add_character_image(chara: String, image: Node2D) -> void:
 
 ## Removes an image for a character.
 func remove_character_image(chara: String, image: Node2D) -> void:
-	if chara not in _character_image_map:
+	if not has_image(chara):
 		return
 
 	# remove from array, erasing array if needed
@@ -410,6 +489,59 @@ func retrieve_and_remove_from_cache(image_name: String) -> Node2D:
 	return image
 
 
+## Shows an image to the scene.
+func show_image(image: Node2D, pos: Vector2, with: String) -> void:
+	image.modulate = Color.WHITE
+	image.scale = Vector2.ONE
+	image.position = pos
+	image.show()
+
+	var tween := create_tween()
+	match with:
+		FADE_TO_BLACK:
+			image.modulate = Color.WHITE
+			tween.tween_property(image, 'modulate', Color(0.0, 0.0, 0.0, 0.0), 0.4)
+		FADE_FROM_BLACK:
+			image.modulate = Color(0.0, 0.0, 0.0, 0.0)
+			tween.tween_property(image, 'modulate', Color.WHITE, 0.4)
+		FADE_IN:
+			image.modulate = Color.TRANSPARENT
+			tween.tween_property(image, 'modulate', Color.WHITE, 0.4)
+		FADE_OUT:
+			image.modulate = Color.WHITE
+			tween.tween_property(image, 'modulate', Color.TRANSPARENT, 0.4)
+		SLIDE_FROM_LEFT:
+			image.position = norm_to_pos(OFFSCREEN_LEFT)
+			tween.tween_property(image, 'position', pos, 0.4)
+		SLIDE_FROM_RIGHT:
+			image.position = norm_to_pos(OFFSCREEN_RIGHT)
+			tween.tween_property(image, 'position', pos, 0.4)
+		SLIDE_TO_LEFT:
+			image.position = pos
+			tween.tween_property(image, 'position', OFFSCREEN_LEFT, 0.4)
+		SLIDE_TO_RIGHT:
+			image.position = pos
+			tween.tween_property(image, 'position', OFFSCREEN_RIGHT, 0.4)
+		SLIDE_TO:
+			tween.tween_property(image, 'position', pos, 0.4)
+		SCALE_IN:
+			image.scale = Vector2.ZERO
+			tween.tween_property(image, 'scale', Vector2.ONE, 0.4)
+		SCALE_OUT:
+			image.scale = Vector2.ONE
+			tween.tween_property(image, 'scale', Vector2.ZERO, 0.4)
+		_:
+			tween.stop()
+			tween = null
+	if tween:
+		await tween.finished
+
+
+## Hides the image from the scene.
+func hide_image(image: Node2D, _with: String) -> void:
+	image.hide()
+
+
 ## Shows the black bars.
 func show_black_bars(duration := 0.0, height: Variant = get_default_black_bars_height()) -> void:
 	var pixel_height: int
@@ -423,12 +555,15 @@ func show_black_bars(duration := 0.0, height: Variant = get_default_black_bars_h
 		push_error('expected int or float for height')
 		return
 
-	%BlackBars.show() # iffy, but this will do
-
 	# stop ongoing progress
 	if _black_bars_tween:
 		duration = _black_bars_tween.get_total_elapsed_time()
 		_black_bars_tween.kill()
+	else:
+		_black_bars[0].custom_minimum_size = Vector2.ZERO
+		_black_bars[1].custom_minimum_size = Vector2.ZERO
+		
+	%BlackBars.show() # iffy, but this will do
 
 	# setup tween
 	var tween := _create_black_bars_tween(pixel_height, duration)
@@ -441,6 +576,9 @@ func show_black_bars(duration := 0.0, height: Variant = get_default_black_bars_h
 
 ## Hides the black bars.
 func hide_black_bars(duration := 0.0) -> void:
+	if not %BlackBars.visible:
+		return
+
 	# stop ongoing progress
 	if _black_bars_tween:
 		duration = _black_bars_tween.get_total_elapsed_time()
@@ -470,13 +608,18 @@ func get_default_black_bars_height() -> int:
 
 ## Returns float height value to pixels.
 func black_bars_float_to_pixels(height: float) -> int:
-	return roundi(ProjectSettings.get_setting('display/window/size/height')/2 * height)
+	return roundi(ProjectSettings.get_setting('display/window/size/viewport_height')/2 * height)
+
+
+## Returns the screen position from given normalized value.
+func norm_to_pos(v: Vector2) -> Vector2:
+	return Game.get_viewport_size() * v
 
 
 ## Opens the pause menu.
 func open_pause_menu() -> void:
 	var pause_menu := PauseMenuScene.instantiate()
-	add_child(pause_menu)
+	$Overlay.add_child(pause_menu)
 
 
 ## Closes the pause menu.

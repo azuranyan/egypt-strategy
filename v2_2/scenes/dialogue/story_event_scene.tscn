@@ -112,27 +112,29 @@ color = Color(0, 0, 0, 1)
 [node name="Characters" type="Node2D" parent="."]
 unique_name_in_owner = true
 
-[node name="nnivx" type="Sprite2D" parent="Characters"]
+[node name="nnivxa" type="Sprite2D" parent="Characters"]
+visible = false
 position = Vector2(396, 665)
 scale = Vector2(0.751, 0.751)
 texture = ExtResource("3_irbkg")
 
-[node name="Head" type="Node2D" parent="Characters/nnivx"]
+[node name="Head" type="Node2D" parent="Characters/nnivxa"]
 position = Vector2(-98.5353, -316.911)
 
-[node name="Bb2" type="Sprite2D" parent="Characters"]
+[node name="Bb2a" type="Sprite2D" parent="Characters"]
 visible = false
 z_index = 1
 position = Vector2(253, 935)
 scale = Vector2(0.749, 0.749)
 texture = ExtResource("3_irbkg")
 
-[node name="Nathan" type="Sprite2D" parent="Characters"]
+[node name="Nathana" type="Sprite2D" parent="Characters"]
+visible = false
 position = Vector2(1525, 755)
 scale = Vector2(0.482258, 0.482258)
 texture = ExtResource("4_w46av")
 
-[node name="Head" type="Node2D" parent="Characters/Nathan"]
+[node name="Head" type="Node2D" parent="Characters/Nathana"]
 position = Vector2(-103.679, -1194.38)
 
 [node name="PlaceholderOrigin" type="Node2D" parent="Characters"]
@@ -146,7 +148,10 @@ position = Vector2(44.7455, 187.931)
 texture = ExtResource("3_irbkg")
 offset = Vector2(0, -581.035)
 
-[node name="BalloonArea" type="Control" parent="."]
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 6
+
+[node name="BalloonArea" type="Control" parent="UI"]
 unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 8
@@ -162,7 +167,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ClassicDialogueBox" type="PanelContainer" parent="."]
+[node name="ClassicDialogueBox" type="PanelContainer" parent="UI"]
 unique_name_in_owner = true
 offset_top = 756.0
 offset_right = 1920.0
@@ -176,34 +181,34 @@ start_opened = true
 character_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/RichTextLabel")
 dialogue_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/DialogueLabel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ClassicDialogueBox"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ClassicDialogueBox"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="TextureRect" type="TextureRect" parent="ClassicDialogueBox/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="UI/ClassicDialogueBox/VBoxContainer"]
 modulate = Color(0, 0, 0, 0.588235)
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_w0cdn")
 
-[node name="PanelContainer" type="PanelContainer" parent="ClassicDialogueBox/VBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="UI/ClassicDialogueBox/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_5nhbd")
 
-[node name="Control" type="MarginContainer" parent="ClassicDialogueBox/VBoxContainer/PanelContainer"]
+[node name="Control" type="MarginContainer" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 200
 theme_override_constants/margin_top = 36
 theme_override_constants/margin_right = 200
 theme_override_constants/margin_bottom = 36
 
-[node name="MarginContainer" type="HBoxContainer" parent="ClassicDialogueBox/VBoxContainer/PanelContainer/Control"]
+[node name="MarginContainer" type="HBoxContainer" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="RichTextLabel" type="RichTextLabel" parent="ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer"]
 clip_contents = false
 layout_mode = 2
 theme_override_colors/default_color = Color(0, 0, 0, 1)
@@ -222,10 +227,11 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 0
 script = ExtResource("10_fvofk")
+big_caps = 0
 format = "{text}:"
 darkened_outline = 0.6
 
-[node name="DialogueLabel" parent="ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer" instance=ExtResource("6_w4yux")]
+[node name="DialogueLabel" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer" instance=ExtResource("6_w4yux")]
 modulate = Color(1.2, 1.2, 1.2, 1)
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
@@ -243,7 +249,10 @@ theme_override_font_sizes/italics_font_size = 32
 theme_override_font_sizes/bold_italics_font_size = 32
 text = "They seem extremely confident in my knowledge of the area. Time to break the news, I guess."
 
-[node name="ResponsesContainer" type="MarginContainer" parent="."]
+[node name="Overlay" type="CanvasLayer" parent="."]
+layer = 6
+
+[node name="ResponsesContainer" type="MarginContainer" parent="Overlay"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -258,7 +267,7 @@ grow_vertical = 2
 mouse_filter = 2
 metadata/_edit_group_ = true
 
-[node name="ResponsesMenu" type="VBoxContainer" parent="ResponsesContainer"]
+[node name="ResponsesMenu" type="VBoxContainer" parent="Overlay/ResponsesContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -266,7 +275,7 @@ theme_override_constants/separation = 32
 alignment = 1
 script = ExtResource("15_g2i7a")
 
-[node name="ResponseTemplate" type="Button" parent="ResponsesContainer/ResponsesMenu"]
+[node name="ResponseTemplate" type="Button" parent="Overlay/ResponsesContainer/ResponsesMenu"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme = ExtResource("16_lchrb")
