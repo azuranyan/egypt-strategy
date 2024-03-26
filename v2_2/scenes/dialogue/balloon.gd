@@ -29,15 +29,6 @@ const DEFAULT_SPACING: float = 30
 		if tail:
 			tail.visible = target and show_tail
 
-## The action to listen to to continue the dialogue.
-@export var continue_action: StringName
-
-## The action to listen to to skip the dialogue.
-@export var skip_action: StringName
-
-## Whether to automatically close when finished.
-@export_flags("Close", "Free") var on_finish: int = (1 << 0) | (1 << 1)
-
 ## Whether the text should be centered.
 @export var centered_text: bool
 

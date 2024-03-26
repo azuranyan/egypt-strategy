@@ -2,7 +2,6 @@
 
 do show_character('nnivx', norm_to_pos(LEFT))
 do show_character('Nathan', norm_to_pos(RIGHT))
-
 Nathan: [[Hi|Hello|Howdy]], this is some dialogue.
 nnivx: Lorem ipsum dolor sit amet.
 nnivx: Here are some choices.

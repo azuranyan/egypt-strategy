@@ -6,12 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://cyu0qvm88tnj5" path="res://events/aa.png" id="4_w46av"]
 [ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="6_w4yux"]
 [ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="7_2j0sd"]
-[ext_resource type="Script" path="res://scenes/dialogue/balloon.gd" id="7_ak5mx"]
 [ext_resource type="FontFile" uid="uid://bfkvgx07nqvy3" path="res://scenes/data/fonts/Aleo-Bold.ttf" id="8_oqwvv"]
+[ext_resource type="Script" path="res://scenes/dialogue/balloon.gd" id="9_7csf8"]
 [ext_resource type="FontFile" uid="uid://cgu0d1fepqdbp" path="res://scenes/data/fonts/Aleo-Italic.ttf" id="9_s5tvh"]
-[ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="10_fvofk"]
 [ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="10_ge03q"]
-[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_reponses_menu.gd" id="15_g2i7a"]
+[ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="10_jk023"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_reponses_menu.gd" id="11_pymk7"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="16_lchrb"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tl2gp"]
@@ -31,9 +31,18 @@ bg_color = Color(0, 0, 0, 0.588235)
 [node name="StoryEventScene" type="CanvasLayer"]
 layer = 5
 script = ExtResource("1_vxdlj")
-skip_action = &"vn_continue"
-continue_action = &"vn_skip"
+skip_action = &"vn_skip"
+continue_action = &"vn_continue"
+toggle_ui_action = &"vn_toggle"
 balloon_v_spacing = 45.0
+auto_close = {
+"full": true,
+"narration": false,
+"new_chapter": true,
+"new_scene": true,
+"out_of_context": true,
+"solo": false
+}
 
 [node name="CachedImages" type="Node2D" parent="."]
 unique_name_in_owner = true
@@ -176,7 +185,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxEmpty_tl2gp")
-script = ExtResource("7_ak5mx")
+script = ExtResource("9_7csf8")
 start_opened = true
 character_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/RichTextLabel")
 dialogue_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/DialogueLabel")
@@ -226,13 +235,13 @@ text = "nnivx:"
 fit_content = true
 scroll_active = false
 autowrap_mode = 0
-script = ExtResource("10_fvofk")
+script = ExtResource("10_jk023")
 big_caps = 0
 format = "{text}:"
-darkened_outline = 0.6
 
 [node name="DialogueLabel" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer" instance=ExtResource("6_w4yux")]
 modulate = Color(1.2, 1.2, 1.2, 1)
+clip_contents = false
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -273,7 +282,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 32
 alignment = 1
-script = ExtResource("15_g2i7a")
+script = ExtResource("11_pymk7")
 
 [node name="ResponseTemplate" type="Button" parent="Overlay/ResponsesContainer/ResponsesMenu"]
 custom_minimum_size = Vector2(0, 32)

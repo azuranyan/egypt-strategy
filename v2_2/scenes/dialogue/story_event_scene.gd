@@ -1,9 +1,9 @@
-
+@tool
 extends CanvasLayer
 
 
 signal dialogue_started
-signal dialogue_ended
+signal dialogue_finished
 signal dialogue_line_changed(dialogue_line: DialogueLine)
 
 signal balloons_cleared
@@ -53,10 +53,11 @@ const DEFAULT_TRANSITION := FADE_IN
 ## The action used for skipping dialogue.
 @export var skip_action: StringName = 'ui_cancel'
 
-## The action used for continuing dialogue.
-##
-## Pressing with LMB also continues the action.
+## The action used for continuing dialogue. Pressing with LMB also continues the action.
 @export var continue_action: StringName = 'ui_accept'
+
+## The action used for toggling ui.
+@export var toggle_ui_action: StringName
 
 ## The offset of where the balloons should be spawned relative to the target.
 @export var balloon_target_offset: Vector2 = Vector2(400, -300)
@@ -64,6 +65,8 @@ const DEFAULT_TRANSITION := FADE_IN
 ## The vertical spacing between the balloons.
 @export var balloon_v_spacing: float = 20
 
+## Auto-close balloon flags.
+@export var auto_close := default_auto_close_flags()
 
 ## The image library.
 ##
@@ -105,13 +108,21 @@ var wait_for_response: bool
 ## An array containing all the open balloons.
 var open_balloons: Array[Balloon]
 
+## Determines whether to reuse the existing balloon or spawn a new one when the same
+## character speaks a new line of dialogue.
+##
+## If set to `true`, the existing balloon will be reused for subsequent dialogue lines
+## from the same character. If set to `false`, a new balloon will be spawned for each
+## new line of dialogue.
+var reuse_balloons: bool
+
 var _resource: DialogueResource
 var _temp_game_states: Array
 
 var _dialogue_line: DialogueLine:
 	set(value):
 		if not value:
-			dialogue_ended.emit()
+			dialogue_finished.emit()
 			queue_free()
 			return
 
@@ -121,6 +132,9 @@ var _dialogue_line: DialogueLine:
 		
 var _black_bars_tween: Tween
 var _character_image_map: Dictionary = {}
+
+var _previous_speaker: String
+var _previous_speaker_on_scene: bool
 
 
 @onready var _cached_images: Node2D = %CachedImages
@@ -133,6 +147,11 @@ var _character_image_map: Dictionary = {}
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		set_process_input(false)
+		set_process_unhandled_input(false)
+		return
+		
 	add_to_group("balloon_listeners")
 
 	_responses_menu.response_selected.connect(
@@ -146,23 +165,12 @@ func _ready() -> void:
 			wait_for_input = false
 	)
 
-	test.call_deferred()
-
-
-func test() -> void:
-	#_character_image_map.nnivx = [$Characters/nnivx] as Array[Node2D]
-	#_character_image_map.Nathan = [$Characters/Nathan] as Array[Node2D]
-	image_library = preload("res://events/image_library.tscn").instantiate()
-	await get_tree().create_timer(1).timeout
-	var resource := preload("data/test.dialogue")
-	start(resource, 'start')
-
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel"):
 		open_pause_menu()
 		get_viewport().set_input_as_handled()
-
+		
 
 func _unhandled_input(event: InputEvent) -> void:
 	if should_skip_typing(event):
@@ -179,7 +187,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		next(_dialogue_line.next_id)
 
 	elif continue_action and event.is_action_pressed(continue_action) and get_viewport().gui_get_focus_owner() == self:
-		DialogueEvents.next_requested.emit(self)
+		next(_dialogue_line.next_id)
+
+
+func default_auto_close_flags() -> Dictionary:
+	return {
+		new_chapter = true,
+		new_scene = true,
+		solo = false,
+		out_of_context = true,
+		narration = false,
+		full = true,
+	}
 
 
 ## Starts the dialogue.
@@ -206,14 +225,23 @@ func update_dialogue() -> void:
 	close_responses_menu()
 	wait_for_input = false
 
-	# clear on balloons on title start
-	if _resource.titles.find_key(_dialogue_line.id):
-		if close_balloons(true):
-			await balloons_cleared
+	if is_new_chapter(_dialogue_line.id):
+		if auto_close.new_chapter:
+			await clear_balloons()
 
-	# add the characters if they exist
-	if _dialogue_line.character and is_character_shown(_dialogue_line.character):
-		show_character(_dialogue_line.character, KEEP_POSITION, _dialogue_line.tags)
+	if auto_close.out_of_context and not _previous_speaker_on_scene and _previous_speaker != _dialogue_line.character:
+		await clear_balloons()
+
+	if _dialogue_line.character:
+		# update tags if they exist
+		if is_character_shown(_dialogue_line.character):
+			show_character(_dialogue_line.character, KEEP_POSITION, _dialogue_line.tags)
+
+		_previous_speaker = _dialogue_line.character
+		_previous_speaker_on_scene = is_character_shown(_dialogue_line.character)
+	else:
+		if auto_close.narration:
+			await clear_balloons()
 
 	# play dialogue line
 	_dialogue_box.clear()
@@ -221,11 +249,19 @@ func update_dialogue() -> void:
 	balloon.play_dialogue_line(_dialogue_line)
 
 
+## Returns true if the given id is a new chapter.
+func is_new_chapter(id: String) -> bool:
+	return _resource.titles.find_key(id) != null
+
+
 func _get_balloon_for(line: DialogueLine) -> Balloon:
 	# find target character
 	var target := _get_balloon_target(line.character)
 
 	if line.character and target[0] and target[0].visible:
+		if auto_close.solo and not open_balloons.is_empty() and open_balloons[-1]._current_line.character == line.character:
+			return open_balloons[-1]
+		
 		var balloon := BalloonScene.instantiate()
 		if target[0]:
 			balloon.target = target[1]
@@ -234,8 +270,9 @@ func _get_balloon_for(line: DialogueLine) -> Balloon:
 			balloon.target = null
 			balloon.z_index = 0
 		%BalloonArea.add_child(balloon)
-		if will_overflow(balloon) and close_balloons(true):
-			await balloons_cleared
+
+		if auto_close.full and will_overflow(balloon):
+			await clear_balloons()
 		return balloon
 	else:
 		return _dialogue_box
@@ -304,6 +341,12 @@ func toggle_dialogue_box() -> void:
 		hide_dialogue_box()
 	else:
 		show_dialogue_box()
+
+
+## Clears the balloons.
+func clear_balloons() -> void:
+	if close_balloons(true):
+		await balloons_cleared
 
 
 ## Closes all the balloons.
@@ -542,6 +585,14 @@ func hide_image(image: Node2D, _with: String) -> void:
 	image.hide()
 
 
+## Changes the scene.
+func change_scene(scene_info: Dictionary, transition := DEFAULT_TRANSITION, duration := 1.0) -> void:
+	if auto_close.new_scene:
+		await clear_balloons()
+
+	# TODO change scenes
+
+
 ## Shows the black bars.
 func show_black_bars(duration := 0.0, height: Variant = get_default_black_bars_height()) -> void:
 	var pixel_height: int
@@ -562,7 +613,7 @@ func show_black_bars(duration := 0.0, height: Variant = get_default_black_bars_h
 	else:
 		_black_bars[0].custom_minimum_size = Vector2.ZERO
 		_black_bars[1].custom_minimum_size = Vector2.ZERO
-		
+
 	%BlackBars.show() # iffy, but this will do
 
 	# setup tween

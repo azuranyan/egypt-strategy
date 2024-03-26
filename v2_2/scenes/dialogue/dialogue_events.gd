@@ -27,7 +27,7 @@ signal new_event_unlocked(event_id: StringName)
 ## Emitted when rollback is requested.
 signal rollback_requested(source)
 
-## Emitted when dialogue is continued.
+## Emitted when the next dialogue line is requested.
 signal next_requested(source)
 
 signal dialogue_line_started(dialogue_line, balloon)

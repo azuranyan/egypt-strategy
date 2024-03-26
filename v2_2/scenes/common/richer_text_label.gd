@@ -1,3 +1,4 @@
+class_name RicherTextLabel
 extends RichTextLabel
 
 
@@ -48,7 +49,7 @@ var _raw_text: String
 
 
 func _process(_delta: float) -> void:
-	if text == '' or _raw_text == text:
+	if text == '':# or _raw_text == text:
 		return
 
 	# since there are no signals or callbacks for text changes,

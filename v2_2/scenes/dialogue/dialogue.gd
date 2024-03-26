@@ -2,14 +2,14 @@ class_name Dialogue
 extends Node
 
 
-const StoryDirector := preload("res://scenes/dialogue/story_director.gd")
+const StoryEventScene := preload("story_event_scene.gd")
 const ImageLibrary := preload("res://events/image_library.gd")
 
 
 var image_library: ImageLibrary
 
 var current_event_id: StringName
-var current_director: StoryDirector
+var current_event_scene: StoryEventScene
 var is_playing_queue: bool
 
 var event_registry: Dictionary
@@ -28,6 +28,11 @@ func _ready() -> void:
 
 	DialogueEvents.start_event_requested.connect(_on_start_event_requested)
 	DialogueEvents.stop_event_requested.connect(_on_stop_event_requested)
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed('vn_rollback'):
+		_on_dialogue_rollback_requested()
 
 
 ## Registers an event. Will overwrite existing entries.
@@ -147,30 +152,22 @@ func start_event(event_id: StringName, extra_game_states := []) -> void:
 	stop_event()
 
 	# create the scene and add it to the *root*
-	var scene := preload('res://scenes/dialogue/story_event_scene.tscn').instantiate()
+	var scene := preload('story_event_scene.tscn').instantiate()
 	scene.name = 'StoryEventScene'
+	scene.image_library = image_library
 	get_tree().root.add_child(scene)
-
-	# create the director and add it to the under the *director*
-	var director := StoryDirector.new()
-	director.story_event_scene = scene
-	director.image_library = image_library
-	director.name = 'StoryDirector'
-	add_child(director)
-
+	
 	# setup our own references
 	current_event_id = event_id
-	current_director = director
+	current_event_scene = scene
 
 	# finish up dialogue scene
-	scene.dialogue_scene.dialogue_started.connect(func(): DialogueEvents.event_started.emit(event_id))
-	scene.dialogue_scene.dialogue_finished.connect(stop_event)
-	scene.dialogue_scene.rollback_requested.connect(_on_dialogue_rollback_requested)
+	scene.dialogue_started.connect(func(): DialogueEvents.event_started.emit(event_id))
+	scene.dialogue_finished.connect(stop_event)
 
 	# start the scene
 	var event := get_event(event_id)
 	var script_env := [
-		director,
 		Persistent,
 		Game.settings,
 	]
@@ -180,17 +177,16 @@ func start_event(event_id: StringName, extra_game_states := []) -> void:
 		script_env.append(Overworld.instance())
 	elif event.context == StoryEvent.Context.BATTLE:
 		script_env.append(Battle.instance())
-	scene.dialogue_scene.start(event.dialog_resource, event.start, script_env + extra_game_states)
+	scene.start(event.dialog_resource, event.start, script_env + extra_game_states)
 
 
 ## Forcefully stops current ongoing event.
 func stop_event() -> void:
-	if current_director:
+	if current_event_scene:
 		var event_id := current_event_id
 		current_event_id = ''
-		current_director.story_event_scene.queue_free()
-		current_director.queue_free()
-		current_director = null
+		current_event_scene.queue_free()
+		current_event_scene = null
 		mark_event_as_completed(event_id)
 		DialogueEvents.event_ended.emit(event_id)
 
@@ -254,4 +250,4 @@ func load_state(save: Dictionary) -> void:
 
 
 func _on_dialogue_rollback_requested() -> void:
-	current_director.story_event_scene.dialogue_scene.next(current_event().start)
+	current_event_scene.next(current_event().start)

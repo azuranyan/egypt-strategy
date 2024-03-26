@@ -1,7 +1,7 @@
 ~ intro
 
 set background = load("res://events/dungeon_entrance.jpg")
-
+set reuse_balloons = true
 # i used gippity to generate some random scene
 
 Lysandra steps into a dimly lit chamber, her footsteps echoing against the stone floor. As she gazes around, a figure emerges from the shadows, their features obscured.
@@ -17,6 +17,8 @@ Hooded Traveler: "Fear not, Lady Lysandra. I mean you no harm."
 Lysandra's grip on her staff tightens, uncertainty flickering in her eyes. She takes a cautious step back.
 
 Lysandra: "How do you know my name?"
+
+Lysandra: "That's suspicious."
 
 Hooded Traveler: "I have traveled far and wide, gathering tales of valor and heroism. Yours is a name spoken with reverence in every corner of the realm."
 
