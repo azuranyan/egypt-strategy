@@ -86,12 +86,16 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
+theme_override_constants/outline_size = 0
 text = "Confirm"
 
 [node name="CancelButton" type="Button" parent="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
+theme_override_constants/outline_size = 0
 text = "Cancel"
 
 [connection signal="pressed" from="Panel/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton" to="." method="_on_forfeit_confirm_button_pressed"]

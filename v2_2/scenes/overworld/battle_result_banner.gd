@@ -8,8 +8,6 @@ var _done := false
 
 
 func _ready():
-	Util.bb_big_caps(%StrategyRoomLabel, 'STRATEGY ROOM', {font_size = 20})
-	Util.bb_big_caps(%ContinueLabel, 'CONTINUE', {font_size = 20})
 	hide()
 
 	%ContinueButton.pressed.connect(_on_continue_button_pressed)
@@ -41,8 +39,8 @@ func show_parsed_result(result: BattleResult, allow_strategy_room: bool) -> bool
 
 func show_result(header: String, message: String, allow_strategy_room: bool) -> bool:
 	_done = false
-	Util.bb_big_caps($Control/RichTextLabel, header, {font_size = 40, call_caps = true})
-	$Control/Label.text = message
+	%HeaderLabel.text = header
+	%MessageLabel.text = message
 	%StrategyRoomButton.visible = allow_strategy_room
 	%ContinueButton.grab_focus()
 	modulate = Color.TRANSPARENT # prevent flicker

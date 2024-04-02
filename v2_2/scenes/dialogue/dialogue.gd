@@ -112,6 +112,8 @@ func refresh_event_queue() -> bool:
 	var completed_events := get_completed_events()
 	for event_id in event_registry:
 		var state: Dictionary = event_registry[event_id]
+		if state.chara: # character events are not included in the queue
+			continue
 		if state.locked:
 			continue
 		if state.event.once and state.times_seen > 0:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://brikuwut5uo7e"]
+[gd_scene load_steps=20 format=3 uid="uid://brikuwut5uo7e"]
 
 [ext_resource type="Script" path="res://scenes/dialogue/story_event_scene.gd" id="1_vxdlj"]
 [ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_27n7i"]
@@ -12,6 +12,8 @@
 [ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="10_ge03q"]
 [ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="10_jk023"]
 [ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_reponses_menu.gd" id="11_pymk7"]
+[ext_resource type="Script" path="res://scenes/common/pause_menu_spawner.gd" id="14_qtbvv"]
+[ext_resource type="PackedScene" uid="uid://ddq1qxxvbb413" path="res://scenes/common/pause_menu.tscn" id="15_gmlpu"]
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="16_lchrb"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tl2gp"]
@@ -292,3 +294,8 @@ theme_override_colors/font_color = Color(0.529412, 0.329412, 0.278431, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
 theme_override_font_sizes/font_size = 32
 text = "Buttone"
+
+[node name="PauseMenuSpawner" type="Node" parent="."]
+script = ExtResource("14_qtbvv")
+pause_menu_scene = ExtResource("15_gmlpu")
+spawn_node_path = NodePath("../Overlay")

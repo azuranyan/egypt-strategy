@@ -49,54 +49,55 @@ var _raw_text: String
 
 
 func _process(_delta: float) -> void:
-	if text == '':# or _raw_text == text:
+	# we can't do the _raw_text == text because when text gets updated we need to process it again
+	if text == '':
 		return
 
 	# since there are no signals or callbacks for text changes,
 	# we have to poll for changes in _process
 	update_text(text)
-
 	
+
 ## Updates the text stream.
 ##
 ## This will effectively clear [code]text[/code] and applies its own internal processing.
 func update_text(new_text: String) -> void:
 	_raw_text = new_text
 
-	if big_caps == BigCaps.NONE or big_caps_size == 1.0:
-		return
+	var formatted_text := format.format({text = _raw_text}) if format else _raw_text
 
 	# "setting text to an empty string also clears the stack" isn't true
 	clear()
 	text = ''
 
-	var processed_text := _raw_text if big_caps == BigCaps.UPPERCASE else _raw_text.capitalize()
-	if format:
-		processed_text = format.format({text = processed_text})
-	var big_font_size := int(big_caps_size * get_font_size())
 	var darken_outline := darkened_outline > 0.0
 
 	if center_text: append_text('[center]')
 	if darken_outline: push_outline_color(get_font_color().darkened(darkened_outline))
 	
-	var caps: Array[String] = []
-	var flush_caps := func():
-		if caps.is_empty():
-			return
-		push_font_size(big_font_size)
-		add_text(''.join(caps))
-		pop()
-		caps.clear()
+	if big_caps == BigCaps.NONE:
+		add_text(formatted_text)
+	else:
+		var processed_text := formatted_text if big_caps == BigCaps.UPPERCASE else formatted_text.capitalize()
+		var big_font_size := int(big_caps_size * get_font_size())
+		var caps: Array[String] = []
+		var flush_caps := func():
+			if caps.is_empty():
+				return
+			push_font_size(big_font_size)
+			add_text(''.join(caps))
+			pop()
+			caps.clear()
 
-	# capitalize
-	for c in processed_text:
-		var is_caps := c.is_valid_identifier() and c.to_upper() == c
-		if is_caps:
-			caps.append(c)
-		else:
-			flush_caps.call()
-			add_text(c.to_upper() if all_caps else c)
-	flush_caps.call()
+		# capitalize
+		for c in processed_text:
+			var is_caps := c.is_valid_identifier() and c.to_upper() == c
+			if is_caps:
+				caps.append(c)
+			else:
+				flush_caps.call()
+				add_text(c.to_upper() if all_caps else c)
+		flush_caps.call()
 
 	if darken_outline: pop()
 

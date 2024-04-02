@@ -42,6 +42,7 @@ func _on_game_started():
 
 
 func register_events() -> void:
+	## TODO 
 	Dialogue.instance().register_event(load('res://units/alara/story_event_1.tres'), load('res://units/alara/chara.tres'))
 	Dialogue.instance().register_event(load('res://units/alara/story_event_2.tres'), load('res://units/alara/chara.tres'))	
 	Dialogue.instance().register_event(load('res://units/alara/story_event_3.tres'), load('res://units/alara/chara.tres'))

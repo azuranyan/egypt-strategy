@@ -15,11 +15,8 @@ const ImageLibrary := preload('res://events/image_library.gd')
 ## A simple class holding a set of images for one character.
 const CharacterImageList := preload('res://events/character_image_list.gd')
 
-## The pause menu.
-const PauseMenu := preload('dialogue_menu_scene.gd')
-
 ## The pause menu scene.
-const PauseMenuScene := preload("dialogue_menu_scene.tscn")
+const PauseMenuScene := preload("res://scenes/common/pause_menu.tscn")
 
 ## The balloon scene.
 const BalloonScene := preload("balloon.tscn")
@@ -165,12 +162,6 @@ func _ready() -> void:
 			wait_for_input = false
 	)
 
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("cancel"):
-		open_pause_menu()
-		get_viewport().set_input_as_handled()
-		
 
 func _unhandled_input(event: InputEvent) -> void:
 	if should_skip_typing(event):
@@ -669,15 +660,17 @@ func norm_to_pos(v: Vector2) -> Vector2:
 
 ## Opens the pause menu.
 func open_pause_menu() -> void:
-	var pause_menu := PauseMenuScene.instantiate()
-	$Overlay.add_child(pause_menu)
+	$PauseMenuSpawner.open_pause_menu()
+	# var pause_menu := PauseMenuScene.instantiate()
+	# $Overlay.add_child(pause_menu)
 
 
 ## Closes the pause menu.
 func close_pause_menu() -> void:
-	for child in get_children():
-		if child is PauseMenu:
-			child.close()
+	$PauseMenuSpawner.close_pause_menu()
+	# for child in get_children():
+	# 	if child is PauseMenu:
+	# 		child.close()
 
 
 func _on_balloon_opened(balloon: Balloon) -> void:

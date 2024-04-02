@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cgiu5x8itr8ah"]
+[gd_scene load_steps=9 format=3 uid="uid://bch8o3ovx3pom"]
 
 [ext_resource type="Script" path="res://scenes/battle/hud/pause_menu.gd" id="1_hhvgv"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="2_jpu1p"]
@@ -32,7 +32,7 @@ shadow_color = Color(0, 0, 0, 0.572549)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_621nr"]
 
-[node name="PauseMenu" type="Control"]
+[node name="BattlePauseMenu" type="Control"]
 process_mode = 2
 layout_mode = 3
 anchors_preset = 15
@@ -41,6 +41,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_hhvgv")
+forfeit_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/ForfeitButton")
+resume_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/ResumeButton")
+save_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/SaveButton")
+load_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/LoadButton")
+settings_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/SettingsButton")
+quit_to_title_button_path = NodePath("Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/QuitToTitleButton")
 
 [node name="AutopauseNode" type="Node" parent="."]
 script = ExtResource("2_yxtsj")
@@ -86,7 +92,6 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="Panel/Panel/MarginContainer/VBoxContainer2"]
-unique_name_in_owner = true
 layout_mode = 2
 text = "Paused"
 label_settings = SubResource("LabelSettings_jrk2x")
@@ -106,35 +111,30 @@ theme_override_constants/separation = 8
 alignment = 1
 
 [node name="ResumeButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Resume"
 text_overrun_behavior = 4
 
 [node name="ForfeitButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Forfeit"
 text_overrun_behavior = 4
 
 [node name="SaveButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Save"
 text_overrun_behavior = 4
 
 [node name="LoadButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Load"
 text_overrun_behavior = 4
 
 [node name="SettingsButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Settings"
@@ -146,11 +146,9 @@ theme_override_constants/separation = 12
 theme_override_styles/separator = SubResource("StyleBoxEmpty_621nr")
 
 [node name="QuitToTitleButton" type="Button" parent="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_qcm4y")
 text = "Quit to Title"
 text_overrun_behavior = 4
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
-[connection signal="pressed" from="Panel/Panel/MarginContainer/VBoxContainer2/MarginContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]

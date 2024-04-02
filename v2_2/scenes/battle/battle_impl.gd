@@ -841,18 +841,18 @@ func show_pause_menu() -> void:
 	hide_pause_menu()
 	pause_menu = preload("res://scenes/battle/hud/pause_menu.tscn").instantiate()
 	get_active_battle_scene().add_child(pause_menu)
-	pause_menu.resume_button.pressed.connect(hide_pause_menu)
+	# pause_menu.resume_button.pressed.connect(hide_pause_menu)
 	pause_menu.forfeit_button.pressed.connect(show_forfeit_dialog)
 	pause_menu.forfeit_button.disabled = player() == defender()
-	pause_menu.save_button.pressed.connect(_stub.bind('save'))
-	pause_menu.save_button.disabled = not saving_allowed()
-	pause_menu.load_button.pressed.connect(_stub.bind('load'))
-	pause_menu.settings_button.pressed.connect(func():
-		var settings = load('res://scenes/common/settings_scene.tscn').instantiate()
-		get_tree().root.add_child(settings, true)
-		settings.initialize(Game.settings)
-	)
-	pause_menu.quit_to_title_button.pressed.connect(_stub.bind('quit_to_title'))
+	# pause_menu.save_button.pressed.connect(_stub.bind('save'))
+	# pause_menu.save_button.disabled = not saving_allowed()
+	# pause_menu.load_button.pressed.connect(_stub.bind('load'))
+	# pause_menu.settings_button.pressed.connect(func():
+	# 	var settings = load('res://scenes/common/settings_scene.tscn').instantiate()
+	# 	get_tree().root.add_child(settings, true)
+	# 	settings.initialize(Game.settings)
+	# )
+	# pause_menu.quit_to_title_button.pressed.connect(_stub.bind('quit_to_title'))
 
 
 func hide_pause_menu() -> void:

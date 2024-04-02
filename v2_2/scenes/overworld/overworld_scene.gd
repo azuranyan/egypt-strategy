@@ -141,7 +141,7 @@ func show_marching_animation(attacker: Empire, _defender: Empire, target: Territ
 
 func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) -> bool:
 	var banner: BattleResultBanner = battle_result_banner_scene.instantiate()
-	add_child(banner)
+	$Overlay.add_child(banner)
 	return await banner.show_parsed_result(result, allow_strategy_room)
 
 
@@ -172,12 +172,3 @@ func _on_territory_button_train_pressed(button: TerritoryButton) -> void:
 	
 func _on_strategy_room_button_pressed() -> void:
 	OverworldEvents.player_action_chosen.emit({type='strategy', source = self})
-
-
-func _unhandled_input(event) -> void:
-	if not is_active():
-		return
-	if event.is_action_pressed("ui_cancel"):
-		get_viewport().set_input_as_handled()
-		return scene_call('pause', {save_data = Game.save_state()})
-	

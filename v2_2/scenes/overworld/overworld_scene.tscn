@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://dw0pqub4o2o82"]
+[gd_scene load_steps=31 format=3 uid="uid://dw0pqub4o2o82"]
 
 [ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
 [ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
@@ -24,6 +24,8 @@
 [ext_resource type="PackedScene" uid="uid://c1r233k6re33q" path="res://maps/starting_zone/starting_zone.tscn" id="19_mec2q"]
 [ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
 [ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="24_sxrdq"]
+[ext_resource type="Script" path="res://scenes/common/pause_menu_spawner.gd" id="25_qoo8t"]
+[ext_resource type="PackedScene" uid="uid://ddq1qxxvbb413" path="res://scenes/common/pause_menu.tscn" id="26_vg4ii"]
 
 [sub_resource type="Gradient" id="Gradient_n8nx8"]
 interpolation_mode = 2
@@ -221,8 +223,10 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_lock_ = true
 
-[node name="HUD" type="Control" parent="."]
-z_index = 2
+[node name="Overlay" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HUD" type="Control" parent="Overlay"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -233,7 +237,7 @@ mouse_filter = 2
 theme = ExtResource("3_sc2vb")
 metadata/_edit_lock_ = true
 
-[node name="TurnBox" type="Control" parent="HUD"]
+[node name="TurnBox" type="Control" parent="Overlay/HUD"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -243,7 +247,7 @@ offset_right = -889.0
 offset_bottom = 56.0
 grow_horizontal = 2
 
-[node name="TextureRect" type="TextureRect" parent="HUD/TurnBox"]
+[node name="TextureRect" type="TextureRect" parent="Overlay/HUD/TurnBox"]
 self_modulate = Color(0, 0, 0, 0.545098)
 layout_mode = 1
 anchors_preset = 15
@@ -257,7 +261,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("GradientTexture2D_yq7nc")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/TurnBox"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/HUD/TurnBox"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -267,14 +271,14 @@ grow_vertical = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Label3" type="Label" parent="HUD/TurnBox/HBoxContainer"]
+[node name="Label3" type="Label" parent="Overlay/HUD/TurnBox/HBoxContainer"]
 layout_mode = 2
 text = "Turn"
 label_settings = SubResource("LabelSettings_sdpw6")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TurnCountLabel" type="Label" parent="HUD/TurnBox/HBoxContainer"]
+[node name="TurnCountLabel" type="Label" parent="Overlay/HUD/TurnBox/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "5"
@@ -282,7 +286,7 @@ label_settings = SubResource("LabelSettings_lcrub")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StrategyRoomButton" type="Button" parent="HUD"]
+[node name="StrategyRoomButton" type="Button" parent="Overlay/HUD"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -301,7 +305,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
 theme_override_font_sizes/font_size = 32
 text = "Strategy Room ➤"
 
-[node name="NewSceneIcon" type="TextureRect" parent="HUD/StrategyRoomButton"]
+[node name="NewSceneIcon" type="TextureRect" parent="Overlay/HUD/StrategyRoomButton"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -321,6 +325,11 @@ stretch_mode = 4
 
 [node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
 script = ExtResource("24_sxrdq")
-buttons = [NodePath("../HUD/StrategyRoomButton")]
+buttons = [NodePath("../Overlay/HUD/StrategyRoomButton")]
 
-[connection signal="pressed" from="HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]
+[node name="PauseMenuSpawner" type="Node" parent="."]
+script = ExtResource("25_qoo8t")
+pause_menu_scene = ExtResource("26_vg4ii")
+spawn_node_path = NodePath("../Overlay")
+
+[connection signal="pressed" from="Overlay/HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]
