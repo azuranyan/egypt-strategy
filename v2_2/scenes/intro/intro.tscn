@@ -37,12 +37,12 @@ color = Color(0.109804, 0.109804, 0.109804, 1)
 
 [node name="Label" type="Label" parent="Control"]
 layout_mode = 0
-offset_left = 372.0
-offset_top = 310.0
-offset_right = 657.0
-offset_bottom = 344.0
-text = "some body once told me"
+offset_left = 29.0
+offset_top = 963.0
+offset_right = 314.0
+offset_bottom = 1034.0
+text = "Radiant Ambition
+ver 0.5"
 label_settings = SubResource("LabelSettings_tp2qw")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-

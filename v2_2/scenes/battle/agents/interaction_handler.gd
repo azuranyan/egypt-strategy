@@ -78,6 +78,9 @@ func _physics_process(_delta):
 	# will cause input to be handled even if no objects are picked/collided
 	# https://github.com/godotengine/godot/issues/79897
 
+	# more issues (unrelated) - logical panels are a fucking nightmare
+	# https://github.com/godotengine/godot-proposals/issues/8200
+
 	var space_state = Battle.instance().world().get_world_2d().direct_space_state
 	
 	var mouse_pos := Battle.instance().world().get_global_mouse_position()

@@ -121,6 +121,7 @@ func update_new_available_scenes(empire: Empire = Overworld.instance().player_em
 func has_any_new_events(empire: Empire) -> bool:
 	for u in Game.get_empire_units(empire, Game.ALL_UNITS_MASK):
 		if Dialogue.instance().has_new_character_event(u.chara()):
+			print('new event for ', u.chara(), '?')
 			return true
 	return false
 

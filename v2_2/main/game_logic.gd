@@ -38,16 +38,7 @@ func show_parsed_result(result: BattleResult):
 
 func _on_game_started():
 	print('Game started')
-	register_events()
-
-
-func register_events() -> void:
-	## TODO 
-	Dialogue.instance().register_event(load('res://units/alara/story_event_1.tres'), load('res://units/alara/chara.tres'))
-	Dialogue.instance().register_event(load('res://units/alara/story_event_2.tres'), load('res://units/alara/chara.tres'))	
-	Dialogue.instance().register_event(load('res://units/alara/story_event_3.tres'), load('res://units/alara/chara.tres'))
-	Dialogue.instance().register_event(load('res://events/new_game/new_game.tres'))
-
+	
 
 func _on_battle_ended(result: BattleResult):
 	show_parsed_result(result)

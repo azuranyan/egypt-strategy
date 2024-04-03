@@ -445,20 +445,20 @@ func _overworld_main() -> void:
 			# This makes it so the player can choose a different strategy room scene, however
 			# new events will not be skipped and still be forced to play.
 			'post_turn':
+				# get all available events
 				var events := Dialogue.instance().get_available_events()
-				if events:
-					# if there are new events, play them
-					Dialogue.instance().start_queue(events)
-					await DialogueEvents.event_ended
-				else:
-					# if there are no events, show the banner
-					var open_strategy_room: bool = await show_battle_result_banner(Battle.instance().get_battle_result(), on_turn().is_player_owned())
 
-					if open_strategy_room:
-						var event_id: StringName = await show_strategy_room(false)
-						if event_id:
-							Dialogue.instance().start_queue([event_id])
-							await DialogueEvents.queue_ended
+				# show result banner
+				var open_strategy_room := await show_battle_result_banner(Battle.instance().get_battle_result(), events.is_empty() and on_turn().is_player_owned())
+				if open_strategy_room:
+					var event_id: StringName = await show_strategy_room(false)
+					if event_id:
+						events = [event_id]
+				
+				# play events
+				if events:
+					Dialogue.instance().start_queue(events)
+					await DialogueEvents.queue_ended
 
 				_next_state = 'turn_end'
 				

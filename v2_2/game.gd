@@ -396,6 +396,13 @@ func start_new_game():
 	_cleanup()
 
 	_create_subsystems()
+
+	# TODO register events properly: do this before the Dialogue is loaded otherwise register will override
+	Dialogue.instance().register_event(load('res://units/alara/story_event_1.tres'), load('res://units/alara/chara.tres'))
+	Dialogue.instance().register_event(load('res://units/alara/story_event_2.tres'), load('res://units/alara/chara.tres'))	
+	Dialogue.instance().register_event(load('res://units/alara/story_event_3.tres'), load('res://units/alara/chara.tres'))
+	Dialogue.instance().register_event(load('res://events/new_game/new_game.tres'))
+	
 	var err := overworld.load_new_state()
 	if err != Overworld.NO_ERROR:
 		push_error(err)

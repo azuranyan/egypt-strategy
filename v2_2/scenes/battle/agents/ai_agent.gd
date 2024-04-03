@@ -4,11 +4,28 @@ extends BattleAgent
 @export var action_cooldown: float = 0.3
 var battle: Battle
 
+var action_order: Array[Unit]
+
 	
 ## Called on initialize.
 func _initialize():
 	battle = Game.battle # fucking bastard refuse to show autocomplete for this
-	
+	BattleEvents.cycle_started.connect(_on_cycle_started)
+
+
+func _on_cycle_started(_cycle: int):
+	# TODO polish action order
+
+	# determine action order
+	action_order = []
+	for u in Game.get_empire_units(empire):
+		if u.can_act():
+			action_order.append(u)
+
+	Battle.instance().hud().action_order_list.clear_units()
+	for u in action_order:
+		Battle.instance().hud().action_order_list.add_unit(u)
+
 
 ## Called on start preparation.
 func _enter_prepare_units():
@@ -52,13 +69,8 @@ func _get_closest_player_spawn_point(cell: Vector2) -> Vector2:
 ## Called on turn start.
 @warning_ignore("redundant_await")
 func _enter_turn():
-	var unit_action_queue: Array[Unit] = []
-	for u in Game.get_empire_units(empire):
-		if u.can_act():
-			unit_action_queue.append(u)
-	
-	while not unit_action_queue.is_empty():
-		var unit: Unit = unit_action_queue.pop_back()
+	while not action_order.is_empty():
+		var unit: Unit = action_order.pop_back()
 		
 		var action := make_action_for(unit)
 		await battle.do_action(unit, action)

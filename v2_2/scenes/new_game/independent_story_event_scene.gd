@@ -11,6 +11,7 @@ func scene_enter(kwargs := {}) -> void:
 	DialogueEvents.queue_ended.connect(finish_scene)
 
 	var queue := Dialogue.instance().get_available_events()
+	print("WHERE IS THE FUCKING QUEUE", queue)
 	Dialogue.instance().start_queue(queue)
 
 

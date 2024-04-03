@@ -5,6 +5,7 @@ extends Control
 var _selected_unit: Unit
 var _selected_attack: Attack
 
+
 # top panel
 @onready var menu_button: Button = $Control/MenuButton
 @onready var undo_button: Button = $Control/UndoButton
@@ -14,9 +15,9 @@ var _selected_attack: Attack
 @onready var message_box = $Control/MessageBox
 @onready var objectives_panel = $Control/ObjectivesPanel
 @onready var prep_unit_list: UnitList = $Control/PrepUnitList
+@onready var action_order_list: UnitList = $Control/ActionOrderList
 @onready var turn_banner = %TurnBanner
 @onready var attack_banner = %AttackBanner
-
 
 # bottom panel
 @onready var rest_button: Button = %RestButton
@@ -39,6 +40,9 @@ func _ready():
 	%AttackInfoPanel.hide()
 	hide()
 	character_panel.hide()
+	action_order_button.toggled.connect(_toggle_right_panel_visibility)
+	# TODO auto hide when losing focus, but not when losing focus to action order list
+	
 	BattleEvents.prep_phase_started.connect(_on_prep_phase_started)
 	BattleEvents.turn_started.connect(_on_turn_started)
 	BattleEvents.objective_updated.connect(func(_objective: Objective):
@@ -58,6 +62,7 @@ func _on_prep_phase_started(empire: Empire):
 
 
 func _on_turn_started(_empire: Empire):
+	action_order_button.button_pressed = false
 	update()
 
 
@@ -82,13 +87,19 @@ func update():
 	end_button.visible = is_player_turn
 	
 	# top right panel
-	prep_unit_list.visible = not battle_phase
-	objectives_panel.visible = battle_phase
+	_toggle_right_panel_visibility(action_order_button.button_pressed)
 	%MissionPanel.visible = true
 	set_missions(missions)
 	%BonusGoalPanel.visible = battle_phase and not is_training
 	set_bonus_goals(bonus_goals)
 	action_order_button.visible = battle_phase and is_player_turn
+
+
+func _toggle_right_panel_visibility(action_order_mode: bool) -> void:
+	var battle_phase := Battle.instance().is_battle_phase()
+	prep_unit_list.visible = not battle_phase
+	objectives_panel.visible = battle_phase and not action_order_mode
+	action_order_list.visible = battle_phase and action_order_mode
 
 
 ## Returns the selected unit.

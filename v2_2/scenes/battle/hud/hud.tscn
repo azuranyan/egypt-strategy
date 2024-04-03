@@ -147,7 +147,6 @@ speed_scale = 10.0
 one_shot = true
 
 [node name="TestMapMockupV8Hd" type="TextureRect" parent="."]
-visible = false
 layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
@@ -237,6 +236,7 @@ offset_top = 96.0
 offset_right = 1498.0
 offset_bottom = 145.0
 theme = ExtResource("2_2bpvx")
+toggle_mode = true
 icon = ExtResource("6_2vhg0")
 icon_alignment = 1
 
@@ -566,6 +566,9 @@ theme_override_constants/outline_size = 8
 text = "✓"
 
 [node name="PrepUnitList" parent="Control" instance=ExtResource("12_nfnju")]
+layout_mode = 1
+
+[node name="ActionOrderList" parent="Control" instance=ExtResource("12_nfnju")]
 layout_mode = 1
 
 [node name="Overlay" type="CanvasLayer" parent="."]

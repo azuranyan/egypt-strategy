@@ -42,6 +42,7 @@ enum State {
 @export var _dying_units: int
 @export var _next_state: State = State.INVALID
 
+var _last_battle_result: BattleResult
 
 var _waiting_for: StringName
 var _battle_scene
@@ -119,6 +120,7 @@ func start_battle(data: Dictionary) -> void:
 		return
 	_is_running = true
 	_next_state = State.INITIALIZATION
+	_last_battle_result = null
 
 	# initialize context
 	_attacker = data.attacker
@@ -147,9 +149,13 @@ func start_battle(data: Dictionary) -> void:
 		_real_battle.call_deferred()
 	
 	
-func _end_battle(result: BattleResult):
+func _end_battle():
+	# if we exited normally without stop_battle() or without encountering check_for_battle_end()
+	if not _last_battle_result:
+		_last_battle_result = load_battle_results(_result_value)
+
 	# give out the rewards
-	_update_unit_bonds(result)
+	_update_unit_bonds(_last_battle_result)
 
 	# allow at least 1 frame between battle start and end
 	# this fixes signals that happen in the same frame
@@ -161,7 +167,7 @@ func _end_battle(result: BattleResult):
 		SceneManager.scene_return('fade_to_black')
 
 	_is_running = false
-	BattleEvents.battle_ended.emit(result)
+	BattleEvents.battle_ended.emit(_last_battle_result)
 
 
 func _quick_battle():
@@ -189,7 +195,7 @@ func _quick_battle():
 			_result_value = BattleResult.DEFENDER_VICTORY
 		
 	# end battle
-	_end_battle(get_battle_result())
+	_end_battle()
 
 
 func _real_battle() -> void:
@@ -404,7 +410,7 @@ func _real_battle_main():
 	# start end sequence
 	BattleEvents.battle_scene_exiting.emit()
 	
-	_end_battle(get_battle_result())
+	_end_battle()
 
 
 func pan_to_last_acting_unit(empire: Empire) -> void:
@@ -451,9 +457,9 @@ func check_for_battle_end() -> bool:
 	if not (_next_state > State.PLAYER_PREP):
 		return false
 
-	var result := evaluate_battle_result()
-	if not result.is_none():
-		stop_battle(result.value)
+	BattleEvents.objectives_evaluated.emit()
+	if _result_value != BattleResult.NONE:
+		stop_battle(_result_value)
 	
 	if _should_end or should_end_turn(on_turn()):
 		agents[on_turn()].end_turn()
@@ -495,13 +501,6 @@ func create_agent(empire: Empire) -> BattleAgent:
 	return agent
 		
 	
-func end_battle(result_value: int):
-	_result_value = result_value
-	_should_end = true
-	if on_turn():
-		agents[on_turn()].force_end()
-	
-	
 ## Stops the battle cycle.
 func stop_battle(result_value: int = BattleResult.CANCELLED) -> void:
 	if not is_running():
@@ -509,9 +508,11 @@ func stop_battle(result_value: int = BattleResult.CANCELLED) -> void:
 	
 	_result_value = result_value
 	_should_end = true
+	_last_battle_result = load_battle_results(_result_value)
+
 	if on_turn():
 		agents[on_turn()].force_end()
-	
+		
 
 ## Returns true if the battle is running.
 func is_running() -> bool:
@@ -680,17 +681,16 @@ func get_spawn_points(type: SpawnPoint.Type) -> Array[SpawnPoint]:
 
 ## Returns the battle result.
 func get_battle_result() -> BattleResult:
-	var re := BattleResult.new(_result_value, _attacker, _defender, _territory, _map_id)
-	re.completed_goals = bonus_goals().filter(func(g: Objective): return g.status() == Objective.Status.COMPLETED)
+	return _last_battle_result
+
+
+func load_battle_results(value: int) -> BattleResult:
+	var re := BattleResult.new(value, _attacker, _defender, _territory, _map_id)
+	# TODO fix this shit, bonus goals require a map to be loaded
+	if not is_quick_battle():
+		re.completed_goals = bonus_goals().filter(func(g: Objective): return g.status() == Objective.Status.COMPLETED)
 	return re
-	
-	
-## Evaluates victory conditions and returns first valid result.
-func evaluate_battle_result() -> BattleResult:
-	# does not do anything other than allow objectives to be manually polled for results
-	BattleEvents.objectives_evaluated.emit()
-	return get_battle_result()
-	
+
 
 ## Returns a config variable.
 func get_config_value(config: StringName) -> Variant:
@@ -882,12 +882,12 @@ func show_forfeit_dialog() -> void:
 	hide_pause_menu()
 	
 	if not is_battle_phase():
-		end_battle(BattleResult.CANCELLED)
+		stop_battle(BattleResult.CANCELLED)
 	else:
 		if player() == attacker():
-			end_battle(BattleResult.ATTACKER_WITHDRAW)
+			stop_battle(BattleResult.ATTACKER_WITHDRAW)
 		else:
-			end_battle(BattleResult.DEFENDER_WITHDRAW)
+			stop_battle(BattleResult.DEFENDER_WITHDRAW)
 
 
 func hide_forfeit_dialog() -> void:

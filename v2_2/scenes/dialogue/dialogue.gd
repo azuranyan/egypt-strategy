@@ -204,7 +204,7 @@ func get_available_events(chara: CharacterInfo = null) -> Array[StringName]:
 	var completed_events := get_completed_events()
 	for event_id in event_registry:
 		var state: Dictionary = event_registry[event_id]
-		if chara == null or state.chara != chara:
+		if state.chara and (chara == null or state.chara != chara):
 			continue
 		if state.locked:
 			continue

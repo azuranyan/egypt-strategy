@@ -163,16 +163,17 @@ func _ready() -> void:
 	)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func do_unhandled_input(event: InputEvent) -> void:
 	if should_skip_typing(event):
 		get_viewport().set_input_as_handled()
 		skip_typing()
 		return
 
+	# swallow input regardless: this is so no input passes through us while we're active
+	get_viewport().set_input_as_handled()
+
 	if not wait_for_input or wait_for_response:
 		return
-
-	get_viewport().set_input_as_handled()
 
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
 		next(_dialogue_line.next_id)

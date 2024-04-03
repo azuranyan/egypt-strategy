@@ -54,9 +54,11 @@ func scene_enter(kwargs := {}) -> void:
 	%TooltipLabel.text = 'Inspect units.' if inspect_mode else 'View unit scenes.'
 	for unit in Game.get_empire_units(Game.overworld.player_empire(), Game.ALL_UNITS_MASK):
 		var icon: Texture2D 
-		if not inspect_mode and Dialogue.instance().has_new_character_event(unit.chara()):
+		if Dialogue.instance().has_new_character_event(unit.chara()):
+			print('no new event for ', unit.chara())
 			icon = load('res://scenes/data/exclamation_mark.svg')
 		else:
+			print('has new event for ', unit.chara())
 			icon = null
 		var idx := unit_list.add_item(unit.display_name(), icon)
 		units[idx] = unit
@@ -107,6 +109,7 @@ func _on_unit_list_item_selected(idx: int) -> void:
 func _on_unit_list_item_activated(idx: int) -> void:
 	change_unit(units[idx])
 	if inspect_mode:
+		Game.create_pause_dialog("Cannot view scenes on inspect mode.", 'Confirm', '')
 		return
 		
 	var chara := selected_unit.chara()

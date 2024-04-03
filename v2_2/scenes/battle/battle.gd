@@ -275,14 +275,8 @@ func get_spawn_points(_type: SpawnPoint.Type) -> Array[SpawnPoint]:
 	return []
 
 
-## Returns the battle result.
+## Returns the last known battle result. 
 func get_battle_result() -> BattleResult:
-	assert(false, 'not implemented')
-	return null
-	
-	
-## Evaluates victory conditions and returns first valid result.
-func evaluate_battle_result() -> BattleResult:
 	assert(false, 'not implemented')
 	return null
 	

@@ -24,11 +24,11 @@ var _active_unit: Unit
 @onready var item_container = %ItemContainer
 
 
-func _ready():
+func _ready() -> void:
 	unit_item_sample.visible = false
 	
 
-func _input(event):
+func _input(event: InputEvent) -> void:
 	if not _active_unit:
 		return
 	
@@ -45,7 +45,7 @@ func _input(event):
 		
 	
 ## Adds a unit to the list.
-func add_unit(unit: Unit):
+func add_unit(unit: Unit) -> void:
 	if unit in _unit_buttons:
 		return
 	var item := unit_item_sample.duplicate()
@@ -64,7 +64,7 @@ func add_unit(unit: Unit):
 	_sort_buttons()
 	
 	
-func _sort_buttons():
+func _sort_buttons() -> void:
 	var units := _unit_buttons.keys()
 	units.sort_custom(func(a, b): return a.display_name() < b.display_name())
 	
@@ -73,7 +73,7 @@ func _sort_buttons():
 	
 	
 ## Removes a unit from the list.
-func remove_unit(unit: Unit):
+func remove_unit(unit: Unit) -> void:
 	if unit not in _unit_buttons:
 		return
 	if unit == _active_unit:
@@ -81,10 +81,17 @@ func remove_unit(unit: Unit):
 	item_container.remove_child(_unit_buttons[unit].get_parent())
 	_unit_buttons[unit].get_parent().queue_free()
 	_unit_buttons.erase(unit)
+
+
+## Removes all units.
+func clear_units() -> void:
+	if _unit_buttons:
+		for u in _unit_buttons.duplicate():
+			remove_unit(u)
 	
 	
 ## Sets the selected unit.
-func set_selected_unit(unit: Unit):
+func set_selected_unit(unit: Unit) -> void:
 	if unit == null:
 		if _active_unit:
 			_unit_buttons[_active_unit].button_pressed = false
@@ -94,7 +101,7 @@ func set_selected_unit(unit: Unit):
 	
 	
 ## Cancels interaction.
-func cancel():
+func cancel() -> void:
 	if not _active_unit:
 		return
 	_unit_buttons[_active_unit].set_pressed_no_signal(false)
@@ -109,7 +116,7 @@ func get_selected_unit() -> Unit:
 	return _active_unit
 
 	
-func _set_selected_unit(unit: Unit):
+func _set_selected_unit(unit: Unit) -> void:
 	if _active_unit == unit:
 		return
 	var old_active_unit := _active_unit
@@ -120,7 +127,7 @@ func _set_selected_unit(unit: Unit):
 		unit_released.emit(old_active_unit)
 	
 	
-func _on_button_down(button: Button, unit: Unit):
+func _on_button_down(button: Button, unit: Unit) -> void:
 	for u in _unit_buttons:
 		if _unit_buttons[u] != button:
 			_unit_buttons[u].button_pressed = false
@@ -128,13 +135,13 @@ func _on_button_down(button: Button, unit: Unit):
 	_set_selected_unit(unit)
 	
 	
-func _on_button_up(button: Button, _unit: Unit):
+func _on_button_up(button: Button, _unit: Unit) -> void:
 	if button.button_pressed:
 		return
 	button.release_focus()
 	_set_selected_unit(null)
 
 	
-func _on_button_toggle(toggle: bool, _button: Button, unit: Unit):
+func _on_button_toggle(toggle: bool, _button: Button, unit: Unit) -> void:
 	_set_selected_unit(unit if toggle else null)
 
