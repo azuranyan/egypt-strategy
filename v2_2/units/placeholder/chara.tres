@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://bqm251axwhrnn"]
+
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_8thv1"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="2_1x3sl"]
+
+[resource]
+script = ExtResource("2_1x3sl")
+name = "Placeholder"
+gender = "F"
+avatar = "Avatar of Placeholding"
+title = "The placeholdiest"
+map_color = Color(0.129412, 0.360784, 0.458824, 1)
+portrait = ExtResource("1_8thv1")
+metadata/placeholder = true

@@ -83,10 +83,27 @@ var world := {
 
 var scene_queue: Array[String] = []
 var overworld: Overworld = preload("res://Screens/Overworld/Overworld.tscn").instantiate()
-var battle: Battle = preload("res://Screens/Battle/Battle.tscn").instantiate()
+
+## Access to global battle variable.
+var battle: Battle
 
 var screen_stack: Array[Node] = []
 
+
+## Special variable that is set to false when running from main.
+## This allows individual scenes to be tested from _ready()
+var test_individual_scenes := true
+
+
+## Returns the viewport size.
+func get_viewport_size() -> Vector2:
+	# TODO get_viewport().size doesn't work, even with stretch mode set to
+	# viewport. despite what godot says, it doesn't change the viewport to
+	# project settings set size if window is launched with a fixed size 
+	# like maximized and force window size.
+	return Vector2(1920, 1080)
+	
+	
 
 ## Registers data from /battle.
 static func register_data(subdir: String, get_id: Callable):
@@ -97,23 +114,9 @@ static func register_data(subdir: String, get_id: Callable):
 	while filename != "":
 		if !dir.current_is_dir() and filename.ends_with(".tres"):
 			var res = load(path + filename)
-			Globals.get(subdir)[get_id.call(res)] = res
+			Game.get(subdir)[get_id.call(res)] = res
 		filename = dir.get_next()
 		
-		
-## Factory for Battle agents.
-func create_agent_for(empire: Empire) -> BattleAgent:
-	var agent: BattleAgent
-	if empire.is_player_owned():
-		agent = preload("res://Screens/Battle/BattleAgentPlayer.tscn").instantiate()
-	else:
-		agent = preload("res://Screens/Battle/BattleAgentAI.tscn").instantiate()
-	agent.battle = battle
-	agent.empire = empire
-	battle.add_child(agent)
-	agent.initialize()
-	return agent
-	
 		
 ## Replaces the top screen with another.
 func transition_screen(new: Node, transition: String = ''):
@@ -126,22 +129,22 @@ func transition_screen(new: Node, transition: String = ''):
 
 
 ## Pushes a new screen on top.
-func push_screen(new: Node, transition: String = ''):
+func push_screen(new: Node, transition_effect: String = ''):
 	# this check is not necessary but back() spits an error if null is empty
 	# which is undesirable instead of just being fucking quiet about it 
 	var old: Node = null if screen_stack.is_empty() else screen_stack.back()
 	screen_stack.push_back(new)
-	_transition.call_deferred(old, new, transition)
+	_transition.call_deferred(old, new, transition_effect)
 
 
 ## Pops the top screen and restores the previous screen.
-func pop_screen(transition: String = ''):
+func pop_screen(transition_effect: String = ''):
 	var old: Node = screen_stack.pop_back()
 	var new: Node = screen_stack.back()
-	_transition.call_deferred(old, new, transition)
+	_transition.call_deferred(old, new, transition_effect)
 	
 
-func _transition(old: Node, new: Node, _transition: String): # TODO different transitions
+func _transition(old: Node, new: Node, _transition_effect: String): # TODO different transitions
 	print('transitioning from ', old, ' to ', new)
 	# replace old screen with a dummy (dummy first to hide the remove)
 	var dummy := dummy_scene.instantiate()
@@ -181,13 +184,26 @@ func notify_end_scene():
 	
 	
 func _dequeue_scene():
-	if not Globals.scene_queue.is_empty():
-		var scn: String = Globals.scene_queue.pop_front()
+	if not Game.scene_queue.is_empty():
+		var scn: String = Game.scene_queue.pop_front()
 		scene_started.emit(scn)
 	else:
 		scene_queue_finished.emit()
 		
 		
+@export var dialog_resource: DialogueResource
+@export var title: String
+
+## The entry point of the game.
+func start_game(_args := {}):
+	test_individual_scenes = false
+	
+	var node := preload("res://Screens/Dialogue/Dialogue.tscn").instantiate()
+	add_child(node)
+	DialogueResource.new()
+	node.start(dialog_resource, title)
+	
+	
 #func load_scene(old_scene: String, new_scene: String, transition: String):
 #	var loading_screen_inst := SCENES.loading_screen.instantiate() as LoadingScreen
 #	get_tree().root.add_child.call_deferred(loading_screen_inst)

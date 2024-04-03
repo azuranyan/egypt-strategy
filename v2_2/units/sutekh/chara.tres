@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://brhqrfirodpdc"]
+
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_4a5gu"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_wvuar"]
+
+[resource]
+script = ExtResource("1_wvuar")
+name = "Sutekh"
+gender = "M"
+avatar = "Avatar of Seth"
+title = "Ferocious Fox God"
+map_color = Color(0.541176, 0.0156863, 0.160784, 1)
+portrait = ExtResource("1_4a5gu")
+

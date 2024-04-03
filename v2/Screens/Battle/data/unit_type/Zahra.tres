@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://baqii06rv0kxo" path="res://Screens/Battle/data/attack/zahra_basic.tres" id="1_6u7w3"]
 [ext_resource type="Resource" uid="uid://c77i5p06r7021" path="res://Screens/Battle/data/chara/Zahra.tres" id="2_ftxe1"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="3_sp700"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="3_sp700"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="4_io3ex"]
 [ext_resource type="Resource" uid="uid://k8kxbusw61gw" path="res://Screens/Battle/data/attack/zahra_special.tres" id="4_nsl5x"]
 

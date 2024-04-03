@@ -1,0 +1,91 @@
+[gd_scene load_steps=10 format=3 uid="uid://tswv0jrmndgy"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_fyf4x"]
+[ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="2_1pxfs"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="3_qtici"]
+[ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="4_7feta"]
+[ext_resource type="PackedScene" uid="uid://dgiub7m8fawlq" path="res://scenes/battle/map_objects/unit_map_object.tscn" id="6_1hp1t"]
+[ext_resource type="PackedScene" uid="uid://f7wfyvgvuqsf" path="res://scenes/battle/map_objects/spawn_point.tscn" id="7_wihym"]
+[ext_resource type="PackedScene" uid="uid://bjgmgbp75bsb4" path="res://scenes/battle/map_objects/barrier.tscn" id="8_njobe"]
+
+
+[node name="Test" type="Node2D" node_paths=PackedStringArray("world", "pathing_painter")]
+y_sort_enabled = true
+script = ExtResource("1_fyf4x")
+world = NodePath("World")
+pathing_painter = NodePath("TileOverlay")
+
+[node name="World" parent="." instance=ExtResource("2_1pxfs")]
+z_index = -10
+metadata/_edit_lock_ = true
+
+[node name="TileOverlay" parent="." node_paths=PackedStringArray("world") instance=ExtResource("4_7feta")]
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(589824, 458752, 0, 589825, 458752, 0, 589826, 458752, 0, 589827, 458752, 0, 655363, 458752, 0, 655364, 458752, 0, 655365, 458752, 0, 720901, 458752, 0, 196608, 458752, 0, 196609, 458752, 0, 196610, 458752, 0, 196611, 458752, 0, 196612, 458752, 0, 196613, 458752, 0, 196614, 458752, 0, 196615, 458752, 0, 131079, 458752, 0, 65543, 458752, 0, 65544, 458752, 0, 65545, 458752, 0, 65546, 458752, 0, 65547, 458752, 0, 131083, 458752, 0, 196619, 458752, 0)
+world = NodePath("../World")
+
+[node name="MapObjectContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("3_qtici")
+
+[node name="UnitMapObject" parent="." instance=ExtResource("6_1hp1t")]
+map_position = Vector2(8, 5)
+
+[node name="SpawnPoint" parent="." instance=ExtResource("7_wihym")]
+map_position = Vector2(4, 7)
+
+[node name="SpawnPoint2" parent="." instance=ExtResource("7_wihym")]
+map_position = Vector2(6, 10)
+
+[node name="SpawnPoint3" parent="." instance=ExtResource("7_wihym")]
+map_position = Vector2(9, 7)
+
+[node name="SpawnPoint4" parent="." instance=ExtResource("7_wihym")]
+map_position = Vector2(8, 2)
+
+[node name="SpawnPoint5" parent="." instance=ExtResource("7_wihym")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(5, 6)
+
+[node name="SpawnPoint6" parent="." instance=ExtResource("7_wihym")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(7, 9)
+
+[node name="SpawnPoint7" parent="." instance=ExtResource("7_wihym")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(10, 9)
+
+[node name="SpawnPoint8" parent="." instance=ExtResource("7_wihym")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(10, 3)
+
+[node name="Barrier" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(3, 9)
+
+[node name="Barrier6" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(2, 9)
+
+[node name="Barrier7" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(1, 9)
+
+[node name="Barrier8" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(0, 9)
+
+[node name="Barrier2" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(3, 10)
+
+[node name="Barrier3" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(4, 10)
+
+[node name="Barrier4" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(5, 10)
+
+[node name="Barrier5" parent="." instance=ExtResource("8_njobe")]
+map_position = Vector2(5, 11)

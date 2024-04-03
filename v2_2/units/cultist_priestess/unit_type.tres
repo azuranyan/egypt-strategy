@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=3 format=3 uid="uid://b31kkvasq8l10"]
+
+[ext_resource type="Resource" uid="uid://brw4d08j5j3jc" path="res://units/cultist_priestess/cultist_priestess_heal.tres" id="1_3ub7w"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_ftgqd"]
+
+[resource]
+script = ExtResource("1_ftgqd")
+stats = {
+"dmg": 0,
+"maxhp": 12,
+"mov": 2,
+"rng": 2
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_3ub7w")

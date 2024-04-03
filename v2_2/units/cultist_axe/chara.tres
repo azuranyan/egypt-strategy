@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://jehd7a1drfwu"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_qg367"]
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_wh6da"]
+
+[resource]
+script = ExtResource("1_qg367")
+name = "Cultist - Axe"
+gender = "F"
+avatar = ""
+title = ""
+map_color = Color(0, 0, 0, 1)
+portrait = ExtResource("1_wh6da")
+

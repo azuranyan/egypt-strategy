@@ -310,13 +310,13 @@ func _on_character_list_unit_released(uname: String, _pos: Vector2):
 func _on_character_list_unit_dragged(uname: String, pos: Vector2):
 	var unit: Unit = unit_map[uname]
 	
-	var drag_pos := battle.map.world.screen_to_uniform(pos)
-	unit.map_pos = drag_pos
+	#var drag_pos := battle.map.world.screen_to_uniform(pos)
+	#unit.map_pos = drag_pos
 	
-	if Vector2(battle.map.cell(drag_pos)) in battle.map.get_spawn_points('player'):
-		unit.animation.play("RESET")
-	else:
-		unit.animation.play("highlight_red")
+	#if Vector2(battle.map.cell(drag_pos)) in battle.map.get_spawn_points('player'):
+	#	unit.animation.play("RESET")
+	#else:
+	#	unit.animation.play("highlight_red")
 
 
 func _on_character_list_unit_cancelled(uname: String):
@@ -611,7 +611,7 @@ func _on_battle_cell_selected(cell: Vector2i):
 	# set ui elements
 	var show_portrait: bool = active_unit or unit != null
 	var show_actions: bool = not active_attack and active_unit and battle.is_owned(active_unit) and battle.can_attack(active_unit)
-	var show_undo_end: bool = battle.context.on_turn == Globals.empires["Lysandra"]
+	var show_undo_end: bool = battle.context.on_turn == Game.empires["Lysandra"]
 	
 	if show_portrait:
 		battle.update_portrait(unit if unit else active_unit)

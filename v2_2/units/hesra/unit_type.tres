@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://d3f02bwbrqif7"]
+
+[ext_resource type="Resource" uid="uid://cah21816hmomj" path="res://units/hesra/hesra_attack.tres" id="1_phbhx"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_wirn4"]
+[ext_resource type="Resource" uid="uid://byo38u65dl2f7" path="res://units/hesra/hesra_poison.tres" id="3_b0xwc"]
+
+[resource]
+script = ExtResource("1_wirn4")
+stats = {
+"dmg": 4,
+"maxhp": 16,
+"mov": 3,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 4,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 4,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_phbhx")
+special_attack = ExtResource("3_b0xwc")

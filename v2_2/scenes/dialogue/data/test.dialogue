@@ -1,0 +1,24 @@
+~ start
+
+do show_character('nnivx', norm_to_pos(LEFT))
+do show_character('Nathan', norm_to_pos(RIGHT))
+Nathan: [[Hi|Hello|Howdy]], this is some dialogue.
+nnivx: Lorem ipsum dolor sit amet.
+nnivx: Here are some choices.
+- First one
+	Nathan: You picked the first one.
+- Second one
+	Nathan: You picked the second one.
+- Start again => start
+- Pause
+	do show_black_bars()
+	do open_pause_menu()
+- End the conversation => END
+This is a narration text. No one said this.
+someone: This one is from someone that isn't present in the scene.
+Nathan: For more information see the online documentation.
+nnivx: Surely this is going to make it to the next slide right?
+Nathan: If not, surely this will.
+nnivx: Yeah lol. Aight bye!
+
+=> END

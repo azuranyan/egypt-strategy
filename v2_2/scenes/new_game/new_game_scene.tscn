@@ -1,0 +1,104 @@
+[gd_scene load_steps=8 format=3 uid="uid://bf670hy03k4dp"]
+
+[ext_resource type="Script" path="res://scenes/new_game/new_game_scene.gd" id="1_mtlmk"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_ca3p7"]
+[ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_m6web"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="4_rb6bf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lh0ba"]
+
+[sub_resource type="Gradient" id="Gradient_fppkx"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 0.843137, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_s25fd"]
+gradient = SubResource("Gradient_fppkx")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="NewGameScene" type="CanvasLayer" node_paths=PackedStringArray("background", "vignette", "text_label", "panel", "hold_timer", "skip_button")]
+script = ExtResource("1_mtlmk")
+text_speed = 27.821
+text_fade_duration = 0.521
+background = NodePath("SubViewportContainer/Control/Background")
+vignette = NodePath("SubViewportContainer/Control/PanelContainer/Vignette")
+text_label = NodePath("SubViewportContainer/Control/PanelContainer/Control/VBoxContainer/MarginContainer/Label")
+panel = NodePath("SubViewportContainer")
+hold_timer = NodePath("Timer")
+skip_button = NodePath("SkipButton")
+
+[node name="BackgroundFill" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Control" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="Background" type="TextureRect" parent="SubViewportContainer/Control"]
+offset_left = -120.0
+offset_right = 2040.0
+offset_bottom = 1080.0
+texture = ExtResource("2_m6web")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="PanelContainer" type="PanelContainer" parent="SubViewportContainer/Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxEmpty_lh0ba")
+
+[node name="Vignette" type="TextureRect" parent="SubViewportContainer/Control/PanelContainer"]
+modulate = Color(0.0156863, 0.0196078, 0.0313726, 1)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_s25fd")
+
+[node name="Control" type="MarginContainer" parent="SubViewportContainer/Control/PanelContainer"]
+layout_mode = 2
+theme = ExtResource("2_ca3p7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SubViewportContainer/Control/PanelContainer/Control"]
+layout_mode = 2
+alignment = 1
+
+[node name="MarginContainer" type="CenterContainer" parent="SubViewportContainer/Control/PanelContainer/Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="RichTextLabel" parent="SubViewportContainer/Control/PanelContainer/Control/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(1536, 0)
+layout_mode = 2
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.721569, 0.584314, 0.411765, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/normal_font = ExtResource("4_rb6bf")
+theme_override_font_sizes/normal_font_size = 48
+theme_override_font_sizes/bold_font_size = 48
+theme_override_font_sizes/italics_font_size = 48
+theme_override_font_sizes/bold_italics_font_size = 48
+theme_override_font_sizes/mono_font_size = 48
+bbcode_enabled = true
+text = "[center]Bling bang bang born.[/center]"
+fit_content = true
+scroll_active = false
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="SkipButton" type="Button" parent="."]
+offset_left = 1794.0
+offset_top = 21.0
+offset_right = 1886.0
+offset_bottom = 52.0
+text = "Skip"

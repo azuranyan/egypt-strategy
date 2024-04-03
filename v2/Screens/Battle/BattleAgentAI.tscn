@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dy04bd374kpr8"]
-
-[ext_resource type="Script" path="res://Screens/Battle/BattleAgentAI.gd" id="1_b446k"]
-
-[node name="BattleAgentAI" type="Node"]
-script = ExtResource("1_b446k")

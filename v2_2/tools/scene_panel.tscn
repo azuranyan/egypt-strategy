@@ -1,0 +1,77 @@
+[gd_scene load_steps=3 format=3 uid="uid://dphluso4iln0n"]
+
+[ext_resource type="Script" path="res://tools/scene_panel.gd" id="1_u8tmk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0ia43"]
+content_margin_left = 4.0
+
+[node name="ScenePanel" type="Panel"]
+offset_left = 17.0
+offset_top = 521.0
+offset_right = 192.0
+offset_bottom = 782.0
+script = ExtResource("1_u8tmk")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "scene_name"
+
+[node name="VBoxContainer" type="HBoxContainer" parent="VBoxContainer2"]
+layout_mode = 2
+
+[node name="CallButton" type="Button" parent="VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "call"
+
+[node name="LoadButton" type="Button" parent="VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "load"
+
+[node name="ReturnButton" type="Button" parent="VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ret"
+
+[node name="ReturnToButton" type="Button" parent="VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ret2"
+
+[node name="Panel" type="PanelContainer" parent="VBoxContainer2"]
+layout_mode = 2
+
+[node name="CurrentSceneLabel" type="Label" parent="VBoxContainer2/Panel"]
+unique_name_in_owner = true
+modulate = Color(0.513726, 0.784314, 0.568627, 1)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_0ia43")
+text = "overworlddasdasdasdasdasdasdasdasdasdasdasd"
+text_overrun_behavior = 3
+
+[node name="CallStackList" type="ItemList" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 3
+item_0/text = "load"
+item_1/text = "main_menu"
+item_2/text = "intro"
+
+[connection signal="text_submitted" from="VBoxContainer2/LineEdit" to="." method="_on_line_edit_text_submitted"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/CallButton" to="." method="_on_call_button_pressed"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/ReturnButton" to="." method="_on_return_button_pressed"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/ReturnToButton" to="." method="_on_return_to_button_pressed"]
+[connection signal="item_activated" from="VBoxContainer2/CallStackList" to="." method="_on_item_list_item_activated"]
+[connection signal="item_selected" from="VBoxContainer2/CallStackList" to="." method="_on_item_list_item_selected"]

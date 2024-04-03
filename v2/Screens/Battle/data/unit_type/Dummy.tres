@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://blc6hirmqo4k"]
+[gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://blc6hirmqo4k"]
 
 [ext_resource type="Resource" uid="uid://djn7qxgy84x1d" path="res://Screens/Battle/data/attack/00default.tres" id="1_cwl7l"]
 [ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_ayc8x"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="4_ah3v8"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="4_ah3v8"]
+[ext_resource type="Resource" uid="uid://cu1m22jwus54c" path="res://Screens/Battle/data/attack/alara_special.tres" id="4_x156j"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="5_y2jx2"]
 
 [resource]
@@ -11,24 +12,24 @@ chara = ExtResource("2_ayc8x")
 sprite_frames = ExtResource("5_y2jx2")
 name = "Dummy"
 behavior = 0
-avatar = ""
-title = ""
+avatar = "Avatar of Dumdum"
+title = "The dummiest"
 map_color = Color(1, 1, 1, 1)
-stat_maxhp = 99
-stat_mov = 0
-stat_dmg = 0
-stat_rng = 0
+stat_maxhp = 3
+stat_mov = 3
+stat_dmg = 1
+stat_rng = 1
 stat_growth_1 = {
-"dmg": 0,
+"dmg": 1,
 "maxhp": 0,
 "mov": 0,
 "rng": 0
 }
 stat_growth_2 = {
 "dmg": 0,
-"maxhp": 0,
+"maxhp": 1,
 "mov": 0,
 "rng": 0
 }
 basic_attack = ExtResource("1_cwl7l")
-special_attack = ExtResource("1_cwl7l")
+special_attack = ExtResource("4_x156j")

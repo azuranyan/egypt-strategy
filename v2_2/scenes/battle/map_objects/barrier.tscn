@@ -1,0 +1,28 @@
+[gd_scene load_steps=7 format=3 uid="uid://bjgmgbp75bsb4"]
+
+[ext_resource type="Script" path="res://scenes/battle/map_objects/barrier.gd" id="1_g6v07"]
+[ext_resource type="Script" path="res://scenes/battle/pathable_component.gd" id="1_x3k7x"]
+[ext_resource type="Script" path="res://scenes/battle/default_pathing_condition.gd" id="2_koae3"]
+[ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="3_p2csm"]
+[ext_resource type="Texture2D" uid="uid://bstcokue5kclj" path="res://scenes/battle/data/crossed-circle.png" id="4_k5273"]
+
+[sub_resource type="Resource" id="Resource_5jrwb"]
+script = ExtResource("2_koae3")
+
+[node name="Barrier" type="Node2D"]
+light_mask = 512
+visibility_layer = 512
+script = ExtResource("1_g6v07")
+
+[node name="PathableComponent" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("1_x3k7x")
+pathing_group = 4
+conditions = Array[Resource("res://scenes/battle/pathing_condition.gd")]([SubResource("Resource_5jrwb")])
+map_object = NodePath("..")
+
+[node name="Transformable" type="Node2D" parent="."]
+script = ExtResource("3_p2csm")
+internal_size = Vector2(240, 240)
+
+[node name="Sprite2D" type="Sprite2D" parent="Transformable"]
+texture = ExtResource("4_k5273")

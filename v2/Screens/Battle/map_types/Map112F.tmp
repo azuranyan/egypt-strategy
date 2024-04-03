@@ -1,0 +1,114 @@
+[gd_scene load_steps=13 format=3 uid="uid://bg3djjkbmlv2r"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Map.gd" id="1_nlile"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="3_hffm8"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/World.gd" id="3_i0cah"]
+[ext_resource type="PackedScene" uid="uid://86byh8q1hmuu" path="res://Screens/Battle/map_types/Doodad.tscn" id="4_6qpf8"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/Grid.gd" id="4_c10ln"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/ObjectContainer.gd" id="5_7lvne"]
+[ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="5_f1lhi"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/cursor.gd" id="5_mql1q"]
+[ext_resource type="Texture2D" uid="uid://p5pbqbjrpr6d" path="res://Screens/Battle/cursor.png" id="6_ml1x5"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/map_object.gd" id="9_6415n"]
+[ext_resource type="PackedScene" uid="uid://dt5a8j6l6ab2y" path="res://Screens/Battle/map_types/enemy_spawn_point.tscn" id="9_xl0rt"]
+[ext_resource type="PackedScene" uid="uid://conf6sokwx7ww" path="res://Screens/Battle/map_types/player_spawn_point.tscn" id="10_qv147"]
+
+[node name="Map" type="Node2D" node_paths=PackedStringArray("world")]
+script = ExtResource("1_nlile")
+world = NodePath("World")
+metadata/_edit_lock_ = true
+
+[node name="World" type="Node2D" parent="."]
+position = Vector2(-1, 0)
+script = ExtResource("3_i0cah")
+texture = ExtResource("3_hffm8")
+map_size = Vector2i(12, 12)
+tile_size = 67.995
+offset = Vector2(1011.33, 208.347)
+y_ratio = 0.579
+
+[node name="FullRect" type="Control" parent="World"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="World/FullRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("3_hffm8")
+expand_mode = 3
+
+[node name="Grid" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+self_modulate = Color(0, 0, 0, 0.376471)
+position = Vector2(1011.33, 208.347)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+script = ExtResource("4_c10ln")
+world = NodePath("../World")
+tile_size = 67.995
+size = Vector2i(12, 12)
+thickness = 1.5
+
+[node name="Cursor" type="Node2D" parent="." node_paths=PackedStringArray("world")]
+position = Vector2(945, 307)
+script = ExtResource("5_mql1q")
+world = NodePath("../World")
+texture = ExtResource("6_ml1x5")
+
+[node name="Sprite2D" type="Sprite2D" parent="Cursor"]
+position = Vector2(1, 0)
+centered = false
+
+[node name="ObjectContainer" type="Node2D" parent="."]
+script = ExtResource("5_7lvne")
+
+[node name="Doodad2" parent="ObjectContainer" instance=ExtResource("4_6qpf8")]
+visible = false
+position = Vector2(1010.33, 208.347)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+texture = ExtResource("5_f1lhi")
+show_debug_tile = true
+
+[node name="Sprite2D" parent="ObjectContainer/Doodad2" index="1"]
+position = Vector2(-1010.33, -208.347)
+scale = Vector2(0.46875, 0.46875)
+texture = ExtResource("5_f1lhi")
+
+[node name="MapObject" type="Node2D" parent="ObjectContainer"]
+position = Vector2(1391, 459)
+script = ExtResource("9_6415n")
+map_pos = Vector2(8.46071, 0.54323)
+
+[node name="EnemySpawnPoint" parent="ObjectContainer" instance=ExtResource("9_xl0rt")]
+position = Vector2(780, 441)
+map_pos = Vector2(1.78338, 6.57396)
+
+[node name="PlayerSpawnPoint" parent="ObjectContainer" instance=ExtResource("10_qv147")]
+position = Vector2(1069, 464)
+map_pos = Vector2(5.20191, 3.98164)
+
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="." to="." method="_on_child_exiting_tree"]
+[connection signal="map_changed" from="." to="Grid" method="_on_map_map_changed"]
+[connection signal="map_changed" from="." to="Cursor" method="_on_map_map_changed"]
+[connection signal="world_changed" from="World" to="Grid" method="_on_world_world_changed"]
+[connection signal="child_entered_tree" from="ObjectContainer" to="ObjectContainer" method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="ObjectContainer" to="ObjectContainer" method="_on_child_exiting_tree"]
+[connection signal="object_added" from="ObjectContainer" to="." method="_on_object_container_object_added"]
+[connection signal="object_removed" from="ObjectContainer" to="." method="_on_object_container_object_removed"]
+
+[editable path="ObjectContainer/Doodad2"]

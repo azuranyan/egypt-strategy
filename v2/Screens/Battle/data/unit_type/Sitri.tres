@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://cyr3rqlljbdvd"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_d6gwo"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_d6gwo"]
 [ext_resource type="Resource" uid="uid://bhl5h0sih5pqk" path="res://Screens/Battle/data/attack/sitri_basic.tres" id="1_diw8u"]
 [ext_resource type="Resource" uid="uid://d0230ikbham6e" path="res://Screens/Battle/data/chara/Sitri.tres" id="2_hs11p"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_jvpv7"]

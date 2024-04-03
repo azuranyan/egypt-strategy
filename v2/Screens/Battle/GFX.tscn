@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://07gcu65hwvg1"]
+
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="1_3klat"]
+
+[sub_resource type="GDScript" id="GDScript_4dpr4"]
+script/source = "extends AnimatedSprite2D
+
+
+func _ready():
+	play()
+
+
+func _on_animation_finished():
+	queue_free()
+"
+
+[node name="GFX" type="AnimatedSprite2D"]
+scale = Vector2(0.5, 0.5)
+sprite_frames = ExtResource("1_3klat")
+animation = &"basic_damage"
+script = SubResource("GDScript_4dpr4")
+
+[connection signal="animation_finished" from="." to="." method="_on_animation_finished"]

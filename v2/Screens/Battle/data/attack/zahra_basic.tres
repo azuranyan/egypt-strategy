@@ -1,21 +1,30 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://baqii06rv0kxo"]
+[gd_resource type="Resource" script_class="Attack" load_steps=8 format=3 uid="uid://baqii06rv0kxo"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_8t3ri"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_8t3ri"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_incvm"]
+[ext_resource type="Script" path="res://Screens/Battle/types/AttackEffect.gd" id="1_v6tqk"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="2_vfxy3"]
+
+[sub_resource type="Resource" id="Resource_f1kjx"]
+script = ExtResource("1_v6tqk")
+target = 0
+
+[sub_resource type="Resource" id="Resource_c0t7a"]
+script = ExtResource("2_vfxy3")
+animation = "hurt"
+target = 0
 
 [sub_resource type="Resource" id="Resource_23jvd"]
 script = ExtResource("1_8t3ri")
 flat_damage = 0
-stat = "dmg"
+stat = "damage"
 multiplier = 1.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_incvm")
 name = "Cleave"
-description = ""
+description = "Damages multiple units in front."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, -1), Vector2i(0, 1)])
@@ -24,4 +33,4 @@ range = -1
 min_range = 0
 multicast = 0
 melee = true
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_23jvd")])
+effects = Array[ExtResource("1_v6tqk")]([SubResource("Resource_f1kjx"), SubResource("Resource_c0t7a"), SubResource("Resource_23jvd")])

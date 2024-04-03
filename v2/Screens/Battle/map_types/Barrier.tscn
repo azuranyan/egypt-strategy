@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://dggdd7fpr8qn5"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="1_1mnob"]
+
+[node name="Barrier" type="Node2D"]
+visibility_layer = 512
+script = ExtResource("1_1mnob")
+pathing = 4
+no_show = true
+debug_tile_color = Color(0, 0, 0, 0.32549)

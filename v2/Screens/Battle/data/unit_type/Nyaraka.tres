@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://dhfvyow6mea4a"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_4nxtp"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_4nxtp"]
 [ext_resource type="Resource" uid="uid://7xoo4tjn6qea" path="res://Screens/Battle/data/attack/nyaraka_basic.tres" id="1_pr7kg"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_5rrdj"]
 [ext_resource type="Resource" uid="uid://bkdmg4n5eme2g" path="res://Screens/Battle/data/chara/Nyaraka.tres" id="2_bwiei"]

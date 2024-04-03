@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://4vhw74hddihj"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_iggbm"]
+[ext_resource type="Resource" uid="uid://drsecgj7cg1ne" path="res://units/lysandra/lysandra_basic.tres" id="1_r4mhq"]
+[ext_resource type="Resource" uid="uid://buffs3pvcvsxa" path="res://units/lysandra/lysandra_recover.tres" id="3_un751"]
+
+[resource]
+script = ExtResource("1_iggbm")
+stats = {
+"dmg": 8,
+"maxhp": 20,
+"mov": 2,
+"rng": 2
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 1,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 4,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_r4mhq")
+special_attack = ExtResource("3_un751")

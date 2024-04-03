@@ -1,0 +1,96 @@
+[gd_scene load_steps=8 format=3 uid="uid://c7anjek1wsbsd"]
+
+[ext_resource type="Script" path="res://events/image_library.gd" id="1_4t4mq"]
+[ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="1_eryr7"]
+[ext_resource type="Script" path="res://events/character_image_list.gd" id="2_oxgmx"]
+[ext_resource type="Texture2D" uid="uid://cyu0qvm88tnj5" path="res://events/aa.png" id="2_wv0tn"]
+[ext_resource type="Texture2D" uid="uid://btl3o7glk686f" path="res://events/bb.png" id="3_kyvek"]
+
+[sub_resource type="Gradient" id="Gradient_3rj8s"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.124138, 0.893103, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fiusu"]
+gradient = SubResource("Gradient_3rj8s")
+width = 1920
+height = 1080
+fill_to = Vector2(0, 1)
+
+[node name="ImageLibrary" type="CanvasLayer" node_paths=PackedStringArray("placeholder")]
+script = ExtResource("1_4t4mq")
+placeholder = NodePath("PlaceholderOrigin/PlaceholderCharacter")
+
+[node name="DungeonEntrance" type="Sprite2D" parent="."]
+position = Vector2(957, 539)
+scale = Vector2(1.04, 1.08)
+texture = ExtResource("1_eryr7")
+metadata/_edit_lock_ = true
+
+[node name="BlackBars" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(960, 540)
+texture = SubResource("GradientTexture2D_fiusu")
+metadata/_edit_lock_ = true
+
+[node name="PlaceholderOrigin" type="Node2D" parent="."]
+position = Vector2(453, 1080)
+scale = Vector2(0.893946, 0.893946)
+
+[node name="PlaceholderCharacter" type="Sprite2D" parent="PlaceholderOrigin"]
+position = Vector2(44.7455, 187.931)
+texture = ExtResource("3_kyvek")
+offset = Vector2(0, -581.035)
+
+[node name="Head" type="Node2D" parent="PlaceholderOrigin/PlaceholderCharacter"]
+position = Vector2(-91.7282, -898.265)
+
+[node name="nnivx" type="Node2D" parent="." node_paths=PackedStringArray("default", "images")]
+position = Vector2(1526, 1080)
+script = ExtResource("2_oxgmx")
+default = NodePath("default")
+images = [NodePath("red")]
+
+[node name="default" type="Sprite2D" parent="nnivx"]
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("default")
+
+[node name="Head" type="Node2D" parent="nnivx/default"]
+position = Vector2(-122.762, -1215.82)
+
+[node name="red" type="Sprite2D" parent="nnivx"]
+modulate = Color(1, 0.639216, 0.639216, 1)
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("red")
+
+[node name="Head" type="Node2D" parent="nnivx/red"]
+position = Vector2(-122.762, -1215.82)
+
+[node name="Lysandra" type="Node2D" parent="." node_paths=PackedStringArray("default", "images")]
+position = Vector2(1526, 1080)
+script = ExtResource("2_oxgmx")
+default = NodePath("../nnivx/default")
+images = [NodePath("../nnivx/red")]
+
+[node name="default" type="Sprite2D" parent="Lysandra"]
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("default")
+
+[node name="Head" type="Node2D" parent="Lysandra/default"]
+position = Vector2(-122.762, -1215.82)
+
+[node name="red" type="Sprite2D" parent="Lysandra"]
+modulate = Color(1, 0.639216, 0.639216, 1)
+position = Vector2(114.19, -113)
+scale = Vector2(0.669508, 0.669508)
+texture = ExtResource("2_wv0tn")
+metadata/tags = PackedStringArray("red")
+
+[node name="Head" type="Node2D" parent="Lysandra/red"]
+position = Vector2(-122.762, -1215.82)

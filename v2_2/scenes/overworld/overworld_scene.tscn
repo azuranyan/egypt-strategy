@@ -1,0 +1,335 @@
+[gd_scene load_steps=31 format=3 uid="uid://dw0pqub4o2o82"]
+
+[ext_resource type="Script" path="res://scenes/overworld/overworld_scene.gd" id="1_fqotl"]
+[ext_resource type="Texture2D" uid="uid://bvekg1x8lbqtc" path="res://scenes/overworld/data/Map_wo_Separators_Color_Filters_Blank.png" id="2_fv5n0"]
+[ext_resource type="AudioStream" uid="uid://3fbx4g7ex1cs" path="res://audio/music/AE_Royal_Tomb_LessMel_Loop.wav" id="3_rausi"]
+[ext_resource type="Script" path="res://scenes/overworld/empire_node.gd" id="3_rq8ib"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="3_sc2vb"]
+[ext_resource type="Resource" uid="uid://bq47arkapu6hu" path="res://units/lysandra/chara.tres" id="4_ai0xe"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="4_bp11s"]
+[ext_resource type="Resource" uid="uid://4vhw74hddihj" path="res://units/lysandra/unit_type.tres" id="5_j6qdb"]
+[ext_resource type="Resource" uid="uid://ceufx8acegtc1" path="res://units/sitri/chara.tres" id="6_gxwvc"]
+[ext_resource type="Resource" uid="uid://bnvl35k6vwirj" path="res://units/sitri/unit_type.tres" id="7_1lo02"]
+[ext_resource type="Resource" uid="uid://deby84sa6u6sq" path="res://units/tali/chara.tres" id="8_l0af5"]
+[ext_resource type="Resource" uid="uid://bv34ypmo75lcr" path="res://units/tali/unit_type.tres" id="9_fsjus"]
+[ext_resource type="Resource" uid="uid://be1oij41g24v5" path="res://units/maia/chara.tres" id="10_6jdt3"]
+[ext_resource type="Resource" uid="uid://b3rn2n4vcbfbp" path="res://units/maia/unit_type.tres" id="11_wn8u1"]
+[ext_resource type="Resource" uid="uid://dtmi5xkob1tpd" path="res://units/zahra/chara.tres" id="12_8mfsj"]
+[ext_resource type="Resource" uid="uid://b8b8l1glgxpp6" path="res://units/zahra/unit_type.tres" id="13_salgo"]
+[ext_resource type="Resource" uid="uid://tt2seal55q21" path="res://units/alara/chara.tres" id="14_plgjf"]
+[ext_resource type="Resource" uid="uid://m278p32g20ar" path="res://units/alara/unit_type.tres" id="15_p03ft"]
+[ext_resource type="PackedScene" uid="uid://vo0h66hnj2jc" path="res://scenes/overworld/territory_button.tscn" id="16_0hx7d"]
+[ext_resource type="PackedScene" uid="uid://tswv0jrmndgy" path="res://maps/test/test.tscn" id="18_b6tny"]
+[ext_resource type="PackedScene" uid="uid://wjbxvkl38yg8" path="res://scenes/overworld/battle_result_banner.tscn" id="18_l1pmu"]
+[ext_resource type="PackedScene" uid="uid://c1r233k6re33q" path="res://maps/starting_zone/starting_zone.tscn" id="19_mec2q"]
+[ext_resource type="Texture2D" uid="uid://c4mspqjcdu7nv" path="res://scenes/data/exclamation_mark.svg" id="21_sy7q1"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="24_sxrdq"]
+[ext_resource type="Script" path="res://scenes/common/pause_menu_spawner.gd" id="25_qoo8t"]
+[ext_resource type="PackedScene" uid="uid://ddq1qxxvbb413" path="res://scenes/common/pause_menu.tscn" id="26_vg4ii"]
+
+[sub_resource type="Gradient" id="Gradient_n8nx8"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.654321, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yq7nc"]
+gradient = SubResource("Gradient_n8nx8")
+width = 120
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_sdpw6"]
+font = ExtResource("4_bp11s")
+font_size = 40
+font_color = Color(0.898039, 0.713726, 0.486275, 1)
+outline_size = 4
+outline_color = Color(0.0588235, 0.0392157, 0.0196078, 1)
+shadow_size = 6
+shadow_color = Color(0.266667, 0.266667, 0.266667, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lcrub"]
+font = ExtResource("4_bp11s")
+font_size = 50
+font_color = Color(0.898039, 0.713726, 0.486275, 1)
+outline_size = 4
+outline_color = Color(0.0588235, 0.0392157, 0.0196078, 1)
+shadow_size = 6
+shadow_color = Color(0.266667, 0.266667, 0.266667, 1)
+
+[node name="OverworldScene" type="CanvasLayer"]
+script = ExtResource("1_fqotl")
+battle_result_banner_scene = ExtResource("18_l1pmu")
+bgm = ExtResource("3_rausi")
+
+[node name="MapWoSeparatorsColorFiltersBlank" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(960, 540)
+scale = Vector2(0.96, 0.940767)
+texture = ExtResource("2_fv5n0")
+
+[node name="Empires" type="Node" parent="."]
+
+[node name="Player" type="Node" parent="Empires" node_paths=PackedStringArray("home_territory")]
+script = ExtResource("3_rq8ib")
+type = 1
+leader_id = &"lysandra"
+home_territory = NodePath("../../Territories/Zetennu")
+leader = ExtResource("4_ai0xe")
+hero_unit = ExtResource("5_j6qdb")
+
+[node name="Boss" type="Node" parent="Empires" node_paths=PackedStringArray("home_territory")]
+script = ExtResource("3_rq8ib")
+type = 2
+leader_id = &"sitri"
+base_aggression = 0.9
+home_territory = NodePath("../../Territories/Cursed Stronghold")
+leader = ExtResource("6_gxwvc")
+hero_unit = ExtResource("7_1lo02")
+
+[node name="SpareEmpireSelection" type="Node" parent="."]
+
+[node name="RandomEmpireSelection" type="Node" parent="."]
+
+[node name="Tali" type="Node" parent="RandomEmpireSelection"]
+script = ExtResource("3_rq8ib")
+leader_id = &"tali"
+base_aggression = 0.8
+leader = ExtResource("8_l0af5")
+hero_unit = ExtResource("9_fsjus")
+
+[node name="Maia" type="Node" parent="RandomEmpireSelection"]
+script = ExtResource("3_rq8ib")
+leader_id = &"maia"
+base_aggression = 0.9
+leader = ExtResource("10_6jdt3")
+hero_unit = ExtResource("11_wn8u1")
+
+[node name="Zahra" type="Node" parent="RandomEmpireSelection"]
+script = ExtResource("3_rq8ib")
+leader_id = &"zahra"
+base_aggression = 0.7
+leader = ExtResource("12_8mfsj")
+hero_unit = ExtResource("13_salgo")
+
+[node name="Alara" type="Node" parent="RandomEmpireSelection"]
+script = ExtResource("3_rq8ib")
+leader_id = &"alara"
+base_aggression = 0.5
+leader = ExtResource("14_plgjf")
+hero_unit = ExtResource("15_p03ft")
+
+[node name="Territories" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Zetennu" parent="Territories" node_paths=PackedStringArray("adjacent", "empire_node") instance=ExtResource("16_0hx7d")]
+offset_left = 1475.0
+offset_top = 801.0
+offset_right = 1475.0
+offset_bottom = 801.0
+adjacent = [NodePath("../Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+_unit_list = PackedStringArray("maia", "cultist_axe", "alara")
+empire_node = NodePath("../../Empires/Player")
+
+[node name="Cursed Stronghold" parent="Territories" node_paths=PackedStringArray("empire_node") instance=ExtResource("16_0hx7d")]
+offset_left = 273.0
+offset_top = 201.0
+offset_right = 273.0
+offset_bottom = 201.0
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+empire_node = NodePath("../../Empires/Boss")
+
+[node name="Nekhet\'s Rest" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 467.0
+offset_top = 638.0
+offset_right = 467.0
+offset_bottom = 638.0
+adjacent = [NodePath("../Ruins of Atesh"), NodePath("../Fort Zaka")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+connect_to_boss = true
+
+[node name="Forsaken Temple" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 826.0
+offset_top = 212.0
+offset_right = 826.0
+offset_bottom = 212.0
+adjacent = [NodePath("../Khel-Et"), NodePath("../Medjed\'s Beacon"), NodePath("../Ruins of Atesh")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+connect_to_boss = true
+
+[node name="Khel-Et" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 1313.0
+offset_top = 163.0
+offset_right = 1313.0
+offset_bottom = 163.0
+adjacent = [NodePath("../Satayi"), NodePath("../Forsaken Temple"), NodePath("../Medjed\'s Beacon")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+
+[node name="Satayi" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 1638.0
+offset_top = 244.0
+offset_right = 1638.0
+offset_bottom = 244.0
+adjacent = [NodePath("../Khel-Et"), NodePath("../Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+
+[node name="Neru-Khisi" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 1594.0
+offset_top = 519.0
+offset_right = 1594.0
+offset_bottom = 519.0
+adjacent = [NodePath("../Zetennu"), NodePath("../Satayi"), NodePath("../Medjed\'s Beacon")]
+maps = Array[PackedScene]([ExtResource("19_mec2q")])
+_unit_list = PackedStringArray("cultist_axe", "cultist_axe", "cultist_sword", "cultist_sword", "cultist_spear", "cultist_priest")
+
+[node name="Medjed\'s Beacon" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 1088.0
+offset_top = 463.0
+offset_right = 1088.0
+offset_bottom = 463.0
+adjacent = [NodePath("../Khel-Et"), NodePath("../Forsaken Temple"), NodePath("../Ruins of Atesh"), NodePath("../Fort Zaka"), NodePath("../Neru-Khisi")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+
+[node name="Fort Zaka" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 948.0
+offset_top = 712.0
+offset_right = 948.0
+offset_bottom = 712.0
+adjacent = [NodePath("../Medjed\'s Beacon"), NodePath("../Ruins of Atesh"), NodePath("../Nekhet\'s Rest")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+
+[node name="Ruins of Atesh" parent="Territories" node_paths=PackedStringArray("adjacent") instance=ExtResource("16_0hx7d")]
+offset_left = 702.0
+offset_top = 456.0
+offset_right = 702.0
+offset_bottom = 456.0
+adjacent = [NodePath("../Forsaken Temple"), NodePath("../Medjed\'s Beacon"), NodePath("../Fort Zaka"), NodePath("../Nekhet\'s Rest")]
+maps = Array[PackedScene]([ExtResource("18_b6tny")])
+connect_to_boss = true
+
+[node name="InputBlocker" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HUD" type="Control" parent="Overlay"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_sc2vb")
+metadata/_edit_lock_ = true
+
+[node name="TurnBox" type="Control" parent="Overlay/HUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 889.0
+offset_top = 4.0
+offset_right = -889.0
+offset_bottom = 56.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/HUD/TurnBox"]
+self_modulate = Color(0, 0, 0, 0.545098)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -48.0
+offset_top = -6.0
+offset_right = 48.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_yq7nc")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/HUD/TurnBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Label3" type="Label" parent="Overlay/HUD/TurnBox/HBoxContainer"]
+layout_mode = 2
+text = "Turn"
+label_settings = SubResource("LabelSettings_sdpw6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TurnCountLabel" type="Label" parent="Overlay/HUD/TurnBox/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "5"
+label_settings = SubResource("LabelSettings_lcrub")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StrategyRoomButton" type="Button" parent="Overlay/HUD"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 648.0
+offset_top = -517.0
+offset_right = 927.0
+offset_bottom = -463.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.529412, 0.329412, 0.278431, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
+theme_override_font_sizes/font_size = 32
+text = "Strategy Room ➤"
+
+[node name="NewEventsAvailableIcon" type="TextureRect" parent="Overlay/HUD/StrategyRoomButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -144.5
+offset_top = -34.0
+offset_right = -124.5
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("21_sy7q1")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("24_sxrdq")
+buttons = [NodePath("../Overlay/HUD/StrategyRoomButton")]
+
+[node name="PauseMenuSpawner" type="Node" parent="."]
+script = ExtResource("25_qoo8t")
+pause_menu_scene = ExtResource("26_vg4ii")
+spawn_node_path = NodePath("../Overlay")
+
+[connection signal="pressed" from="Overlay/HUD/StrategyRoomButton" to="." method="_on_strategy_room_button_pressed"]

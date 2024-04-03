@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://2x6t18pxwa83"]
+
+[ext_resource type="Script" path="res://scenes/common/attack_shape_widget.gd" id="1_2a36j"]
+
+[node name="AttackShapeWidget" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 174.0
+offset_bottom = 100.0
+script = ExtResource("1_2a36j")
+columns = 3
+separation = 7
+shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)])
+active_shape_color = Color(0.870588, 0.294118, 0.294118, 1)
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="AspectRatioContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 7
+theme_override_constants/v_separation = 7
+columns = 3
+
+[node name="GridRect1" type="ColorRect" parent="AspectRatioContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

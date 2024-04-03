@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://bek2op2th3iee"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_aqldy"]
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_fis13"]
+
+[resource]
+script = ExtResource("1_aqldy")
+name = "Nebet"
+gender = "F"
+avatar = "Avatar of Sia"
+title = ""
+map_color = Color(0.376471, 0.721569, 0.815686, 1)
+portrait = ExtResource("1_fis13")
+

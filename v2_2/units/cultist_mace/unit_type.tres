@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=3 format=3 uid="uid://byykdwq7paamc"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_42kbg"]
+[ext_resource type="Resource" uid="uid://h688s6x0t0o6" path="res://units/cultist_mace/cultist_mace_knockback.tres" id="1_e6hxf"]
+
+[resource]
+script = ExtResource("1_42kbg")
+stats = {
+"dmg": 4,
+"maxhp": 12,
+"mov": 2,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_e6hxf")

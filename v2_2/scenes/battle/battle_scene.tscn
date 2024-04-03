@@ -1,0 +1,390 @@
+[gd_scene load_steps=24 format=3 uid="uid://d2wdgl38ld0i6"]
+
+[ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1_ty2dt"]
+[ext_resource type="AudioStream" uid="uid://bnhy6gb74ak8h" path="res://audio/music/AE_Golden_Age_FULL_Loop.wav" id="2_46m3i"]
+[ext_resource type="AudioStream" uid="uid://dj1ignkno64mo" path="res://audio/music/AE_Golden_Age_noMel_Loop.wav" id="3_vitwe"]
+[ext_resource type="Script" path="res://scenes/battle/unhandled_input_listener.gd" id="4_0x7je"]
+[ext_resource type="AudioStream" uid="uid://dkcv5gwmkmi6m" path="res://audio/music/AE_Scorpion_King_noMel_Loop.wav" id="4_157p4"]
+[ext_resource type="PackedScene" uid="uid://cj17rk2orwu6t" path="res://scenes/battle/level.tscn" id="4_loo3i"]
+[ext_resource type="PackedScene" uid="uid://mmt7kfrybnfi" path="res://scenes/battle/hud/hud.tscn" id="5_ghoy2"]
+[ext_resource type="AudioStream" uid="uid://cd0cf2ygldpp6" path="res://audio/music/AE_Scorpion_King_FULL_Loop.wav" id="5_y5slx"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="6_i7shf"]
+[ext_resource type="PackedScene" uid="uid://c1i2yiwf08gqj" path="res://scenes/battle/battle_result_screen.tscn" id="8_6a2cn"]
+
+[sub_resource type="Gradient" id="Gradient_nf1a3"]
+offsets = PackedFloat32Array(0, 0.987654)
+colors = PackedColorArray(1, 1, 1, 1, 0.462291, 0.462291, 0.462291, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_b57ex"]
+gradient = SubResource("Gradient_nf1a3")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Animation" id="Animation_b6u52"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_bbebw"]
+resource_name = "shake"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(5, 0), Vector2(-2, 0), Vector2(4, 0), Vector2(-3, 0), Vector2(3, 0), Vector2(-2, 0), Vector2(5, 0), Vector2(-1, 0), Vector2(2, 0), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xvbuf"]
+_data = {
+"RESET": SubResource("Animation_b6u52"),
+"shake": SubResource("Animation_bbebw")
+}
+
+[sub_resource type="Animation" id="Animation_smh23"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Label/Label2:label_settings:shadow_size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [111]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Label/Label2:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_sko32"]
+resource_name = "hide"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Label/Label2:label_settings:shadow_size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [111]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Label/Label2:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_bdh1b"]
+resource_name = "show"
+length = 20.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 15),
+"transitions": PackedFloat32Array(1, 0.406126, 1),
+"update": 0,
+"values": [Vector2(5, 5), Vector2(0.9, 0.9), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Label/Label2:label_settings:shadow_size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2.2, 3.5, 20),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0, 111, 111, 0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Label/Label2:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.6, 9.1, 20),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1.5, 12.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(2, 2, 2, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7bnme"]
+_data = {
+"RESET": SubResource("Animation_smh23"),
+"hide": SubResource("Animation_sko32"),
+"show": SubResource("Animation_bdh1b")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_hb81j"]
+font = ExtResource("6_i7shf")
+font_size = 120
+font_color = Color(1, 0.568627, 0.568627, 1)
+outline_size = 8
+outline_color = Color(0.219608, 0.180392, 0.117647, 1)
+shadow_size = 16
+shadow_color = Color(0, 0, 0, 0.301961)
+shadow_offset = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_f3pdu"]
+offsets = PackedFloat32Array(0, 0.283951, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_4akuy"]
+gradient = SubResource("Gradient_f3pdu")
+fill = 2
+fill_from = Vector2(0.49115, 0.504425)
+
+[sub_resource type="LabelSettings" id="LabelSettings_y8vo3"]
+font = ExtResource("6_i7shf")
+font_size = 120
+shadow_size = 111
+shadow_color = Color(1, 1, 1, 1)
+shadow_offset = Vector2(0, 0)
+
+[node name="BattleScene" type="CanvasLayer"]
+script = ExtResource("1_ty2dt")
+conquest_bgm = ExtResource("2_46m3i")
+training_bgm = ExtResource("3_vitwe")
+defense_bgm = ExtResource("4_157p4")
+final_battle_bgm = ExtResource("5_y5slx")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BG" type="TextureRect" parent="Control"]
+modulate = Color(0.345098, 0.286275, 0.184314, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_b57ex")
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Viewport" type="SubViewport" parent="Control/ViewportContainer"]
+unique_name_in_owner = true
+transparent_bg = true
+handle_input_locally = false
+physics_object_picking = true
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="Camera2D" type="Camera2D" parent="Control/ViewportContainer/Viewport"]
+unique_name_in_owner = true
+position = Vector2(960, 540)
+limit_left = -384
+limit_top = -216
+limit_right = 2304
+limit_bottom = 1296
+limit_smoothed = true
+position_smoothing_enabled = true
+editor_draw_limits = true
+editor_draw_drag_margin = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/ViewportContainer/Viewport/Camera2D"]
+libraries = {
+"": SubResource("AnimationLibrary_xvbuf")
+}
+speed_scale = 3.0
+
+[node name="UnhandledInputListener" type="Node" parent="Control/ViewportContainer/Viewport"]
+unique_name_in_owner = true
+script = ExtResource("4_0x7je")
+
+[node name="Level" parent="Control/ViewportContainer/Viewport" instance=ExtResource("4_loo3i")]
+unique_name_in_owner = true
+
+[node name="HUDVisibilityControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUD" parent="HUDVisibilityControl" instance=ExtResource("5_ghoy2")]
+layout_mode = 1
+
+[node name="BattleStartBanner" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BattleStartBanner"]
+libraries = {
+"": SubResource("AnimationLibrary_7bnme")
+}
+autoplay = "RESET"
+speed_scale = 10.0
+
+[node name="Label" type="Label" parent="BattleStartBanner"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(402, 90)
+text = "BATTLE START"
+label_settings = SubResource("LabelSettings_hb81j")
+
+[node name="TextureRect" type="TextureRect" parent="BattleStartBanner/Label"]
+modulate = Color(0, 0, 0, 0.701961)
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -416.0
+offset_top = 20.0
+offset_right = 416.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_4akuy")
+
+[node name="Label2" type="Label" parent="BattleStartBanner/Label"]
+modulate = Color(1, 1, 1, 0)
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(402, 90)
+text = "BATTLE START"
+label_settings = SubResource("LabelSettings_y8vo3")
+
+[node name="BattleResultScreen" parent="." instance=ExtResource("8_6a2cn")]
+visible = false

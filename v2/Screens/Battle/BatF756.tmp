@@ -1,0 +1,495 @@
+[gd_scene load_steps=18 format=3 uid="uid://bfo6inl2uutjo"]
+
+[ext_resource type="Script" path="res://Screens/Battle/BattleManager.gd" id="1_7nbam"]
+[ext_resource type="Texture2D" uid="uid://d11ms4wwvkbwg" path="res://Screens/Battle/Test_Map_Mockup_V8_HD.png" id="2_cy4xa"]
+[ext_resource type="PackedScene" uid="uid://bg3djjkbmlv2r" path="res://Screens/Battle/map_types/Map.tscn" id="2_wb1y3"]
+[ext_resource type="FontFile" uid="uid://b1mr3ff8qpetx" path="res://Rakkas-Regular.ttf" id="3_leprk"]
+[ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="4_bdp4j"]
+[ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="4_c2fdo"]
+
+[sub_resource type="Gradient" id="Gradient_6tuyg"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.18, 0.15888, 0.1224, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_q38ec"]
+gradient = SubResource("Gradient_6tuyg")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="LabelSettings" id="LabelSettings_8ab5r"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 27
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_coxmg"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 31
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 17
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_xhpmv"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 30
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_q8lss"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 29
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 20
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3mgfy"]
+font = ExtResource("4_bdp4j")
+font_size = 26
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_color = Color(0.235294, 0.188235, 0.12549, 1)
+
+[sub_resource type="Animation" id="Animation_hemgg"]
+resource_name = "shake"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(5, 0), Vector2(-2, 0), Vector2(4, 0), Vector2(-3, 0), Vector2(3, 0), Vector2(-2, 0), Vector2(5, 0), Vector2(-1, 0), Vector2(-2, 0), Vector2(2, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cep1i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lj2o0"]
+_data = {
+"RESET": SubResource("Animation_cep1i"),
+"shake": SubResource("Animation_hemgg")
+}
+
+[sub_resource type="GDScript" id="GDScript_aiobb"]
+script/source = "extends SubViewport
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	if Engine.is_editor_hint():
+		canvas_cull_mask = ~(0)
+	else:
+		canvas_cull_mask = ~(1 << 9)
+"
+
+[node name="BattleManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7nbam")
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="Background"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_q38ec")
+expand_mode = 3
+
+[node name="TextureRect2" type="TextureRect" parent="Background"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_cy4xa")
+expand_mode = 3
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="MenuButton" type="Button" parent="HUD"]
+offset_left = 23.0
+offset_top = 50.0
+offset_right = 115.0
+offset_bottom = 138.0
+focus_neighbor_right = NodePath("../UndoMoveButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../UndoMoveButton")
+focus_previous = NodePath("../DiefyButton")
+
+[node name="Label" type="Label" parent="HUD/MenuButton"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 92.0
+offset_bottom = 10.0
+text = "MENU"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="UndoMoveButton" type="Button" parent="HUD"]
+offset_left = 164.0
+offset_top = 96.0
+offset_right = 266.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../EndTurnButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../EndTurnButton")
+focus_previous = NodePath("../MenuButton")
+
+[node name="Label" type="Label" parent="HUD/UndoMoveButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "UNDO
+MOVE"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="EndTurnButton" type="Button" parent="HUD"]
+offset_left = 278.0
+offset_top = 96.0
+offset_right = 380.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../UndoMoveButton")
+focus_neighbor_right = NodePath("../ActionOrderButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../ActionOrderButton")
+focus_previous = NodePath("../UndoMoveButton")
+
+[node name="Label" type="Label" parent="HUD/EndTurnButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "END
+TURN"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ActionOrderButton" type="Button" parent="HUD"]
+offset_left = 1391.0
+offset_top = 96.0
+offset_right = 1498.0
+offset_bottom = 145.0
+focus_neighbor_left = NodePath("../EndTurnButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../RestButton")
+focus_previous = NodePath("../EndTurnButton")
+
+[node name="Label" type="Label" parent="HUD/ActionOrderButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 107.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "ACTION
+ORDER"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="CharacterPortrait" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 28.0
+offset_top = 865.0
+offset_right = 229.0
+offset_bottom = 1053.0
+focus_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="HUD/CharacterPortrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/CharacterPortrait"]
+layout_mode = 0
+offset_top = -34.0
+offset_right = 201.0
+offset_bottom = 13.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "LYSANDRA"
+label_settings = SubResource("LabelSettings_coxmg")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="TextureRect" type="TextureRect" parent="HUD/CharacterPortrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_c2fdo")
+expand_mode = 3
+
+[node name="RestButton" type="Button" parent="HUD"]
+offset_left = 241.0
+offset_top = 897.0
+offset_right = 340.0
+offset_bottom = 1026.0
+focus_neighbor_top = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../FightButton")
+focus_next = NodePath("../FightButton")
+focus_previous = NodePath("../ActionOrderButton")
+
+[node name="Label" type="Label" parent="HUD/RestButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 99.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "REST"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="FightButton" type="Button" parent="HUD"]
+offset_left = 352.0
+offset_top = 897.0
+offset_right = 481.0
+offset_bottom = 1026.0
+focus_neighbor_left = NodePath("../RestButton")
+focus_neighbor_top = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../DiefyButton")
+focus_next = NodePath("../DiefyButton")
+focus_previous = NodePath("../RestButton")
+
+[node name="Label" type="Label" parent="HUD/FightButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 129.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "FIGHT"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="DiefyButton" type="Button" parent="HUD"]
+offset_left = 492.0
+offset_top = 897.0
+offset_right = 621.0
+offset_bottom = 1026.0
+focus_neighbor_left = NodePath("../FightButton")
+focus_neighbor_top = NodePath("../MenuButton")
+focus_next = NodePath("../MenuButton")
+focus_previous = NodePath("../FightButton")
+
+[node name="Label" type="Label" parent="HUD/DiefyButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 129.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "DIEFY"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="MissionBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1545.0
+offset_top = 53.0
+offset_right = 1880.0
+offset_bottom = 159.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/MissionBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/MissionBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 335.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "MISSION"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MissionBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="HUD/MissionBox/VBoxContainer"]
+layout_mode = 2
+text = "Defeat all enemies
+within 10 turns!"
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BonusGoalBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1545.0
+offset_top = 194.0
+offset_right = 1880.0
+offset_bottom = 300.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/BonusGoalBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/BonusGoalBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 335.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "BONUS GOAL"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/BonusGoalBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="HUD/BonusGoalBox/VBoxContainer"]
+layout_mode = 2
+text = "Win the battle with
+full health points!"
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InformationBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1408.0
+offset_top = 868.0
+offset_right = 1880.0
+offset_bottom = 1049.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/InformationBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/InformationBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 472.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "INFORMATION"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="DescriptionLabel" type="Label" parent="HUD/InformationBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_right = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Envelope yourself in a torrent of divine fire, incinerating your foes. Deals 1 damage and pushes all  adjacent enemies back 1 space."
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer"]
+position = Vector2(1011, 486)
+position_smoothing_enabled = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="SubViewportContainer/Camera2D"]
+libraries = {
+"": SubResource("AnimationLibrary_lj2o0")
+}
+speed_scale = 3.0
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+script = SubResource("GDScript_aiobb")
+
+[node name="Map" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_wb1y3")]

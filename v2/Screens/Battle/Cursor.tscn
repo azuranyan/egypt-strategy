@@ -83,7 +83,6 @@ func is_static() -> bool:
 [node name="Cursor" type="Node2D"]
 z_index = 1
 z_as_relative = false
-position = Vector2(1011.36, 251.987)
 script = SubResource("GDScript_r41lq")
 
 [node name="Node2D" type="Node2D" parent="."]

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dsib5wsooums4"]
+
+[ext_resource type="Script" path="res://scenes/loading/loading_screen.gd" id="1_qniti"]
+
+[node name="LoadingScreen" type="CanvasLayer"]
+layer = 71
+script = ExtResource("1_qniti")

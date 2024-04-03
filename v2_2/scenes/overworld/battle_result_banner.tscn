@@ -1,0 +1,189 @@
+[gd_scene load_steps=10 format=3 uid="uid://wjbxvkl38yg8"]
+
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_ubpcv"]
+[ext_resource type="Script" path="res://scenes/overworld/battle_result_banner.gd" id="2_27rhy"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="3_n2ngn"]
+[ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="4_fw3mu"]
+[ext_resource type="Script" path="res://scenes/common/autopause_node.gd" id="5_alrea"]
+
+[sub_resource type="Animation" id="Animation_5xp3e"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_vry5d"]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_n0sg4"]
+_data = {
+"RESET": SubResource("Animation_5xp3e"),
+"show": SubResource("Animation_vry5d")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_jdxpc"]
+font_size = 29
+font_color = Color(0.360784, 0.254902, 0.113725, 1)
+
+[node name="BattleResultBanner" type="Control"]
+process_mode = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_ubpcv")
+script = ExtResource("2_27rhy")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_n0sg4")
+}
+autoplay = "RESET"
+speed_scale = 5.0
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 608.0
+offset_top = 422.0
+offset_right = -608.0
+offset_bottom = -422.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 30
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="HeaderLabel" type="RichTextLabel" parent="Panel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
+theme_override_font_sizes/normal_font_size = 40
+bbcode_enabled = true
+text = "Region Conquered!"
+fit_content = true
+scroll_active = false
+script = ExtResource("4_fw3mu")
+all_caps = true
+center_text = true
+
+[node name="MessageLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "The Cult of Ra has laid claim to the lands of Satayi!
+"
+label_settings = SubResource("LabelSettings_jdxpc")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Control" type="Control" parent="Panel"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/Control"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="StrategyRoomButton" type="Button" parent="Panel/Control/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 48)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/Control/HBoxContainer/StrategyRoomButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="StrategyRoomLabel" type="RichTextLabel" parent="Panel/Control/HBoxContainer/StrategyRoomButton/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
+bbcode_enabled = true
+text = "Strategy Room"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("4_fw3mu")
+all_caps = true
+center_text = true
+
+[node name="ContinueButton" type="Button" parent="Panel/Control/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 48)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/Control/HBoxContainer/ContinueButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="ContinueLabel" type="RichTextLabel" parent="Panel/Control/HBoxContainer/ContinueButton/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("3_n2ngn")
+bbcode_enabled = true
+text = "Continue"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("4_fw3mu")
+all_caps = true
+center_text = true
+
+[node name="AutopauseNode" type="Node" parent="."]
+script = ExtResource("5_alrea")

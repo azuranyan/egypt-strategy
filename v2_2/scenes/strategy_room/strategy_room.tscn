@@ -1,0 +1,395 @@
+[gd_scene load_steps=19 format=3 uid="uid://m6454awul4gx"]
+
+[ext_resource type="Script" path="res://scenes/strategy_room/strategy_room.gd" id="1_f8a7s"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="2_sg0r4"]
+[ext_resource type="Texture2D" uid="uid://becd3mhykth8g" path="res://events/sprites/throne_room/RC_EgyptianPalaceInteriors_(14).jpg" id="3_idqa0"]
+[ext_resource type="Texture2D" uid="uid://dggbqored2ays" path="res://units/alara/Alara.png" id="4_b7ngt"]
+[ext_resource type="Script" path="res://scenes/strategy_room/unit_list_panel.gd" id="4_c4fc5"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="5_uumvb"]
+[ext_resource type="FontFile" uid="uid://daofijf3ycy6k" path="res://scenes/data/fonts/Aleo-VariableFont_wght.ttf" id="6_yipoh"]
+[ext_resource type="PackedScene" uid="uid://t3wfofdlp4c5" path="res://scenes/strategy_room/unit_info_card.tscn" id="7_0c7x5"]
+[ext_resource type="PackedScene" uid="uid://1as7qe1f084t" path="res://scenes/strategy_room/attack_card.tscn" id="8_tqsgu"]
+[ext_resource type="Script" path="res://scenes/common/button_sound_emitter.gd" id="10_uyp2m"]
+
+[sub_resource type="Animation" id="Animation_4f5xn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/CharacterPortrait:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1920, 332)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/CharacterPortrait:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = false
+tracks/2/path = NodePath("Control/UnitInfoCard:rotation")
+tracks/2/interp = 4
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.5708]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Control/UnitInfoCard:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Control/AttackCard:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_fio8d"]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/CharacterPortrait:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1920, 332), Vector2(1130, 332)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/CharacterPortrait:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = false
+tracks/2/path = NodePath("Control/UnitInfoCard:rotation")
+tracks/2/interp = 4
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.5708, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Control/UnitInfoCard:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Control/AttackCard:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hahpu"]
+_data = {
+"RESET": SubResource("Animation_4f5xn"),
+"show": SubResource("Animation_fio8d")
+}
+
+[sub_resource type="Gradient" id="Gradient_moclt"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hl1kw"]
+gradient = SubResource("Gradient_moclt")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kin3n"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7kf6e"]
+bg_color = Color(0.815686, 0.72549, 0.639216, 1)
+border_width_bottom = 4
+border_color = Color(0.235294, 0.235294, 0.235294, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i82bf"]
+content_margin_left = 20.0
+draw_center = false
+
+[node name="StrategyRoom" type="CanvasLayer"]
+script = ExtResource("1_f8a7s")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_hahpu")
+}
+autoplay = "RESET"
+speed_scale = 8.0
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_sg0r4")
+
+[node name="Background" type="TextureRect" parent="Control"]
+clip_children = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_idqa0")
+expand_mode = 1
+metadata/_edit_lock_ = true
+
+[node name="Vignette" type="TextureRect" parent="Control"]
+modulate = Color(0, 0, 0, 0.619608)
+clip_children = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_hl1kw")
+metadata/_edit_lock_ = true
+
+[node name="CharacterPortrait" type="TextureRect" parent="Control"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1920.0
+offset_top = 332.0
+offset_right = 2970.72
+offset_bottom = 1080.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("4_b7ngt")
+expand_mode = 3
+stretch_mode = 4
+
+[node name="BackButton" type="Button" parent="Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -910.0
+offset_top = -517.0
+offset_right = -732.0
+offset_bottom = -463.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"FlatButton"
+theme_override_colors/font_color = Color(0.529412, 0.329412, 0.278431, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
+theme_override_font_sizes/font_size = 32
+text = "⮜ Back"
+
+[node name="UnitListPanel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 131.0
+offset_right = -1399.0
+offset_bottom = -252.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kin3n")
+script = ExtResource("4_c4fc5")
+
+[node name="Panel" type="Panel" parent="Control/UnitListPanel"]
+layout_mode = 0
+offset_left = 45.0
+offset_top = -30.0
+offset_right = 426.0
+offset_bottom = 46.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_7kf6e")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/UnitListPanel/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control/UnitListPanel/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.937255, 0.901961, 0.870588, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/normal_font = ExtResource("5_uumvb")
+bbcode_enabled = true
+text = "[center][font_size=48]UNIT LIST[/font_size][/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/UnitListPanel"]
+layout_direction = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = 74.0
+offset_right = -9.0
+offset_bottom = -27.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_scroll_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/UnitListPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="UnitList" type="ItemList" parent="Control/UnitListPanel/ScrollContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_direction = 2
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
+theme_override_fonts/font = ExtResource("6_yipoh")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/panel = SubResource("StyleBoxFlat_i82bf")
+item_count = 2
+fixed_icon_size = Vector2i(16, 16)
+item_0/text = "Alara"
+item_1/text = "Lysandra"
+
+[node name="AttackCard" parent="Control" instance=ExtResource("8_tqsgu")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = -1
+offset_left = 1045.0
+offset_top = 103.0
+offset_right = 1305.0
+offset_bottom = 393.0
+grow_horizontal = 0
+
+[node name="UnitInfoCard" parent="Control" instance=ExtResource("7_0c7x5")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 1316.0
+offset_top = 53.0
+offset_right = 1851.0
+offset_bottom = 393.0
+pivot_offset = Vector2(604, 342)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+modulate = Color(1, 1, 1, 0.513726)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = -204.0
+offset_right = 685.0
+offset_bottom = 27.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="StrategyRoomLabel" type="RichTextLabel" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="PanelContainer" type="PanelContainer" parent="Control"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 849.0
+offset_right = 521.0
+offset_bottom = 896.0
+
+[node name="TooltipLabel" type="Label" parent="Control/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Inspect units."
+
+[node name="ButtonSoundEmitter" type="Node" parent="." node_paths=PackedStringArray("buttons")]
+script = ExtResource("10_uyp2m")
+buttons = [NodePath("../Control/BackButton"), null]
+
+[connection signal="pressed" from="Control/BackButton" to="." method="_on_back_button_pressed"]

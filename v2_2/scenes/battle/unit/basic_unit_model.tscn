@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://diawd3fxwy2cy"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_model.gd" id="1_l5fke"]
+[ext_resource type="SpriteFrames" uid="uid://q7fm5unoyvur" path="res://scenes/battle/unit/data/placeholder_sprite_frames.tres" id="2_kix1i"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mveqy"]
+radius = 15.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_266ts"]
+size = Vector2(30, 51)
+
+[node name="UnitModel" type="Node2D" node_paths=PackedStringArray("sprite", "detector", "grab_point")]
+scale = Vector2(-1, 1)
+script = ExtResource("1_l5fke")
+sprite = NodePath("Sprite")
+detector = NodePath("MouseDetector")
+grab_point = NodePath("GrabPoint")
+
+[node name="GrabPoint" type="Node2D" parent="."]
+position = Vector2(-4, -76)
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -38)
+scale = Vector2(0.575, 0.575)
+sprite_frames = ExtResource("2_kix1i")
+animation = &"back_attack"
+
+[node name="MouseDetector" type="Area2D" parent="."]
+
+[node name="Head" type="CollisionShape2D" parent="MouseDetector"]
+position = Vector2(-4, -65)
+shape = SubResource("CircleShape2D_mveqy")
+
+[node name="Body" type="CollisionShape2D" parent="MouseDetector"]
+position = Vector2(-3, -25)
+shape = SubResource("RectangleShape2D_266ts")
+
+[connection signal="input_event" from="MouseDetector" to="." method="_on_cursor_detector_input_event"]

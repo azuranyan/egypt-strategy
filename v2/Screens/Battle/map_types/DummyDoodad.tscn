@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dd8q27lfwya5"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/MapObject.gd" id="1_tqpqm"]
+
+[node name="DummyDoodad" type="Node2D"]
+visibility_layer = 512
+script = ExtResource("1_tqpqm")
+pathing = 2
+no_show = true

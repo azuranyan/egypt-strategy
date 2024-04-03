@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://bpgc3ekatrfo6"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_26ksc"]
+[ext_resource type="Resource" uid="uid://b4o7ju1g3bra2" path="res://units/ishtar/ishtar_magic_missile.tres" id="1_cbkc0"]
+[ext_resource type="Resource" uid="uid://de5soqmslvwca" path="res://units/ishtar/ishtar_magic.tres" id="1_nhstk"]
+
+[resource]
+script = ExtResource("1_26ksc")
+stats = {
+"dmg": 4,
+"maxhp": 12,
+"mov": 3,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 4,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 1,
+"rng": 0
+}
+basic_attack = ExtResource("1_nhstk")
+special_attack = ExtResource("1_cbkc0")

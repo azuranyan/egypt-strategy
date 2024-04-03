@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://6tklx7lxk55m"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_ga4uc"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_ga4uc"]
 [ext_resource type="Resource" uid="uid://diwyndwsjwymh" path="res://Screens/Battle/data/attack/hesra_basic.tres" id="1_ojd1l"]
 [ext_resource type="Resource" uid="uid://dw0ii0h0jo7eg" path="res://Screens/Battle/data/chara/Hesra.tres" id="2_g0b5q"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_qxt8y"]

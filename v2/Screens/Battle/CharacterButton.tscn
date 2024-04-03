@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bak58p4o0klca"]
 
 [ext_resource type="Script" path="res://Screens/Battle/CharacterButton.gd" id="1_kx34e"]
-[ext_resource type="FontFile" uid="uid://ba16ggoccu0bx" path="res://sylfaen.ttf" id="4_lpa2y"]
+[ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="4_lpa2y"]
 
 [sub_resource type="Gradient" id="Gradient_dxnge"]
 colors = PackedColorArray(1, 1, 1, 0.615686, 0, 0, 0, 0)

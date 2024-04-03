@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=13 format=3 uid="uid://dehf1nhxqh0jg"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_animated_sprite_effect.gd" id="1_2lg8h"]
+[ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="1_144ws"]
+[ext_resource type="Script" path="res://resource_property_access.gd" id="2_cbyc4"]
+[ext_resource type="SpriteFrames" uid="uid://qa2cwjttcrf5" path="res://scenes/battle/attack_effects/data/default_effects.tres" id="2_mgpmk"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/play_animation_effect.gd" id="3_grtxf"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/damage_effect.gd" id="4_pt3cf"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/move_effect.gd" id="6_pb1sr"]
+
+[sub_resource type="Resource" id="Resource_qp6lr"]
+script = ExtResource("4_pt3cf")
+amount = 4
+stat = "none"
+
+[sub_resource type="Resource" id="Resource_rpxoy"]
+script = ExtResource("2_cbyc4")
+resource = SubResource("Resource_qp6lr")
+property = &"amount"
+
+[sub_resource type="Resource" id="Resource_pyl8d"]
+script = ExtResource("1_2lg8h")
+sprite_frames = ExtResource("2_mgpmk")
+animation = &"basic_damage"
+target = &"body"
+draw_over_unit = true
+
+[sub_resource type="Resource" id="Resource_ilol4"]
+script = ExtResource("3_grtxf")
+animation = &"hurt"
+hold_condition = 2
+
+[sub_resource type="Resource" id="Resource_8cpmh"]
+script = ExtResource("6_pb1sr")
+origin = 1
+offset = Vector2(0, 1)
+direction = 2
+speed = 0.0
+
+[resource]
+script = ExtResource("1_144ws")
+name = "Fadeshot"
+description = "Hits the target for {damage} damage and hops back 1 tile."
+description_args = {
+"damage": SubResource("Resource_rpxoy")
+}
+user_animation = "attack"
+multicast = 0
+max_range = 1
+min_range = 0
+include_user = false
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_8cpmh")])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_pyl8d"), SubResource("Resource_qp6lr"), SubResource("Resource_ilol4")])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = true
+target_flags = 4
+allow_rotation = false

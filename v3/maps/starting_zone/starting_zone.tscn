@@ -1,0 +1,116 @@
+[gd_scene load_steps=23 format=3 uid="uid://b3tq2w78t60y5"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_hbpqf"]
+[ext_resource type="PackedScene" uid="uid://cux1v2yokvd78" path="res://scenes/battle/map/world.tscn" id="2_hapkb"]
+[ext_resource type="Script" path="res://scenes/battle/trigger.gd" id="2_o7d0s"]
+[ext_resource type="PackedScene" uid="uid://dawqwk1rwon1j" path="res://scenes/battle/map/map_objects/unit.tscn" id="3_3wtrm"]
+[ext_resource type="PackedScene" uid="uid://bsngbbt6h7fms" path="res://scenes/battle/map/tile_overlay.tscn" id="3_ohuob"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="4_q05u2"]
+[ext_resource type="Texture2D" uid="uid://bp6wo3q0kq8i5" path="res://maps/starting_zone/sprites/StartingZoneObj1.png" id="6_mupoa"]
+[ext_resource type="Texture2D" uid="uid://bdxc26fib2hc2" path="res://maps/starting_zone/sprites/StartingZoneObj2.png" id="7_fqrx5"]
+[ext_resource type="Texture2D" uid="uid://bfkpi1sb6iyag" path="res://maps/starting_zone/sprites/StartingZoneObj3.png" id="8_tpdlq"]
+[ext_resource type="Texture2D" uid="uid://p6rsul6icj7u" path="res://maps/starting_zone/sprites/StartingZoneObj4.png" id="9_s4ih6"]
+[ext_resource type="Texture2D" uid="uid://boghbqgdlsyf2" path="res://maps/starting_zone/sprites/StartingZoneObj5.png" id="10_8v0se"]
+[ext_resource type="Texture2D" uid="uid://ce6pjkjik3yxc" path="res://maps/starting_zone/sprites/StartingZoneObj6.png" id="11_ne2i7"]
+[ext_resource type="Texture2D" uid="uid://cdo4arx6uaqjr" path="res://maps/starting_zone/sprites/StartingZoneObj7.png" id="12_m5mni"]
+[ext_resource type="Texture2D" uid="uid://dm81oxepepily" path="res://maps/starting_zone/sprites/StartingZoneObj8.png" id="13_jvhw7"]
+[ext_resource type="Texture2D" uid="uid://blxwpaig88rmp" path="res://maps/starting_zone/sprites/StartingZoneObj9.png" id="14_q5di1"]
+[ext_resource type="Texture2D" uid="uid://dpvewodb8mukx" path="res://maps/starting_zone/sprites/StartingZoneObj10.png" id="15_30aag"]
+[ext_resource type="Texture2D" uid="uid://b7aa6jt48vcew" path="res://maps/starting_zone/sprites/StartingZoneObj11.png" id="16_uprsf"]
+[ext_resource type="Texture2D" uid="uid://bbo4wradfhfko" path="res://maps/starting_zone/sprites/StartingZoneObj12.png" id="17_1x53t"]
+[ext_resource type="Texture2D" uid="uid://c0hejwomgh4r6" path="res://maps/starting_zone/sprites/StartingZoneObj13.png" id="18_sgwe5"]
+[ext_resource type="PackedScene" uid="uid://cgm41m46kwr2l" path="res://scenes/battle/map/map_objects/detector.tscn" id="19_630k6"]
+[ext_resource type="PackedScene" uid="uid://dkb038jvle2wf" path="res://scenes/battle/map/map_objects/barrier.tscn" id="20_vyxgg"]
+
+[sub_resource type="Resource" id="Resource_fh7f3"]
+script = ExtResource("2_o7d0s")
+
+[node name="StartingZone" type="Node2D" node_paths=PackedStringArray("world", "pathing_painter")]
+y_sort_enabled = true
+script = ExtResource("1_hbpqf")
+world = NodePath("World")
+pathing_painter = NodePath("TileOverlay")
+triggers = Array[ExtResource("2_o7d0s")]([SubResource("Resource_fh7f3")])
+evaluators = Array[Resource("res://scenes/battle/battle_result_evaluator.gd")]([])
+
+[node name="World" parent="." instance=ExtResource("2_hapkb")]
+
+[node name="TileOverlay" parent="." node_paths=PackedStringArray("world") instance=ExtResource("3_ohuob")]
+z_index = 1
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(196611, 458754, 0, 65542, 458754, 0, 196612, 458754, 0, 196613, 458754, 0, 196614, 458754, 0, 131079, 458754, 0, 131078, 458754, 0, 524292, 196610, 0, 262148, 196610, 0, 524296, 196610, 0, 262152, 196610, 0, 589827, 65538, 0, 655369, 65538, 0, 131081, 65538, 0, 720907, 458754, 0, 655371, 458754, 0, 589835, 458754, 0, 524299, 458754, 0, 720906, 458754, 0, 262155, 458754, 0, 196619, 458754, 0, 131083, 458754, 0, 65547, 458754, 0, 10, 458754, 0, 9, 458754, 0, 2, 458754, 0, 3, 458754, 0, 65546, 458754, 0, 720896, 458754, 0, 720897, 458754, 0, 720898, 458754, 0, 720899, 458754, 0, 458752, 458754, 0, 458753, 458754, 0, 458754, 458754, 0, 458755, 458754, 0, 393219, 458754, 0, 327683, 458754, 0, 262147, 458754, 0, 6, 458754, 0)
+world = NodePath("../World")
+
+[node name="MapObjectContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("4_q05u2")
+
+[node name="Unit" parent="MapObjectContainer" instance=ExtResource("3_3wtrm")]
+position = Vector2(1011.46, 626.818)
+map_position = Vector2(7, 7)
+
+[node name="Node2D" type="Node2D" parent="."]
+scale = Vector2(0.473, 0.473)
+
+[node name="StartingZoneObj1" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("6_mupoa")
+centered = false
+
+[node name="StartingZoneObj2" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("7_fqrx5")
+centered = false
+
+[node name="StartingZoneObj3" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("8_tpdlq")
+centered = false
+
+[node name="StartingZoneObj4" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("9_s4ih6")
+centered = false
+
+[node name="StartingZoneObj5" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("10_8v0se")
+centered = false
+
+[node name="StartingZoneObj6" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("11_ne2i7")
+centered = false
+
+[node name="StartingZoneObj7" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("12_m5mni")
+centered = false
+
+[node name="StartingZoneObj8" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("13_jvhw7")
+centered = false
+
+[node name="StartingZoneObj9" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("14_q5di1")
+centered = false
+
+[node name="StartingZoneObj10" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("15_30aag")
+centered = false
+
+[node name="StartingZoneObj11" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("16_uprsf")
+centered = false
+
+[node name="StartingZoneObj12" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("17_1x53t")
+centered = false
+
+[node name="StartingZoneObj13" type="Sprite2D" parent="Node2D"]
+texture = ExtResource("18_sgwe5")
+centered = false
+
+[node name="Detector" parent="." instance=ExtResource("19_630k6")]
+position = Vector2(867.21, 654.658)
+map_position = Vector2(6, 9)
+
+[node name="Barrier" parent="." instance=ExtResource("20_vyxgg")]
+position = Vector2(1251.88, 598.978)
+map_position = Vector2(9, 4)

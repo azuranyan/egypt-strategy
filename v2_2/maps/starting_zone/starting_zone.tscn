@@ -1,0 +1,176 @@
+[gd_scene load_steps=25 format=3 uid="uid://c1r233k6re33q"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_ok0h5"]
+[ext_resource type="PackedScene" uid="uid://bdlmdisb4hngu" path="res://scenes/battle/map/world.tscn" id="3_6y2y1"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/defeat_all_enemies.gd" id="3_cdw7g"]
+[ext_resource type="Script" path="res://scenes/battle/triggers/all_units_defeated.gd" id="3_kl6gs"]
+[ext_resource type="Texture2D" uid="uid://8e53xrl080tr" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="4_o4n1p"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/no_damage_clear.gd" id="5_6ach7"]
+[ext_resource type="PackedScene" uid="uid://csnrahswbsonh" path="res://scenes/battle/tile_overlay.tscn" id="5_lepi5"]
+[ext_resource type="Script" path="res://scenes/battle/objectives/defeat_target.gd" id="5_myo41"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_object_container.gd" id="6_f7xbd"]
+[ext_resource type="PackedScene" uid="uid://yprjs7acc27b" path="res://scenes/battle/map_objects/static_doodad.tscn" id="7_0h7yf"]
+[ext_resource type="PackedScene" uid="uid://f7wfyvgvuqsf" path="res://scenes/battle/map_objects/spawn_point.tscn" id="7_4daum"]
+[ext_resource type="Texture2D" uid="uid://jiw6y231h20k" path="res://maps/starting_zone/sprites/StartingZoneObj1.png" id="8_3vl5c"]
+[ext_resource type="Texture2D" uid="uid://bjiowvmqtou0m" path="res://maps/starting_zone/sprites/StartingZoneObj2.png" id="9_dlfa4"]
+[ext_resource type="Texture2D" uid="uid://cr281r0g4e2f7" path="res://maps/starting_zone/sprites/StartingZoneObj3.png" id="10_1tiv6"]
+[ext_resource type="Texture2D" uid="uid://d3viadbrfy5on" path="res://maps/starting_zone/sprites/StartingZoneObj4.png" id="11_5ebwt"]
+[ext_resource type="Texture2D" uid="uid://5gq4nwqkeq1x" path="res://maps/starting_zone/sprites/StartingZoneObj5.png" id="12_f03uo"]
+[ext_resource type="Texture2D" uid="uid://c2h8w1srxlp5s" path="res://maps/starting_zone/sprites/StartingZoneObj6.png" id="13_n8v6b"]
+[ext_resource type="Texture2D" uid="uid://b5ivu2g1qnco6" path="res://maps/starting_zone/sprites/StartingZoneObj7.png" id="14_npjpy"]
+[ext_resource type="Texture2D" uid="uid://cpcbr8prckigo" path="res://maps/starting_zone/sprites/StartingZoneObj8.png" id="15_ucbvd"]
+[ext_resource type="Texture2D" uid="uid://dunoejdurhax5" path="res://maps/starting_zone/sprites/StartingZoneObj9.png" id="16_r3306"]
+[ext_resource type="Texture2D" uid="uid://cjsgqvnsiulcc" path="res://maps/starting_zone/sprites/StartingZoneObj10.png" id="17_0cdjt"]
+[ext_resource type="Texture2D" uid="uid://xt52elc0wubk" path="res://maps/starting_zone/sprites/StartingZoneObj11.png" id="18_o07kn"]
+[ext_resource type="Texture2D" uid="uid://cpk1a2prsll3i" path="res://maps/starting_zone/sprites/StartingZoneObj12.png" id="19_4ryph"]
+[ext_resource type="Texture2D" uid="uid://dpp00n16q43ai" path="res://maps/starting_zone/sprites/StartingZoneObj13.png" id="20_14e67"]
+
+[node name="StartingZone" type="Node2D" node_paths=PackedStringArray("world", "pathing_painter")]
+y_sort_enabled = true
+script = ExtResource("1_ok0h5")
+world = NodePath("World")
+pathing_painter = NodePath("Painter")
+
+[node name="Triggers" type="Node" parent="."]
+
+[node name="AllUnitsDefeatedTrigger" type="Node" parent="Triggers"]
+script = ExtResource("3_kl6gs")
+
+[node name="Missions" type="Node" parent="."]
+
+[node name="DefeatAllEnemiesObjective" type="Node" parent="Missions"]
+script = ExtResource("3_cdw7g")
+
+[node name="DefeatTargetObjective" type="Node" parent="Missions"]
+script = ExtResource("5_myo41")
+target_type = 2
+target_data = null
+objective_type = "Bonus Objective"
+countdown = 1
+
+[node name="NoDamageClearObjective" type="Node" parent="Missions"]
+script = ExtResource("5_6ach7")
+objective_type = "Bonus Objective"
+one_shot = false
+
+[node name="BonusGoals" type="Node" parent="."]
+
+[node name="World" parent="." instance=ExtResource("3_6y2y1")]
+z_index = -10
+texture = ExtResource("4_o4n1p")
+metadata/_edit_lock_ = true
+
+[node name="Painter" parent="." instance=ExtResource("5_lepi5")]
+z_index = 1
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+layer_0/tile_data = PackedInt32Array(720905, 458752, 0, 720906, 458752, 0, 720907, 458752, 0, 720898, 458752, 0, 720897, 458752, 0, 720896, 458752, 0, 393218, 458752, 0, 327682, 458752, 0, 262146, 458752, 0, 196610, 458752, 0, 131075, 458752, 0, 131076, 458752, 0, 131077, 458752, 0, 131078, 458752, 0, 65542, 458752, 0, 131074, 458752, 0, 5, 458752, 0, 65541, 458752, 0, 458754, 458752, 0, 458752, 458752, 0, 458753, 458752, 0)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("6_f7xbd")
+
+[node name="SpawnPoint1" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(3, 7)
+
+[node name="SpawnPoint2" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(4, 9)
+
+[node name="SpawnPoint3" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(7, 4)
+
+[node name="SpawnPoint4" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(9, 4)
+
+[node name="SpawnPoint5" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(5, 9)
+
+[node name="SpawnPoint6" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(6, 9)
+
+[node name="SpawnPoint7" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+map_position = Vector2(8, 8)
+
+[node name="SpawnPoint8" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(5, 7)
+
+[node name="SpawnPoint9" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(6, 7)
+
+[node name="SpawnPoint10" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(8, 5)
+
+[node name="SpawnPoint11" parent="SpawnPoints" instance=ExtResource("7_4daum")]
+modulate = Color(0, 0, 1, 0.2)
+type = 1
+map_position = Vector2(8, 4)
+
+[node name="Dummy" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("6_f7xbd")
+
+[node name="Doodads" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("6_f7xbd")
+metadata/_edit_group_ = true
+metadata/_edit_lock_ = true
+
+[node name="StaticDoodad1" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("8_3vl5c")
+map_position = Vector2(11, 0)
+
+[node name="StaticDoodad2" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("9_dlfa4")
+map_position = Vector2(11, 11)
+
+[node name="StaticDoodad3" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("10_1tiv6")
+map_position = Vector2(10, 11)
+
+[node name="StaticDoodad4" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("11_5ebwt")
+map_position = Vector2(10, 0)
+
+[node name="StaticDoodad5" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("12_f03uo")
+map_position = Vector2(8, 6)
+
+[node name="StaticDoodad6" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("13_n8v6b")
+map_position = Vector2(7, 2)
+
+[node name="StaticDoodad7" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("14_npjpy")
+map_position = Vector2(3, 5)
+
+[node name="StaticDoodad8" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("15_ucbvd")
+map_position = Vector2(3, 3)
+
+[node name="StaticDoodad9" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("16_r3306")
+map_position = Vector2(2, 5)
+
+[node name="StaticDoodad10" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("17_0cdjt")
+map_position = Vector2(1, 7)
+
+[node name="StaticDoodad11" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("18_o07kn")
+map_position = Vector2(2, 11)
+
+[node name="StaticDoodad12" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("19_4ryph")
+map_position = Vector2(0, 1)
+
+[node name="StaticDoodad13" parent="Doodads" instance=ExtResource("7_0h7yf")]
+texture = ExtResource("20_14e67")
+map_position = Vector2(1, 11)

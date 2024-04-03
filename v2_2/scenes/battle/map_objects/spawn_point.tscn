@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3 uid="uid://f7wfyvgvuqsf"]
+
+[ext_resource type="Script" path="res://scenes/battle/map_objects/spawn_point.gd" id="1_8lfal"]
+[ext_resource type="Script" path="res://scenes/battle/transformable.gd" id="2_0civp"]
+
+[sub_resource type="Gradient" id="Gradient_xu6og"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_3fj8f"]
+gradient = SubResource("Gradient_xu6og")
+
+[node name="SpawnPoint" type="Node2D"]
+modulate = Color(1, 0, 0, 0.2)
+script = ExtResource("1_8lfal")
+
+[node name="Transformable" type="Node2D" parent="."]
+script = ExtResource("2_0civp")
+internal_size = Vector2(64, 64)
+
+[node name="Sprite2D" type="Sprite2D" parent="Transformable"]
+z_index = -1
+texture = SubResource("GradientTexture2D_3fj8f")

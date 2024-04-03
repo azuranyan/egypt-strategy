@@ -1,0 +1,19 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://psiyd7sreioo"]
+
+[ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="1_obj01"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1qkh3"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[resource]
+default_font = ExtResource("1_obj01")
+default_font_size = 28
+Label/colors/font_color = Color(0.235294, 0.211765, 0.184314, 1)
+Label/font_sizes/font_size = 20
+Panel/styles/panel = SubResource("StyleBoxFlat_1qkh3")
+RichTextLabel/colors/default_color = Color(0.235294, 0.211765, 0.184314, 1)

@@ -1,0 +1,308 @@
+[gd_scene load_steps=21 format=3 uid="uid://brikuwut5uo7e"]
+
+[ext_resource type="Script" path="res://scenes/dialogue/story_event_scene.gd" id="1_vxdlj"]
+[ext_resource type="Texture2D" uid="uid://dxpqo6o4gme5c" path="res://events/dungeon_entrance.jpg" id="2_27n7i"]
+[ext_resource type="Script" path="res://scenes/dialogue/background.gd" id="2_lwf20"]
+[ext_resource type="Texture2D" uid="uid://btl3o7glk686f" path="res://events/bb.png" id="3_irbkg"]
+[ext_resource type="Texture2D" uid="uid://cyu0qvm88tnj5" path="res://events/aa.png" id="4_w46av"]
+[ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="6_w4yux"]
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="7_2j0sd"]
+[ext_resource type="FontFile" uid="uid://bfkvgx07nqvy3" path="res://scenes/data/fonts/Aleo-Bold.ttf" id="8_oqwvv"]
+[ext_resource type="Script" path="res://scenes/dialogue/balloon.gd" id="9_7csf8"]
+[ext_resource type="FontFile" uid="uid://cgu0d1fepqdbp" path="res://scenes/data/fonts/Aleo-Italic.ttf" id="9_s5tvh"]
+[ext_resource type="FontFile" uid="uid://ct4ls6wbdv257" path="res://scenes/data/fonts/Aleo-BoldItalic.ttf" id="10_ge03q"]
+[ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="10_jk023"]
+[ext_resource type="Script" path="res://addons/dialogue_manager/dialogue_reponses_menu.gd" id="11_pymk7"]
+[ext_resource type="Script" path="res://scenes/common/pause_menu_spawner.gd" id="14_qtbvv"]
+[ext_resource type="PackedScene" uid="uid://ddq1qxxvbb413" path="res://scenes/common/pause_menu.tscn" id="15_gmlpu"]
+[ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="16_lchrb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tl2gp"]
+
+[sub_resource type="Gradient" id="Gradient_2kqk0"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w0cdn"]
+gradient = SubResource("Gradient_2kqk0")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5nhbd"]
+bg_color = Color(0, 0, 0, 0.588235)
+
+[node name="StoryEventScene" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_vxdlj")
+skip_action = &"vn_skip"
+continue_action = &"vn_continue"
+toggle_ui_action = &"vn_toggle"
+balloon_v_spacing = 45.0
+auto_close = {
+"full": true,
+"narration": false,
+"new_chapter": true,
+"new_scene": true,
+"out_of_context": true,
+"solo": false
+}
+
+[node name="CachedImages" type="Node2D" parent="."]
+unique_name_in_owner = true
+process_mode = 4
+visible = false
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_lwf20")
+
+[node name="BackgroundFill" type="ColorRect" parent="Background"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.054902, 0.054902, 0.054902, 1)
+metadata/_edit_lock_ = true
+
+[node name="BackgroundTexture" type="TextureRect" parent="Background"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_right = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_27n7i")
+metadata/_edit_lock_ = true
+
+[node name="BlackBars" type="Control" parent="Background"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="ColorRect" parent="Background/BlackBars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BottomBar" type="ColorRect" parent="Background/BlackBars"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Characters" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="nnivxa" type="Sprite2D" parent="Characters"]
+visible = false
+position = Vector2(396, 665)
+scale = Vector2(0.751, 0.751)
+texture = ExtResource("3_irbkg")
+
+[node name="Head" type="Node2D" parent="Characters/nnivxa"]
+position = Vector2(-98.5353, -316.911)
+
+[node name="Bb2a" type="Sprite2D" parent="Characters"]
+visible = false
+z_index = 1
+position = Vector2(253, 935)
+scale = Vector2(0.749, 0.749)
+texture = ExtResource("3_irbkg")
+
+[node name="Nathana" type="Sprite2D" parent="Characters"]
+visible = false
+position = Vector2(1525, 755)
+scale = Vector2(0.482258, 0.482258)
+texture = ExtResource("4_w46av")
+
+[node name="Head" type="Node2D" parent="Characters/Nathana"]
+position = Vector2(-103.679, -1194.38)
+
+[node name="PlaceholderOrigin" type="Node2D" parent="Characters"]
+visible = false
+z_index = 1
+position = Vector2(250, 1330)
+scale = Vector2(0.893946, 0.893946)
+
+[node name="PlaceholderCharacter" type="Sprite2D" parent="Characters/PlaceholderOrigin"]
+position = Vector2(44.7455, 187.931)
+texture = ExtResource("3_irbkg")
+offset = Vector2(0, -581.035)
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 6
+
+[node name="BalloonArea" type="Control" parent="UI"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -527.0
+offset_top = -423.0
+offset_right = 527.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ClassicDialogueBox" type="PanelContainer" parent="UI"]
+unique_name_in_owner = true
+offset_top = 756.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_tl2gp")
+script = ExtResource("9_7csf8")
+start_opened = true
+character_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/RichTextLabel")
+dialogue_label_path = NodePath("VBoxContainer/PanelContainer/Control/MarginContainer/DialogueLabel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ClassicDialogueBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="UI/ClassicDialogueBox/VBoxContainer"]
+modulate = Color(0, 0, 0, 0.588235)
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_w0cdn")
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/ClassicDialogueBox/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5nhbd")
+
+[node name="Control" type="MarginContainer" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 36
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 36
+
+[node name="MarginContainer" type="HBoxContainer" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer"]
+clip_contents = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+bbcode_enabled = true
+text = "nnivx:"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("10_jk023")
+big_caps = 0
+format = "{text}:"
+
+[node name="DialogueLabel" parent="UI/ClassicDialogueBox/VBoxContainer/PanelContainer/Control/MarginContainer" instance=ExtResource("6_w4yux")]
+modulate = Color(1.2, 1.2, 1.2, 1)
+clip_contents = false
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.968627, 0.968627, 0.968627, 1)
+theme_override_colors/font_outline_color = Color(0.0392157, 0.00784314, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/normal_font = ExtResource("7_2j0sd")
+theme_override_fonts/bold_font = ExtResource("8_oqwvv")
+theme_override_fonts/italics_font = ExtResource("9_s5tvh")
+theme_override_fonts/bold_italics_font = ExtResource("10_ge03q")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+text = "They seem extremely confident in my knowledge of the area. Time to break the news, I guess."
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+layer = 6
+
+[node name="ResponsesContainer" type="MarginContainer" parent="Overlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -276.0
+offset_top = -302.0
+offset_right = 276.0
+offset_bottom = 52.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_group_ = true
+
+[node name="ResponsesMenu" type="VBoxContainer" parent="Overlay/ResponsesContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+script = ExtResource("11_pymk7")
+
+[node name="ResponseTemplate" type="Button" parent="Overlay/ResponsesContainer/ResponsesMenu"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme = ExtResource("16_lchrb")
+theme_override_colors/font_color = Color(0.529412, 0.329412, 0.278431, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.952941)
+theme_override_font_sizes/font_size = 32
+text = "Buttone"
+
+[node name="PauseMenuSpawner" type="Node" parent="."]
+script = ExtResource("14_qtbvv")
+pause_menu_scene = ExtResource("15_gmlpu")
+spawn_node_path = NodePath("../Overlay")

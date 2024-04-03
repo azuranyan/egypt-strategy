@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://dykk4ro2rrtvs"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_a5oag"]
+[ext_resource type="Resource" uid="uid://dqca2qhh8pi2n" path="res://units/sutekh/sutekh_basic.tres" id="1_u884l"]
+[ext_resource type="Resource" uid="uid://ci7ww4uorn13g" path="res://units/sutekh/sutekh_charge.tres" id="3_csj43"]
+
+[resource]
+script = ExtResource("1_a5oag")
+stats = {
+"dmg": 8,
+"maxhp": 16,
+"mov": 2,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 1,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 4,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_u884l")
+special_attack = ExtResource("3_csj43")

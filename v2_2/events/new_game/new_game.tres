@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="StoryEvent" load_steps=3 format=3 uid="uid://dbd6yvgirbmxp"]
+
+[ext_resource type="Script" path="res://scenes/dialogue/story_event.gd" id="1_e6ofh"]
+[ext_resource type="Resource" uid="uid://bvfe7ykpcf2w4" path="res://events/new_game/new_game.dialogue" id="1_xltfi"]
+
+[resource]
+script = ExtResource("1_e6ofh")
+event_id = &"new_game"
+dialog_resource = ExtResource("1_xltfi")
+start = "intro"
+requires = Array[StringName]([])
+conditions = Array[Resource("res://scenes/dialogue/story_event_condition.gd")]([])
+priority = 65535
+locked = false
+once = true
+transient = false
+context = 0

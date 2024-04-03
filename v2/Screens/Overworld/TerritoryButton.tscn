@@ -16,8 +16,8 @@ script/source = "extends Node2D
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	# a small hack because of the flawed design. FIX later
+func _process(_delta):
+	# TODO a small hack because of the flawed design. FIX later
 	scale = Vector2.ONE/get_parent().scale
 	global_position = Vector2.ZERO
 "

@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://uo1mf10ei78w"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_impl.gd" id="1_555e3"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_driver.gd" id="2_pi83f"]
+
+[sub_resource type="Curve2D" id="Curve2D_38cup"]
+
+[node name="UnitImpl" type="Node"]
+script = ExtResource("1_555e3")
+_id = null
+_chara_id = null
+_display_name = null
+_model_scale = null
+_behavior = null
+_state = null
+_turn_flags = null
+_selectable = null
+_stats = null
+_bond = null
+_special_unlock = null
+_status_effects = null
+_heading = null
+_map_position = null
+_walk_speed = null
+_phase_flags = null
+
+[node name="UnitDriver" type="Path2D" parent="."]
+curve = SubResource("Curve2D_38cup")
+script = ExtResource("2_pi83f")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="UnitDriver"]
+rotates = false
+cubic_interp = false
+loop = false
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="UnitDriver/PathFollow2D"]
+update_rotation = false
+update_scale = false

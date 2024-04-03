@@ -1,0 +1,78 @@
+[gd_scene load_steps=6 format=3 uid="uid://bfo6inl2uutjo"]
+
+[ext_resource type="Script" path="res://Screens/Battle/BattleManager.gd" id="1_7nbam"]
+[ext_resource type="PackedScene" uid="uid://bg3djjkbmlv2r" path="res://Screens/Battle/map_types/Map.tscn" id="2_wb1y3"]
+
+[sub_resource type="GDScript" id="GDScript_aiobb"]
+script/source = "extends SubViewport
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	if Engine.is_editor_hint():
+		canvas_cull_mask = ~(0)
+	else:
+		canvas_cull_mask = ~(1 << 9)
+"
+
+[sub_resource type="Gradient" id="Gradient_0qoxg"]
+colors = PackedColorArray(0.25, 0.212083, 0.1625, 1, 0.3, 0.2659, 0.207, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_q38ec"]
+gradient = SubResource("Gradient_0qoxg")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[node name="BattleManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7nbam")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+offset_left = 26.0
+offset_top = 24.0
+offset_right = 120.0
+offset_bottom = 102.0
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_left = 24.0
+offset_top = 25.0
+offset_right = 64.0
+offset_bottom = 48.0
+text = "Testing"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer"]
+position = Vector2(877, 449)
+position_smoothing_enabled = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+script = SubResource("GDScript_aiobb")
+
+[node name="TextureRect" type="TextureRect" parent="SubViewportContainer/SubViewport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_q38ec")
+expand_mode = 3
+
+[node name="Map" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_wb1y3")]

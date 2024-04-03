@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3 uid="uid://ch0exbng0ewb8"]
+
+[ext_resource type="Script" path="res://Bootstrap.gd" id="1_5buea"]
+[ext_resource type="PackedScene" uid="uid://bfo6inl2uutjo" path="res://Screens/Battle/BattleManager.tscn" id="2_chpjb"]
+[ext_resource type="PackedScene" uid="uid://croehem610ycj" path="res://Screens/MainMenu/MainMenu.tscn" id="3_4vqu5"]
+[ext_resource type="PackedScene" uid="uid://bjf4rts52td14" path="res://Screens/Dialogue/Dialogue.tscn" id="4_88wu7"]
+
+[node name="Bootstrap" type="Node"]
+script = ExtResource("1_5buea")
+
+[node name="BattleManager" parent="." instance=ExtResource("2_chpjb")]
+
+[node name="MainMenu" parent="." instance=ExtResource("3_4vqu5")]
+visible = false
+
+[node name="Dialogue" parent="." instance=ExtResource("4_88wu7")]

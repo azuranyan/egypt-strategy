@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=2 format=3 uid="uid://drguw71wlrtcu"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="1_kokh7"]
+
+[resource]
+script = ExtResource("1_kokh7")
+name = "Vulnerability"
+description = "Inflicts vulnerability."
+description_args = {}
+user_animation = "attack"
+multicast = 0
+max_range = 1
+min_range = 0
+include_user = false
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = true
+target_flags = 4
+allow_rotation = false

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=3 format=3 uid="uid://dvss3v0oc864q"]
+
+[ext_resource type="Resource" uid="uid://dtte5ylr63udd" path="res://units/cultist_witch/cultist_witch_debuffs.tres" id="1_1l8yk"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_x7n4d"]
+
+[resource]
+script = ExtResource("1_x7n4d")
+stats = {
+"dmg": 4,
+"maxhp": 8,
+"mov": 3,
+"rng": 0
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_1l8yk")

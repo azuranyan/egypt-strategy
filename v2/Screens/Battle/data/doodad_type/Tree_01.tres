@@ -1,12 +1,22 @@
-[gd_resource type="Resource" script_class="DoodadType" load_steps=4 format=3 uid="uid://b3l0n53fl6pgq"]
+[gd_resource type="Resource" script_class="DoodadType" load_steps=6 format=3 uid="uid://b3l0n53fl6pgq"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/DoodadType.gd" id="1_lucg0"]
-[ext_resource type="Texture2D" uid="uid://gyhrm6q5msig" path="res://Screens/Battle/maps/StartingZoneObj1.png" id="2_t52ob"]
-[ext_resource type="Resource" uid="uid://m5o65p1f51ex" path="res://Screens/Battle/data/World_StartingZone.tres" id="3_0376t"]
+[ext_resource type="Texture2D" uid="uid://c2l2y7wjsql14" path="res://maps/starting_zone/sprites/StartingZoneObj1.png" id="2_t52ob"]
+[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="3_l006m"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="4_3366s"]
+
+[sub_resource type="Resource" id="Resource_av7up"]
+script = ExtResource("3_l006m")
+texture = ExtResource("4_3366s")
+map_size = Vector2i(12, 12)
+tile_size = 180
+offset = Vector2(109.56, 12.33)
+y_ratio = 0.576
+_post_init_hook_hack = 0
 
 [resource]
 resource_name = "Tree_01"
 script = ExtResource("1_lucg0")
 texture = ExtResource("2_t52ob")
-world = ExtResource("3_0376t")
+world = SubResource("Resource_av7up")
 source_pos = Vector2(7, 0)

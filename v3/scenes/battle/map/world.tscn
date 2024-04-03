@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://cux1v2yokvd78"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/world.gd" id="1_3pqth"]
+[ext_resource type="Texture2D" uid="uid://cpomn0wcwygkb" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="2_4ee3k"]
+[ext_resource type="Script" path="res://scenes/battle/map/map_grid.gd" id="2_o5abx"]
+
+[node name="World" type="Node2D"]
+z_index = -100
+script = ExtResource("1_3pqth")
+texture = ExtResource("2_4ee3k")
+offset = Vector2(1011.46, 209.215)
+y_ratio = 0.579
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.46875, 0.46875)
+texture = ExtResource("2_4ee3k")
+centered = false
+
+[node name="MapGrid" type="Node2D" parent="."]
+self_modulate = Color(0.65098, 0.317647, 0.0666667, 0.376471)
+position = Vector2(1011.46, 209.215)
+rotation = 0.524835
+scale = Vector2(0.81708, 0.81708)
+skew = 0.521126
+script = ExtResource("2_o5abx")
+tile_size = 68.0
+size = Vector2i(12, 12)
+thickness = 1.5

@@ -1,0 +1,58 @@
+[gd_scene load_steps=9 format=3 uid="uid://c3arqfaqnrqb"]
+
+[ext_resource type="Script" path="res://audio_manager.gd" id="1_3rrtc"]
+[ext_resource type="Script" path="res://sound_queue.gd" id="2_iasnk"]
+[ext_resource type="AudioStream" uid="uid://7iaosna1pgla" path="res://scenes/common/audio/Basic_Click.wav" id="2_su7fo"]
+[ext_resource type="AudioStream" uid="uid://c5qyku3ulbsin" path="res://scenes/common/audio/Settings_Toggle_Click.wav" id="3_mjkk7"]
+[ext_resource type="AudioStream" uid="uid://bjuoubw3aamn6" path="res://scenes/common/audio/Hover_Mouse.wav" id="4_u25qh"]
+[ext_resource type="AudioStream" uid="uid://cfq7g2aoa7sly" path="res://scenes/common/audio/SelectAndMove.wav" id="5_mmckj"]
+[ext_resource type="AudioStream" uid="uid://k7o8y0c1yygi" path="res://scenes/common/audio/Impossible_Action.wav" id="6_sbl1j"]
+[ext_resource type="AudioStream" uid="uid://dc2kd0saxkcr3" path="res://scenes/common/audio/SaveLoad_Game.wav" id="7_epqm7"]
+
+[node name="AudioManager" type="Node" node_paths=PackedStringArray("music_sound_queue", "voice_sound_queue", "sfx_sound_queue", "ui_sound_queue")]
+script = ExtResource("1_3rrtc")
+music_volume = 0.5
+sfx_volume = 0.9
+sounds = {
+"button_click": ExtResource("2_su7fo"),
+"button_hover": ExtResource("4_u25qh"),
+"button_toggle": ExtResource("3_mjkk7"),
+"invalid_action": ExtResource("6_sbl1j"),
+"save_load": ExtResource("7_epqm7"),
+"select_move": ExtResource("5_mmckj")
+}
+music_sound_queue = NodePath("MusicSoundQueue")
+voice_sound_queue = NodePath("VoiceSoundQueue")
+sfx_sound_queue = NodePath("SFXSoundQueue")
+ui_sound_queue = NodePath("UISoundQueue")
+
+[node name="MusicSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("AudioStreamPlayer")
+queue_size = 2
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="MusicSoundQueue"]
+bus = &"Music"
+
+[node name="VoiceSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("../UISoundQueue/AudioStreamPlayer")
+queue_size = 3
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="VoiceSoundQueue"]
+bus = &"Voice"
+
+[node name="SFXSoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("../UISoundQueue/AudioStreamPlayer")
+queue_size = 20
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="SFXSoundQueue"]
+bus = &"SFX"
+
+[node name="UISoundQueue" type="Node" parent="." node_paths=PackedStringArray("audio_stream_player")]
+script = ExtResource("2_iasnk")
+audio_stream_player = NodePath("AudioStreamPlayer")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="UISoundQueue"]
+bus = &"UI"

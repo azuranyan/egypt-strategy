@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=5 format=3 uid="uid://c1cqleqcgjia6"]
 
 [ext_resource type="Resource" uid="uid://cwmgcdncen3ey" path="res://Screens/Battle/data/attack/basic_ranged.tres" id="1_t6f52"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_ykpc6"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_ykpc6"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_1h4rk"]
 [ext_resource type="Resource" uid="uid://bll72uo4o01wg" path="res://Screens/Battle/data/chara/Dummy.tres" id="2_1mckh"]
 

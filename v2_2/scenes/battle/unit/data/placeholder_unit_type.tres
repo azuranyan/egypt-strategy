@@ -1,0 +1,69 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=8 format=3 uid="uid://c8qe8h5wh1pam"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/debug_print_effect.gd" id="1_st4kb"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_tx87k"]
+[ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="2_8qq4x"]
+
+[sub_resource type="Resource" id="Resource_u63ec"]
+script = ExtResource("1_st4kb")
+format = "{user} effect {target}"
+
+[sub_resource type="Resource" id="Resource_g18s1"]
+script = ExtResource("2_8qq4x")
+name = "Attack"
+description = "Placeholder basic attack"
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_u63ec")])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0
+
+[sub_resource type="Resource" id="Resource_h8ecr"]
+script = ExtResource("1_st4kb")
+format = "{user} effect {target}"
+
+[sub_resource type="Resource" id="Resource_kcwud"]
+script = ExtResource("2_8qq4x")
+name = "Special"
+description = "Placeholder special attack"
+user_animation = "attack"
+multicast = 0
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_h8ecr")])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+targeting = 4
+allow_rotation = false
+max_range = -1
+min_range = 0
+
+[resource]
+script = ExtResource("1_tx87k")
+stats = {
+"dmg": 5,
+"maxhp": 5,
+"mov": 5,
+"rng": 5
+}
+stat_growth_1 = {
+"dmg": 1,
+"maxhp": 1,
+"mov": 1,
+"rng": 1
+}
+stat_growth_2 = {
+"dmg": 1,
+"maxhp": 1,
+"mov": 1,
+"rng": 1
+}
+basic_attack = SubResource("Resource_g18s1")
+special_attack = SubResource("Resource_kcwud")
+

@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://ch0exbng0ewb8"]
+[gd_scene load_steps=3 format=3 uid="uid://ch0exbng0ewb8"]
 
 [ext_resource type="Script" path="res://Bootstrap.gd" id="1_5buea"]
+[ext_resource type="PackedScene" uid="uid://croehem610ycj" path="res://Screens/MainMenu/MainMenu.tscn" id="3_4vqu5"]
 
-[node name="Bootstrap" type="Node2D"]
+[node name="Bootstrap" type="Node"]
 script = ExtResource("1_5buea")
+
+[node name="MainMenu" parent="." instance=ExtResource("3_4vqu5")]

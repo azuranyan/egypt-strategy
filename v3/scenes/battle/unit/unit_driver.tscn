@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://b83wrlmbixcnl"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_driver.gd" id="1_gvw41"]
+
+[node name="UnitDriver" type="Path2D"]
+script = ExtResource("1_gvw41")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+rotates = false
+cubic_interp = false
+loop = false
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="PathFollow2D"]

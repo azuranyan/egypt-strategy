@@ -1,46 +1,65 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=10 format=3 uid="uid://cu1r2bai288i2"]
+[gd_resource type="Resource" script_class="Attack" load_steps=17 format=3 uid="uid://cu1r2bai288i2"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_1qq6v"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_1qq6v"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_a84vy"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="1_e044x"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/GiveStatusEffectEffect.gd" id="2_302i8"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatHealEffect.gd" id="3_7exx3"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="2_nan7r"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/HealEffect.gd" id="3_7exx3"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="3_cvtc0"]
 [ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/RemoveStatusEffect.gd" id="4_em2po"]
 
-[sub_resource type="Resource" id="Resource_t0so8"]
+[sub_resource type="Resource" id="Resource_h5bsy"]
+script = ExtResource("1_e044x")
+sprite_frames = ExtResource("2_nan7r")
+animation = "basic_damage"
+target = 0
+
+[sub_resource type="Resource" id="Resource_yyhrn"]
+script = ExtResource("3_cvtc0")
+animation = "hurt"
+target = 0
+
+[sub_resource type="Resource" id="Resource_3tt30"]
 script = ExtResource("1_1qq6v")
 flat_damage = 0
-stat = "dmg"
+stat = "damage"
 multiplier = 1.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
-[sub_resource type="Resource" id="Resource_63lfh"]
+[sub_resource type="Resource" id="Resource_5hi4h"]
 script = ExtResource("2_302i8")
 effect = "STN"
 duration = 1
 target = 0
-custom_description = ""
-custom_animation = ""
 
-[sub_resource type="Resource" id="Resource_ijjlw"]
-script = ExtResource("3_7exx3")
-amount = 2
+[sub_resource type="Resource" id="Resource_la0eb"]
+script = ExtResource("1_e044x")
+sprite_frames = ExtResource("2_nan7r")
+animation = "basic_heal"
 target = 1
-custom_description = ""
-custom_animation = ""
 
-[sub_resource type="Resource" id="Resource_e7r6e"]
+[sub_resource type="Resource" id="Resource_eb5pn"]
+script = ExtResource("3_cvtc0")
+animation = "victory"
+target = 1
+
+[sub_resource type="Resource" id="Resource_loptl"]
+script = ExtResource("3_7exx3")
+flat_heal = 2
+stat = "bond"
+multiplier = 0.0
+target = 1
+
+[sub_resource type="Resource" id="Resource_itp5r"]
 script = ExtResource("4_em2po")
 effect = "PSN"
 target = 1
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_a84vy")
 name = "Magic"
-description = ""
+description = "Stuns the enemy or removes poison from ally."
 user_animation = "attack"
 target_animation = "idle"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
@@ -49,4 +68,4 @@ range = -1
 min_range = 0
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_t0so8"), SubResource("Resource_63lfh"), SubResource("Resource_ijjlw"), SubResource("Resource_e7r6e")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_h5bsy"), SubResource("Resource_yyhrn"), SubResource("Resource_3tt30"), SubResource("Resource_5hi4h"), SubResource("Resource_la0eb"), SubResource("Resource_eb5pn"), SubResource("Resource_loptl"), SubResource("Resource_itp5r")])

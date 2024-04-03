@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://c7qewnnl5sgjg"]
+
+[ext_resource type="Texture2D" uid="uid://cpomn0wcwygkb" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="1_5qyko"]
+[ext_resource type="Script" path="res://scenes/battle/map/map.gd" id="1_61i2x"]
+[ext_resource type="Script" path="res://scenes/battle/map/object_container.gd" id="3_qbaha"]
+
+[node name="Map" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_61i2x")
+texture = ExtResource("1_5qyko")
+map_size = Vector2i(12, 12)
+tile_size = 68.0
+offset = Vector2(1011.25, 208.212)
+y_ratio = 0.579
+
+[node name="Container" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("3_qbaha")

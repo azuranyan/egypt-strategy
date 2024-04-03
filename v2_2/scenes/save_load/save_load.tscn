@@ -1,0 +1,184 @@
+[gd_scene load_steps=8 format=3 uid="uid://dqq7n3i3usk0p"]
+
+[ext_resource type="Script" path="res://scenes/save_load/save_load.gd" id="1_tbfje"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="2_msn62"]
+[ext_resource type="PackedScene" uid="uid://bhl2tm6isca22" path="res://scenes/save_load/save_slot.tscn" id="3_bujpx"]
+[ext_resource type="Texture2D" uid="uid://bxip65cj4b43o" path="res://scenes/main_menu/Map_wo_Separators_Color_Filters_Blank.png" id="3_nhf4i"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_akdr2"]
+font = ExtResource("2_msn62")
+font_size = 68
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_esa8m"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_m2bpw"]
+font_size = 26
+
+[node name="SaveLoad" type="CanvasLayer"]
+script = ExtResource("1_tbfje")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.109804, 0.109804, 0.109804, 1)
+
+[node name="Button" type="Button" parent="Control"]
+visible = false
+layout_mode = 0
+offset_left = 63.0
+offset_top = 222.0
+offset_right = 291.0
+offset_bottom = 284.0
+text = "Save"
+
+[node name="Button2" type="Button" parent="Control"]
+visible = false
+layout_mode = 0
+offset_left = 63.0
+offset_top = 309.0
+offset_right = 291.0
+offset_bottom = 371.0
+text = "Load
+"
+
+[node name="SaveLoadLabel" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 59.0
+offset_right = 288.0
+offset_bottom = 188.0
+text = "Save"
+label_settings = SubResource("LabelSettings_akdr2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 436.0
+offset_top = 116.0
+offset_right = 532.0
+offset_bottom = 967.0
+alignment = 1
+
+[node name="SampleButton" type="Button" parent="Control/VBoxContainer"]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_esa8m")
+text = "1"
+
+[node name="SaveInfoPanel" type="Control" parent="Control"]
+custom_minimum_size = Vector2(384, 216)
+anchors_preset = 0
+offset_left = 25.0
+offset_top = 217.0
+offset_right = 409.0
+offset_bottom = 433.0
+
+[node name="TextureRect" type="TextureRect" parent="Control/SaveInfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_nhf4i")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ChapterLabel" type="Label" parent="Control/SaveInfoPanel"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 240.0
+offset_right = 129.0
+offset_bottom = 276.0
+text = "Chapter 1"
+label_settings = SubResource("LabelSettings_m2bpw")
+
+[node name="Label" type="Label" parent="Control/SaveInfoPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 289.0
+offset_right = 56.0
+offset_bottom = 312.0
+text = "TODO"
+
+[node name="CloseButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 1667.0
+offset_top = 24.0
+offset_right = 1817.0
+offset_bottom = 66.0
+text = "Return"
+
+[node name="WipeDataButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 1451.0
+offset_top = 24.0
+offset_right = 1601.0
+offset_bottom = 66.0
+text = "Wipe Data"
+
+[node name="GridContainer" type="GridContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -381.0
+offset_top = -426.5
+offset_right = 857.0
+offset_bottom = 426.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 64
+theme_override_constants/v_separation = 32
+columns = 2
+
+[node name="SaveSlot1" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot2" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot3" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot4" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot5" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot6" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot7" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot8" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot9" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[node name="SaveSlot10" parent="GridContainer" instance=ExtResource("3_bujpx")]
+layout_mode = 2
+
+[connection signal="pressed" from="Control/CloseButton" to="." method="_on_close_button_pressed"]
+[connection signal="pressed" from="Control/WipeDataButton" to="." method="_on_wipe_data_button_pressed"]
+

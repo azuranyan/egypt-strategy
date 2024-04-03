@@ -1,12 +1,19 @@
-[gd_scene load_steps=12 format=3 uid="uid://c11gexecl1hvb"]
+[gd_scene load_steps=15 format=3 uid="uid://c11gexecl1hvb"]
 
 [ext_resource type="Script" path="res://Screens/Overworld/Overworld.gd" id="1_mrexs"]
 [ext_resource type="Texture2D" uid="uid://bxjnkian270op" path="res://Screens/Overworld/Map_wo_Separators_Color_Filters_Blank.png" id="2_gnts6"]
 [ext_resource type="PackedScene" uid="uid://d2jpf34a0pcc2" path="res://Screens/Overworld/TerritoryButton.tscn" id="3_aby1e"]
 [ext_resource type="Script" path="res://Screens/Overworld/Territory.gd" id="4_xerix"]
 [ext_resource type="PackedScene" uid="uid://btf3bu5kpnvls" path="res://Screens/Battle/maps/StartingZone.tscn" id="5_xwig8"]
+[ext_resource type="PackedScene" uid="uid://caoyy1w780pww" path="res://tools/HeaderLabel.tscn" id="6_ugdp6"]
 [ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="6_xkwu1"]
 [ext_resource type="PackedScene" uid="uid://cd5xmi7eirbjn" path="res://Screens/Overworld/ActionLog.tscn" id="7_6hcg0"]
+[ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="7_wew8w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_oe7w4"]
+font = ExtResource("7_wew8w")
+font_size = 37
+font_color = Color(0.211765, 0.188235, 0.117647, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_2puew"]
 font = ExtResource("6_xkwu1")
@@ -93,7 +100,7 @@ texture = ExtResource("2_gnts6")
 centered = false
 
 [node name="TerritoryButton1" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(1397, 734)
+position = Vector2(1499, 800)
 scale = Vector2(0.05, 0.05)
 
 [node name="Zetennu" type="Node" parent="TerritoryButton1" node_paths=PackedStringArray("adjacent")]
@@ -103,7 +110,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Zahra", "Lysandra", "Ishtar", "Alara", "Eirene", "Nyaraka", "Sutekh", "Tali", "Maia", "Hesra"])
 
 [node name="TerritoryButton2" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(1504, 453)
+position = Vector2(1612, 541)
 scale = Vector2(0.05, 0.05)
 
 [node name="Neru-Khisi" type="Node" parent="TerritoryButton2" node_paths=PackedStringArray("adjacent")]
@@ -113,7 +120,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton3" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(1545, 160)
+position = Vector2(1673, 239)
 scale = Vector2(0.05, 0.05)
 
 [node name="Satayi" type="Node" parent="TerritoryButton3" node_paths=PackedStringArray("adjacent")]
@@ -123,7 +130,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton4" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(1244, 125)
+position = Vector2(1308, 165)
 scale = Vector2(0.05, 0.05)
 
 [node name="Khel-Et" type="Node" parent="TerritoryButton4" node_paths=PackedStringArray("adjacent")]
@@ -133,7 +140,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton5" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(982, 419)
+position = Vector2(1088, 497)
 scale = Vector2(0.05, 0.05)
 
 [node name="Medjed\'s Beacon" type="Node" parent="TerritoryButton5" node_paths=PackedStringArray("adjacent")]
@@ -143,7 +150,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton6" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(880, 672)
+position = Vector2(976, 722)
 scale = Vector2(0.05, 0.05)
 
 [node name="Fort Zaka" type="Node" parent="TerritoryButton6" node_paths=PackedStringArray("adjacent")]
@@ -153,7 +160,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton7" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(702, 123)
+position = Vector2(870, 182)
 scale = Vector2(0.05, 0.05)
 
 [node name="Forsaken Temple" type="Node" parent="TerritoryButton7" node_paths=PackedStringArray("adjacent")]
@@ -163,7 +170,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton8" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(608, 401)
+position = Vector2(758, 491)
 scale = Vector2(0.05, 0.05)
 
 [node name="Ruins of Atesh" type="Node" parent="TerritoryButton8" node_paths=PackedStringArray("adjacent")]
@@ -173,7 +180,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton9" parent="." instance=ExtResource("3_aby1e")]
-position = Vector2(337, 634)
+position = Vector2(433, 725)
 scale = Vector2(0.05, 0.05)
 
 [node name="Nekhet\'s Rest" type="Node" parent="TerritoryButton9" node_paths=PackedStringArray("adjacent")]
@@ -183,8 +190,7 @@ maps = Array[PackedScene]([ExtResource("5_xwig8")])
 units = Array[String](["Cultist - Axe", "Cultist - Bow", "Cultist - Mace", "Cultist - Priestess", "Cultist - Spear", "Cultist - Sword", "Cultist - Witch"])
 
 [node name="TerritoryButton10" parent="." instance=ExtResource("3_aby1e")]
-visible = false
-position = Vector2(230, 139)
+position = Vector2(302, 201)
 scale = Vector2(0.05, 0.05)
 
 [node name="Cursed Stronghold" type="Node" parent="TerritoryButton10"]
@@ -199,6 +205,73 @@ offset_left = -2.0
 offset_top = -2.0
 offset_right = 1922.0
 offset_bottom = 1082.0
+
+[node name="ResultBanner" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -398.0
+offset_top = -236.0
+offset_right = 398.0
+offset_bottom = 36.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Outline" type="ColorRect" parent="ResultBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.14902, 0.14902, 0.14902, 1)
+
+[node name="ColorRect" type="ColorRect" parent="ResultBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.988235, 0.964706, 0.901961, 1)
+
+[node name="HeaderLabel" parent="ResultBanner" instance=ExtResource("6_ugdp6")]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -392.0
+offset_top = 39.0
+offset_right = 392.0
+offset_bottom = 88.0
+grow_horizontal = 2
+text = "Region Conquered!"
+font_size = 50
+font_color = Color(0.211765, 0.188235, 0.117647, 1)
+caps_size = 70
+
+[node name="Label" type="Label" parent="ResultBanner"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -16.0
+offset_bottom = 77.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "The Cult of Ra has laid claim to the
+lands of Satayi!"
+label_settings = SubResource("LabelSettings_oe7w4")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TurnBanner" type="Control" parent="."]
 visible = false

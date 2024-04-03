@@ -1,26 +1,38 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=6 format=3 uid="uid://dtvjtgjbsugl1"]
+[gd_resource type="Resource" script_class="Attack" load_steps=11 format=3 uid="uid://dtvjtgjbsugl1"]
 
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_6qaot"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/FlatDamageEffect.gd" id="1_j236p"]
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/ZChargeEffect.gd" id="2_6w8g1"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="1_aoggc"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_j236p"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/ChargeEffect.gd" id="2_6w8g1"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="2_d24ap"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="3_j17m5"]
+
+[sub_resource type="Resource" id="Resource_egvdx"]
+script = ExtResource("1_aoggc")
+sprite_frames = ExtResource("2_d24ap")
+animation = "basic_damage"
+target = 0
+
+[sub_resource type="Resource" id="Resource_iwbbd"]
+script = ExtResource("3_j17m5")
+animation = "hurt"
+target = 0
 
 [sub_resource type="Resource" id="Resource_y7a1m"]
 script = ExtResource("1_j236p")
-amount = 2
+flat_damage = 1
+stat = "damage"
+multiplier = 0.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [sub_resource type="Resource" id="Resource_igjmy"]
 script = ExtResource("2_6w8g1")
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_6qaot")
 name = "Charge"
-description = ""
+description = "Charges towards an enemy."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
@@ -29,4 +41,4 @@ range = 2
 min_range = 0
 multicast = 0
 melee = true
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_y7a1m"), SubResource("Resource_igjmy")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_egvdx"), SubResource("Resource_iwbbd"), SubResource("Resource_y7a1m"), SubResource("Resource_igjmy")])

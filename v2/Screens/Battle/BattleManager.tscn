@@ -1,0 +1,1168 @@
+[gd_scene load_steps=41 format=3 uid="uid://bfo6inl2uutjo"]
+
+[ext_resource type="Script" path="res://Screens/Battle/BattleManager.gd" id="1_7nbam"]
+[ext_resource type="Texture2D" uid="uid://d11ms4wwvkbwg" path="res://Screens/Battle/Test_Map_Mockup_V8_HD.png" id="2_cy4xa"]
+[ext_resource type="FontFile" uid="uid://b1mr3ff8qpetx" path="res://Rakkas-Regular.ttf" id="3_leprk"]
+[ext_resource type="Script" path="res://Screens/Battle/BattleHUD.gd" id="3_quhgr"]
+[ext_resource type="FontFile" uid="uid://bpyfg8enh1dg8" path="res://Aleo-Regular.ttf" id="4_bdp4j"]
+[ext_resource type="Texture2D" uid="uid://bfc63h4m3img2" path="res://Screens/Overworld/Portraits/Alara.png" id="4_c2fdo"]
+[ext_resource type="PackedScene" uid="uid://dm44i8bptsqyk" path="res://Screens/Battle/PrepUnitList.tscn" id="6_22ovp"]
+[ext_resource type="Script" path="res://Screens/Battle/PauseBox.gd" id="7_dd7cm"]
+[ext_resource type="FontFile" uid="uid://pci1fqva7r4k" path="res://sylfaen.ttf" id="8_23av0"]
+
+[sub_resource type="Animation" id="Animation_wuq27"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Overlay/TurnBanner/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Overlay/TurnBanner/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Overlay/TurnBanner:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Overlay/TurnBanner:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Overlay/TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_t6u46"]
+resource_name = "character_selected"
+
+[sub_resource type="Animation" id="Animation_oxtu6"]
+resource_name = "turn_banner.enemy"
+length = 1.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Overlay/TurnBanner/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Overlay/TurnBanner/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Overlay/TurnBanner:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Overlay/TurnBanner:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 540), Vector2(0, 0), Vector2(0, 0), Vector2(0, 540)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Overlay/TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_7yf1u"]
+resource_name = "turn_banner.player"
+length = 1.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Overlay/TurnBanner/Label:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Overlay/TurnBanner/Label2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Overlay/TurnBanner:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1), Vector2(1, 1), Vector2(1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Overlay/TurnBanner:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.8, 1),
+"transitions": PackedFloat32Array(0.7, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 540), Vector2(0, 0), Vector2(0, 0), Vector2(0, 540)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Overlay/TurnBanner:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_05h7i"]
+_data = {
+"RESET": SubResource("Animation_wuq27"),
+"character_selected": SubResource("Animation_t6u46"),
+"turn_banner.enemy": SubResource("Animation_oxtu6"),
+"turn_banner.player": SubResource("Animation_7yf1u")
+}
+
+[sub_resource type="Gradient" id="Gradient_6tuyg"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.18, 0.15888, 0.1224, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_q38ec"]
+gradient = SubResource("Gradient_6tuyg")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Animation" id="Animation_cep1i"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_hemgg"]
+resource_name = "shake"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(5, 0), Vector2(-2, 0), Vector2(4, 0), Vector2(-3, 0), Vector2(3, 0), Vector2(-2, 0), Vector2(5, 0), Vector2(-1, 0), Vector2(-2, 0), Vector2(2, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lj2o0"]
+_data = {
+"RESET": SubResource("Animation_cep1i"),
+"shake": SubResource("Animation_hemgg")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_8ab5r"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 27
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_coxmg"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 31
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 17
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="InputEventAction" id="InputEventAction_p4jkk"]
+
+[sub_resource type="Shortcut" id="Shortcut_cfoj4"]
+events = [SubResource("InputEventAction_p4jkk")]
+
+[sub_resource type="LabelSettings" id="LabelSettings_xhpmv"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 30
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_g1glm"]
+font = ExtResource("8_23av0")
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 8
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_e86yf"]
+device = -1
+keycode = 81
+unicode = 113
+
+[sub_resource type="Shortcut" id="Shortcut_aetke"]
+events = [SubResource("InputEventKey_e86yf")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_27j0h"]
+device = -1
+keycode = 69
+unicode = 101
+
+[sub_resource type="Shortcut" id="Shortcut_piuv4"]
+events = [SubResource("InputEventKey_27j0h")]
+
+[sub_resource type="LabelSettings" id="LabelSettings_q8lss"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 29
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 20
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3mgfy"]
+font = ExtResource("4_bdp4j")
+font_size = 26
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_color = Color(0.235294, 0.188235, 0.12549, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_gnco8"]
+font = ExtResource("8_23av0")
+font_size = 18
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+
+[sub_resource type="GDScript" id="GDScript_cquh6"]
+script/source = "extends VBoxContainer
+
+
+@export var battle: Battle
+
+
+func _input(event):
+	if not battle.map:
+		return
+		
+	if event is InputEventMouseMotion:
+		$HBoxContainer2/Label2.text = \"%s\" % event.global_position
+		
+		var pos: Vector2 = get_viewport().canvas_transform.affine_inverse() * event.position
+		
+		$HBoxContainer3/Label2.text = \"%s\" % pos
+		$HBoxContainer/Label2.text = \"%s\" % battle.map.to_cell(battle.map.world.as_uniform(pos))
+		
+			
+			
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_po1sw"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 55
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ik2xm"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 45
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="Gradient" id="Gradient_ygace"]
+offsets = PackedFloat32Array(0, 0.3, 0.7, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yyath"]
+gradient = SubResource("Gradient_ygace")
+
+[sub_resource type="LabelSettings" id="LabelSettings_514ym"]
+line_spacing = -18.835
+font = ExtResource("3_leprk")
+font_size = 45
+font_color = Color(0.235294, 0.188235, 0.12549, 1)
+outline_size = 15
+outline_color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_ecqsk"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_b8ild"]
+events = [SubResource("InputEventKey_ecqsk")]
+
+[node name="BattleManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_7nbam")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_05h7i")
+}
+autoplay = "RESET"
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="Background"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_q38ec")
+expand_mode = 3
+
+[node name="TextureRect2" type="TextureRect" parent="Background"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_cy4xa")
+expand_mode = 3
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer"]
+position = Vector2(960, 540)
+position_smoothing_enabled = true
+drag_left_margin = 0.6
+drag_top_margin = 0.6
+drag_right_margin = 0.6
+drag_bottom_margin = 0.6
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="SubViewportContainer/Camera2D"]
+libraries = {
+"": SubResource("AnimationLibrary_lj2o0")
+}
+speed_scale = 3.0
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+canvas_cull_mask = 4294966783
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="Agents" type="Node" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("battle")]
+script = ExtResource("3_quhgr")
+battle = NodePath("..")
+
+[node name="MenuButton" type="Button" parent="HUD"]
+offset_left = 23.0
+offset_top = 50.0
+offset_right = 115.0
+offset_bottom = 138.0
+focus_neighbor_right = NodePath("../UndoMoveButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../UndoMoveButton")
+focus_previous = NodePath("../DiefyButton")
+
+[node name="Label" type="Label" parent="HUD/MenuButton"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 92.0
+offset_bottom = 10.0
+text = "MENU"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="UndoMoveButton" type="Button" parent="HUD"]
+offset_left = 166.0
+offset_top = 96.0
+offset_right = 268.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../EndTurnButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../EndTurnButton")
+focus_previous = NodePath("../MenuButton")
+
+[node name="Label" type="Label" parent="HUD/UndoMoveButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "UNDO
+MOVE"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="EndTurnButton" type="Button" parent="HUD"]
+offset_left = 278.0
+offset_top = 96.0
+offset_right = 380.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../UndoMoveButton")
+focus_neighbor_right = NodePath("../ActionOrderButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../ActionOrderButton")
+focus_previous = NodePath("../UndoMoveButton")
+
+[node name="Label" type="Label" parent="HUD/EndTurnButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "END
+TURN"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ActionOrderButton" type="Button" parent="HUD"]
+offset_left = 1391.0
+offset_top = 96.0
+offset_right = 1498.0
+offset_bottom = 145.0
+focus_neighbor_left = NodePath("../EndTurnButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../RestButton")
+focus_previous = NodePath("../EndTurnButton")
+
+[node name="Label" type="Label" parent="HUD/ActionOrderButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 107.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "ACTION
+ORDER"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="CharacterPortrait" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 28.0
+offset_top = 865.0
+offset_right = 229.0
+offset_bottom = 1053.0
+focus_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="HUD/CharacterPortrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/CharacterPortrait"]
+layout_mode = 0
+offset_top = -34.0
+offset_right = 201.0
+offset_bottom = 13.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "LYSANDRA"
+label_settings = SubResource("LabelSettings_coxmg")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="TextureRect" type="TextureRect" parent="HUD/CharacterPortrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_c2fdo")
+expand_mode = 3
+
+[node name="RestButton" type="Button" parent="HUD"]
+offset_left = 241.0
+offset_top = 897.0
+offset_right = 340.0
+offset_bottom = 1026.0
+focus_neighbor_top = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../FightButton")
+focus_next = NodePath("../FightButton")
+focus_previous = NodePath("../ActionOrderButton")
+shortcut = SubResource("Shortcut_cfoj4")
+
+[node name="Label" type="Label" parent="HUD/RestButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 99.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "REST"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label2" type="Label" parent="HUD/RestButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "space"
+label_settings = SubResource("LabelSettings_g1glm")
+horizontal_alignment = 2
+
+[node name="FightButton" type="Button" parent="HUD"]
+offset_left = 352.0
+offset_top = 897.0
+offset_right = 481.0
+offset_bottom = 1026.0
+focus_neighbor_left = NodePath("../RestButton")
+focus_neighbor_top = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../DiefyButton")
+focus_next = NodePath("../DiefyButton")
+focus_previous = NodePath("../RestButton")
+shortcut = SubResource("Shortcut_aetke")
+
+[node name="Label" type="Label" parent="HUD/FightButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 129.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "FIGHT"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label2" type="Label" parent="HUD/FightButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Q"
+label_settings = SubResource("LabelSettings_g1glm")
+horizontal_alignment = 2
+
+[node name="DiefyButton" type="Button" parent="HUD"]
+offset_left = 492.0
+offset_top = 897.0
+offset_right = 621.0
+offset_bottom = 1026.0
+focus_neighbor_left = NodePath("../FightButton")
+focus_neighbor_top = NodePath("../MenuButton")
+focus_next = NodePath("../MenuButton")
+focus_previous = NodePath("../FightButton")
+shortcut = SubResource("Shortcut_piuv4")
+
+[node name="Label" type="Label" parent="HUD/DiefyButton"]
+layout_mode = 0
+offset_top = -70.0
+offset_right = 129.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "DIEFY"
+label_settings = SubResource("LabelSettings_xhpmv")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label2" type="Label" parent="HUD/DiefyButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "E"
+label_settings = SubResource("LabelSettings_g1glm")
+horizontal_alignment = 2
+
+[node name="MissionBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1545.0
+offset_top = 53.0
+offset_right = 1880.0
+offset_bottom = 159.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/MissionBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/MissionBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 335.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "MISSION"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MissionBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="HUD/MissionBox/VBoxContainer"]
+layout_mode = 2
+text = "Defeat all enemies
+within 10 turns!"
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BonusGoalBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1545.0
+offset_top = 194.0
+offset_right = 1880.0
+offset_bottom = 300.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/BonusGoalBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/BonusGoalBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 335.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "BONUS GOAL"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/BonusGoalBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="HUD/BonusGoalBox/VBoxContainer"]
+layout_mode = 2
+text = "Win the battle with
+full health points!"
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InformationBox" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1408.0
+offset_top = 868.0
+offset_right = 1880.0
+offset_bottom = 1049.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/InformationBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/InformationBox"]
+layout_mode = 0
+offset_top = -32.0
+offset_right = 472.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "INFORMATION"
+label_settings = SubResource("LabelSettings_q8lss")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="DescriptionLabel" type="Label" parent="HUD/InformationBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_right = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Envelope yourself in a torrent of divine fire, incinerating your foes. Deals 1 damage and pushes all  adjacent enemies back 1 space."
+label_settings = SubResource("LabelSettings_3mgfy")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PrepUnitList" parent="HUD" instance=ExtResource("6_22ovp")]
+visible = false
+
+[node name="UndoPlaceButton" type="Button" parent="HUD"]
+visible = false
+offset_left = 166.0
+offset_top = 96.0
+offset_right = 268.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../MenuButton")
+focus_neighbor_right = NodePath("../EndTurnButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../EndTurnButton")
+focus_previous = NodePath("../MenuButton")
+
+[node name="Label" type="Label" parent="HUD/UndoPlaceButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "UNDO
+PLACE"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="StartBattleButton" type="Button" parent="HUD"]
+visible = false
+offset_left = 278.0
+offset_top = 96.0
+offset_right = 380.0
+offset_bottom = 194.0
+focus_neighbor_left = NodePath("../UndoMoveButton")
+focus_neighbor_right = NodePath("../ActionOrderButton")
+focus_neighbor_bottom = NodePath("../RestButton")
+focus_next = NodePath("../ActionOrderButton")
+focus_previous = NodePath("../UndoMoveButton")
+
+[node name="Label" type="Label" parent="HUD/StartBattleButton"]
+layout_mode = 0
+offset_top = -71.0
+offset_right = 102.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "START
+BATTLE"
+label_settings = SubResource("LabelSettings_8ab5r")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="MessageBox" type="Control" parent="HUD"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 26.0
+offset_top = 217.0
+offset_right = 379.0
+offset_bottom = 253.0
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="HUD/MessageBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="HUD/MessageBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 17.0
+offset_top = 3.0
+offset_right = -17.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Cannot fight left handed."
+label_settings = SubResource("LabelSettings_gnco8")
+vertical_alignment = 1
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+
+[node name="Debug" type="VBoxContainer" parent="Overlay" node_paths=PackedStringArray("battle")]
+offset_left = 26.0
+offset_top = 375.0
+offset_right = 127.0
+offset_bottom = 452.0
+script = SubResource("GDScript_cquh6")
+battle = NodePath("../..")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Overlay/Debug"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Overlay/Debug/HBoxContainer2"]
+layout_mode = 2
+text = "screen"
+
+[node name="Label2" type="Label" parent="Overlay/Debug/HBoxContainer2"]
+layout_mode = 2
+text = "333"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Overlay/Debug"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Overlay/Debug/HBoxContainer3"]
+layout_mode = 2
+text = "global
+"
+
+[node name="Label2" type="Label" parent="Overlay/Debug/HBoxContainer3"]
+layout_mode = 2
+text = "333"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/Debug"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Overlay/Debug/HBoxContainer"]
+layout_mode = 2
+text = "map_pos"
+
+[node name="Label2" type="Label" parent="Overlay/Debug/HBoxContainer"]
+layout_mode = 2
+text = "333"
+
+[node name="TurnBanner" type="Control" parent="Overlay"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="ColorRect" type="ColorRect" parent="Overlay/TurnBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 643.0
+offset_top = 505.0
+offset_right = -643.0
+offset_bottom = -505.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="Overlay/TurnBanner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -247.0
+offset_top = -39.0
+offset_right = 247.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "PLAYER TURN"
+label_settings = SubResource("LabelSettings_po1sw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="Overlay/TurnBanner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -247.0
+offset_top = -39.0
+offset_right = 247.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "ENEMY TURN"
+label_settings = SubResource("LabelSettings_ik2xm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackNameBox" type="Control" parent="Overlay"]
+visible = false
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -424.0
+offset_top = 55.0
+offset_right = 424.0
+offset_bottom = 133.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/AttackNameBox"]
+self_modulate = Color(0.937255, 0.901961, 0.870588, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_yyath")
+
+[node name="Label" type="Label" parent="Overlay/AttackNameBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Fire's Sojourner"
+label_settings = SubResource("LabelSettings_ik2xm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseBox" type="Control" parent="Overlay"]
+process_mode = 2
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -191.0
+offset_top = -91.0
+offset_right = 191.0
+offset_bottom = 91.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+script = ExtResource("7_dd7cm")
+
+[node name="ColorRect2" type="ColorRect" parent="Overlay/PauseBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -788.0
+offset_top = -464.0
+offset_right = 788.0
+offset_bottom = 464.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.435294)
+
+[node name="ColorRect" type="ColorRect" parent="Overlay/PauseBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.937255, 0.901961, 0.870588, 1)
+
+[node name="Label" type="Label" parent="Overlay/PauseBox"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -191.0
+offset_top = -69.0
+offset_right = 191.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Forfeit?"
+label_settings = SubResource("LabelSettings_514ym")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Overlay/PauseBox"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -43.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="Overlay/PauseBox/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_23av0")
+text = "Confirm"
+
+[node name="CancelButton" type="Button" parent="Overlay/PauseBox/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_23av0")
+shortcut = SubResource("Shortcut_b8ild")
+text = "Cancel"
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
+[connection signal="empire_turn_ended" from="." to="HUD" method="_on_battle_manager_empire_turn_ended"]
+[connection signal="empire_turn_started" from="." to="HUD" method="_on_battle_manager_empire_turn_started"]
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="pressed" from="HUD/UndoMoveButton" to="HUD" method="_on_undo_move_button_pressed"]
+[connection signal="pressed" from="HUD/EndTurnButton" to="HUD" method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="HUD/RestButton" to="HUD" method="_on_rest_button_pressed"]
+[connection signal="focus_entered" from="HUD/FightButton" to="HUD" method="_on_fight_button_focus_entered"]
+[connection signal="focus_exited" from="HUD/FightButton" to="HUD" method="_on_fight_button_focus_exited"]
+[connection signal="mouse_entered" from="HUD/FightButton" to="HUD" method="_on_fight_button_mouse_entered"]
+[connection signal="mouse_exited" from="HUD/FightButton" to="HUD" method="_on_fight_button_mouse_exited"]
+[connection signal="pressed" from="HUD/FightButton" to="HUD" method="_on_fight_button_pressed"]
+[connection signal="focus_entered" from="HUD/DiefyButton" to="HUD" method="_on_diefy_button_focus_entered"]
+[connection signal="focus_exited" from="HUD/DiefyButton" to="HUD" method="_on_diefy_button_focus_exited"]
+[connection signal="mouse_entered" from="HUD/DiefyButton" to="HUD" method="_on_diefy_button_mouse_entered"]
+[connection signal="mouse_exited" from="HUD/DiefyButton" to="HUD" method="_on_diefy_button_mouse_exited"]
+[connection signal="pressed" from="HUD/DiefyButton" to="HUD" method="_on_diefy_button_pressed"]
+[connection signal="pressed" from="HUD/UndoPlaceButton" to="HUD" method="_on_undo_place_button_pressed"]
+[connection signal="pressed" from="HUD/StartBattleButton" to="HUD" method="_on_start_battle_button_pressed"]
+[connection signal="pressed" from="Overlay/PauseBox/HBoxContainer/ConfirmButton" to="Overlay/PauseBox" method="_on_confirm_button_pressed"]
+[connection signal="pressed" from="Overlay/PauseBox/HBoxContainer/CancelButton" to="Overlay/PauseBox" method="_on_cancel_button_pressed"]

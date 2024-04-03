@@ -1,0 +1,107 @@
+[gd_resource type="Theme" load_steps=11 format=3 uid="uid://cegg3xuaofnvx"]
+
+[ext_resource type="FontFile" uid="uid://7uaw5jndvhyl" path="res://scenes/data/fonts/Aleo-Regular.ttf" id="1_r6hf5"]
+[ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="1_st4hi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxil0"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.52549, 0.32549, 0.27451, 1)
+border_blend = true
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ja0yb"]
+bg_color = Color(0.635294, 0.403922, 0.32549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34902, 0.227451, 0.207843, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7xvso"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34902, 0.227451, 0.207843, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v6sop"]
+bg_color = Color(0.529412, 0.329412, 0.278431, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i7xay"]
+bg_color = Color(0.937255, 0.901961, 0.870588, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.184314, 0.113725, 0.105882, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hgyth"]
+bg_color = Color(0.635294, 0.403922, 0.32549, 1)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_k10cj"]
+color = Color(0.580392, 0.592157, 0.588235, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2gogw"]
+bg_color = Color(0.164706, 0.152941, 0.152941, 1)
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[resource]
+Button/colors/font_outline_color = Color(0.529412, 0.329412, 0.278431, 1)
+Button/constants/outline_size = 3
+Button/fonts/font = ExtResource("1_st4hi")
+Button/styles/focus = SubResource("StyleBoxFlat_vxil0")
+Button/styles/hover = SubResource("StyleBoxFlat_ja0yb")
+Button/styles/normal = SubResource("StyleBoxFlat_7xvso")
+Button/styles/pressed = SubResource("StyleBoxFlat_v6sop")
+Label/colors/font_color = Color(0.360784, 0.254902, 0.113725, 1)
+Label/fonts/font = ExtResource("1_r6hf5")
+Panel/styles/panel = SubResource("StyleBoxFlat_i7xay")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_i7xay")
+PopupMenu/font_sizes/font_separator_size = 16
+PopupMenu/font_sizes/font_size = 16
+PopupMenu/styles/hover = SubResource("StyleBoxFlat_hgyth")
+PopupMenu/styles/labeled_separator_left = SubResource("StyleBoxLine_k10cj")
+PopupMenu/styles/labeled_separator_right = SubResource("StyleBoxLine_k10cj")
+PopupMenu/styles/panel = SubResource("StyleBoxFlat_2gogw")
+PopupMenu/styles/separator = SubResource("StyleBoxLine_k10cj")
+PopupPanel/styles/panel = SubResource("StyleBoxFlat_2gogw")
+RichTextLabel/colors/default_color = Color(0.360784, 0.254902, 0.113725, 1)
+RichTextLabel/colors/font_outline_color = Color(0, 0, 0, 1)
+RichTextLabel/constants/outline_size = 0

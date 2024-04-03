@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=3 format=3 uid="uid://d2ade40ac22ny"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_rm68r"]
+[ext_resource type="Resource" uid="uid://cmv06wyvg0mm" path="res://units/placeholder/basic_melee.tres" id="1_v7xsr"]
+
+[resource]
+script = ExtResource("1_rm68r")
+stats = {
+"dmg": 8,
+"maxhp": 4,
+"mov": 3,
+"rng": 1
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 0,
+"rng": 0
+}
+basic_attack = ExtResource("1_v7xsr")

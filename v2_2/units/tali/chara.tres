@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://deby84sa6u6sq"]
+
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="1_4iexy"]
+[ext_resource type="Texture2D" uid="uid://bwxxtcx580gok" path="res://units/placeholder/placeholder.webp" id="1_pam4x"]
+
+[resource]
+script = ExtResource("1_4iexy")
+name = "Tali"
+gender = "F"
+avatar = "Avatar of Horus"
+title = "Boastful Bird God"
+map_color = Color(0.0588235, 0.321569, 0.729412, 1)
+portrait = ExtResource("1_pam4x")
+

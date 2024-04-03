@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3c8en8k23kxo"]
+
+[ext_resource type="Script" path="res://scenes/common/key_value_label.gd" id="1_6ide4"]
+
+[node name="KeyValueLabel" type="HBoxContainer"]
+script = ExtResource("1_6ide4")
+key = "qweqweqwe"
+value = "qweqweqweqwe"
+
+[node name="KeyLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "qweqweqwe"
+
+[node name="ValueLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "qweqweqweqwe"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterInfo" load_steps=3 format=3 uid="uid://dbi41kshumras"]
+
+[ext_resource type="Texture2D" uid="uid://dimsfardfwynb" path="res://scenes/battle/unit/data/placeholder.webp" id="1_kkbag"]
+[ext_resource type="Script" path="res://scenes/battle/unit/character_info.gd" id="2_5xgwr"]
+
+[resource]
+script = ExtResource("2_5xgwr")
+name = "Placeholder"
+gender = "F"
+avatar = "Avatar of Placeholder"
+title = "Placeholder Queen"
+map_color = Color(0, 1, 0, 1)
+portrait = ExtResource("1_kkbag")

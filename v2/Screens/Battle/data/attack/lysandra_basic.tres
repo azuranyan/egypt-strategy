@@ -1,21 +1,33 @@
-[gd_resource type="Resource" script_class="Attack" load_steps=4 format=3 uid="uid://dhgc8m3jtq1j"]
+[gd_resource type="Resource" script_class="Attack" load_steps=9 format=3 uid="uid://dhgc8m3jtq1j"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/StatDamageEffect.gd" id="1_5nvff"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/DamageEffect.gd" id="1_5nvff"]
 [ext_resource type="Script" path="res://Screens/Battle/types/Attack.gd" id="1_5peg6"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/AddFXEffect.gd" id="1_lcoh8"]
+[ext_resource type="SpriteFrames" uid="uid://dpfbthpss5pif" path="res://Screens/Battle/data/default_effects.tres" id="2_cw6bc"]
+[ext_resource type="Script" path="res://Screens/Battle/types/attack_effect/PlayAnimationEffect.gd" id="3_y5ibw"]
+
+[sub_resource type="Resource" id="Resource_atd0a"]
+script = ExtResource("1_lcoh8")
+sprite_frames = ExtResource("2_cw6bc")
+animation = "basic_damage"
+target = 0
+
+[sub_resource type="Resource" id="Resource_xw7u3"]
+script = ExtResource("3_y5ibw")
+animation = "hurt"
+target = 0
 
 [sub_resource type="Resource" id="Resource_20j6p"]
 script = ExtResource("1_5nvff")
 flat_damage = 0
-stat = "dmg"
+stat = "damage"
 multiplier = 1.0
 target = 0
-custom_description = ""
-custom_animation = ""
 
 [resource]
 script = ExtResource("1_5peg6")
 name = "Attack"
-description = ""
+description = "Deals damage from range."
 user_animation = "attack"
 target_animation = "hurt"
 target_shape = Array[Vector2i]([Vector2i(0, 0)])
@@ -24,4 +36,4 @@ range = -1
 min_range = 0
 multicast = 0
 melee = false
-effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_20j6p")])
+effects = Array[Resource("res://Screens/Battle/types/AttackEffect.gd")]([SubResource("Resource_atd0a"), SubResource("Resource_xw7u3"), SubResource("Resource_20j6p")])

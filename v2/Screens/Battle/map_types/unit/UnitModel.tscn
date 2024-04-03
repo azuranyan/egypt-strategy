@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1u5syg77qfdo"]
+
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitModel.gd" id="1_hrsvw"]
+[ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_ax8f5"]
+
+[node name="UnitModel" type="Node2D"]
+script = ExtResource("1_hrsvw")
+sprite_frames = ExtResource("2_ax8f5")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(-8, 1)
+sprite_frames = ExtResource("2_ax8f5")
+animation = &"FrontIdle"
+offset = Vector2(0, -64)
+flip_h = true

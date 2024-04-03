@@ -4,22 +4,14 @@
 
 ## minor
 mark units with something when they have taken turn (E) in disgaea
-attack shape rotation is rotated 90 degrees
 overworld buttons need to be double clicked when clicked
-unit states in unit so we're not fiddling with stupid states and stuff
- - this also allows us to set unit on ghost or standby but keep its original position, so we can un-standby
- - can path and other stuff can also be implemented there, idgaf now
- - allows pathing over dead bodies
- - add x and y offset
-AttackEffect.get_animation() -> get_target_special_effect() or something else, as animation is specifically animation strings
-ugly cell() casting because of round: don't apply 0.5 to world and let map object center themselves
 
 
 ## would be nice
+sprite viewer 
 disgaea style enum targetable units in attack range
 disgaea style target and caster placement 
 damage counter for consecutive attacks
-allow scrolling on character list
 Globals empires, territories -> empire, territory
 
 
@@ -38,8 +30,6 @@ battle
  
 spawning 
  - better spawning marker, also allow specifying chance tables
- - allow adding units to the map and assigning them to player spawn
-<<<<<<< Updated upstream
  - dead enemy ai can move on their turn after killed by player in their turn
 =======
 
@@ -49,3 +39,39 @@ remove dead untis from the map
 >>>>>>> Stashed changes
 
 "simulating" battle results for quick battle
+
+
+
+##########################################################################################################
+## v2 demo+
+##########################################################################################################
+
+camera follow stops working after casting skill
+ - hotfixed with cast skill camera target, might have to be perma fixed with better input mode control procedure
+overworld keyboard interactivity
+main menu
+implement the AI behaviour system
+battle missions
+camera follow stops working after casting skill
+overworld keyboard interactivity
+
+camera does not follow walking
+if basic_attack == special_attack, problems arise because the game is designed to check for equality and will crap itself
+if both are the same attacks
+
+cursor out of map and into battle
+ - set cursor layer
+ - remove cursor jank nodes
+ - make camera follow work again
+
+when dragging from prep_unit_list, cursor does not follow
+when rotating, disable cursor and transform into rotate widget
+
+bonus goal not implemented
+attack rotation not working
+ - melee should not be rotated
+
+keyboard controls are broken
+small delay after unit dies
+
+handle multiple unit types in the same map

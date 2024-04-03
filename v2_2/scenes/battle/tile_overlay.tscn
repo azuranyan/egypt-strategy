@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://csnrahswbsonh"]
+
+[ext_resource type="Texture2D" uid="uid://c1ynw16pw66bf" path="res://scenes/battle/data/tile_overlay.png" id="1_by0ml"]
+[ext_resource type="Script" path="res://scenes/battle/tile_overlay.gd" id="1_pac6w"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rsavk"]
+texture = ExtResource("1_by0ml")
+texture_region_size = Vector2i(68, 68)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_qpai6"]
+tile_size = Vector2i(68, 68)
+sources/0 = SubResource("TileSetAtlasSource_rsavk")
+
+[node name="TileOverlay" type="TileMap"]
+tile_set = SubResource("TileSet_qpai6")
+format = 2
+script = ExtResource("1_pac6w")

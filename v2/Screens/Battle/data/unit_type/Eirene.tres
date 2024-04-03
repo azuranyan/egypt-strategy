@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitType" load_steps=6 format=3 uid="uid://oqya0dcflxe7"]
 
 [ext_resource type="Resource" uid="uid://3q5kwqe2uiyo" path="res://Screens/Battle/data/attack/eirene_basic.tres" id="1_257sj"]
-[ext_resource type="Script" path="res://Screens/Battle/types/UnitType.gd" id="1_yblp2"]
+[ext_resource type="Script" path="res://Screens/Battle/map_types/unit/UnitType.gd" id="1_yblp2"]
 [ext_resource type="SpriteFrames" uid="uid://bqwdhsbsyl6vv" path="res://Screens/Battle/sprites/Placeholder.tres" id="2_5p1gf"]
 [ext_resource type="Resource" uid="uid://dny2mp22w4kt6" path="res://Screens/Battle/data/chara/Eirene.tres" id="2_wi2nd"]
 [ext_resource type="Resource" uid="uid://dqf8kd4ksbwi5" path="res://Screens/Battle/data/attack/eirene_special.tres" id="4_agbmu"]

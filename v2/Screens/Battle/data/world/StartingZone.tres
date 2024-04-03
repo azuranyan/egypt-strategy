@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="World" load_steps=3 format=3 uid="uid://m5o65p1f51ex"]
+[gd_resource type="Resource" script_class="World" load_steps=3 format=3 uid="uid://4r1ua5xy7blu"]
 
-[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="1_rd2oc"]
-[ext_resource type="Texture2D" uid="uid://doew1bg5hnxi4" path="res://Screens/Battle/maps/StartingZoneObjBase.png" id="2_e6aus"]
+[ext_resource type="Script" path="res://Screens/Battle/types/World.gd" id="1_pd2g1"]
+[ext_resource type="Texture2D" uid="uid://ufknjc46n6q8" path="res://maps/starting_zone/sprites/StartingZoneObjBase.png" id="2_o7rmp"]
 
 [resource]
-script = ExtResource("1_rd2oc")
-texture = ExtResource("2_e6aus")
-map_size = Vector2i(8, 8)
-tile_size = 218
+script = ExtResource("1_pd2g1")
+texture = ExtResource("2_o7rmp")
+map_size = Vector2i(12, 12)
+tile_size = 145
 offset = Vector2(109.56, 12.33)
 y_ratio = 0.576
 _post_init_hook_hack = 0

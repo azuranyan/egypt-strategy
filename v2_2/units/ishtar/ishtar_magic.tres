@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="Attack" load_steps=15 format=3 uid="uid://de5soqmslvwca"]
+
+[ext_resource type="Script" path="res://scenes/battle/attack/attack.gd" id="1_ly66r"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_animated_sprite_effect.gd" id="1_mjbb4"]
+[ext_resource type="SpriteFrames" uid="uid://qa2cwjttcrf5" path="res://scenes/battle/attack_effects/data/default_effects.tres" id="2_ejesq"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/play_animation_effect.gd" id="3_h08g8"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/heal_effect.gd" id="4_ykwbf"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/remove_status_effect.gd" id="5_ep7fy"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/damage_effect.gd" id="6_1phrd"]
+[ext_resource type="Script" path="res://scenes/battle/attack_effects/add_status_effect.gd" id="7_1tugt"]
+
+[sub_resource type="Resource" id="Resource_cb3ab"]
+script = ExtResource("1_mjbb4")
+sprite_frames = ExtResource("2_ejesq")
+animation = &"basic_damage"
+target = &"body"
+draw_over_unit = true
+
+[sub_resource type="Resource" id="Resource_3vf5i"]
+script = ExtResource("4_ykwbf")
+amount = 2
+stat = "none"
+stat_multiplier = 0.0
+
+[sub_resource type="Resource" id="Resource_vjgal"]
+script = ExtResource("5_ep7fy")
+effect = "PSN"
+
+[sub_resource type="Resource" id="Resource_ow04k"]
+script = ExtResource("6_1phrd")
+amount = 0
+stat = "damage"
+stat_multiplier = 1.0
+
+[sub_resource type="Resource" id="Resource_a7bi7"]
+script = ExtResource("3_h08g8")
+animation = &"hurt"
+hold_condition = 2
+
+[sub_resource type="Resource" id="Resource_a3cuc"]
+script = ExtResource("7_1tugt")
+effect = "STN"
+_duration = -1
+
+[resource]
+script = ExtResource("1_ly66r")
+name = "Magic"
+description = "Inflicts damage and applies STN effect to enemies. When used on allies, it provides healing and removes PSN effect."
+description_args = {}
+user_animation = "attack"
+multicast = 0
+max_range = -1
+min_range = 0
+include_user = false
+self_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([])
+ally_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_cb3ab"), SubResource("Resource_3vf5i"), SubResource("Resource_vjgal")])
+enemy_effects = Array[Resource("res://scenes/battle/attack/attack_effect.gd")]([SubResource("Resource_cb3ab"), SubResource("Resource_ow04k"), SubResource("Resource_a7bi7"), SubResource("Resource_a3cuc")])
+target_shape = Array[Vector2i]([Vector2i(0, 0)])
+melee = false
+target_flags = 4
+allow_rotation = false

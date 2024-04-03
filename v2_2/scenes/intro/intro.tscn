@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvgwbit1ywg2o"]
+
+[ext_resource type="Script" path="res://scenes/intro/intro.gd" id="1_5gbcc"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_tp2qw"]
+font_size = 24
+
+[node name="Intro" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_5gbcc")
+next_scene_path = "res://scenes/main_menu/main_menu.tscn"
+next_scene = &"main_menu"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.7
+one_shot = true
+autostart = true
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.109804, 0.109804, 0.109804, 1)
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 963.0
+offset_right = 314.0
+offset_bottom = 1034.0
+text = "Radiant Ambition
+ver 0.5"
+label_settings = SubResource("LabelSettings_tp2qw")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

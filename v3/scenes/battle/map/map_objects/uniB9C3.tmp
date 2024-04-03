@@ -1,0 +1,168 @@
+[gd_scene load_steps=14 format=3 uid="uid://dawqwk1rwon1j"]
+
+[ext_resource type="Script" path="res://scenes/battle/map/map_objects/unit.gd" id="1_mky0p"]
+[ext_resource type="Texture2D" uid="uid://duo38ajpx04g" path="res://scenes/battle/unit/data/placeholder.webp" id="2_kkcvc"]
+[ext_resource type="SpriteFrames" uid="uid://ms4h43cmvv8q" path="res://scenes/battle/unit/data/placeholder_sprite_frames.tres" id="3_57vff"]
+[ext_resource type="Theme" uid="uid://umyv3x1ykkt5" path="res://scenes/data/regular_theme.tres" id="3_qoxct"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_state.gd" id="3_ujnw8"]
+[ext_resource type="Resource" uid="uid://dq7p2tkat15gy" path="res://scenes/battle/unit/data/placeholder_unit_type.tres" id="4_vrj8t"]
+[ext_resource type="Script" path="res://scenes/battle/map/transformable.gd" id="5_f6ik8"]
+[ext_resource type="Script" path="res://scenes/battle/map/pathable_component.gd" id="5_pe133"]
+
+[sub_resource type="Resource" id="Resource_wyvcj"]
+script = ExtResource("3_ujnw8")
+unit_type = ExtResource("4_vrj8t")
+display_name = "Placeholder"
+display_icon = ExtResource("2_kkcvc")
+model_scale = Vector2(1, 1)
+behavior = 1
+stats = {
+"dmg": 2,
+"hp": 5,
+"maxhp": 5,
+"mov": 3,
+"rng": 1
+}
+bond = 0
+special_unlocked = false
+status_effects = {}
+heading = 0
+map_position = Vector2(0, 0)
+walk_speed = 200.0
+phase = 0
+turn_flags = 0
+selectable = true
+state = "idle"
+
+[sub_resource type="Gradient" id="Gradient_peeo8"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.545455, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ot0m7"]
+gradient = SubResource("Gradient_peeo8")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0.965)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ssdq"]
+size = Vector2(24, 74)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_60xbw"]
+size = Vector2(32, 32)
+
+[node name="Unit" type="Node2D"]
+script = ExtResource("1_mky0p")
+state = SubResource("Resource_wyvcj")
+type = "unit"
+map_position = Vector2(0, 0)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Transformable" type="Node2D" parent="Sprite" node_paths=PackedStringArray("map_object")]
+script = ExtResource("5_f6ik8")
+map_object = NodePath("../..")
+internal_size = Vector2(64, 64)
+transform_flags = 1
+
+[node name="Shadow" type="Sprite2D" parent="Sprite/Transformable"]
+self_modulate = Color(0, 0, 0, 0.337255)
+scale = Vector2(1, 0.5625)
+texture = SubResource("GradientTexture2D_ot0m7")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Sprite"]
+position = Vector2(0, -37)
+scale = Vector2(0.575, 0.575)
+sprite_frames = ExtResource("3_57vff")
+animation = &"back_attack"
+
+[node name="MouseArea" type="Area2D" parent="Sprite"]
+unique_name_in_owner = true
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/MouseArea"]
+position = Vector2(0, -34)
+shape = SubResource("RectangleShape2D_1ssdq")
+debug_color = Color(0.938388, 1.12626e-05, 0.623911, 0.42)
+
+[node name="HUD" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -117.0
+offset_right = 90.0
+offset_bottom = -79.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.6, 0.6)
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control" type="Control" parent="HUD/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="HUD/MarginContainer/Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme = ExtResource("3_qoxct")
+text = "Placeholder"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ColorRect" type="ColorRect" parent="HUD/MarginContainer/Control"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.188235, 0.0470588, 0.054902, 1)
+
+[node name="HPBar" type="ColorRect" parent="HUD/MarginContainer/Control"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.403922, 0.796078, 0, 1)
+
+[node name="Transformable" type="Node2D" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("5_f6ik8")
+map_object = NodePath("..")
+internal_size = Vector2(64, 64)
+
+[node name="Area2D" type="Area2D" parent="Transformable"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Transformable/Area2D"]
+shape = SubResource("RectangleShape2D_60xbw")
+
+[node name="PathableComponent" type="Node" parent="." node_paths=PackedStringArray("map_object")]
+script = ExtResource("5_pe133")
+pathing_group = 1
+map_object = NodePath("..")

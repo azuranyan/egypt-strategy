@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://5luqk4ok8ncu"]
+
+[ext_resource type="Script" path="res://Screens/Credits/Credits.gd" id="1_nklwh"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_mn2ly"]
+font_size = 32
+
+[node name="Credits" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nklwh")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.129412, 0.129412, 0.129412, 1)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 259.0
+offset_top = 762.0
+offset_right = 516.0
+offset_bottom = 807.0
+text = "Dialogue System"
+label_settings = SubResource("LabelSettings_mn2ly")
+
+[node name="Label" type="Label" parent="Label"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 59.0
+offset_right = 153.0
+offset_bottom = 82.0
+text = "Nathan Hoad"

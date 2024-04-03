@@ -52,7 +52,7 @@ extends Control
 # This is called once in the frame where the label is marked as needs
 # updating. This is done this way so all the changes are applied in one
 # go, once per frame, because bbcode parsing is quite expensive.
-func _process(delta):
+func _process(_delta):
 	_update_text(text)
 	set_process(false)
 	
@@ -85,9 +85,9 @@ func _update_text(new_text: String):
 				$VBoxContainer/RichTextLabel.append_text(c)
 			$VBoxContainer/RichTextLabel.pop()
 			caps.clear()
-	for char in new_text:
-		var upper = char.to_upper()
-		if char == upper:
+	for c in new_text:
+		var upper = c.to_upper()
+		if c == upper:
 			caps.append(upper)
 		else:
 			insert_caps.call()

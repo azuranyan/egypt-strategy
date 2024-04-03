@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="UnitType" load_steps=4 format=3 uid="uid://m278p32g20ar"]
+
+[ext_resource type="Resource" uid="uid://1218qo4mdvy" path="res://units/alara/alara_ranged.tres" id="1_icqgu"]
+[ext_resource type="Script" path="res://scenes/battle/unit/unit_type.gd" id="1_ij00e"]
+[ext_resource type="Resource" uid="uid://dehf1nhxqh0jg" path="res://units/alara/alara_fade.tres" id="3_8twy0"]
+
+[resource]
+script = ExtResource("1_ij00e")
+stats = {
+"dmg": 8,
+"maxhp": 12,
+"mov": 3,
+"rng": 3
+}
+stat_growth_1 = {
+"dmg": 0,
+"maxhp": 4,
+"mov": 0,
+"rng": 0
+}
+stat_growth_2 = {
+"dmg": 0,
+"maxhp": 0,
+"mov": 1,
+"rng": 0
+}
+basic_attack = ExtResource("1_icqgu")
+special_attack = ExtResource("3_8twy0")
