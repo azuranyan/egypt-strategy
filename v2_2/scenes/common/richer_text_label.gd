@@ -46,13 +46,19 @@ enum BigCaps {
 
 
 var _raw_text: String
+var _should_update: bool = true
 
 
 func _process(_delta: float) -> void:
+	#if _should_update:
+	#	update_text(text)
+	#	return
+
 	# we can't do the _raw_text == text because when text gets updated we need to process it again
-	if text == '':
+	if not _should_update and text == '':
 		return
 
+	_should_update = false
 	# since there are no signals or callbacks for text changes,
 	# we have to poll for changes in _process
 	update_text(text)

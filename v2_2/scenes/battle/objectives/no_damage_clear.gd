@@ -11,5 +11,15 @@ func _process(_delta: float) -> void:
 			objective_completed(BattleResult.NONE)
 
 
+func _activated() -> void:
+	set_process(true)
+
+
+func _deactivated() -> void:
+	set_process(false)
+
+
 func description() -> String:
 	return "Clear battle without taking any damage."
+
+	

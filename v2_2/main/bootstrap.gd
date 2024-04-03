@@ -10,7 +10,6 @@ const scene_registry := {
 	intro = 'res://scenes/intro/intro.tscn',
 	main_menu = 'res://scenes/main_menu/main_menu.tscn',
 	overworld = 'res://scenes/overworld/overworld_scene.tscn',
-	pause = 'res://scenes/pause/pause.tscn',
 	settings = 'res://scenes/common/settings_scene.tscn',
 	save_load = 'res://scenes/save_load/save_load.tscn',
 	strategy_room = 'res://scenes/strategy_room/strategy_room.tscn',

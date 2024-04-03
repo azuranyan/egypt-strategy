@@ -114,10 +114,12 @@ func _on_unit_list_item_activated(idx: int) -> void:
 	if not Dialogue.instance().has_character_events(chara):
 		return
 
-	if Dialogue.instance().has_new_character_event(chara):
+	var available_events := Dialogue.instance().get_available_events(chara)
+
+	if available_events:
 		var should_play: bool = await Game.create_pause_dialog("View %s's\nlatest scene?" % chara, 'Confirm', 'Cancel').closed
 		if should_play:
-			play_event_id = Dialogue.instance().get_character_event(chara)
+			play_event_id = available_events[0]
 			scene_return()
 	else:
 		Game.create_pause_dialog("%s has no\nnew scenes." % chara, 'Confirm', '')

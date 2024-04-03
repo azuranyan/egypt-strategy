@@ -18,6 +18,8 @@ func _ready() -> void:
 		var settings := Settings.new()
 		Game.setting_changed.connect(func(nem: String, value: Variant): print('%s: %s' % [nem, value]))
 		initialize.call_deferred(settings)
+	else:
+		initialize(Game.settings)
 
 
 func _unhandled_input(event: InputEvent) -> void:

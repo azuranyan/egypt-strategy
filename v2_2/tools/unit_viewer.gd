@@ -47,7 +47,7 @@ func set_minimized(minimized: bool):
 
 func render_unit(unit: Unit) -> void:
 	%IDLabel.value = str(unit.id())
-	%CurrentOwnerLabel.value = str(unit.get_empire().leader)
+	%CurrentOwnerLabel.value = str(unit.get_empire().leader) if unit.get_empire() else 'none'
 	%StateLabel.value = Unit.State.keys()[unit.state()]
 	%FieldedLabel.value = str(unit.is_fielded())
 	%SelectableLabel.value = str(unit.is_selectable())

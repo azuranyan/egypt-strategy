@@ -10,7 +10,8 @@ signal done
 @onready var sprite := %Sprite
 
 
-func march(target: Vector2):
+func march(empire: Empire, target: Vector2):
+	# TODO change sprite based on empire
 	self.curve = Curve2D.new()
 	self.curve.add_point(Vector2.ZERO)
 	self.curve.add_point(target - position)

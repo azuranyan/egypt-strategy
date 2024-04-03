@@ -1,7 +1,10 @@
 class_name Overworld extends Node
 ## The overworld interface.
 
-const OVERWORLD_SCENE := preload("res://scenes/overworld/overworld_scene.tscn")
+
+signal _marching_animation_finished
+signal _battle_result_banner_finished(open_strategy_room: bool)
+
 
 enum {
 	NO_ERROR = 0,
@@ -18,8 +21,14 @@ enum {
 	CANNOT_CREATE_UNIT,
 }
 
+
 @export_range(0.0, 10.0) var enemy_action_delay: float
 
+
+var wait_for_marching_animation: bool
+var wait_for_battle_result_banner: bool
+
+var _held_transfer_units: Dictionary
 var _territories: Array[Territory]
 var _boss_adjacent_territories: Array[Territory]
 var _empires: Array[Empire]
@@ -31,9 +40,7 @@ var _defeated_empires: Array[Empire]
 var _cycle: int
 var _turn_queue: Array[Empire]
 var _next_state: StringName
-var _new_event: StringName
 
-var _overworld_scene: Node
 var _initialized: bool
 var _should_end: bool
 var _should_reload: bool
@@ -54,13 +61,6 @@ func _ready():
 	
 	OverworldEvents.empire_defeated.connect(_check_boss_summon)
 	OverworldEvents.boss_summoned.connect(func(_a, _b): _should_reload = true)
-	DialogueEvents.new_event_unlocked.connect(_notify_new_event)
-	SceneManager.scene_ready.connect(_on_scene_ready)
-	
-
-## Returns the active overworld scene. Kind of a hack, but yes.
-func get_active_overworld_scene() -> OverworldScene:
-	return _overworld_scene
 
 
 ## Returns true if the overworld is initialized.
@@ -83,11 +83,15 @@ func _set_initialized(initialized: bool) -> void:
 ## Loads in a new state.
 func load_new_state() -> int:
 	_set_initialized(false)
-	var node := OVERWORLD_SCENE.instantiate()
+	# TODO this load() will cause hitches
+	var node: Node = preload("res://scenes/overworld/overworld_scene.tscn").instantiate()
 
-	if not node is OverworldScene:
+	if not node:
 		node.queue_free()
 		return SCENE_LOADING_FAILED
+	#if not node is OverworldScene:
+	#	node.queue_free()
+	#	return SCENE_LOADING_FAILED
 
 	add_child(node)
 	var err := _load_from_scene(node)
@@ -107,14 +111,12 @@ func load_new_state() -> int:
 	_should_end = false
 	_should_reload = false
 	_is_running = false
-
-	_new_event = ''
 	
 	_set_initialized(true)
 	return NO_ERROR
 
 
-func _load_from_scene(scene: OverworldScene) -> int:
+func _load_from_scene(scene) -> int:
 	var err: int
 	var distributed_territories: Array[Territory] = []
 
@@ -137,7 +139,7 @@ func _load_from_scene(scene: OverworldScene) -> int:
 	return NO_ERROR
 
 
-func _load_territories(scene: OverworldScene, distributed_territories: Array[Territory]) -> int:
+func _load_territories(scene, distributed_territories: Array[Territory]) -> int:
 	_territories = []
 	for node in scene.get_territory_nodes():
 		# create territory
@@ -157,7 +159,7 @@ func _load_territories(scene: OverworldScene, distributed_territories: Array[Ter
 	return NO_ERROR
 
 
-func _load_empires(scene: OverworldScene, distributed_territories: Array[Territory]) -> int:
+func _load_empires(scene, distributed_territories: Array[Territory]) -> int:
 	_empires = []
 	for node in scene.get_empire_nodes():
 		# load home territory
@@ -194,12 +196,12 @@ func _load_empires(scene: OverworldScene, distributed_territories: Array[Territo
 	return _distribute_territories(scene, distributed_territories)
 
 
-func _distribute_territories(scene: OverworldScene, distributed_territories: Array[Territory]) -> int:
+func _distribute_territories(scene, distributed_territories: Array[Territory]) -> int:
 	if distributed_territories.is_empty():
 		return NO_ERROR
 
 	var selection: Array[Empire] = []
-	var empire_nodes := scene.get_random_empire_nodes()
+	var empire_nodes: Array[EmpireNode] = scene.get_random_empire_nodes()
 
 	# create the selection of random empires
 	while not empire_nodes.is_empty() and selection.size() < distributed_territories.size():
@@ -308,7 +310,6 @@ func save_state() -> Dictionary:
 		cycle = _cycle,
 		turn_queue = _turn_queue.duplicate(),
 		next_state = _next_state,
-		new_event = _new_event,
 	}
 
 
@@ -326,24 +327,11 @@ func load_state(data: Dictionary):
 	_cycle = data.cycle
 	_turn_queue.assign(data.turn_queue)
 	_next_state = data.next_state
-	_new_event = data.new_event
 
 	_should_end = false
 	_should_reload = false
 	_is_running = false
 	_set_initialized(true)
-
-
-## Called when the scene is ready. This small function is what ties the scene manager and overworld together.
-## When the overworld scene is loaded, this automatically launches our main loop.
-func _on_scene_ready(node: Node) -> void:
-	# this will make it so it's null when a diff scene is loaded
-	_overworld_scene = node as OverworldScene
-
-	# important to check if we're already running cos we may have been paused
-	# and waiting for the stack to return to our scene
-	if _overworld_scene and not is_running():
-		_overworld_main.call_deferred()
 
 
 func _overworld_main() -> void:
@@ -358,6 +346,11 @@ func _overworld_main() -> void:
 		match _next_state:
 			# Just reloads the turn queue and sends the signal.
 			'cycle_start':
+				for e in _held_transfer_units:
+					for u in _held_transfer_units[e]:
+						transfer_unit(u, e)
+				_held_transfer_units.clear()
+
 				_reload_turn_queue()
 				OverworldEvents.cycle_started.emit(cycle())
 				_next_state = 'turn_start'
@@ -374,13 +367,12 @@ func _overworld_main() -> void:
 				else:
 					action = await Game.delay_function(_ai_decision_function, enemy_action_delay, [on_turn()])
 
-				print(action)
 				# execute action
 				match action.type:
 					'attack', 'train':
 						if Game.settings.show_marching_animations:
-							await get_active_overworld_scene().show_marching_animation(action.attacker, action.defender, action.territory)
-						
+							await show_marching_animation(action.attacker, action.territory)
+							
 						# TODO this is an ugly way of doing this but it suffices for now
 						var type: Battle.Type
 						if action.attacker == _player_empire:
@@ -408,8 +400,7 @@ func _overworld_main() -> void:
 						_next_state = 'turn_end'
 					
 					'strategy':
-						SceneManager.call_scene(SceneManager.scenes.strategy_room, 'fade_to_black', {inspect_mode=true})
-						await OverworldEvents.strategy_room_closed
+						await show_strategy_room(true)
 						_next_state = 'turn_start'
 
 					_:
@@ -454,34 +445,23 @@ func _overworld_main() -> void:
 			# This makes it so the player can choose a different strategy room scene, however
 			# new events will not be skipped and still be forced to play.
 			'post_turn':
-				if _new_event:
-					_next_state = 'process_new_event'
+				var events := Dialogue.instance().get_available_events()
+				if events:
+					# if there are new events, play them
+					Dialogue.instance().start_queue(events)
+					await DialogueEvents.event_ended
 				else:
-					var allow_strategy_room := on_turn().is_player_owned() and _new_event.is_empty()
-					var strategy_room: bool = await get_active_overworld_scene().show_battle_result_banner(Battle.instance().get_battle_result(), allow_strategy_room)
+					# if there are no events, show the banner
+					var open_strategy_room: bool = await show_battle_result_banner(Battle.instance().get_battle_result(), on_turn().is_player_owned())
 
-					if strategy_room:
-						SceneManager.call_scene(SceneManager.scenes.strategy_room, 'fade_to_black', {inspect_mode=false})
-						var event_id: StringName = await OverworldEvents.strategy_room_closed
-
-						await SceneManager.transition_finished
-						
+					if open_strategy_room:
+						var event_id: StringName = await show_strategy_room(false)
 						if event_id:
-							DialogueEvents.start_event_requested.emit(event_id)
-							await DialogueEvents.event_ended
+							Dialogue.instance().start_queue([event_id])
+							await DialogueEvents.queue_ended
 
-					_next_state = 'turn_end'
-				
-			# Immediately processes the new event and waits for it to end.
-			# Abandoning the game here will cause it to return to this point and restart
-			# the event.
-			'process_new_event':
-				assert(not _new_event.is_empty(), 'no new event to process!')
-				DialogueEvents.start_event_requested.emit(_new_event)
-				await DialogueEvents.event_ended
-				_new_event = ''
 				_next_state = 'turn_end'
-
+				
 			# Ends the turn.
 			'turn_end':
 				OverworldEvents.turn_ended.emit(on_turn())
@@ -505,6 +485,41 @@ func _overworld_main() -> void:
 		await get_tree().process_frame
 	_is_running = false
 	_set_initialized(false)
+
+
+## Shows marching animation.
+func show_marching_animation(attacker: Empire, target: Territory) -> void:
+	OverworldEvents.marching_animation_requested.emit(null, target, attacker)
+	if wait_for_marching_animation:
+		await _marching_animation_finished
+
+
+func notify_marching_animation_finished() -> void:
+	if wait_for_marching_animation:
+		wait_for_marching_animation = false
+		_marching_animation_finished.emit()
+
+
+## Shows the battle result banner.
+func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) -> bool:
+	OverworldEvents.battle_result_banner_requested.emit(result, allow_strategy_room)
+	if wait_for_battle_result_banner:
+		return await _battle_result_banner_finished
+	return false
+		
+
+func notify_battle_result_banner_finished(open_strategy_room: bool) -> void:
+	if wait_for_battle_result_banner:
+		wait_for_battle_result_banner = false
+		_battle_result_banner_finished.emit(open_strategy_room)
+
+
+## Opens the strategy room.
+func show_strategy_room(inspect_mode: bool) -> StringName:
+	SceneManager.call_scene(SceneManager.scenes.strategy_room, 'fade_to_black', {inspect_mode=inspect_mode})
+	var event_id: StringName = await OverworldEvents.strategy_room_closed
+	await SceneManager.transition_finished
+	return event_id
 
 
 ## Returns true if overworld is running.
@@ -647,8 +662,13 @@ func transfer_territory(new_owner: Empire, territory: Territory) -> void:
 			_transfer_territory(old_owner, new_owner, t)
 
 	if old_owner.territories.is_empty():
+		if new_owner not in _held_transfer_units:
+			_held_transfer_units[new_owner] = []
+
 		for u in Game.get_empire_units(old_owner, Game.ALL_UNITS_MASK):
-			transfer_unit(u, new_owner)
+			transfer_unit(u, null)
+			_held_transfer_units[new_owner].append(u)
+
 		update_force_rating(old_owner)
 		update_force_rating(new_owner)
 		set_empire_defeated(old_owner)
@@ -745,10 +765,6 @@ func default_ai_action(empire: Empire) -> Dictionary:
 		
 	# rest
 	return {type='rest'}
-	
-
-func _notify_new_event(ev: StringName) -> void:
-	_new_event = ev
 
 
 func _check_boss_summon(_empire: Empire) -> void:

@@ -43,7 +43,6 @@ var _territory: Territory
 var _empire: Empire
 var _adjacent_to_player: bool
 
-
 ## Group node containing the button connections.
 @onready var connections: Node2D = $Connections
 
@@ -59,6 +58,7 @@ var _adjacent_to_player: bool
 @onready var train_button: Button = %TrainButton
 @onready var rest_button: Button = %RestButton
 
+@onready var _original_index: int = get_index()
 
 
 func _ready() -> void:
@@ -242,12 +242,14 @@ func open_panel(show_attack_button: bool) -> void:
 	attack_button.visible = show_attack_button
 	train_button.visible = show_attack_button
 	rest_button.visible = not show_attack_button and _empire.is_player_owned()
+	get_parent().move_child(self, -1)
 	z_index = 2
 
 
 ## Opens the interactive panel.
 func close_panel() -> void:
 	extended_panel.hide()
+	get_parent().move_child(self, _original_index)
 	z_index = 0
 	
 	

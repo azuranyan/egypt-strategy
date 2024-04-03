@@ -37,6 +37,9 @@ func _ready() -> void:
 		allow_inputs(false)
 	)
 
+	OverworldEvents.marching_animation_requested.connect(show_marching_animation)
+	OverworldEvents.battle_result_banner_requested.connect(show_battle_result_banner)
+
 
 ## Returns the territory nodes.
 func get_territory_nodes() -> Array[TerritoryButton]:
@@ -70,6 +73,10 @@ func find_territory_button(territory: Territory) -> TerritoryButton:
 
 
 func scene_enter(_kwargs = {}) -> void:
+	if not Overworld.instance().is_running():
+		# HACK until this sequence is figured out
+		Overworld.instance()._overworld_main()
+
 	initialize_buttons()
 	update_turn_counter(Overworld.instance().cycle())
 	update_new_available_scenes()
@@ -107,8 +114,15 @@ func update_turn_counter(cycle: int) -> void:
 	%TurnCountLabel.text = str(cycle + 1)
 	
 	
-func update_new_available_scenes(_empire: Empire = null) -> void:
-	%NewSceneIcon.visible = Game.has_new_scenes()
+func update_new_available_scenes(empire: Empire = Overworld.instance().player_empire()) -> void:
+	%NewEventsAvailableIcon.visible = has_any_new_events(empire)
+
+
+func has_any_new_events(empire: Empire) -> bool:
+	for u in Game.get_empire_units(empire, Game.ALL_UNITS_MASK):
+		if Dialogue.instance().has_new_character_event(u.chara()):
+			return true
+	return false
 
 
 func update_button_connections(territory: Territory, adjacent: Array[Territory]) -> void:
@@ -123,26 +137,38 @@ func allow_inputs(allow: bool) -> void:
 	set_block_signals(not allow)
 
 		
-func show_marching_animation(attacker: Empire, _defender: Empire, target: Territory) -> void:
-	# find nearest position
-	var start_pos := find_territory_button(target).global_position
-	var sorted_positions := territory_buttons \
-		.filter(func(btn): return Overworld.instance().get_territory_owner(btn._territory) == attacker and attacker.is_adjacent_territory(target)) \
-		.map(func(btn): return btn.global_position)
-	sorted_positions.sort_custom(Util.is_closer.bind(start_pos))
+func show_marching_animation(from: Territory, to: Territory, empire: Empire) -> void:
+	var start_pos: Vector2
+	var end_pos: Vector2 = find_territory_button(to).global_position
+
+	if from:
+		start_pos = find_territory_button(from).global_position
+	else:
+		# find nearest position
+		var sorted_positions := territory_buttons \
+			.filter(func(btn): return Overworld.instance().get_territory_owner(btn._territory) == empire and empire.is_adjacent_territory(to)) \
+			.map(func(btn): return btn.global_position)
+		sorted_positions.sort_custom(Util.is_closer.bind(start_pos))
+		start_pos = sorted_positions[0]
 	
 	# start and wait for march
 	var anim := preload("res://scenes/overworld/marching_animation.tscn").instantiate()
-	anim.global_position = sorted_positions[0]
+	anim.global_position = start_pos
 	add_child(anim)
-	anim.march(start_pos)
+
+	Overworld.instance().wait_for_marching_animation = true
+	anim.march(empire, end_pos)
 	await anim.done
+	Overworld.instance().notify_marching_animation_finished()
 	
 
-func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) -> bool:
+func show_battle_result_banner(result: BattleResult, allow_strategy_room: bool) -> void:
 	var banner: BattleResultBanner = battle_result_banner_scene.instantiate()
 	$Overlay.add_child(banner)
-	return await banner.show_parsed_result(result, allow_strategy_room)
+
+	Overworld.instance().wait_for_battle_result_banner = true
+	var strategy_room := await banner.show_parsed_result(result, allow_strategy_room)
+	Overworld.instance().notify_battle_result_banner_finished(strategy_room)
 
 
 func _emit_player_attack_action(territory: Territory, training: bool) -> void:

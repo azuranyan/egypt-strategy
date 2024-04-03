@@ -56,3 +56,12 @@ signal strategy_room_opened(inspect_mode: bool)
 signal strategy_room_closed(event_id: StringName)
 
 #endregion Cycle Signals
+
+
+#region Misc Signals
+## Emitted when marching animations are requested.
+signal marching_animation_requested(from: Territory, to: Territory, empire: Empire)
+
+## Emitted when battle result animations are requested.
+signal battle_result_banner_requested(result: BattleResult, allow_strategy_room: bool)
+#endregion Misc Signals

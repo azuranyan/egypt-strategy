@@ -680,7 +680,9 @@ func get_spawn_points(type: SpawnPoint.Type) -> Array[SpawnPoint]:
 
 ## Returns the battle result.
 func get_battle_result() -> BattleResult:
-	return BattleResult.new(_result_value, _attacker, _defender, _territory, _map_id)
+	var re := BattleResult.new(_result_value, _attacker, _defender, _territory, _map_id)
+	re.completed_goals = bonus_goals().filter(func(g: Objective): return g.status() == Objective.Status.COMPLETED)
+	return re
 	
 	
 ## Evaluates victory conditions and returns first valid result.

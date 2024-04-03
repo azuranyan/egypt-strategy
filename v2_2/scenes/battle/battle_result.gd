@@ -15,6 +15,7 @@ var attacker: Empire
 var defender: Empire
 var territory: Territory
 var map_id: int
+var completed_goals: Array[Objective]
 
 
 static func empire_victory(empire: Empire) -> int:
@@ -27,7 +28,6 @@ static func empire_defeat(empire: Empire) -> int:
 
 static func empire_withdraw(empire: Empire) -> int:
 	return ATTACKER_WITHDRAW if empire == Battle.instance().attacker() else DEFENDER_WITHDRAW
-
 
 
 func _init(_value: int, _attacker: Empire = null, _defender: Empire = null, _territory: Territory = null, _map_id: int = 0):

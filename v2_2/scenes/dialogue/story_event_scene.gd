@@ -202,6 +202,11 @@ func start(dialogue_resource: DialogueResource, title: String, extra_game_states
 	next(title)
 
 
+## Stops the dialogue.
+func stop() -> void:
+	_dialogue_line = null
+
+
 ## Shows the next dialogue line.
 func next(next_id: String) -> void:
 	_dialogue_line = await DialogueManager.get_next_dialogue_line(_resource, next_id, _temp_game_states)

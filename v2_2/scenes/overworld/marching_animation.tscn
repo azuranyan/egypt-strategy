@@ -6,6 +6,7 @@
 [sub_resource type="Curve2D" id="Curve2D_wsj2m"]
 
 [node name="MarchingAnimation" type="Path2D"]
+z_index = 2
 curve = SubResource("Curve2D_wsj2m")
 script = ExtResource("1_8yn85")
 speed = 456.359
@@ -20,4 +21,3 @@ unique_name_in_owner = true
 sprite_frames = ExtResource("2_o1l1g")
 animation = &"back_walk_loop"
 frame_progress = 0.243122
-

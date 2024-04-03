@@ -7,9 +7,11 @@ extends GameScene
 func scene_enter(kwargs := {}) -> void:
 	if 'next_scene' in kwargs:
 		next_scene = kwargs['next_scene']
-	Dialogue.instance().refresh_event_queue()
-	Dialogue.instance().start_queue()
+
 	DialogueEvents.queue_ended.connect(finish_scene)
+
+	var queue := Dialogue.instance().get_available_events()
+	Dialogue.instance().start_queue(queue)
 
 
 func scene_exit() -> void:

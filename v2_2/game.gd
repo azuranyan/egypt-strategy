@@ -63,9 +63,6 @@ var _next_unit_id: int
 ## Reference to the [Overworld] system.
 var overworld: Overworld
 
-## Record of playable scenes and whether they've been checked once.
-var available_scenes: Dictionary
-
 ## Reference to the [Battle] system.
 var battle: Battle
 
@@ -77,8 +74,14 @@ var dialogue: Dialogue
 
 var audio_stream_player: AudioStreamPlayer2D
 
-var settings: Settings
+var settings: Settings:
+	set(value):
+		settings = value
 
+		# this is stupid but we'll just go with it
+		for setting in settings.get_property_list():
+			setting_changed.emit(setting.name, settings.get(setting.name))
+			
 var _suspended: bool
 
 var _pause_nodes: Array[Node]
@@ -86,7 +89,7 @@ var _pause_nodes: Array[Node]
 
 func _ready():
 	settings = Settings.new()
-
+	
 	var node := Node.new()
 	node.name = 'Units'
 	add_child(node)
@@ -118,20 +121,12 @@ func _main(kwargs := {}):
 		add_child(debug_overlay)
 	
 	get_tree().set_auto_accept_quit(false)
-	
+
 	# due to the way this works, Bootstrap is the current scene, as set as
 	# the scene to launch on main and will be replaced by the start scene.
 	SceneManager.call_scene(kwargs.start_scene_path, 'fade_to_black')
-		
-		
-## Returns true if there are scenes that have not been checked yet.
-func has_new_scenes() -> bool:
-	for scene_id in available_scenes:
-		if not available_scenes[scene_id]:
-			return true
-	return false
 	
-	
+		
 ## Pauses the game. A node is passed as the key to prevent double pauses.
 func push_pause(node: Node):
 	if node in _pause_nodes:
@@ -368,6 +363,11 @@ func resume() -> void:
 func wait_for_resume() -> void:
 	if _suspended:
 		await game_resumed
+
+
+## Returns true if the game is suspended.
+func suspended() -> bool:
+	return _suspended
 	
 	
 ## Quits the game. Broadcasts [code]on_quit[/code] event.

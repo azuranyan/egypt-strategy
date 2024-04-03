@@ -51,14 +51,10 @@ func register_events() -> void:
 
 func _on_battle_ended(result: BattleResult):
 	show_parsed_result(result)
-	if Dialogue.instance().refresh_event_queue():
-		DialogueEvents.new_event_unlocked.emit(Dialogue.instance().event_queue.front())
 
 
 func _on_overworld_cycle_start(count: int):
 	print('Cycle %s started' % count)
-	if Dialogue.instance().refresh_event_queue():
-		DialogueEvents.new_event_unlocked.emit(Dialogue.instance().event_queue.front())
 
 
 func _on_overworld_turn_end(empire: Empire):

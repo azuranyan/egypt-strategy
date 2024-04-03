@@ -9,7 +9,6 @@ var _done := false
 
 func _ready():
 	hide()
-
 	%ContinueButton.pressed.connect(_on_continue_button_pressed)
 	%StrategyRoomButton.pressed.connect(_on_strategy_room_button_pressed)
 	
@@ -45,7 +44,6 @@ func show_result(header: String, message: String, allow_strategy_room: bool) -> 
 	%ContinueButton.grab_focus()
 	modulate = Color.TRANSPARENT # prevent flicker
 	show()
-	Game.push_pause(self)
 	$AnimationPlayer.play('show')
 	await $AnimationPlayer.animation_finished
 	if not _done:
@@ -55,7 +53,6 @@ func show_result(header: String, message: String, allow_strategy_room: bool) -> 
 	$AnimationPlayer.play('RESET')
 	if %ContinueButton.has_focus():
 		%ContinueButton.release_focus()
-	Game.pop_pause(self)
 	queue_free()
 	return _value
 	

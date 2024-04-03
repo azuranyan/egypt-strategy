@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://wjbxvkl38yg8"]
+[gd_scene load_steps=10 format=3 uid="uid://wjbxvkl38yg8"]
 
 [ext_resource type="Theme" uid="uid://cegg3xuaofnvx" path="res://scenes/data/theme.tres" id="1_ubpcv"]
 [ext_resource type="Script" path="res://scenes/overworld/battle_result_banner.gd" id="2_27rhy"]
 [ext_resource type="FontFile" uid="uid://bole0tasrv4tw" path="res://scenes/data/fonts/Rakkas-Regular.ttf" id="3_n2ngn"]
 [ext_resource type="Script" path="res://scenes/common/richer_text_label.gd" id="4_fw3mu"]
+[ext_resource type="Script" path="res://scenes/common/autopause_node.gd" id="5_alrea"]
 
 [sub_resource type="Animation" id="Animation_5xp3e"]
 length = 0.001
@@ -46,6 +47,7 @@ font_size = 29
 font_color = Color(0.360784, 0.254902, 0.113725, 1)
 
 [node name="BattleResultBanner" type="Control"]
+process_mode = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -182,3 +184,6 @@ autowrap_mode = 0
 script = ExtResource("4_fw3mu")
 all_caps = true
 center_text = true
+
+[node name="AutopauseNode" type="Node" parent="."]
+script = ExtResource("5_alrea")

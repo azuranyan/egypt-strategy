@@ -50,7 +50,6 @@ func _ready() -> void:
 		# TODO this piece of code is being repeated in so many scenes, clean it up
 		var settings = load(SceneManager.scenes.settings).instantiate()
 		get_tree().root.add_child(settings, true)
-		settings.initialize(Game.settings)
 	)
 
 	# connect quit

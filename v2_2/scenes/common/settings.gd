@@ -32,7 +32,7 @@ enum WindowMode {FULLSCREEN, WINDOWED}
 @export_subgroup("Overworld")
 @export var wait_after_event: bool
 @export var defeat_if_home_territory_captured: bool
-@export var show_marching_animations: bool
+@export var show_marching_animations: bool = true
 
 @export_subgroup("Dialogue")
 @export var dialogue_autosave: DialogueAutosave
@@ -55,12 +55,12 @@ enum WindowMode {FULLSCREEN, WINDOWED}
 
 @export_group("Audio")
 #region Audio Settings
-@export_range(0.0, 1.0) var master_volume: float
+@export_range(0.0, 1.0) var master_volume: float = 0.1
 
 @export_subgroup("Audio Balance")
-@export_range(0.0, 1.0) var music_volume: float
-@export_range(0.0, 1.0) var voice_volume: float
-@export_range(0.0, 1.0) var sound_effects_volume: float
-@export_range(0.0, 1.0) var ui_volume: float
+@export_range(0.0, 1.0) var music_volume: float = 0.5
+@export_range(0.0, 1.0) var voice_volume: float = 0.5
+@export_range(0.0, 1.0) var sound_effects_volume: float = 0.5
+@export_range(0.0, 1.0) var ui_volume: float = 0.5
 #endregion Audio Settings
 

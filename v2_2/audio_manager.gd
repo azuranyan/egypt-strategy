@@ -54,6 +54,12 @@ var _tweens := {}
 
 func _ready() -> void:
 	Game.setting_changed.connect(_on_setting_changed)
+	if Game.settings:
+		master_volume = Game.settings.master_volume
+		music_volume = Game.settings.music_volume
+		voice_volume = Game.settings.voice_volume
+		sfx_volume = Game.settings.sfx_volume
+		ui_volume = Game.settings.ui_volume
 
 
 func _set_volume(bus_name: StringName, linear: float) -> void:
