@@ -223,3 +223,36 @@ static func make_random_path(
 		prev = p
 	
 	return re
+
+
+static func find_nearest_unit(cell: Vector2, units: Array[Unit]) -> Unit:
+	var nearest_target: Unit
+	var nearest_dist: float
+	for t in units:
+		var tdist := cell_distance(cell, t.get_position())
+		if nearest_dist == null or tdist < nearest_dist:
+			nearest_target = t
+			nearest_dist = tdist
+	return nearest_target
+
+
+static func find_nearest_enemy(u: Unit) -> Unit:
+	var pool: Array[Unit] = []
+	
+	for tid: int in Game.unit_registry:
+		var t: Unit = Game.unit_registry[tid]
+		if t != u and t.is_valid_target() and u.is_enemy(t):
+			pool.append(t)
+
+	return Util.find_nearest_unit(u.get_position(), pool)
+
+
+static func find_nearest_ally(u: Unit) -> Unit:
+	var pool: Array[Unit] = []
+	
+	for tid: int in Game.unit_registry:
+		var t: Unit = Game.unit_registry[tid]
+		if t != u and t.is_valid_target() and u.is_ally(t):
+			pool.append(t)
+
+	return Util.find_nearest_unit(u.get_position(), pool)
