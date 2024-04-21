@@ -26,7 +26,6 @@ static func action_attack_nearest_target() -> Dictionary:
 	return {}
 
 
-
 # https://www.reddit.com/r/fireemblem/comments/167bnhz/comment/jyoutfv/
 class UnitCPU:
 	enum {
@@ -45,10 +44,8 @@ class UnitCPU:
 	var unit: Unit ## A reference to the controlled unit.
 	var state: int
 
-	var target_units: Array[Unit]
-	var target_attack: Attack
-	var target_location: Vector2
-	var target_rotation: float
+	var deify_meter: float ## If > 1, will be able to use deify.
+	var should_deify: bool ## This will be true if unit should unleash deify when possible.
 
 	var allow_movement: bool = true ## Whether this unit is allowed to move.
 	var allow_fight: bool = true ## Whether this unit is allowed to use the first (normal) attack.
@@ -62,9 +59,7 @@ class UnitCPU:
 
 
 	func reset_action_state() -> void:
-		target_units = []
-		target_attack = null
-		target_location = Map.OUT_OF_BOUNDS
+		should_deify = false
 
 
 	func get_nearest_enemy() -> Unit:
@@ -80,7 +75,6 @@ class UnitCPU:
 				nearest_target = t
 				nearest_dist = tdist
 		return null
-
 
 
 	func target_within_range(target: Unit, attack: Attack, assumed_position := Map.OUT_OF_BOUNDS) -> bool:
@@ -101,25 +95,34 @@ class UnitCPU:
 
 
 	## Returns the unit action for this unit.
-	func choose_action() -> UnitAction:
+	func choose_action() -> void:
 		reset_action_state()
 
 		if unit.can_act():
 			if action_behavior_override():
-				return get_action()
+				return
 
 			if action_behavior_specific():
-				return get_action()
+				return
 
 			if action_default_behavior():
-				return get_action()
+				return
 
 		# fallback action is to do nothing
-		return UnitAction.do_nothing(unit)
+		Battle.instance().unit_action_pass(unit)
 
 		
 	## Action overrides.
 	func action_behavior_override() -> bool:
+		if deify_meter > 1.0:
+			
+		# check if attack is a buff (assume self-targeted attacks are buffs)
+		if unit.special_attack().target_flags & Attack.TARGET_SELF:
+			if Util.find_nearest_enemy(unit).get_position() in unit.special_attack().get_cells_in_range(
+		# can i use either attack to buff me up first?
+		if unit.basic_attack().target_flags & Attack.TARGET_SELF:
+
+		# does using buff make it good for the situation?
 		return false
 
 
@@ -154,8 +157,42 @@ class UnitCPU:
 				if target_within_range(t, unit.basic_attack()):
 					pass # we're already in range so do nothing
 				else:
-					var nearest_attack_position := unit.pathfind_to(t.get_position()
-					Battle.instance().unit_action_move(unit, nearest_attack_position))
+					var nearest_attack_position := unit.pathfind_to(t.get_position())
+					Battle.instance().unit_action_move(unit, nearest_attack_position[-1])
+					took_action = true
+
+			# attack if possible
+			if unit.can_attack():
+				if unit.basic_attack().is_multicast():
+					pass # TODO: multicast attack
+				else:
+					
+					# TODO if can use attack check
+					# TODO battle - use attack add melee face target feature *actually make it so all features
+					# are implemented in battle itself instead of relying on the agents
+
+					Battle.instance().unit_action_attack(unit, unit.basic_attack(), [t.get_position()], [0.0])
+					took_action = true
+					
+		return took_action
+
+
+	## Always attacks nearest target, flees adjacent attackers.
+	func action_normal_ranged() -> bool:
+		var took_action: bool = false
+		var t := Util.find_nearest_enemy(unit)
+		if t:
+			# TODO special attack
+
+			# move towards the target if we have to
+			if unit.can_move():
+				if Util.cell_distance(unit.get_position(), t.get_position()) == 1:
+					pass # TODO pathfind to furthest reachable attack spot
+				elif target_within_range(t, unit.basic_attack()):
+					pass # we're already in range so do nothing
+				else:
+					var nearest_attack_position := unit.pathfind_to(t.get_position())
+					Battle.instance().unit_action_move(unit, nearest_attack_position[-1])
 					took_action = true
 
 			# attack if possible
@@ -165,21 +202,16 @@ class UnitCPU:
 				else:
 					Battle.instance().unit_action_attack(unit, unit.basic_attack(), [t.get_position()], [0.0])
 					took_action = true
-					
+
 		return took_action
-
-
-	## Always attacks nearest target, flees adjacent attackers.
-	func action_normal_ranged() -> bool:
-		var t := Util.find_nearest_enemy(unit)
-		if t:
-			action_attack_only(t, unit.basic_attack())
-		return null
 	
 
 	## Always advances and tries to attack target with lowest HP.
 	func action_exploitative_melee() -> bool:
-		return null
+		# try to attack move to lowest hp
+			# if possible, do that
+			# else, attack normally
+		return false
 	
 
 	## Always tries to attack targets that would not be able to retaliate.

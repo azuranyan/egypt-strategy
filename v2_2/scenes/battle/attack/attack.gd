@@ -15,6 +15,19 @@ enum {
 }
 
 
+enum Tag {
+	ATTACK, ## Default tag for damaging attacks with no extra properties.
+	DOT, ## Damaging attack but is dot instead of one big damage.
+	DEBUFF, ## Tag for attacks that inflict debuffs.
+	OFFENSIVE_BUFF, ## Skill is an offensive buff.
+	DEFENSIVE_BUFF, ## Skill is a defensive buff.
+	HEAL, ## Tag for recovery skills.
+	CC, ## Tag for crowd control abilities.
+	RELOCATE_ENEMY, ## Tag for skills that relocates the enemy.
+	RELOCATE_SELF, ## Tag for skills that relocates the user.
+}
+
+
 ## Display name of the attack.
 @export var name: String
 
@@ -68,6 +81,11 @@ enum {
 
 ## Whether rotation is allowed.
 @export var allow_rotation: bool
+
+@export_group("Tags")
+
+## List of tags for metadata.
+@export var tags: Array[Tag] = [Tag.ATTACK]
 
 
 ## Returns true if attack is multicast.
