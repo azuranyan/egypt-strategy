@@ -26,6 +26,11 @@ static func action_attack_nearest_target() -> Dictionary:
 	return {}
 
 
+
+class Action:
+	var unit: Unit
+
+
 # https://www.reddit.com/r/fireemblem/comments/167bnhz/comment/jyoutfv/
 class UnitCPU:
 	enum {
@@ -82,6 +87,25 @@ class UnitCPU:
 		return pos in unit.attack_range_cells(attack)
 
 
+	func find_valid_attack_actions(target: Unit, attack: Attack, allow_move: bool) -> Array[Dictionary]:
+		return []
+
+
+	func find_valid_attack_actions_at(location: Vector2, attack: Attack, target: Unit) -> Array[Dictionary]:
+		var arr: Array[Dictionary] = []
+
+		# for each cell within attack range, test every cell within the aoe if it contains the target unit
+		for cell in attack.get_cells_in_range(location, unit.attack_range(attack)):
+			for t in attack.get_target_cells(cell, 0): # TODO do other rotations
+				if Battle.instance().get_unit_at(t) == target:
+					arr.append({
+						cell = t,
+						rotation = 0.0,
+					})
+
+		return arr
+			
+
 	func get_action() -> UnitAction:
 		var a := UnitAction.new()
 
@@ -92,6 +116,11 @@ class UnitCPU:
 		a.attack = target_attack
 		a.target = target_units[0].get_position()
 		a.rotation = target_rotation
+	
+
+	func asd() -> void:
+		pass
+
 
 
 	## Returns the unit action for this unit.
@@ -99,6 +128,7 @@ class UnitCPU:
 		reset_action_state()
 
 		if unit.can_act():
+			
 			if action_behavior_override():
 				return
 
@@ -111,11 +141,29 @@ class UnitCPU:
 		# fallback action is to do nothing
 		Battle.instance().unit_action_pass(unit)
 
-		
+
+	# global target
+	# unit preferred target
+
+	# check if can use self buff
+	# check if can use ally buff
+	# check if can heal ally
+	# check if can debuff enemy
+	# should use deify
+
+	# can kill enemy
+	# might die
+
+	# should move towards nearest target
+	# should move away from nearest target
+	# should hold position
+
+
+
 	## Action overrides.
 	func action_behavior_override() -> bool:
 		if deify_meter > 1.0:
-			
+			pass
 		# check if attack is a buff (assume self-targeted attacks are buffs)
 		if unit.special_attack().target_flags & Attack.TARGET_SELF:
 			if Util.find_nearest_enemy(unit).get_position() in unit.special_attack().get_cells_in_range(
@@ -371,5 +419,5 @@ func _enter_turn():
 	
 	
 func make_action_for(unit: Unit) -> UnitAction:
-	var list := Game.battle.generate_actions(unit)
+	var list := Game.battle.find_actions(unit)
 	return list.pick_random()
