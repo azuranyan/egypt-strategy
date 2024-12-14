@@ -165,11 +165,11 @@ class UnitCPU:
 		if deify_meter > 1.0:
 			pass
 		# check if attack is a buff (assume self-targeted attacks are buffs)
-		if unit.special_attack().target_flags & Attack.TARGET_SELF:
-			if Util.find_nearest_enemy(unit).get_position() in unit.special_attack().get_cells_in_range(
+		#if unit.special_attack().target_flags & Attack.TARGET_SELF:
+		#	if Util.find_nearest_enemy(unit).get_position() in unit.special_attack().get_cells_in_range(
 		# can i use either attack to buff me up first?
-		if unit.basic_attack().target_flags & Attack.TARGET_SELF:
-
+		#if unit.basic_attack().target_flags & Attack.TARGET_SELF:
+		#	pass
 		# does using buff make it good for the situation?
 		return false
 
@@ -419,5 +419,5 @@ func _enter_turn():
 	
 	
 func make_action_for(unit: Unit) -> UnitAction:
-	var list := Game.battle.find_actions(unit)
+	var list = Game.battle.find_actions(unit)
 	return list.pick_random()

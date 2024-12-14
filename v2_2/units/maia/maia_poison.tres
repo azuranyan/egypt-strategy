@@ -47,3 +47,4 @@ target_shape = Array[Vector2i]([Vector2i(0, 0)])
 melee = false
 target_flags = 4
 allow_rotation = false
+tags = Array[int]([0])
