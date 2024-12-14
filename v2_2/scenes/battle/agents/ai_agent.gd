@@ -1,10 +1,350 @@
 extends BattleAgent
 
 
+## Decides what the main objective of the ai should be.
+class GrandCPU:
+	enum {
+		DO_NOTHING,
+		AGGRESSIVE,
+		REACT,
+		SURVIVE,
+	}
+	
+
+
+class StrategyCPU:
+	enum {
+		TARGET,
+	}
+
+
+static func action_attack_target(unit: Unit, target: Unit, attack: Attack) -> Dictionary:
+	return {}
+
+
+static func action_attack_nearest_target() -> Dictionary:
+	return {}
+
+
+
+class Action:
+	var unit: Unit
+
+
+# https://www.reddit.com/r/fireemblem/comments/167bnhz/comment/jyoutfv/
+class UnitCPU:
+	enum {
+		IDLE,
+		ATTACK,
+		GUARD,
+
+	}
+
+	enum Aggro {
+		ACTIVE,
+		PASSIVE,
+		NEUTRAL,
+	}
+
+	var unit: Unit ## A reference to the controlled unit.
+	var state: int
+
+	var deify_meter: float ## If > 1, will be able to use deify.
+	var should_deify: bool ## This will be true if unit should unleash deify when possible.
+
+	var allow_movement: bool = true ## Whether this unit is allowed to move.
+	var allow_fight: bool = true ## Whether this unit is allowed to use the first (normal) attack.
+	var allow_diefy: bool = true ## Whether this unit is allowed to use the special (diefy) attack.
+	var allow_heal: bool = true ## Allows this unit to heal, if it has healing capabilities.
+	var allow_flee: bool = true ## Allows this unit to retreat for self preservation.
+
+	var aggro: Aggro = Aggro.ACTIVE ## Whether this unit
+	var aggro_range: int = 999
+	var aggro_group: int = 0
+
+
+	func reset_action_state() -> void:
+		should_deify = false
+
+
+	func get_nearest_enemy() -> Unit:
+		var cell := unit.get_position()
+		var nearest_target: Unit
+		var nearest_dist: float
+		for tid: int in Game.unit_registry:
+			var t: Unit = Game.unit_registry[tid]
+			if not unit.is_enemy(t):
+				continue
+			var tdist := Util.cell_distance(cell, t.get_position())
+			if nearest_dist == null or tdist < nearest_dist:
+				nearest_target = t
+				nearest_dist = tdist
+		return null
+
+
+	func target_within_range(target: Unit, attack: Attack, assumed_position := Map.OUT_OF_BOUNDS) -> bool:
+		var pos := assumed_position if assumed_position != Map.OUT_OF_BOUNDS else target.get_position()
+		return pos in unit.attack_range_cells(attack)
+
+
+	func find_valid_attack_actions(target: Unit, attack: Attack, allow_move: bool) -> Array[Dictionary]:
+		return []
+
+
+	func find_valid_attack_actions_at(location: Vector2, attack: Attack, target: Unit) -> Array[Dictionary]:
+		var arr: Array[Dictionary] = []
+
+		# for each cell within attack range, test every cell within the aoe if it contains the target unit
+		for cell in attack.get_cells_in_range(location, unit.attack_range(attack)):
+			for t in attack.get_target_cells(cell, 0): # TODO do other rotations
+				if Battle.instance().get_unit_at(t) == target:
+					arr.append({
+						cell = t,
+						rotation = 0.0,
+					})
+
+		return arr
+			
+
+	func get_action() -> UnitAction:
+		var a := UnitAction.new()
+
+		a.is_move = target_location != Map.OUT_OF_BOUNDS
+		a.cell = target_location
+
+		a.is_attack = target_attack != null
+		a.attack = target_attack
+		a.target = target_units[0].get_position()
+		a.rotation = target_rotation
+	
+
+	func asd() -> void:
+		pass
+
+
+
+	## Returns the unit action for this unit.
+	func choose_action() -> void:
+		reset_action_state()
+
+		if unit.can_act():
+			
+			if action_behavior_override():
+				return
+
+			if action_behavior_specific():
+				return
+
+			if action_default_behavior():
+				return
+
+		# fallback action is to do nothing
+		Battle.instance().unit_action_pass(unit)
+
+
+	# global target
+	# unit preferred target
+
+	# check if can use self buff
+	# check if can use ally buff
+	# check if can heal ally
+	# check if can debuff enemy
+	# should use deify
+
+	# can kill enemy
+	# might die
+
+	# should move towards nearest target
+	# should move away from nearest target
+	# should hold position
+
+
+
+	## Action overrides.
+	func action_behavior_override() -> bool:
+		if deify_meter > 1.0:
+			pass
+		# check if attack is a buff (assume self-targeted attacks are buffs)
+		#if unit.special_attack().target_flags & Attack.TARGET_SELF:
+		#	if Util.find_nearest_enemy(unit).get_position() in unit.special_attack().get_cells_in_range(
+		# can i use either attack to buff me up first?
+		#if unit.basic_attack().target_flags & Attack.TARGET_SELF:
+		#	pass
+		# does using buff make it good for the situation?
+		return false
+
+
+	## The default behavior when no specific one is found.
+	func action_default_behavior() -> bool:
+		return false
+
+
+	## Returns behavior-specific action.
+	func action_behavior_specific() -> bool:
+		match unit.get_behavior():
+			Unit.Behavior.NORMAL_MELEE: return action_normal_melee()
+			Unit.Behavior.NORMAL_RANGED: return action_normal_ranged()
+			Unit.Behavior.EXPLOITATIVE_MELEE: return action_exploitative_melee()
+			Unit.Behavior.EXPLOITATIVE_RANGED: return action_exploitative_ranged()
+			Unit.Behavior.DEFENSIVE_MELEE: return action_defensive_melee()
+			Unit.Behavior.DEFENSIVE_RANGED: return action_defensive_ranged()
+			Unit.Behavior.SUPPORT_HEALER: return action_support_healer()
+			Unit.Behavior.STATUS_APPLIER: return action_status_applier()
+			_, Unit.Behavior.PLAYER_CONTROLLED: return false
+
+
+	## Always advances towards nearest target and attacks.
+	func action_normal_melee() -> bool:
+		var took_action: bool = false
+		var t := get_nearest_enemy()
+		if t:
+			# TODO special attack
+
+			# move towards the target if we have to
+			if unit.can_move():
+				if target_within_range(t, unit.basic_attack()):
+					pass # we're already in range so do nothing
+				else:
+					var nearest_attack_position := unit.pathfind_to(t.get_position())
+					Battle.instance().unit_action_move(unit, nearest_attack_position[-1])
+					took_action = true
+
+			# attack if possible
+			if unit.can_attack():
+				if unit.basic_attack().is_multicast():
+					pass # TODO: multicast attack
+				else:
+					
+					# TODO if can use attack check
+					# TODO battle - use attack add melee face target feature *actually make it so all features
+					# are implemented in battle itself instead of relying on the agents
+
+					Battle.instance().unit_action_attack(unit, unit.basic_attack(), [t.get_position()], [0.0])
+					took_action = true
+					
+		return took_action
+
+
+	## Always attacks nearest target, flees adjacent attackers.
+	func action_normal_ranged() -> bool:
+		var took_action: bool = false
+		var t := Util.find_nearest_enemy(unit)
+		if t:
+			# TODO special attack
+
+			# move towards the target if we have to
+			if unit.can_move():
+				if Util.cell_distance(unit.get_position(), t.get_position()) == 1:
+					pass # TODO pathfind to furthest reachable attack spot
+				elif target_within_range(t, unit.basic_attack()):
+					pass # we're already in range so do nothing
+				else:
+					var nearest_attack_position := unit.pathfind_to(t.get_position())
+					Battle.instance().unit_action_move(unit, nearest_attack_position[-1])
+					took_action = true
+
+			# attack if possible
+			if unit.can_attack():
+				if unit.basic_attack().is_multicast():
+					pass # TODO: multicast attack
+				else:
+					Battle.instance().unit_action_attack(unit, unit.basic_attack(), [t.get_position()], [0.0])
+					took_action = true
+
+		return took_action
+	
+
+	## Always advances and tries to attack target with lowest HP.
+	func action_exploitative_melee() -> bool:
+		# try to attack move to lowest hp
+			# if possible, do that
+			# else, attack normally
+		return false
+	
+
+	## Always tries to attack targets that would not be able to retaliate.
+	func action_exploitative_ranged() -> bool:
+		return null
+	
+
+	## Holds 1 spot and attacks any who approach.
+	func action_defensive_melee() -> bool:
+		return null
+	
+	## Holds 1 spot and attacks any who approach, flees adjacent attackers.
+	func action_defensive_ranged() -> bool:
+		return null
+
+	
+	## Heals allies and self, runs away from attackers.
+	func action_support_healer() -> bool:
+		return null
+	
+
+	## Aims to inflict as many enemies with negative status as possible, will choose different target if already afflicted.
+	func action_status_applier() -> bool:
+		return null
+		
+
+# targeting
+# favor guaranteed kills
+# prioritize based on damage dealt, if possible take into account accuracy and crit hits
+# factor in attacks from other units such that if x is killed if n units attack it
+# prune 0 damage and 0% hits (exceptions are debuffs)
+# dont do pointless stuff like silence non magic users
+
+# movement
+# stand still
+# move when aggroed
+# group linked aggro
+# on trigger
+
+# self preservation
+# avoid taking high counterattack damage
+# retreat when low hp
+
+
+
+
 @export var action_cooldown: float = 0.3
 var battle: Battle
 
 var action_order: Array[Unit]
+var action_queue: Array[Dictionary]
+
+
+
+## Evaluates the game state and queues the actions for each unit.
+func refresh_action_queue() -> void:
+	action_queue.clear()
+
+	evaluate_game_state()
+	queue_unit_actions()
+
+	Battle.instance().hud().action_order_list.clear_units()
+	for d in action_queue:
+		Battle.instance().hud().action_order_list.add_unit(d.unit)
+
+
+
+
+## Allows the cpu to re-evaluate the state of the game and come up with strategies.
+func evaluate_game_state() -> void:
+	# relative force strength
+	# how well the units support each other
+	# how large area you threaten
+	# how many units are threatened
+	# 
+	# check if we're winning or losing thru objectives
+	# adjust grand strategy accordingly
+	# issue strategies to squads
+	pass
+
+
+## Pushes actions to the action queue.
+func queue_unit_actions() -> void:
+	# how do you optimize the order of the unit actions
+	pass
 
 	
 ## Called on initialize.
@@ -79,5 +419,5 @@ func _enter_turn():
 	
 	
 func make_action_for(unit: Unit) -> UnitAction:
-	var list := Game.battle.generate_actions(unit)
+	var list = Game.battle.find_actions(unit)
 	return list.pick_random()

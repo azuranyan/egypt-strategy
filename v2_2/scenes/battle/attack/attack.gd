@@ -15,6 +15,19 @@ enum {
 }
 
 
+enum Tag {
+	ATTACK, ## Default tag for damaging attacks with no extra properties.
+	DOT, ## Damaging attack but is dot instead of one big damage.
+	DEBUFF, ## Tag for attacks that inflict debuffs.
+	OFFENSIVE_BUFF, ## Skill is an offensive buff.
+	DEFENSIVE_BUFF, ## Skill is a defensive buff.
+	HEAL, ## Tag for recovery skills.
+	CC, ## Tag for crowd control abilities.
+	RELOCATE_ENEMY, ## Tag for skills that relocates the enemy.
+	RELOCATE_SELF, ## Tag for skills that relocates the user.
+}
+
+
 ## Display name of the attack.
 @export var name: String
 
@@ -69,6 +82,11 @@ enum {
 ## Whether rotation is allowed.
 @export var allow_rotation: bool
 
+@export_group("Tags")
+
+## List of tags for metadata.
+@export var tags: Array[Tag] = [Tag.ATTACK]
+
 
 ## Returns true if attack is multicast.
 func is_multicast() -> bool:
@@ -82,36 +100,46 @@ func attack_range(unit_range: int) -> int:
 
 ## Returns the cells in range.
 func get_cells_in_range(cell: Vector2, unit_range: int) -> PackedVector2Array:
-	var _range := attack_range(unit_range)
+	var r := attack_range(unit_range)
 	if melee:
+		# if the attack is melee, we simply return the cells in each cardinal direction at max range
 		return [
-			Vector2(cell.x, cell.y + _range),
-			Vector2(cell.x, cell.y - _range),
-			Vector2(cell.x + _range, cell.y),
-			Vector2(cell.x - _range, cell.y),
+			Vector2(cell.x, cell.y + r),
+			Vector2(cell.x, cell.y - r),
+			Vector2(cell.x + r, cell.y),
+			Vector2(cell.x - r, cell.y),
 		]
 	else:
-		var cells := Util.flood_fill(cell, Battle.instance().world_bounds(), _range)
-		if min_range > 0:
-			var re := PackedVector2Array()
-			for c in cells:
-				if Util.cell_distance(cell, c) > min_range:
-					re.append(c)
-			return re
-		else:
-			return cells
+		# if the attack is ranged, we return all the cells within the attack range
+		var re := PackedVector2Array()
+		for x in range(-r, r + 1):
+			for y in range(-r, r + 1):
+				var d := absi(x) + absi(y)
+				if d > min_range and d <= r:
+					re.append(Vector2(x, y))
+		return re
 
 
 ## Returns an array of cells in the target aoe.
 func get_target_cells(target: Vector2, target_rotation: float) -> PackedVector2Array:
 	var re := PackedVector2Array()
-	for offs in target_shape:
-		var m := Transform2D()
-		m = m.translated(offs)
-		m = m.rotated(target_rotation)
-		m = m.translated(target)
-		var p := m * Vector2.ZERO 
-		re.append(Vector2(roundi(p.x), roundi(p.y)))
+
+	# snap rotation into 90 degrees
+	match Map.to_heading(target_rotation):
+		Map.Heading.EAST:
+			for offs: Vector2 in target_shape:
+				re.append(target + offs)
+		Map.Heading.SOUTH:
+			for offs: Vector2 in target_shape:
+				re.append(target + Vector2(offs.y, -offs.x))
+		Map.Heading.WEST:
+			for offs: Vector2 in target_shape:
+				re.append(target + Vector2(-offs.x, -offs.y))
+		Map.Heading.NORTH:
+			for offs: Vector2 in target_shape:
+				re.append(target + Vector2(-offs.y, offs.x))
+
+	assert(not re.is_empty())
 	return re
 	
 	
