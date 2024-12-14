@@ -7,114 +7,6 @@ extends Node
 signal selected_unit_changed(unit: Unit, selected: bool)
 
 
-enum {
-	## Marker for none/invalid state.
-	STATE_NONE,
-
-	## Idle state during prep phase.
-	STATE_PREP_STANDBY,
-
-	## Idle state during battle phase.
-	STATE_BATTLE_STANDBY,
-
-	## Unit has been selected and is allowed to select a move (or attack).
-	STATE_BATTLE_SELECTING_MOVE,
-
-	## An attack has been selected and is allowed to select a target.
-	STATE_BATTLE_SELECTING_TARGET,
-}
-
-
-## A special flag for ignoring mouse inputs.
-var mouse_alt_mode: bool = false
-
-var state: int = STATE_NONE
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	# we are on a different branch of the tree so we need to make the input
-	# relative to the world by calling make_input_local to get the correct
-	# mouse and viewport calculations.
-	event = Game.battle.world().make_input_local(event)
-	
-	match state:
-		STATE_PREP_STANDBY:
-			handle_input_prep_standby(event)
-		STATE_BATTLE_STANDBY:
-			handle_input_battle_standby(event)
-		STATE_BATTLE_SELECTING_MOVE:
-			handle_input_battle_selecting_move(event)
-		STATE_BATTLE_SELECTING_MOVE:
-			handle_input_battle_selecting_target(event)
-
-
-func handle_input_prep_standby(event: InputEvent) -> void:
-	return
-
-
-func handle_input_battle_standby(event: InputEvent) -> void:
-	return
-
-
-func handle_input_battle_selecting_move(event: InputEvent) -> void:
-	return
-
-
-func handle_input_battle_selecting_target(event: InputEvent) -> void:
-	return
-
-
-
-	if event.is_action("mouse_alt_mode"):
-		mouse_alt_mode = event.is_pressed()
-	elif event.is_action_pressed("up"):
-		pass
-	elif event.is_action_pressed("down"):
-		pass
-	elif event.is_action_pressed("left"):
-		pass
-	elif event.is_action_pressed("right"):
-		pass
-	elif event.is_action_pressed("select_cell"):
-		pass
-	elif event.is_action_pressed("select_unit"):
-		pass
-	elif event.is_action_pressed("select_attack"):
-		pass
-
-
-
-
-enum interactions {
-	start_battle,
-	quit,
-	end,
-	cancel,
-	undo,
-	start_rotate_unit,
-	stop_rotate_unit,
-	start_drag_unit,
-	stop_drag_unit,
-	drag_unit,
-	place_unit,
-	remove_unit,
-	move_pointer,
-	move_cursor,
-	select_cell,
-	select_unit,
-	select_attack,
-	select_target,
-}
-
-# move_up
-# move_down
-# move_left
-# move_right
-# select_cell
-# select_unit
-# select_attack
-
-
 @export var rotation_deadzone := 0.2
 
 @export var interactable: Node
@@ -123,6 +15,7 @@ enum interactions {
 var _selected_units_list: Array[Unit] = []
 var _aimed_target := {}
 
+var _alt_held := false
 var _mouse_input_mode: bool
 
 
@@ -148,16 +41,16 @@ func _exit_tree() -> void:
 	set_battle_remote_unhandled_input_handler(null)
 
 
-func asd(event):
+func _unhandled_input(event: InputEvent):
 	if _is_battle_scene_not_running_workaround():
 		return
 
 	event = Battle.instance().world().make_input_local(event)
 
 	if event is InputEventKey and event.keycode == KEY_ALT:
-		mouse_alt_mode = event.pressed
+		_alt_held = event.pressed
 	
-	if mouse_alt_mode:
+	if _alt_held:
 		get_viewport().set_input_as_handled()
 		return 
 
@@ -212,10 +105,10 @@ func _physics_process(_delta):
 
 func _notification(what) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
-		mouse_alt_mode = false
+		_alt_held = false
 
 	elif what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
-		mouse_alt_mode = false
+		_alt_held = false
 
 
 func set_battle_remote_unhandled_input_handler(node: Node):

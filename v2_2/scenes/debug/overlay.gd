@@ -13,8 +13,7 @@ func _ready():
 	
 	$Timer.timeout.connect(update)
 	$Timer.start()
-
-	visible = OS.is_debug_build()
+	hide()
 
 
 func _input(event: InputEvent) -> void:
