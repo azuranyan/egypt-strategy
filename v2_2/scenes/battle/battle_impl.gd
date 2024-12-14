@@ -61,14 +61,6 @@ func _ready() -> void:
 	BattleEvents.stop_battle_requested.connect(stop_battle)
 	SceneManager.scene_ready.connect(_on_scene_ready)
 
-	if true:
-		
-		_test.call_deferred()
-
-
-func _test() -> void:
-	print('hello world')
-
 
 func save_state() -> Dictionary:
 	# save all the unit states
